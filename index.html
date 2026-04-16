@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="no-js">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>創巢數位 Nest Digital｜用非常規思維解決真正的問題</title>
+    <meta name="description" content="創巢數位 Nest Digital — 軟體開發 × 品牌行銷 × AI應用 × 自動化，一條龍數位成長團隊。用驗證過的工具和流程，幫品牌在正確的地方成長。">
+    <meta property="og:title"       content="創巢數位 Nest Digital｜非常規，才是真解法">
+    <meta property="og:description" content="從軟體開發到行銷一條龍，我們用自己驗證過的工具和流程，在別人覺得不可能的地方找到真正的出口。">
+    <meta property="og:image"       content="https://nestxmedia.com/assets/images/og/index.jpg">
+    <meta property="og:type"        content="website">
+    <meta property="og:url"         content="https://nestxmedia.com/">
+    <link rel="canonical"           href="https://nestxmedia.com/">
+    <link rel="icon"                href="assets/images/brand/icon.png">
+    <link rel="apple-touch-icon"    href="assets/images/brand/icon.png">
+
+    <!-- Schema 結構化資料 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Nest Digital",
+        "alternateName": "創巢數位",
+        "url": "https://nestxmedia.com",
+        "logo": "https://nestxmedia.com/assets/images/brand/icon.png",
+        "description": "軟體開發 × 品牌行銷 × AI應用 × 自動化，用非常規的跳躍思維解決習以為常卻永遠解決不了的問題。",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+886-3-491-2872",
+            "contactType": "customer service",
+            "areaServed": "TW",
+            "availableLanguage": "zh-TW"
+        },
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "中央西路二段268號5樓",
+            "addressLocality": "中壢區",
+            "addressRegion": "桃園市",
+            "addressCountry": "TW"
+        },
+        "sameAs": ["https://line.me/R/ti/p/@604vqsva"]
+    }
+    </script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Exo+2:wght@700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <!-- CSS（順序不得更改）-->
+    <link rel="stylesheet" href="assets/css/tokens.css">
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
+    <link rel="stylesheet" href="assets/css/pages/index.css">
+</head>
+<body class="has-threejs">
+
+    <!-- 星空 canvas（全站固定後層，Three.js 渲染目標） -->
+    <canvas id="starfield-canvas" aria-hidden="true"></canvas>
+
+    <!-- Nav 由 nav.js 動態注入 -->
+
+    <main>
+
+        <!-- ════════════════════════════════════════════════
+             Section 1｜Hero
+        ════════════════════════════════════════════════ -->
+        <section class="hero" aria-labelledby="hero-title">
+
+            <div class="hero__glow" aria-hidden="true"></div>
+
+            <div class="hero__inner">
+
+                <!-- 左側文字區 -->
+                <div class="hero__content">
+
+                    <!-- 品牌 Tag -->
+                    <div class="hero__brand-tag js-hidden">
+                        <span class="tag tag--blue">
+                            <span class="tag__dot"></span>
+                            創巢數位 · Nest Digital
+                        </span>
+                    </div>
+
+                    <!-- 主標題（品牌宣言） -->
+                    <h1 class="hero__title js-hidden" id="hero-title">
+                        <span class="line">用非常規的</span>
+                        <span class="line"><span class="highlight">跳躍思維</span></span>
+                        <span class="line">解決習以為常</span>
+                        <span class="line">卻永遠解決</span>
+                        <span class="line">不了的問題</span>
+                    </h1>
+
+                    <!-- 副標 -->
+                    <p class="hero__subtitle js-hidden">
+                        傳統做法不夠用時，你需要的不是更努力——<br>
+                        而是一個敢用不同方法的團隊。
+                    </p>
+
+                    <!-- CTA 按鈕組 -->
+                    <div class="hero__cta-group js-hidden">
+                        <a href="services.html" class="btn btn--primary">
+                            探索服務
+                            <span class="btn-arrow" aria-hidden="true">→</span>
+                        </a>
+                        <a href="about.html" class="btn btn--ghost">
+                            了解我們
+                            <i class="fas fa-arrow-up-right-from-square" aria-hidden="true" style="font-size:0.75em;"></i>
+                        </a>
+                    </div>
+
+                    <!-- 向下捲動 -->
+                    <div class="hero__scroll-hint js-hidden" aria-hidden="true">
+                        <span class="hero__scroll-hint__line"></span>
+                        <span>往下探索</span>
+                    </div>
+
+                </div>
+
+                <!-- 右側太空人 -->
+                <div class="hero__astronaut" aria-hidden="true">
+                    <!-- Three.js 太空人渲染 canvas -->
+                    <canvas id="astronaut-canvas"></canvas>
+                    <!-- PNG fallback（Three.js 未載入或手機版時顯示） -->
+                    <img
+                        src="assets/images/brand/astronaut_07.png"
+                        alt="太空人插圖"
+                        class="hero__astronaut-fallback"
+                        width="480"
+                        height="480"
+                        loading="eager"
+                    >
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ════════════════════════════════════════════════
+             Section 2｜宣言
+        ════════════════════════════════════════════════ -->
+        <section class="manifesto" aria-label="品牌宣言">
+            <div class="manifesto__line" aria-hidden="true"></div>
+
+            <div class="manifesto__inner">
+                <h2 class="manifesto__big-text f-disp">
+                    <span class="line">非常規，</span>
+                    <span class="line"><span class="accent">才是真解法</span></span>
+                </h2>
+
+                <div class="manifesto__body">
+                    <p>
+                        從軟體開發到行銷一條龍，我們用自己驗證過的工具和流程，在別人覺得不可能的地方，找到真正的出口。不靠包裝，靠真實試過之後的底氣。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ════════════════════════════════════════════════
+             Section 3｜服務星圖（非對稱 Bento）
+        ════════════════════════════════════════════════ -->
+        <section class="services-section" aria-labelledby="services-title">
+            <div class="services-section__inner">
+
+                <div class="section-header">
+                    <p class="section-header__eyebrow" data-reveal>OUR SERVICES</p>
+                    <h2 class="section-header__title" id="services-title" data-reveal data-reveal-delay="0.1">
+                        我們能做的，<span class="accent">比你想的更多</span>
+                    </h2>
+                </div>
+
+                <!-- Bento Grid -->
+                <div class="bento-grid" data-stagger-group="0.10">
+
+                    <!-- A 社群服務 -->
+                    <a href="social.html" class="card bento--a service-card" aria-label="A 社群服務">
+                        <div>
+                            <div class="service-card__icon">
+                                <i class="fas fa-mobile-alt" aria-hidden="true"></i>
+                            </div>
+                            <span class="service-card__label">A — 社群服務</span>
+                            <h3 class="service-card__title">社群經營<br>& 廣告代投</h3>
+                            <p class="service-card__desc">幫你建立能長期燃燒的社群引擎，不只代發文。</p>
+                        </div>
+                        <span class="service-card__arrow">
+                            了解更多 <span aria-hidden="true">→</span>
+                        </span>
+                    </a>
+
+                    <!-- C AI 虛擬網紅（Featured） -->
+                    <a href="virtual.html" class="card bento--c service-card" aria-label="C AI 虛擬網紅（精選）">
+                        <div>
+                            <div class="service-card__icon" style="background:rgba(23,54,245,0.2);border-color:rgba(23,54,245,0.5);">
+                                <i class="fas fa-user-astronaut" aria-hidden="true"></i>
+                            </div>
+                            <span class="service-card__label">C — AI 虛擬網紅</span>
+                            <h3 class="service-card__title">THE 2ND LIFE<br>OF BRAND</h3>
+                            <p class="service-card__desc">我們做的不是虛擬人，而是可被長期經營的角色系統。情緒穩定、形象可控、精準導流。</p>
+                        </div>
+                        <span class="service-card__arrow">
+                            了解更多 <span aria-hidden="true">→</span>
+                        </span>
+                    </a>
+
+                    <!-- B 網站架設 -->
+                    <a href="website.html" class="card bento--b-web service-card" aria-label="B 網站架設">
+                        <div>
+                            <div class="service-card__icon">
+                                <i class="fas fa-laptop-code" aria-hidden="true"></i>
+                            </div>
+                            <span class="service-card__label">B — 開發</span>
+                            <h3 class="service-card__title">網站架設</h3>
+                            <p class="service-card__desc">一頁式到企業電商，讓你說清楚你是誰。</p>
+                        </div>
+                        <span class="service-card__arrow">
+                            了解更多 <span aria-hidden="true">→</span>
+                        </span>
+                    </a>
+
+                    <!-- B 客製化系統 -->
+                    <a href="system.html" class="card bento--b-sys service-card" aria-label="B 客製化系統開發">
+                        <div>
+                            <div class="service-card__icon">
+                                <i class="fas fa-cogs" aria-hidden="true"></i>
+                            </div>
+                            <span class="service-card__label">B — 開發</span>
+                            <h3 class="service-card__title">客製系統<br>開發</h3>
+                            <p class="service-card__desc">把重複性人力換成系統，讓流程自動化。</p>
+                        </div>
+                        <span class="service-card__arrow">
+                            了解更多 <span aria-hidden="true">→</span>
+                        </span>
+                    </a>
+
+                    <!-- D 顧問服務（跨兩行） -->
+                    <a href="consultant.html" class="card bento--d service-card" aria-label="D 顧問服務">
+                        <div>
+                            <div class="service-card__icon">
+                                <i class="fas fa-magnifying-glass-chart" aria-hidden="true"></i>
+                            </div>
+                            <span class="service-card__label">D — 顧問服務</span>
+                            <h3 class="service-card__title">產業顧問<br>導入</h3>
+                            <p class="service-card__desc">大部分公司的問題，不在執行力，在診斷。我們跨產業歷練，AI 輔助，帶你找到卡關在哪。</p>
+                        </div>
+                        <div style="margin-top:var(--sp-sm);">
+                            <span class="tag tag--yellow" style="font-size:0.65rem;">詢價制</span>
+                        </div>
+                        <span class="service-card__arrow">
+                            了解更多 <span aria-hidden="true">→</span>
+                        </span>
+                    </a>
+
+                    <!-- E 跳動E投放（跨兩欄） -->
+                    <a href="tiktok.html" class="card bento--e service-card" aria-label="E 跳動E投放">
+                        <div style="display:flex;gap:var(--sp-md);align-items:flex-start;flex-wrap:wrap;">
+                            <div>
+                                <div class="service-card__icon" style="background:rgba(255,199,9,0.08);border-color:rgba(255,199,9,0.3);color:var(--c-yellow);">
+                                    <i class="fab fa-tiktok" aria-hidden="true"></i>
+                                </div>
+                                <span class="service-card__label" style="color:var(--c-yellow);">E — 自營平台</span>
+                                <h3 class="service-card__title">跳動E投放</h3>
+                            </div>
+                            <p class="service-card__desc" style="max-width:340px;padding-top:0.25rem;">
+                                台灣個人戶也能投 TikTok 廣告——我們發現市場缺口，直接做了一個平台解決它。免營業登記，最快 24 小時開通。
+                            </p>
+                        </div>
+                        <span class="service-card__arrow">
+                            前往平台 <span aria-hidden="true">→</span>
+                        </span>
+                    </a>
+
+                </div>
+
+                <!-- F 補充說明 -->
+                <div style="margin-top:var(--sp-md);text-align:right;" data-reveal>
+                    <a href="growth.html" class="btn btn--ghost" style="font-size:var(--fs-sm);">
+                        另有 F 社群增長服務
+                        <span class="btn-arrow" aria-hidden="true">→</span>
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ════════════════════════════════════════════════
+             Section 4｜品牌故事預告
+        ════════════════════════════════════════════════ -->
+        <section class="brand-preview" aria-labelledby="brand-story-title">
+
+            <div class="brand-preview__inner">
+
+                <div class="brand-preview__left">
+                    <h2 class="big-label" id="brand-story-title">
+                        <em>不正常</em><br>人類的<br>故事
+                    </h2>
+                </div>
+
+                <div class="brand-preview__right">
+                    <p>
+                        兩個非本科系的人，對軟體資訊有著幾乎偏執的著迷。不是轉行，是著迷。從沒進過資訊科系的課堂，卻對「未來一定是資訊網路的主導時代」這件事深信不疑，於是義無反顧地投入。
+                    </p>
+                    <p>
+                        「不正常人類軟體開發」這個名字，不是標新立異，是一種直白的世界觀宣示：這個世界有太多問題，大部分人習以為常、視為正常，卻永遠解決不了。我們就是那種不願意接受「這樣就好」的人……
+                    </p>
+                    <div class="fade-mask" aria-hidden="true"></div>
+                    <a href="about.html" class="btn btn--ghost" style="margin-top:var(--sp-md);">
+                        看完整故事
+                        <span class="btn-arrow" aria-hidden="true">→</span>
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ════════════════════════════════════════════════
+             Section 5｜終點 CTA
+        ════════════════════════════════════════════════ -->
+        <section class="final-cta" aria-labelledby="cta-title">
+
+            <div class="final-cta__glow" aria-hidden="true"></div>
+
+            <div class="final-cta__inner">
+                <span class="tag tag--blue">
+                    <span class="tag__dot"></span>
+                    準備好了嗎
+                </span>
+
+                <h2 class="final-cta__title" id="cta-title">
+                    你的下一步，<br>從這裡開始
+                </h2>
+
+                <p class="final-cta__subtitle">
+                    我們習慣從亂中找出路，所以不怕你說不清楚。
+                </p>
+
+                <div class="final-cta__btns">
+                    <a href="contact.html" class="btn btn--yellow">
+                        立即聯絡
+                        <span class="btn-arrow" aria-hidden="true">→</span>
+                    </a>
+                    <a href="services.html" class="btn btn--ghost">
+                        查看所有服務
+                    </a>
+                </div>
+
+                <p class="final-cta__coords" aria-label="聯絡資訊">
+                    LINE @604vqsva &nbsp;·&nbsp; 03-4912872 &nbsp;·&nbsp; 桃園市中壢區
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- ════════════════════════════════════════════════
+         頁尾
+    ════════════════════════════════════════════════ -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <div class="site-footer__inner">
+                <div class="site-footer__brand">
+                    創巢數位 &nbsp;<span style="opacity:.4;">·</span>&nbsp; Nest Digital
+                </div>
+                <nav class="site-footer__links" aria-label="頁尾連結">
+                    <a href="about.html">關於我們</a>
+                    <a href="services.html">服務項目</a>
+                    <a href="news.html">最新消息</a>
+                    <a href="contact.html">聯絡我們</a>
+                </nav>
+                <p class="site-footer__copy">
+                    © 2024–2026 Nest Digital. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Scripts（順序不得更改）-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script src="assets/js/pages/index.js"></script>
+
+</body>
+</html>

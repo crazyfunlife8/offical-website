@@ -1,0 +1,168 @@
+/* ============================================================
+   animations.css — 所有 @keyframes 統一放這裡
+   創巢數位 Nest Digital | 版本 redesign-v1
+   ============================================================ */
+
+/* ─── CSS 星空漂移（三層不同速度與方向，製造視差感）─── */
+/* 使用 background-position 而非 transform，確保 tiling 無縫 */
+
+@keyframes stars-drift-s {
+    /* 小星：斜向右下，慢 */
+    from { background-position: 0 0; }
+    to   { background-position: 340px 200px; }
+}
+
+@keyframes stars-drift-m {
+    /* 中星：斜向左下，中速 */
+    from { background-position: 0 0; }
+    to   { background-position: -260px 180px; }
+}
+
+@keyframes stars-drift-l {
+    /* 亮點星：幾乎垂直向上，極慢 */
+    from { background-position: 0 0; }
+    to   { background-position: 80px -360px; }
+}
+
+/* ─── 品牌 dot 脈衝 ─── */
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(1.4); }
+}
+
+/* ─── 星點閃爍 ─── */
+@keyframes twinkle {
+    0%, 100% { opacity: 0.2; }
+    50%       { opacity: 1; }
+}
+
+/* ─── 浮動 ─── */
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33%       { transform: translateY(-18px) rotate(2deg); }
+    66%       { transform: translateY(-8px) rotate(-1.5deg); }
+}
+
+/* ─── 雷達訊號擴散 ─── */
+@keyframes radar-ring {
+    0%   { transform: scale(0.5); opacity: 0.8; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* ─── 掃描線 ─── */
+@keyframes scan-line {
+    0%   { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+}
+
+/* ─── 文字閃爍（終端機感） ─── */
+@keyframes cursor-blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+}
+
+/* ─── 光暈脈衝 ─── */
+@keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(23, 54, 245, 0.3); }
+    50%       { box-shadow: 0 0 50px rgba(23, 54, 245, 0.7); }
+}
+
+/* ─── 黃色光暈脈衝 ─── */
+@keyframes glow-yellow {
+    0%, 100% { box-shadow: 0 0 20px rgba(255, 199, 9, 0.3); }
+    50%       { box-shadow: 0 0 50px rgba(255, 199, 9, 0.7); }
+}
+
+/* ─── 進場 fade-up（GSAP 外也可直接用） ─── */
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─── 進場 fade-in ─── */
+@keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ─── 水平滑入（從左） ─── */
+@keyframes slide-in-left {
+    from {
+        opacity: 0;
+        transform: translateX(-40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ─── 水平滑入（從右） ─── */
+@keyframes slide-in-right {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ─── scale 進場 ─── */
+@keyframes scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.85);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ─── 齒輪旋轉（system.html） ─── */
+@keyframes gear-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+@keyframes gear-spin-reverse {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(-360deg); }
+}
+
+/* ─── 光暈放射（hero 背景） ─── */
+@keyframes radiate {
+    0%, 100% {
+        opacity: 0.35;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: translate(-50%, -50%) scale(1.08);
+    }
+}
+
+/* ─── Hero 文字進場輔助類（用於 no-JS fallback） ─── */
+.anim-fade-up {
+    animation: fade-up 0.8s var(--t-slow) both;
+}
+
+.anim-fade-in {
+    animation: fade-in 0.6s var(--t-base) both;
+}
+
+/* ─── 通用動畫延遲輔助 ─── */
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.delay-5 { animation-delay: 0.5s; }
+.delay-6 { animation-delay: 0.6s; }

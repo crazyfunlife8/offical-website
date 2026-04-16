@@ -1,0 +1,209 @@
+/* ============================================================
+   base.css — Reset + 全站基礎排版
+   創巢數位 Nest Digital | 版本 redesign-v1
+   ============================================================ */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--f-sans);
+    background-color: var(--c-black);
+    color: var(--c-white);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+    /* 星空 canvas 固定在後層，body 需 position:relative */
+    position: relative;
+}
+
+/* ─── Three.js canvas（僅 index.html，body.has-threejs）─── */
+#starfield-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: var(--z-stars);
+    pointer-events: none;
+}
+
+/* ─── CSS 星空（其他頁全站共用，由 nav.js 注入 DOM）────── */
+#css-starfield {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-stars);
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* 首頁已有 Three.js，隱藏 CSS 星空 */
+body.has-threejs #css-starfield {
+    display: none;
+}
+
+.css-stars {
+    position: absolute;
+    inset: -10%; /* 稍微超出邊界，避免 translate 動畫露白邊 */
+    width: 120%;
+    height: 120%;
+    will-change: transform; /* GPU 合成層 */
+}
+
+/* ── 層一：細密小星（高密度、慢速斜移）─── */
+.css-stars--s {
+    background-image:
+        radial-gradient(circle at 11% 24%, rgba(var(--c-white-rgb), 0.85) 1px,   transparent 1px),
+        radial-gradient(circle at 67%  8%, rgba(var(--c-white-rgb), 0.60) 1px,   transparent 1px),
+        radial-gradient(circle at 39% 55%, rgba(var(--c-blue-rgb),  0.70) 1px,   transparent 1px),
+        radial-gradient(circle at 82% 43%, rgba(var(--c-white-rgb), 0.50) 0.8px, transparent 0.8px),
+        radial-gradient(circle at 25% 88%, rgba(var(--c-white-rgb), 0.75) 1px,   transparent 1px),
+        radial-gradient(circle at 55% 72%, rgba(var(--c-blue-rgb),  0.50) 0.8px, transparent 0.8px),
+        radial-gradient(circle at 90% 62%, rgba(var(--c-white-rgb), 0.60) 1px,   transparent 1px),
+        radial-gradient(circle at  3% 45%, rgba(var(--c-white-rgb), 0.70) 0.8px, transparent 0.8px),
+        radial-gradient(circle at 48% 33%, rgba(var(--c-white-rgb), 0.55) 0.8px, transparent 0.8px),
+        radial-gradient(circle at 74% 90%, rgba(var(--c-blue-rgb),  0.45) 1px,   transparent 1px);
+    background-size: 340px 340px;
+    animation: stars-drift-s 100s linear infinite;
+    opacity: 0.8;
+}
+
+/* ── 層二：中型星（中密度、反向緩移）─── */
+.css-stars--m {
+    background-image:
+        radial-gradient(circle at 20% 30%, rgba(var(--c-white-rgb), 0.90) 1.5px, transparent 1.5px),
+        radial-gradient(circle at 75% 15%, rgba(var(--c-blue-rgb),  0.80) 1.5px, transparent 1.5px),
+        radial-gradient(circle at 45% 70%, rgba(var(--c-white-rgb), 0.70) 1.5px, transparent 1.5px),
+        radial-gradient(circle at 88% 80%, rgba(var(--c-yellow-rgb),0.40) 1.5px, transparent 1.5px),
+        radial-gradient(circle at 10% 65%, rgba(var(--c-white-rgb), 0.65) 1px,   transparent 1px),
+        radial-gradient(circle at 60% 45%, rgba(var(--c-blue-rgb),  0.55) 1px,   transparent 1px);
+    background-size: 520px 520px;
+    animation: stars-drift-m 150s linear infinite;
+    opacity: 0.65;
+}
+
+/* ── 層三：亮點星（低密度、大範圍緩轉）─── */
+.css-stars--l {
+    background-image:
+        radial-gradient(circle at 30% 20%, rgba(var(--c-white-rgb), 0.95) 2px,   transparent 2px),
+        radial-gradient(circle at 70% 50%, rgba(var(--c-white-rgb), 0.90) 2px,   transparent 2px),
+        radial-gradient(circle at 50% 80%, rgba(var(--c-blue-rgb),  0.85) 2px,   transparent 2px),
+        radial-gradient(circle at 85% 10%, rgba(var(--c-yellow-rgb),0.50) 2px,   transparent 2px),
+        radial-gradient(circle at 15% 90%, rgba(var(--c-white-rgb), 0.80) 1.5px, transparent 1.5px),
+        radial-gradient(circle at 92% 40%, rgba(var(--c-white-rgb), 0.70) 1.5px, transparent 1.5px);
+    background-size: 720px 720px;
+    animation: stars-drift-l 220s linear infinite;
+    opacity: 0.55;
+}
+
+/* ─── 全站內容容器 ─── */
+.container {
+    width: 100%;
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 var(--sec-px);
+}
+
+/* ─── Typography ─── */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--f-sans);
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+h1 { font-size: clamp(var(--fs-3xl), 6vw, var(--fs-5xl)); }
+h2 { font-size: clamp(var(--fs-2xl), 4vw, var(--fs-4xl)); }
+h3 { font-size: clamp(var(--fs-xl),  3vw, var(--fs-3xl)); }
+h4 { font-size: var(--fs-lg); }
+
+p {
+    color: var(--c-muted);
+    line-height: 1.75;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+ul, ol {
+    list-style: none;
+}
+
+/* ─── 英文顯示字體套用輔助 ─── */
+.f-disp {
+    font-family: var(--f-disp);
+    font-weight: 900;
+}
+
+.f-mono {
+    font-family: var(--f-mono);
+}
+
+/* ─── 通用分區樣式 ─── */
+section {
+    position: relative;
+    z-index: var(--z-content);
+}
+
+/* ─── 通用 visible 狀態（GSAP 進場前隱藏，JS 完成後由 GSAP 控制）
+   只在 .js class 存在時才隱藏，確保 JS 載入失敗時內容仍可見 ─── */
+.js [data-reveal] {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+/* Hero 入場前預隱藏（僅 .js 存在時），取代 HTML inline style="opacity:0" */
+.js .js-hidden {
+    opacity: 0;
+}
+
+/* ─── 選取色 ─── */
+::selection {
+    background: var(--c-blue);
+    color: var(--c-white);
+}
+
+/* ─── 滾動條 ─── */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--c-black);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--c-navy);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--c-blue);
+}
+
+/* ─── 手機響應式基礎 ─── */
+@media (max-width: 900px) {
+    :root {
+        --sec-px: 1.25rem;
+    }
+
+    h1 { font-size: clamp(2rem, 9vw, 3.5rem); }
+    h2 { font-size: clamp(1.75rem, 7vw, 2.5rem); }
+}
