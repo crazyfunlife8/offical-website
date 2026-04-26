@@ -95,14 +95,49 @@
         onScroll(); // 初始執行一次
     }
 
-    // ─── 初始化 ───────────────────────────────────────────────
-    document.addEventListener('DOMContentLoaded', function () {
+    // ─── 磁性按鈕（全站共用，元素需帶 .btn--magnetic） ─────────
+    // 游標靠近時按鈕往游標偏移，離開時平滑歸零
+    function initMagneticButton() {
+        const buttons = document.querySelectorAll('.btn--magnetic');
+        if (!buttons.length) return;
+
+        const STRENGTH = 0.25;     // 偏移強度：滑鼠位移 × 此值
+        const MAX_SHIFT = 8;       // 最大偏移（px）
+
+        buttons.forEach((btn) => {
+            function onMove(e) {
+                const rect = btn.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                let dx = (e.clientX - cx) * STRENGTH;
+                let dy = (e.clientY - cy) * STRENGTH;
+                // clamp
+                dx = Math.max(-MAX_SHIFT, Math.min(MAX_SHIFT, dx));
+                dy = Math.max(-MAX_SHIFT, Math.min(MAX_SHIFT, dy));
+                btn.style.transform = `translate(${dx}px, ${dy}px)`;
+            }
+            function onLeave() {
+                btn.style.transform = '';
+            }
+            btn.addEventListener('mousemove', onMove);
+            btn.addEventListener('mouseleave', onLeave);
+        });
+    }
+
+    // ─── 初始化（readyState 防禦，避免 DOMContentLoaded 已提前觸發）────
+    function init() {
         initNavScroll();
-        // Scroll reveal 延遲一幀，確保 nav.js 注入完成
+        initMagneticButton();
         requestAnimationFrame(function () {
             initScrollReveal();
             initStaggerReveal();
         });
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 
 })();

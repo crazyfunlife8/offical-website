@@ -13,43 +13,72 @@
     --c-muted:   rgba(255, 255, 255, 0.55);
     --c-accent:  var(--c-yellow); /* 全站預設強調色；各頁可在 pages/[page].css 頂部 override */
 
+    /* ─── 天文觀測站色票（2026-04-18 新規範，比例 88/8/3/1） ─── */
+    --c-stellar: #e8f0ff;   /* 星白：主要文字與星點（8%） */
+    --c-cyan:    #00c8ff;   /* 冷電藍：Hover / 連結 / 軌道環（3%） */
+    --c-amber:   #f5a623;   /* 琥珀金：全站僅單一位置畫龍點睛（1%） */
+
     /* ─── RGB Channels（供 rgba() 帶透明度使用，保證跟 Token 顏色同步） ─── */
     /* 若調整上方色碼，必須同步更新下方對應的 RGB 值 */
-    --c-black-rgb:  5, 13, 46;      /* #050d2e */
-    --c-blue-rgb:   23, 54, 245;    /* #1736F5 */
-    --c-navy-rgb:   11, 26, 122;    /* #0b1a7a */
-    --c-yellow-rgb: 255, 199, 9;    /* #FFC709 */
-    --c-white-rgb:  255, 255, 255;  /* #FFFFFF */
+    --c-black-rgb:   5, 13, 46;      /* #050d2e */
+    --c-blue-rgb:    23, 54, 245;    /* #1736F5 */
+    --c-navy-rgb:    11, 26, 122;    /* #0b1a7a */
+    --c-yellow-rgb:  255, 199, 9;    /* #FFC709 */
+    --c-white-rgb:   255, 255, 255;  /* #FFFFFF */
+    --c-stellar-rgb: 232, 240, 255;  /* #e8f0ff */
+    --c-cyan-rgb:    0, 200, 255;    /* #00c8ff */
+    --c-amber-rgb:   245, 166, 35;   /* #f5a623 */
 
     /* ─── Glass / Overlay ─── */
-    --glass-bg:       rgba(23, 54, 245, 0.08);
-    --glass-border:   rgba(23, 54, 245, 0.3);
-    --glass-blur:     12px;
-    --glass-bg-hover: rgba(23, 54, 245, 0.16);
+    --glass-bg:       rgba(23, 54, 245, 0.12);
+    --glass-border:   rgba(23, 54, 245, 0.4);
+    --glass-blur:     16px;
+    --glass-bg-hover: rgba(23, 54, 245, 0.22);
 
-    /* ─── Typography ─── */
-    --f-sans: 'Noto Sans TC', sans-serif;
-    --f-disp: 'Exo 2', sans-serif;
-    --f-mono: 'IBM Plex Mono', monospace;
+    /* ─── Typography（2026-04-19 Q2 決議：B 半替換） ─── */
+    --f-sans:  'Noto Sans TC', sans-serif;                              /* 全站中文內文 */
+    --f-serif: 'Fraunces', serif;                                       /* 英文大標／副標／引言，opsz+wght+SOFT 三軸 */
+    --f-serif-cjk: 'Chiron Sung HK WS', 'Noto Serif TC', 'Songti TC', serif;
+                                                                        /* 中文大標／宣言，港產明朝活字；與 Fraunces 英宋對位 */
+    --f-mono:  'JetBrains Mono', monospace;                             /* 座標文字、技術細節、數據 */
+    /* --f-bebas 於 2026-04-19 移除（Fraunces 接手所有英文大字，含 Manifesto UNCONVENTIONAL） */
 
-    /* ─── Font Sizes ─── */
-    --fs-xs:   0.75rem;   /* 12px */
-    --fs-sm:   0.875rem;  /* 14px */
-    --fs-base: 1rem;      /* 16px */
-    --fs-md:   1.125rem;  /* 18px */
-    --fs-lg:   1.375rem;  /* 22px */
-    --fs-xl:   1.75rem;   /* 28px */
-    --fs-2xl:  2.25rem;   /* 36px */
-    --fs-3xl:  3rem;      /* 48px */
-    --fs-4xl:  4rem;      /* 64px */
-    --fs-5xl:  5.5rem;    /* 88px */
+    /* ─── Font Sizes（1.333 Perfect Fourth 階梯，基底 16px） ─── */
+    --fs-xs:   0.75rem;     /* 12px */
+    --fs-sm:   0.875rem;    /* 14px */
+    --fs-base: 1rem;        /* 16px */
+    --fs-md:   1.125rem;    /* 18px */
+    --fs-lg:   1.3125rem;   /* 21px — 16 × 1.333 */
+    --fs-xl:   1.75rem;     /* 28px — 16 × 1.333² */
+    --fs-2xl:  2.375rem;    /* 38px — 16 × 1.333³ */
+    --fs-3xl:  3.125rem;    /* 50px — 16 × 1.333⁴ */
+    --fs-4xl:  4.1875rem;   /* 67px — 16 × 1.333⁵ */
+    --fs-5xl:  5.625rem;    /* 90px — 16 × 1.333⁶ */
 
-    /* ─── Spacing ─── */
-    --sp-xs:  0.5rem;
-    --sp-sm:  1rem;
-    --sp-md:  2rem;
-    --sp-lg:  4rem;
-    --sp-xl:  7rem;
+    /* ─── Baseline Grid（8pt 基線 + 4pt 半步，所有垂直距離必須為 4 的倍數） ─── */
+    --grid-base: 8px;
+    --grid-half: 4px;
+
+    /* ─── Spacing（三節奏系統，視覺元素庫 v1.0） ───
+       緊（t）：同一語意群之間　中（m）：區塊內分段　寬（w）：區塊之間
+       新代碼以 --sp-t/m/w 為準；以下 xs–xl 保留為既有元件相容別名
+    */
+    --sp-t1:  0.5rem;    /* 8px  */
+    --sp-t2:  1rem;      /* 16px */
+    --sp-t3:  1.5rem;    /* 24px */
+    --sp-m1:  3rem;      /* 48px */
+    --sp-m2:  4rem;      /* 64px */
+    --sp-m3:  5rem;      /* 80px */
+    --sp-w1:  7.5rem;    /* 120px */
+    --sp-w2:  10rem;     /* 160px */
+    --sp-w3:  12.5rem;   /* 200px */
+
+    /* 舊別名（既有元件相容，新代碼改用 --sp-t/m/w） */
+    --sp-xs:  0.5rem;    /* = --sp-t1 */
+    --sp-sm:  1rem;      /* = --sp-t2 */
+    --sp-md:  2rem;      /* 32px */
+    --sp-lg:  4rem;      /* = --sp-m2 */
+    --sp-xl:  7rem;      /* ≈ --sp-w1 */
 
     /* ─── Layout ─── */
     --max-w:       1200px;
@@ -64,9 +93,35 @@
     --t-slow:   0.5s ease;
 
     /* ─── Shadows ─── */
-    --shadow-card:  0 4px 32px rgba(23, 54, 245, 0.18);
-    --shadow-glow:  0 0 32px rgba(23, 54, 245, 0.45);
-    --shadow-yellow: 0 0 24px rgba(255, 199, 9, 0.4);
+    --shadow-card:   0 4px 40px rgba(23, 54, 245, 0.28);
+    --shadow-glow:   0 0 60px rgba(23, 54, 245, 0.65);
+    --shadow-yellow: 0 0 40px rgba(255, 199, 9, 0.5);
+
+    /* ─── 光與影的雕刻（Text Sculpt Tokens，2026-04-18 新增） ───
+       目的：讓關鍵文字有「被光雕出來」而非「貼上去」的立體感
+       用法：套 .text-sculpted 類別或直接 text-shadow: var(--ts-sculpt)
+    */
+    /* 浮雕（凸起）：上方高光 + 下方陰影 */
+    --ts-emboss:
+        0 1px 0 rgba(255, 255, 255, 0.15),
+        0 -1px 0 rgba(0, 0, 0, 0.35);
+    /* 陰刻（凹入）：上方陰影 + 下方高光，與浮雕反向 */
+    --ts-deboss:
+        0 -1px 0 rgba(255, 255, 255, 0.12),
+        0 1px 1px rgba(0, 0, 0, 0.45);
+    /* 雕刻（主力）：浮雕層 + 極微暗 halo，讓字與深空背景咬合 */
+    --ts-sculpt:
+        0 1px 0 rgba(255, 255, 255, 0.10),
+        0 -1px 1px rgba(0, 0, 0, 0.40),
+        0 0 24px rgba(232, 240, 255, 0.06);
+
+    /* ─── 內凹陰影（Inset Shadow Tokens，按鈕與關鍵容器用） ─── */
+    --shadow-inset:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.35);
+    --shadow-inset-strong:
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.50);
 
     /* ─── Z-index ─── */
     --z-stars:   0;

@@ -7,9 +7,19 @@
 (function () {
     'use strict';
 
-    // matchMedia 取代靜態寬度快照，可響應 resize / orientation change
+    /* ════════════════════════════════════════════════════════
+       DESIGN_MODE（2026-04-19 靜態設計凍結開關）
+       true  → 關閉所有進場 / 捲動驅動動畫（L2 + L3），
+               保留 L1 環境（Three.js 星場 / 太空人 / 黑洞）
+               讓 CSS 改動不被 GSAP inline style 蓋掉，純靜態驗收。
+       false → 正常全部動畫啟用。
+       ════════════════════════════════════════════════════════ */
+    const DESIGN_MODE = true;
+
+    // matchMedia 取代靜態寬度快照，let 允許 resize 時更新
     const mobileQuery = window.matchMedia('(max-width: 900px)');
-    const IS_MOBILE   = mobileQuery.matches;
+    let IS_MOBILE     = mobileQuery.matches;
+    mobileQuery.addEventListener('change', (e) => { IS_MOBILE = e.matches; });
 
     /* ════════════════════════════════════════════════════════
        1. Three.js 星空粒子場（全站 canvas，手機跳過）
@@ -17,99 +27,404 @@
 
     function initStarfield() {
         if (typeof THREE === 'undefined') return;
-        if (IS_MOBILE) return; // 效能邊界規則
+        if (IS_MOBILE) return;
+        /* ── 黑洞漩渦星場 ──────────────────────────────────────────
+           概念：主視覺中心是黑洞深淵，所有星辰以螺旋軌跡被吸入
+           技術：極座標系 (r, θ) 每幀更新 → 轉為 XY 位置
+                 sizeAttenuation：近心熾熱大星 / 遠處細密小星
+                 滾動加速：旋轉 ×17、拉力 ×60
+        ═════════════════════════════════════════════════════════ */
 
         const canvas = document.getElementById('starfield-canvas');
         if (!canvas) return;
 
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+        // DESIGN_MODE：preserveDrawingBuffer: true，讓單幀星場永久保留在緩衝區
+        // （否則 WebGL 在 composite 後清空 buffer，畫面會變全黑）
+        const renderer = new THREE.WebGLRenderer({
+            canvas,
+            alpha: true,
+            antialias: false,
+            preserveDrawingBuffer: DESIGN_MODE,
+        });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.sortObjects = false;
 
         const scene  = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
-        camera.position.z = 800;
+        // 鏡頭正面朝向 z=0 平面（黑洞所在面），FOV 50°
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = 4;
 
-        // ── 星星粒子 ──
-        const COUNT      = 2000;
-        const geometry   = new THREE.BufferGeometry();
-        const positions  = new Float32Array(COUNT * 3);
-        const colors     = new Float32Array(COUNT * 3);
-        const sizes      = new Float32Array(COUNT);
+        // ── 紋理工具 ──────────────────────────────────────────────
 
-        // 品牌色系：白 + 品牌藍淡化 + 黃點綴
-        const PALETTE = [
-            new THREE.Color('#ffffff'),
-            new THREE.Color('#ffffff'),
-            new THREE.Color('#6b8fff'),
-            new THREE.Color('#9db4ff'),
-            new THREE.Color('#FFC709'),
-        ];
-
-        for (let i = 0; i < COUNT; i++) {
-            const i3 = i * 3;
-            positions[i3]     = (Math.random() - 0.5) * 2400;
-            positions[i3 + 1] = (Math.random() - 0.5) * 1400;
-            positions[i3 + 2] = (Math.random() - 0.5) * 1200;
-
-            const col = PALETTE[Math.floor(Math.random() * PALETTE.length)];
-            colors[i3]     = col.r;
-            colors[i3 + 1] = col.g;
-            colors[i3 + 2] = col.b;
-
-            sizes[i] = Math.random() * 2.2 + 0.4;
+        function makeStarTex() {
+            const sz = 32, cv = document.createElement('canvas');
+            cv.width = cv.height = sz;
+            const ctx = cv.getContext('2d');
+            const g = ctx.createRadialGradient(sz/2,sz/2,0,sz/2,sz/2,sz/2);
+            g.addColorStop(0,    'rgba(255,255,255,1.0)');
+            g.addColorStop(0.12, 'rgba(255,255,255,0.85)');
+            g.addColorStop(0.45, 'rgba(255,255,255,0.12)');
+            g.addColorStop(1.0,  'rgba(255,255,255,0.0)');
+            ctx.fillStyle = g; ctx.fillRect(0,0,sz,sz);
+            return new THREE.CanvasTexture(cv);
         }
 
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
-        geometry.setAttribute('size',     new THREE.BufferAttribute(sizes, 1));
+        // 黑洞虛空已改由 CSS #blackhole 處理（radial-gradient，無色階問題）
 
-        // 圓形粒子材質
-        const material = new THREE.PointsMaterial({
-            size:           1.8,
-            vertexColors:   true,
-            transparent:    true,
-            opacity:        0.85,
-            sizeAttenuation: true,
-            blending:       THREE.AdditiveBlending,
-            depthWrite:     false,
+        // ── 動態螺旋星場（ShaderMaterial → per-vertex 可變大小）──
+
+        const COUNT    = 6500;
+        const R_MIN    = 0.42;         // 事件視界半徑
+        const SPIRAL_K = 0.42;
+        const TILT     = Math.PI / 12;  // +15°，與 CSS 斜帶同向
+        const COS_T = Math.cos(TILT), SIN_T = Math.sin(TILT); // 預先計算，全函式共用
+
+        // 四色群各自的軌道帶 [rMin, rMax]
+        // 內圈熾熱金 → 外圈冷白，色彩即深度語言
+        const ORBITAL_BANDS = [
+            [0.42, 2.0],  // 琥珀金 15%：最近深淵
+            [1.2,  3.0],  // 青藍   15%：中內層
+            [1.8,  4.0],  // 紫羅蘭 30%：中層
+            [2.5,  5.5],  // 純白   40%：最遠外圍
+        ];
+
+        // starData[i*4] = [ r, theta, zOffset, baseSize ]
+        const starData  = new Float32Array(COUNT * 4);
+        // starType: 0=琥珀金 1=青藍 2=紫羅蘭 3=純白
+        const starType   = new Uint8Array(COUNT);
+        // starBright：每顆星的本質亮度係數（冪次分布，固定不變）
+        const starBright = new Float32Array(COUNT);
+        const positions = new Float32Array(COUNT * 3);
+        const aColors   = new Float32Array(COUNT * 3);
+        const aSizes    = new Float32Array(COUNT);
+
+        function spawnStar(i) {
+            const i4 = i * 4;
+            // 先定色群，再從該群的軌道帶取 r（色彩 = 軌道位置）
+            const tr   = Math.random();
+            const type = tr < 0.15 ? 0 : tr < 0.30 ? 1 : tr < 0.60 ? 2 : 3;
+            starType[i] = type;
+            const [rMin, rMax] = ORBITAL_BANDS[type];
+            const r = Math.sqrt(rMin*rMin + Math.random()*(rMax*rMax - rMin*rMin));
+
+            // 螺旋臂：95% 緊貼臂線（清晰光流），5% 漫散星際塵
+            let theta;
+            if (Math.random() < 0.95) {
+                const arm    = Math.floor(Math.random() * 2) * Math.PI + TILT;
+                const spread = (Math.random() - 0.5) * 0.08; // 極窄臂寬 → 清晰光流線
+                theta = arm - Math.log(r + 0.1) * SPIRAL_K * 3.5 + spread;
+            } else {
+                theta = Math.random() * Math.PI * 2;
+            }
+            starData[i4]     = r;
+            starData[i4 + 1] = theta;
+            starData[i4 + 2] = (Math.random() - 0.5) * 0.22;  // z 微深度（保留臂結構）
+            // 冪次分布：55% 微塵 / 27% 小星 / 14% 中星 / 4% 亮星錨點
+            const u = Math.random();
+            const sz = u < 0.55 ? 0.002 + Math.random() * 0.003
+                     : u < 0.82 ? 0.005 + Math.random() * 0.007
+                     : u < 0.96 ? 0.013 + Math.random() * 0.010
+                     :            0.026 + Math.random() * 0.014;
+            starData[i4 + 3] = sz;
+            // B：本質亮度（固定冪次分布，決定這顆星的自身發光強度）
+            // 58% 超暗微塵 → 25% 中暗 → 14% 中等 → 3% 亮錨點
+            const bv = Math.random();
+            starBright[i] = bv < 0.58 ? 0.08 + Math.random() * 0.20
+                          : bv < 0.83 ? 0.32 + Math.random() * 0.26
+                          : bv < 0.97 ? 0.62 + Math.random() * 0.23
+                          :              0.88 + Math.random() * 0.12;
+        }
+        for (let i = 0; i < COUNT; i++) spawnStar(i);
+
+        const geo      = new THREE.BufferGeometry();
+        const posAttr  = new THREE.BufferAttribute(positions, 3);
+        const colAttr  = new THREE.BufferAttribute(aColors,   3);
+        const szAttr   = new THREE.BufferAttribute(aSizes,    1);
+        posAttr.setUsage(THREE.DynamicDrawUsage);
+        colAttr.setUsage(THREE.DynamicDrawUsage);
+        szAttr.setUsage(THREE.DynamicDrawUsage);
+        geo.setAttribute('position', posAttr);
+        geo.setAttribute('aColor',   colAttr);
+        geo.setAttribute('aSize',    szAttr);
+
+        // ShaderMaterial：vertex 讀取 aSize → gl_PointSize（px）
+        // 320.0 / abs(mvPos.z) ≈ 320/4 = 80，world 0.05 ≈ 4px
+        const starMat = new THREE.ShaderMaterial({
+            uniforms: { uTex: { value: makeStarTex() } },
+            vertexShader: `
+                attribute float aSize;
+                attribute vec3  aColor;
+                varying   vec3  vColor;
+                void main() {
+                    vColor = aColor;
+                    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+                    gl_PointSize = aSize * (320.0 / -mv.z);
+                    gl_Position  = projectionMatrix * mv;
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D uTex;
+                varying vec3 vColor;
+                void main() {
+                    vec4 t = texture2D(uTex, gl_PointCoord);
+                    gl_FragColor = vec4(vColor, t.r * 0.93);
+                }
+            `,
+            transparent: true,
+            blending:    THREE.AdditiveBlending,
+            depthTest:   false,
+            depthWrite:  false,
         });
 
-        const stars = new THREE.Points(geometry, material);
-        scene.add(stars);
+        const starPoints = new THREE.Points(geo, starMat);
+        starPoints.renderOrder = 1;
+        scene.add(starPoints);
 
-        // ── 動畫循環 ──
-        let scrollY = 0;
-        window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+        // ── 靜態背景星塵（固定像素大小，提供全畫面深邃基底）──
+
+        const BG_N  = 1800;
+        const bgGeo = new THREE.BufferGeometry();
+        const bgPos = new Float32Array(BG_N * 3);
+        const bgCol = new Float32Array(BG_N * 3);
+        for (let i = 0; i < BG_N; i++) {
+            const i3 = i * 3;
+            const t2 = Math.random() * Math.PI * 2;
+            const ph = Math.acos(2*Math.random()-1);
+            const r  = 4 + Math.random() * 10;
+            bgPos[i3]   = r*Math.sin(ph)*Math.cos(t2);
+            bgPos[i3+1] = r*Math.sin(ph)*Math.sin(t2);
+            bgPos[i3+2] = r*Math.cos(ph);
+            const rnd = Math.random();
+            if      (rnd < 0.06)  { bgCol[i3]=1.0; bgCol[i3+1]=0.88; bgCol[i3+2]=0.5;  }
+            else if (rnd < 0.16)  { bgCol[i3]=0.5; bgCol[i3+1]=0.65; bgCol[i3+2]=1.0;  }
+            else { const b=0.55+Math.random()*0.45; bgCol[i3]=b; bgCol[i3+1]=b; bgCol[i3+2]=b; }
+        }
+        bgGeo.setAttribute('position', new THREE.BufferAttribute(bgPos, 3));
+        bgGeo.setAttribute('color',    new THREE.BufferAttribute(bgCol, 3));
+        const bgStars = new THREE.Points(bgGeo, new THREE.PointsMaterial({
+            size: 0.45, map: makeStarTex(), vertexColors: true,
+            transparent: true, opacity: 0.60,
+            sizeAttenuation: false,
+            blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false,
+        }));
+        bgStars.renderOrder = 0;
+        scene.add(bgStars);
+
+        // ── 星際塵埃暗霧層（獨立 Points，整體旋轉，幾乎零 CPU 額外負擔）──
+        // 與主粒子相同螺旋臂結構，但 spread 更寬（霧感）、亮度極低（0.03–0.14）
+        // 不做逐粒子軌道計算，用 group.rotation 慢轉，視覺上暈染臂的厚度
+
+        const DUST_N   = 2800;
+        const dustGeo  = new THREE.BufferGeometry();
+        const dustPos  = new Float32Array(DUST_N * 3);
+        const dustCol  = new Float32Array(DUST_N * 3);
+        const dustSize = new Float32Array(DUST_N);
+
+        for (let d = 0; d < DUST_N; d++) {
+            const d3 = d * 3;
+            // 與主粒子相同的 r 全域分布（平方根均勻取樣）
+            const rD = Math.sqrt(R_MIN*R_MIN + Math.random() * (5.2*5.2 - R_MIN*R_MIN));
+            // 臂走向相同，但 spread 更寬 → 臂暈染
+            const armD   = Math.floor(Math.random() * 2) * Math.PI + TILT;
+            const sprdD  = (Math.random() - 0.5) * (Math.random() < 0.7 ? 0.55 : Math.PI * 2);
+            const thetaD = armD - Math.log(rD + 0.1) * SPIRAL_K * 3.5 + sprdD;
+
+            // 橢圓投影（與主粒子一致）
+            const aD = rD, bD = rD * 0.38;
+            const pxD = aD * Math.cos(thetaD);
+            const pyD = bD * Math.sin(thetaD);
+            dustPos[d3]   = pxD * COS_T - pyD * SIN_T;
+            dustPos[d3+1] = pxD * SIN_T + pyD * COS_T;
+            dustPos[d3+2] = (Math.random() - 0.5) * 0.55;  // z 比主粒子寬，增加立體厚度
+
+            // 極暗色彩（同色溫但亮度壓到 0.03–0.14）
+            const bright = 0.03 + Math.random() * 0.11;
+            const nrD = Math.max(0, Math.min(1, (rD - 0.42) / 5.08));
+            let dr, dg, db;
+            if (nrD < 0.20) {
+                dr = 0.75 + nrD * 1.25; dg = 0.85 + nrD * 0.75; db = 1.00;
+            } else if (nrD < 0.50) {
+                const f = (nrD - 0.20) / 0.30;
+                dr = 1.00; dg = 1.00 - f * 0.12; db = 1.00 - f * 0.45;
+            } else {
+                const f = (nrD - 0.50) / 0.50;
+                dr = 1.00 - f * 0.35; dg = 0.88 - f * 0.23; db = 0.55 + f * 0.45;
+            }
+            dustCol[d3]   = dr * bright;
+            dustCol[d3+1] = dg * bright;
+            dustCol[d3+2] = db * bright;
+
+            // 大小：比最小主粒子略大（霧感光暈），尺寸隨機以避免一致感
+            dustSize[d] = 0.004 + Math.random() * 0.012;
+        }
+
+        dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+        dustGeo.setAttribute('aColor',   new THREE.BufferAttribute(dustCol, 3));
+        dustGeo.setAttribute('aSize',    new THREE.BufferAttribute(dustSize, 1));
+
+        const dustMat = new THREE.ShaderMaterial({
+            uniforms: { uTex: { value: makeStarTex() } },
+            vertexShader: `
+                attribute float aSize;
+                attribute vec3  aColor;
+                varying   vec3  vColor;
+                void main() {
+                    vColor = aColor;
+                    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+                    gl_PointSize = aSize * (320.0 / -mv.z);
+                    gl_Position  = projectionMatrix * mv;
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D uTex;
+                varying vec3 vColor;
+                void main() {
+                    vec4 t = texture2D(uTex, gl_PointCoord);
+                    gl_FragColor = vec4(vColor, t.r * 0.80);
+                }
+            `,
+            transparent: true,
+            blending:  THREE.AdditiveBlending,
+            depthTest: false,
+            depthWrite: false,
+        });
+
+        const dustPoints = new THREE.Points(dustGeo, dustMat);
+        dustPoints.renderOrder = 0;
+        scene.add(dustPoints);
+
+        // ── 動畫循環 ──────────────────────────────────────────────
+
+        // 四色群角速度（開普勒差速，內圈 ~20s 一圈，外圈 ~6min）
+        const ROT_BY_TYPE = [0.00060, 0.00032, 0.00017, 0.000075];
+        const BASE_PULL   = 0.000010;
+
+        // 預熱模擬：快轉 6000 幀讓差速旋轉充分剪切成自然形態
+        (function warmup() {
+            for (let w = 0; w < 6000; w++) {
+                for (let i = 0; i < COUNT; i++) {
+                    const i4 = i * 4;
+                    let r = starData[i4], theta = starData[i4 + 1];
+                    const gravBoost = r < 1.0 ? 1 + Math.pow(1 - r, 2) * 3.0 : 1.0;
+                    theta += ROT_BY_TYPE[starType[i]] / Math.sqrt(r + 0.04) * gravBoost;
+                    r     -= BASE_PULL / (r * r + 0.06) * gravBoost;
+                    if (r <= R_MIN) { spawnStar(i); continue; }
+                    starData[i4]     = r;
+                    starData[i4 + 1] = theta;
+                }
+            }
+        })();
 
         let animId;
         function animate() {
-            animId = requestAnimationFrame(animate);
+            // DESIGN_MODE：warmup 後只 render 一幀（星場位置 = 差速剪切後的定格），不進 RAF
+            if (!DESIGN_MODE) animId = requestAnimationFrame(animate);
+            const t = Date.now() * 0.001;
 
-            stars.rotation.y += 0.00012;
-            stars.rotation.x  = scrollY * 0.00004;
+            for (let i = 0; i < COUNT; i++) {
+                const i3 = i * 3, i4 = i * 4;
+                let r     = starData[i4];
+                let theta = starData[i4 + 1];
+                const zOff = starData[i4 + 2];
+                const bSz  = starData[i4 + 3];
 
-            // 視差：鏡頭隨滾動緩緩後退
-            camera.position.z = 800 + scrollY * 0.15;
+                // 臨界加速：r < 1.0 時引力急速增強，製造被吞噬前的最後衝刺
+                const gravBoost = r < 1.0 ? 1 + Math.pow(1 - r, 2) * 3.0 : 1.0;
+
+                // 開普勒差速（ω ∝ 1/√r）+ 臨界加速
+                theta += ROT_BY_TYPE[starType[i]] / Math.sqrt(r + 0.04) * gravBoost;
+                r     -= BASE_PULL / (r * r + 0.06) * gravBoost;
+
+                // 超過事件視界 → 重生在自己的軌道帶
+                if (r <= R_MIN) {
+                    spawnStar(i);
+                    const nr = starData[i4], nt = starData[i4+1];
+                    const ea = nr, eb = nr * 0.38;
+                    const px = ea*Math.cos(nt), py = eb*Math.sin(nt);
+                    positions[i3]   = px*COS_T - py*SIN_T;
+                    positions[i3+1] = px*SIN_T + py*COS_T;
+                    positions[i3+2] = starData[i4+2];
+                    continue;
+                }
+                starData[i4]     = r;
+                starData[i4 + 1] = theta;
+
+                // 橢圓軌道投影（長軸:短軸 = 2.6:1，傾斜 TILT = -15°，強烈盤面感）
+                const a  = r, b = r * 0.38;
+                const fa = 0.005 * Math.sqrt(r); // 極緩微飄
+                const px = a*Math.cos(theta) + Math.sin(t*0.18 + i*0.19)*fa;
+                const py = b*Math.sin(theta) + Math.cos(t*0.13 + i*0.25)*fa;
+                positions[i3]   = px*COS_T - py*SIN_T;
+                positions[i3+1] = px*SIN_T + py*COS_T;
+                positions[i3+2] = zOff;
+
+                // 連續色溫：依實際 r 決定，仿天文溫度序列
+                const heatCore = r < 1.2 ? Math.max(0, (1.2 - r) / 0.78) : 0;
+                const normR    = Math.max(0, Math.min(1, (r - 0.42) / 5.08));
+                let cr, cg, cb;
+                if (normR < 0.20) {
+                    // 超熱核區：藍白（r ≈ 0.42 ~ 1.4）
+                    cr = 0.75 + normR * 1.25;
+                    cg = 0.85 + normR * 0.75;
+                    cb = 1.00;
+                } else if (normR < 0.50) {
+                    // 過渡：純白 → 暖白（r ≈ 1.4 ~ 3.0）
+                    const f = (normR - 0.20) / 0.30;
+                    cr = 1.00; cg = 1.00 - f * 0.12; cb = 1.00 - f * 0.45;
+                } else {
+                    // 外圈：琥珀金 → 冷藍白（r ≈ 3.0 ~ 5.5）
+                    const f = (normR - 0.50) / 0.50;
+                    cr = 1.00 - f * 0.35;
+                    cg = 0.88 - f * 0.23;
+                    cb = 0.55 + f * 0.45;
+                }
+                // 事件視界白熾（近心強推向純白）
+                cr = Math.min(1, cr + heatCore * (1 - cr) * 0.85);
+                cg = Math.min(1, cg + heatCore * (1 - cg) * 0.85);
+                cb = Math.min(1, cb + heatCore * (1 - cb) * 0.55);
+                // 深度亮度：前景星（zOff > 0）略亮，背景星略暗
+                const depthDim = 0.88 + 0.12 * ((zOff + 0.11) / 0.22);
+                cr *= depthDim; cg *= depthDim; cb *= depthDim;
+
+                // A×B 亮度系統：軌道亮度（A）× 本質亮度（B）→ 層次感
+                // A：外圈漸暗（normR > 0.30 開始衰減），內圈維持全亮
+                const orbitalBright = normR < 0.30 ? 1.0 : 1.0 - (normR - 0.30) * 0.55;
+                // B：本質亮度（spawnStar 賦值，每顆固定）
+                const bright = orbitalBright * starBright[i];
+                cr *= bright; cg *= bright; cb *= bright;
+
+                // 中等以上亮星微閃爍（正弦呼吸，讓星辰有「活著」的質感）
+                const twinkle = bSz > 0.013
+                    ? 0.72 + 0.28 * Math.sin(t * (1.1 + i * 0.006) + i * 2.3)
+                    : 1.0;
+                aColors[i3]   = cr * twinkle;
+                aColors[i3+1] = cg * twinkle;
+                aColors[i3+2] = cb * twinkle;
+                aSizes[i] = bSz * (0.75 + heatCore * 2.5);
+            }
+
+            posAttr.needsUpdate = true;
+            colAttr.needsUpdate = true;
+            szAttr.needsUpdate  = true;
+
+            bgStars.rotation.y  += 0.000009;
+            // 塵埃層整體緩轉（比最外圈主粒子稍慢，製造細微視差）
+            dustPoints.rotation.z += 0.000022;
 
             renderer.render(scene, camera);
         }
         animate();
 
-        // ── RWD resize ──
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // 頁面隱藏時停止渲染
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                cancelAnimationFrame(animId);
-            } else {
-                animate();
-            }
+            if (document.hidden) cancelAnimationFrame(animId);
+            else animate();
         });
     }
 
@@ -251,17 +566,18 @@
         const clock = new THREE.Clock();
         let astAnim;
         function animateAstronaut() {
-            astAnim = requestAnimationFrame(animateAstronaut);
+            // DESIGN_MODE：render 一幀後停住（太空人停在初始位置）
+            if (!DESIGN_MODE) astAnim = requestAnimationFrame(animateAstronaut);
             const t = clock.getElapsedTime();
 
-            // 浮動
-            astronautGroup.position.y  = Math.sin(t * 0.6) * 0.12;
+            // 浮動 + 滾動向上漂移（合併 y 軸，避免互相覆蓋）
+            astronautGroup.position.y  = Math.sin(t * 0.6) * 0.12 + scrollProgress * 1.8;
             astronautGroup.rotation.y  = Math.sin(t * 0.25) * 0.18;
             astronautGroup.rotation.z  = Math.sin(t * 0.4) * 0.05;
 
-            // 滾動：向右上方漂移 + 縮小
+            // 滾動：向右漂移 + 向後退 + 縮小
             astronautGroup.position.x  = scrollProgress * 3.5;
-            astronautGroup.position.z -= scrollProgress * 0.01;
+            astronautGroup.position.z  = -scrollProgress * 0.5;  // 用 = 避免累積
             const scale = 0.75 * (1 - scrollProgress * 0.6);
             astronautGroup.scale.set(scale, scale, scale);
 
@@ -276,7 +592,84 @@
     }
 
     /* ════════════════════════════════════════════════════════
-       3. Hero GSAP 入場序列
+       3. Hero 裂縫副標（2026-04-26 重設計）
+       視覺概念：文字從深空撕裂的縫中炸出來
+
+       設計決策：
+       - SVG 裂縫從中心向兩側生長（clip-path 動畫），象徵空間被撕開
+       - 裂縫不是直線，是有 zig-zag 的不規則折線，有「撕裂」物理感
+       - 三層光效：背光寬模糊層（glow）+ 主線（main）+ 衍生細裂紋（branch）
+       - 文字在裂縫生長完成後從縫中推出（translateY + opacity）
+       - DESIGN_MODE=true 時直接設定 rest 狀態（裂縫完整、文字定位完成）
+       ════════════════════════════════════════════════════════ */
+
+    function initRift() {
+        const riftWrap = document.querySelector('.hero__rift');
+        const crackContainer = document.querySelector('.hero__rift-crack');
+        if (!riftWrap || !crackContainer) return;
+
+        // ── 裂縫路徑生成 ──────────────────────────────────────────
+        // viewBox 以容器 100% 為基準，裂縫水平橫跨，中央為爆發源
+        // 裂縫設計：從中心點向左右各延伸，不規則 zig-zag 模擬撕裂
+        // 數值為 viewBox 百分比座標（0-100 x, 0-100 y，y=50 為中線）
+
+        const svgNS = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(svgNS, 'svg');
+        svg.setAttribute('xmlns', svgNS);
+        svg.setAttribute('viewBox', '0 0 1000 200');
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        svg.setAttribute('aria-hidden', 'true');
+
+        // 背光寬暈（模糊的能量面，最底層）
+        const glowPath = document.createElementNS(svgNS, 'path');
+        glowPath.setAttribute('class', 'rift-glow');
+        // 主裂縫路徑（相同路徑，寬 stroke + blur 做背光）
+        glowPath.setAttribute('d', 'M 500,100 L 472,93 L 445,107 L 415,96 L 382,104 L 348,92 L 310,100 L 268,95 L 225,105 L 178,98 L 128,103 L 75,97 L 30,102 M 500,100 L 528,107 L 555,93 L 585,104 L 618,96 L 652,108 L 690,100 L 732,105 L 775,95 L 822,102 L 872,97 L 925,103 L 970,98');
+
+        // 主裂縫（發光的主線）
+        const mainPath = document.createElementNS(svgNS, 'path');
+        mainPath.setAttribute('class', 'rift-main');
+        mainPath.setAttribute('d', 'M 500,100 L 472,93 L 445,107 L 415,96 L 382,104 L 348,92 L 310,100 L 268,95 L 225,105 L 178,98 L 128,103 L 75,97 L 30,102 M 500,100 L 528,107 L 555,93 L 585,104 L 618,96 L 652,108 L 690,100 L 732,105 L 775,95 L 822,102 L 872,97 L 925,103 L 970,98');
+
+        // 衍生細裂紋（從主縫上方和下方延伸的小分支）
+        const branch1 = document.createElementNS(svgNS, 'path');
+        branch1.setAttribute('class', 'rift-branch');
+        branch1.setAttribute('d', 'M 472,93 L 462,78 L 468,65 M 445,107 L 438,120 L 432,130 M 382,104 L 375,118 M 310,100 L 305,88 L 298,78 M 225,105 L 220,92 M 178,98 L 170,85 L 162,76');
+
+        const branch2 = document.createElementNS(svgNS, 'path');
+        branch2.setAttribute('class', 'rift-branch');
+        branch2.setAttribute('d', 'M 528,107 L 536,120 L 540,132 M 555,93 L 562,80 L 568,68 M 618,96 L 624,82 M 652,108 L 660,122 L 668,134 M 732,105 L 738,118 M 775,95 L 782,82 L 788,70');
+
+        // 爆發核心點（縫的起始交叉，最亮）
+        const coreCircle = document.createElementNS(svgNS, 'circle');
+        coreCircle.setAttribute('class', 'rift-core');
+        coreCircle.setAttribute('cx', '500');
+        coreCircle.setAttribute('cy', '100');
+        coreCircle.setAttribute('r', '3');
+
+        svg.appendChild(glowPath);
+        svg.appendChild(branch1);
+        svg.appendChild(branch2);
+        svg.appendChild(mainPath);
+        svg.appendChild(coreCircle);
+
+        crackContainer.appendChild(svg);
+
+        // ── DESIGN_MODE 處理 ──────────────────────────────────────
+        // DESIGN_MODE=true：直接設定 rest 狀態（裂縫完整展開、文字到位）
+        // DESIGN_MODE=false：GSAP 序列動畫（由 initHeroEntrance 整合）
+
+        if (DESIGN_MODE) {
+            // rest 狀態：裂縫完整、文字到位
+            // .hero__rift 的 .js-hidden 在 DESIGN_MODE 下由 base.css 的規則
+            // body.design-mode .js-hidden { opacity:1; transform:none } 處理
+            // SVG 本身不需要額外操作，直接可見
+        }
+        // DESIGN_MODE=false 時的動畫在 initHeroEntrance() 中處理
+    }
+
+    /* ════════════════════════════════════════════════════════
+       4. Hero GSAP 入場序列（2026-04-26 更新加入裂縫副標）
        ════════════════════════════════════════════════════════ */
 
     function initHeroEntrance() {
@@ -284,40 +677,60 @@
 
         const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-        tl.fromTo('.hero__brand-tag',
-            { opacity: 0, y: -16 },
-            { opacity: 1, y: 0, duration: 0.5 },
-            0
-        )
+        // h1 有 .js-hidden（opacity:0），先讓容器可見，再由 .line 子元素做 stagger
+        tl.set('.hero__title', { opacity: 1 }, 0)
         .fromTo('.hero__title .line',
             { opacity: 0, y: 40, skewY: 2 },
             { opacity: 1, y: 0, skewY: 0, duration: 0.8, stagger: 0.15 },
-            0.2
-        )
-        .fromTo('.hero__subtitle',
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.7 },
-            0.65
+            0
         )
         .fromTo('.hero__cta-group',
             { opacity: 0, y: 20 },
             { opacity: 1, y: 0, duration: 0.6 },
-            0.85
+            0.70
         )
         .fromTo('.hero__scroll-hint',
             { opacity: 0 },
             { opacity: 1, duration: 0.5 },
-            1.1
+            1.0
         )
         .fromTo('.hero__astronaut',
             { opacity: 0, x: 40 },
-            { opacity: 1, x: 0, duration: 1.0 },
-            0.3
+            { opacity: IS_MOBILE ? 0.18 : 1, x: 0, duration: 1.0 },
+            0.15
+        )
+
+        // ── 裂縫副標進場序列（2026-04-26）──
+        // 時序：主標進場中段（0.8s 後）裂縫開始生長，文字隨後推出
+        // 裂縫主線先從 clipPath 0→100% 展開（模擬從中心撕開到兩端）
+        // 然後文字從縫中向上推出（translateY -18px → 0 + opacity）
+
+        // 整個裂縫容器先出現（opacity 0 → 1）
+        .fromTo('.hero__rift',
+            { opacity: 0 },
+            { opacity: 1, duration: 0.4, ease: 'power2.out' },
+            0.75
+        )
+
+        // SVG 裂縫線：用 stroke-dasharray / stroke-dashoffset 從中心向兩端生長
+        // 這個效果需要在 initRift() 後計算路徑長度，此處用 scaleX 替代
+        // scaleX 從 0.02 → 1（以中心為錨點），視覺上是「從中心向兩端裂開」
+        .fromTo('.hero__rift-crack',
+            { scaleX: 0.02, opacity: 0, transformOrigin: '50% 50%' },
+            { scaleX: 1, opacity: 1, duration: 0.65, ease: 'power4.out' },
+            0.78
+        )
+
+        // 文字從縫中向上「推出」（縫是能量源，文字從縫往上冒出）
+        .fromTo('.hero__readout',
+            { opacity: 0, y: 22, filter: 'blur(4px)' },
+            { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.75, ease: 'power2.out' },
+            1.1
         );
     }
 
     /* ════════════════════════════════════════════════════════
-       4. ScrollTrigger — 各 Section 動畫
+       5. ScrollTrigger — 各 Section 動畫
        ════════════════════════════════════════════════════════ */
 
     function initScrollAnimations() {
@@ -347,7 +760,7 @@
             {
                 opacity: 1, y: 0, scale: 1,
                 duration: 0.65,
-                stagger: 0.10,
+                stagger: 0.12,
                 ease: 'power2.out',
                 scrollTrigger: { trigger: '.bento-grid', start: 'top 80%', toggleActions: 'play none none none' }
             }
@@ -382,14 +795,281 @@
     }
 
     /* ════════════════════════════════════════════════════════
-       5. 初始化
+       6. 星座連線（Bento 卡片之間）
        ════════════════════════════════════════════════════════ */
 
-    document.addEventListener('DOMContentLoaded', function () {
-        initStarfield();
-        initAstronaut();
+    // 計算每張 Bento 卡中心位置，以 SVG line 串接成星座
+    // 連線定義：以「相鄰且視覺上能構成星座圖」的方式挑選，避免過度交叉
+    function initConstellation() {
+        const grid = document.querySelector('.bento-grid');
+        if (!grid) return;
+
+        const cards = grid.querySelectorAll('.card');
+        if (cards.length < 2) return;
+
+        // 連線對：依 DOM 順序為節點 0..6
+        // 0=A社群, 1=C虛擬網紅(featured), 2=B網站, 3=B系統, 4=D顧問, 5=E跳動, 6=F社群增長
+        // 星座邏輯：相鄰區塊連線，不做全連通，避免視覺雜亂
+        const CONNECTIONS = [
+            [0, 1], [1, 4],     // A → C → D
+            [0, 2], [2, 3],     // A → B網站 → B系統
+            [3, 1],             // B系統 → C
+            [2, 5], [3, 5],     // 網站、系統 → E
+            [4, 6], [5, 6],     // D → F, E → F
+        ];
+
+        // 建立 SVG overlay
+        const svgNS = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(svgNS, 'svg');
+        svg.setAttribute('class', 'bento-constellation');
+        svg.setAttribute('xmlns', svgNS);
+        svg.setAttribute('aria-hidden', 'true');
+        svg.setAttribute('preserveAspectRatio', 'none');
+        grid.appendChild(svg);
+
+        function draw() {
+            // 清空舊元素
+            while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+            const gridRect = grid.getBoundingClientRect();
+            svg.setAttribute('viewBox', `0 0 ${gridRect.width} ${gridRect.height}`);
+            svg.style.width  = gridRect.width + 'px';
+            svg.style.height = gridRect.height + 'px';
+
+            // 計算每張卡中心（相對 grid）
+            const points = Array.from(cards).map((card) => {
+                const r = card.getBoundingClientRect();
+                return {
+                    x: r.left - gridRect.left + r.width / 2,
+                    y: r.top  - gridRect.top  + r.height / 2,
+                };
+            });
+
+            // 畫連線（排除超出節點範圍的 index）
+            CONNECTIONS.forEach(([a, b]) => {
+                if (a >= points.length || b >= points.length) return;
+                const line = document.createElementNS(svgNS, 'line');
+                line.setAttribute('x1', points[a].x);
+                line.setAttribute('y1', points[a].y);
+                line.setAttribute('x2', points[b].x);
+                line.setAttribute('y2', points[b].y);
+                svg.appendChild(line);
+            });
+
+            // 節點：每張卡中心畫小星點
+            points.forEach((p) => {
+                const c = document.createElementNS(svgNS, 'circle');
+                c.setAttribute('cx', p.x);
+                c.setAttribute('cy', p.y);
+                c.setAttribute('r',  '2.5');
+                svg.appendChild(c);
+            });
+        }
+
+        draw();
+
+        // resize 重繪（debounce）
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(draw, 150);
+        });
+
+        // ScrollTrigger 進場淡入
+        if (typeof ScrollTrigger !== 'undefined') {
+            ScrollTrigger.create({
+                trigger: grid,
+                start: 'top 75%',
+                onEnter: () => svg.classList.add('is-visible'),
+            });
+        } else {
+            svg.classList.add('is-visible');
+        }
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       7. Variable Font 軸動（視覺元素庫 v2.0 #1，2026-04-19）
+       Fraunces 三軸（opsz / wght / SOFT）由捲動進度插值
+       錨點 A：Hero ANOMALY — 光學尺寸粗化、字重增重
+       錨點 B：Manifesto UNCONVENTIONAL — 由輕盈細長收斂為厚實宣告
+       （取代原金屬掃光，v2.0 廢止）
+       ════════════════════════════════════════════════════════ */
+
+    function initVariableFontAxis() {
+        if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+        const heroBg = document.querySelector('.hero__bg-text');
+        if (heroBg) {
+            gsap.fromTo(heroBg,
+                { '--vf-opsz': 144, '--vf-wght': 200, '--vf-soft': 80 },
+                {
+                    '--vf-opsz': 36,
+                    '--vf-wght': 600,
+                    '--vf-soft': 10,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: '.hero',
+                        start: 'top top',
+                        end: 'bottom top',
+                        scrub: 0.6,
+                    },
+                }
+            );
+        }
+
+        const maniBg = document.querySelector('.manifesto__bg-text');
+        if (maniBg) {
+            gsap.fromTo(maniBg,
+                { '--vf-opsz': 144, '--vf-wght': 200, '--vf-soft': 90 },
+                {
+                    '--vf-opsz': 20,
+                    '--vf-wght': 800,
+                    '--vf-soft': 0,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: '.manifesto',
+                        start: 'top 80%',
+                        end: 'center center',
+                        scrub: 0.8,
+                    },
+                }
+            );
+        }
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       8. 稜鏡折射光斑（品牌故事區塊進場時單次觸發）
+       ════════════════════════════════════════════════════════ */
+
+    function initPrismaticSweep() {
+        const target = document.querySelector('.brand-preview');
+        if (!target) return;
+
+        // 注入稜鏡元素（避免改 HTML）
+        if (!target.querySelector('.brand-preview__prism')) {
+            const prism = document.createElement('div');
+            prism.className = 'brand-preview__prism';
+            prism.setAttribute('aria-hidden', 'true');
+            target.insertBefore(prism, target.firstChild);
+        }
+
+        if (typeof ScrollTrigger !== 'undefined') {
+            ScrollTrigger.create({
+                trigger: target,
+                start: 'top 70%',
+                onEnter: () => {
+                    target.classList.add('is-prism-active');
+                    // 12 秒動畫完成後保留 class，不重播
+                },
+            });
+        } else {
+            target.classList.add('is-prism-active');
+        }
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       9. 軌道環 DOM 注入（Hero 太空人外圍）
+       ════════════════════════════════════════════════════════ */
+
+    function initOrbitRings() {
+        if (IS_MOBILE) return;
+
+        const astronaut = document.querySelector('.hero__astronaut');
+        if (!astronaut) return;
+        if (astronaut.querySelector('.hero__orbits')) return;
+
+        const svgNS = 'http://www.w3.org/2000/svg';
+
+        // 建立容器
+        const orbits = document.createElement('div');
+        orbits.className = 'hero__orbits';
+        orbits.setAttribute('aria-hidden', 'true');
+
+        // 外環：傾斜 12°
+        const outer = document.createElement('div');
+        outer.className = 'hero__orbit hero__orbit--outer';
+        const outerSvg = document.createElementNS(svgNS, 'svg');
+        outerSvg.setAttribute('viewBox', '-100 -100 200 200');
+        outerSvg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        const outerEllipse = document.createElementNS(svgNS, 'ellipse');
+        outerEllipse.setAttribute('cx', '0');
+        outerEllipse.setAttribute('cy', '0');
+        outerEllipse.setAttribute('rx', '95');
+        outerEllipse.setAttribute('ry', '38');
+        outerEllipse.setAttribute('transform', 'rotate(12)');
+        outerSvg.appendChild(outerEllipse);
+        outer.appendChild(outerSvg);
+
+        // 內環：反向 -18°，虛線
+        const inner = document.createElement('div');
+        inner.className = 'hero__orbit hero__orbit--inner';
+        const innerSvg = document.createElementNS(svgNS, 'svg');
+        innerSvg.setAttribute('viewBox', '-100 -100 200 200');
+        innerSvg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        const innerEllipse = document.createElementNS(svgNS, 'ellipse');
+        innerEllipse.setAttribute('cx', '0');
+        innerEllipse.setAttribute('cy', '0');
+        innerEllipse.setAttribute('rx', '72');
+        innerEllipse.setAttribute('ry', '26');
+        innerEllipse.setAttribute('transform', 'rotate(-18)');
+        innerSvg.appendChild(innerEllipse);
+        inner.appendChild(innerSvg);
+
+        orbits.appendChild(outer);
+        orbits.appendChild(inner);
+        astronaut.insertBefore(orbits, astronaut.firstChild);
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       10. 初始化
+       ════════════════════════════════════════════════════════ */
+
+    // readyState 防禦：若 DOMContentLoaded 已在 script 執行前觸發，直接執行
+    function init() {
+        // Three.js 未載入時移除 has-threejs class，讓 CSS 星空 fallback 正常顯示
+        if (typeof THREE === 'undefined') {
+            document.body.classList.remove('has-threejs');
+        }
+
+        // L1 環境動畫（設計模式保留，屬於靜態視覺一部分）
+        try { initStarfield(); } catch(e) { console.warn('[index.js] initStarfield failed:', e); }
+        try {
+            initAstronaut();
+        } catch(e) {
+            console.warn('[index.js] initAstronaut failed, showing fallback:', e);
+            const fallback = document.querySelector('.hero__astronaut-fallback');
+            if (fallback) fallback.style.opacity = '1';
+        }
+
+        // 裂縫 SVG 注入（L1 層級，DESIGN_MODE 下也需執行以顯示 rest 狀態）
+        try { initRift(); } catch(e) { console.warn('[index.js] initRift failed:', e); }
+
+        // DESIGN_MODE：凍結 L2（進場）+ L3（捲動驅動），加 body class 讓 CSS 提供救援
+        if (DESIGN_MODE) {
+            document.body.classList.add('design-mode');
+            console.info('[index.js] DESIGN_MODE on — L2/L3 animations skipped');
+            return;
+        }
+
         initHeroEntrance();
         initScrollAnimations();
-    });
+
+        // ─── 天文觀測站質感元素（2026-04-18）───
+        // 軌道環：2026-04-18 使用者回饋「多餘」，停用；程式保留供未來評估
+        // try { initOrbitRings(); }  catch(e) { console.warn('[index.js] orbits failed:', e); }
+        try { initConstellation(); }  catch(e) { console.warn('[index.js] constellation failed:', e); }
+        try { initVariableFontAxis(); } catch(e) { console.warn('[index.js] VF axis failed:', e); }
+        try { initPrismaticSweep(); } catch(e) { console.warn('[index.js] prismatic failed:', e); }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 
 })();

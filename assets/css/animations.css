@@ -7,27 +7,33 @@
 /* 使用 background-position 而非 transform，確保 tiling 無縫 */
 
 @keyframes stars-drift-s {
-    /* 小星：斜向右下，慢 */
-    from { background-position: 0 0; }
-    to   { background-position: 340px 200px; }
+    /* 遠星：極緩斜移 + 微量順時針旋轉，模擬繞核公轉感 */
+    from { transform: translate(0, 0) rotate(0deg); }
+    to   { transform: translate(70px, 45px) rotate(1.0deg); }
 }
 
 @keyframes stars-drift-m {
-    /* 中星：斜向左下，中速 */
-    from { background-position: 0 0; }
-    to   { background-position: -260px 180px; }
+    /* 中星：反向緩移 + 逆時針旋轉，與遠景產生反向視差 */
+    from { transform: translate(0, 0) rotate(0deg); }
+    to   { transform: translate(-50px, 38px) rotate(-0.7deg); }
 }
 
 @keyframes stars-drift-l {
-    /* 亮點星：幾乎垂直向上，極慢 */
-    from { background-position: 0 0; }
-    to   { background-position: 80px -360px; }
+    /* 近星：略快斜移 + 順時針旋轉，前景恆星軌道感 */
+    from { transform: translate(0, 0) rotate(0deg); }
+    to   { transform: translate(22px, -80px) rotate(1.3deg); }
 }
 
 /* ─── 品牌 dot 脈衝 ─── */
 @keyframes pulse-dot {
     0%, 100% { opacity: 1; transform: scale(1); }
     50%       { opacity: 0.5; transform: scale(1.4); }
+}
+
+/* ─── 遠方星點微閃：極小幅度、極緩、呼吸式（不是 pulse 而是遠處光的微顫）─── */
+@keyframes star-twinkle {
+    0%, 100% { opacity: 0.88; transform: scale(1); }
+    50%       { opacity: 1;    transform: scale(1.12); }
 }
 
 /* ─── 星點閃爍 ─── */
@@ -166,3 +172,46 @@
 .delay-4 { animation-delay: 0.4s; }
 .delay-5 { animation-delay: 0.5s; }
 .delay-6 { animation-delay: 0.6s; }
+
+
+/* ============================================================
+   天文觀測站質感動畫（2026-04-18 新增）
+   ============================================================ */
+
+/* ─── 軌道環緩慢旋轉（60s 以上，不可更快，否則破壞沉靜感）─── */
+@keyframes orbit-rotate {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+@keyframes orbit-rotate-reverse {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(-360deg); }
+}
+
+/* ─── 稜鏡折射光斑（極緩橫越一次，12s）─── */
+@keyframes prismatic-sweep {
+    0%   { transform: translateX(-120%) skewX(-20deg); opacity: 0; }
+    15%  { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { transform: translateX(120%) skewX(-20deg); opacity: 0; }
+}
+
+/* ─── 體積光 God Rays 極緩漂移（呼吸式，18s）─── */
+@keyframes god-rays-drift {
+    0%, 100% { opacity: 0.25; transform: translateX(-50%) rotate(15deg) scaleY(1); }
+    50%      { opacity: 0.40; transform: translateX(-50%) rotate(15deg) scaleY(1.04); }
+}
+
+/* ─── SVG 描邊動畫（服務卡進場，由 GSAP 或 CSS 觸發）───
+   需元素帶 stroke-dasharray + stroke-dashoffset 初值
+*/
+@keyframes stroke-draw {
+    to { stroke-dashoffset: 0; }
+}
+
+/* ─── 星座連線淡入（由 JS 在 ScrollTrigger 進場時觸發）─── */
+@keyframes constellation-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}

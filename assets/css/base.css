@@ -17,13 +17,29 @@ html {
 
 body {
     font-family: var(--f-sans);
-    background-color: var(--c-black);
+    background:
+        radial-gradient(ellipse 80% 55% at 15% 0%, rgba(var(--c-blue-rgb), 0.09) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 45% at 88% 100%, rgba(var(--c-navy-rgb), 0.20) 0%, transparent 55%),
+        var(--c-black);
     color: var(--c-white);
     line-height: 1.6;
     overflow-x: hidden;
     min-height: 100vh;
     /* 星空 canvas 固定在後層，body 需 position:relative */
     position: relative;
+}
+
+/* ─── Grain texture overlay（全站質感層，pointer-events:none 不擋操作）─── */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    background-repeat: repeat;
 }
 
 /* ─── Three.js canvas（僅 index.html，body.has-threejs）─── */
@@ -46,6 +62,21 @@ body {
     overflow: hidden;
 }
 
+/* 核心暗域：中心疊與背景同色漸層，製造黑洞虛空吸入感
+   星點由輻射分布自然環繞此暗核，強化銀河核心透視 */
+#css-starfield::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+        ellipse 40% 40% at 50% 50%,
+        rgba(5, 13, 46, 0.85) 0%,
+        rgba(5, 13, 46, 0.42) 38%,
+        transparent 70%
+    );
+}
+
 /* 首頁已有 Three.js，隱藏 CSS 星空 */
 body.has-threejs #css-starfield {
     display: none;
@@ -53,56 +84,29 @@ body.has-threejs #css-starfield {
 
 .css-stars {
     position: absolute;
-    inset: -10%; /* 稍微超出邊界，避免 translate 動畫露白邊 */
-    width: 120%;
-    height: 120%;
-    will-change: transform; /* GPU 合成層 */
+    inset: -15%;
+    width: 130%;
+    height: 130%;
+    will-change: transform;
+    /* box-shadow 由 nav.js initCSSStarfield() 動態注入，確保真正圓形星點 */
 }
 
-/* ── 層一：細密小星（高密度、慢速斜移）─── */
+/* ── 層一：細小遠星（高密度、極慢移）─── */
 .css-stars--s {
-    background-image:
-        radial-gradient(circle at 11% 24%, rgba(var(--c-white-rgb), 0.85) 1px,   transparent 1px),
-        radial-gradient(circle at 67%  8%, rgba(var(--c-white-rgb), 0.60) 1px,   transparent 1px),
-        radial-gradient(circle at 39% 55%, rgba(var(--c-blue-rgb),  0.70) 1px,   transparent 1px),
-        radial-gradient(circle at 82% 43%, rgba(var(--c-white-rgb), 0.50) 0.8px, transparent 0.8px),
-        radial-gradient(circle at 25% 88%, rgba(var(--c-white-rgb), 0.75) 1px,   transparent 1px),
-        radial-gradient(circle at 55% 72%, rgba(var(--c-blue-rgb),  0.50) 0.8px, transparent 0.8px),
-        radial-gradient(circle at 90% 62%, rgba(var(--c-white-rgb), 0.60) 1px,   transparent 1px),
-        radial-gradient(circle at  3% 45%, rgba(var(--c-white-rgb), 0.70) 0.8px, transparent 0.8px),
-        radial-gradient(circle at 48% 33%, rgba(var(--c-white-rgb), 0.55) 0.8px, transparent 0.8px),
-        radial-gradient(circle at 74% 90%, rgba(var(--c-blue-rgb),  0.45) 1px,   transparent 1px);
-    background-size: 340px 340px;
-    animation: stars-drift-s 100s linear infinite;
-    opacity: 0.8;
+    animation: stars-drift-s 140s linear infinite;
+    opacity: 0.75;
 }
 
 /* ── 層二：中型星（中密度、反向緩移）─── */
 .css-stars--m {
-    background-image:
-        radial-gradient(circle at 20% 30%, rgba(var(--c-white-rgb), 0.90) 1.5px, transparent 1.5px),
-        radial-gradient(circle at 75% 15%, rgba(var(--c-blue-rgb),  0.80) 1.5px, transparent 1.5px),
-        radial-gradient(circle at 45% 70%, rgba(var(--c-white-rgb), 0.70) 1.5px, transparent 1.5px),
-        radial-gradient(circle at 88% 80%, rgba(var(--c-yellow-rgb),0.40) 1.5px, transparent 1.5px),
-        radial-gradient(circle at 10% 65%, rgba(var(--c-white-rgb), 0.65) 1px,   transparent 1px),
-        radial-gradient(circle at 60% 45%, rgba(var(--c-blue-rgb),  0.55) 1px,   transparent 1px);
-    background-size: 520px 520px;
-    animation: stars-drift-m 150s linear infinite;
-    opacity: 0.65;
+    animation: stars-drift-m 200s linear infinite;
+    opacity: 0.70;
 }
 
-/* ── 層三：亮點星（低密度、大範圍緩轉）─── */
+/* ── 層三：亮點近星（低密度、帶光暈）─── */
 .css-stars--l {
-    background-image:
-        radial-gradient(circle at 30% 20%, rgba(var(--c-white-rgb), 0.95) 2px,   transparent 2px),
-        radial-gradient(circle at 70% 50%, rgba(var(--c-white-rgb), 0.90) 2px,   transparent 2px),
-        radial-gradient(circle at 50% 80%, rgba(var(--c-blue-rgb),  0.85) 2px,   transparent 2px),
-        radial-gradient(circle at 85% 10%, rgba(var(--c-yellow-rgb),0.50) 2px,   transparent 2px),
-        radial-gradient(circle at 15% 90%, rgba(var(--c-white-rgb), 0.80) 1.5px, transparent 1.5px),
-        radial-gradient(circle at 92% 40%, rgba(var(--c-white-rgb), 0.70) 1.5px, transparent 1.5px);
-    background-size: 720px 720px;
-    animation: stars-drift-l 220s linear infinite;
-    opacity: 0.55;
+    animation: stars-drift-l 260s linear infinite;
+    opacity: 0.65;
 }
 
 /* ─── 全站內容容器 ─── */
@@ -146,10 +150,12 @@ ul, ol {
     list-style: none;
 }
 
-/* ─── 英文顯示字體套用輔助 ─── */
-.f-disp {
-    font-family: var(--f-disp);
-    font-weight: 900;
+/* ─── 英文顯示字體套用輔助（Fraunces Variable，opsz 大字光學尺寸） ─── */
+.f-serif,
+.f-disp {  /* .f-disp 為舊別名，新代碼請用 .f-serif */
+    font-family: var(--f-serif);
+    font-variation-settings: "opsz" 144, "wght" 400, "SOFT" 20;
+    letter-spacing: -0.02em;
 }
 
 .f-mono {
@@ -172,6 +178,24 @@ section {
 /* Hero 入場前預隱藏（僅 .js 存在時），取代 HTML inline style="opacity:0" */
 .js .js-hidden {
     opacity: 0;
+}
+
+/* ─── DESIGN_MODE 靜態設計凍結救援（2026-04-19） ───
+   body.design-mode：index.js 關閉 L2 進場 + L3 捲動驅動後，
+   讓原本等待 GSAP 解放的元素直接可見、純 CSS 控制版面
+*/
+body.design-mode .js-hidden,
+body.design-mode .js [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+/* 所有 CSS animation 凍結於當下幀（太空人 float / glow radiate / god-rays / star-twinkle 等）
+   Three.js 端由 index.js 自行判斷 DESIGN_MODE，跑一幀後停住 */
+body.design-mode *,
+body.design-mode *::before,
+body.design-mode *::after {
+    animation-play-state: paused !important;
 }
 
 /* ─── 選取色 ─── */

@@ -3,10 +3,64 @@
    創巢數位 Nest Digital | 版本 redesign-v1
    ============================================================ */
 
+/* ─── 深空斜帶（CSS radial-gradient，16-bit 精度，無色階問題）─── */
+/*
+   設計概念：一條深邃的暗帶以 -15° 斜切整個主視覺
+   ellipse 50% 20%：橫跨全寬，帶高約 40vw，形成壓迫性的空間縱深感
+   220vw 正方形確保任意比例螢幕旋轉後都不露邊
+*/
+#blackhole {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 220vw;
+    height: 220vw;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    background: radial-gradient(
+        ellipse 50% 20% at center,
+        #000000              0%,
+        #000507              20%,
+        #020f2e              38%,
+        #061840              54%,
+        rgba(8,24,58,0.72)   66%,
+        rgba(7,20,52,0.40)   77%,
+        rgba(5,15,42,0.15)   88%,
+        transparent          100%
+    );
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* canvas 升到斜帶上層，星星粒子可見於帶上（透明區域仍穿透顯示帶）*/
+#starfield-canvas {
+    z-index: 1;
+}
+
+/* SVG fractalNoise 噪點層：打散漸層色階斷層，opacity 極低不可見 */
+#blackhole::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+}
+
+/* 手機不顯示（Three.js 跳過，斜帶也跳過）*/
+@media (max-width: 900px) {
+    #blackhole { display: none; }
+}
+
 /* ─── 首頁基礎 ─── */
 body {
-    /* Hero 區域上方預留 nav 高度 */
     padding-top: 0;
+    /* 首頁覆寫：底色壓到 #020b1e，ambient 漸層近零，Three.js 星場對比更深邃
+       base.css 的 #050d2e 保留給其他頁面 */
+    background:
+        radial-gradient(ellipse 80% 55% at 15% 0%, rgba(var(--c-blue-rgb), 0.04) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 45% at 88% 100%, rgba(var(--c-navy-rgb), 0.07) 0%, transparent 55%),
+        #020b1e;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -21,18 +75,17 @@ body {
     overflow: hidden;
 }
 
-/* 背景放射光暈 */
+/* 背景放射光暈（偏左上，非置中，製造方向感） */
 .hero__glow {
     position: absolute;
-    top: 40%;
-    left: 30%;
-    width: 700px;
-    height: 700px;
+    top: 25%;
+    left: 15%;
+    width: 1000px;
+    height: 1000px;
     background: radial-gradient(
         ellipse at center,
-        rgba(var(--c-blue-rgb), 0.22) 0%,
-        rgba(var(--c-navy-rgb), 0.12) 40%,
-        transparent 70%
+        rgba(var(--c-blue-rgb), 0.04) 0%,
+        transparent 60%
     );
     transform: translate(-50%, -50%);
     pointer-events: none;
@@ -40,25 +93,76 @@ body {
     z-index: 0;
 }
 
+/* ─── Variable Font 軸動文字（2026-04-19 視覺元素庫 v2.0 #1） ───
+   Fraunces 三軸（opsz / wght / SOFT）由 GSAP ScrollTrigger 依捲動進度插值
+   @property 將 CSS 變數註冊為可動畫的 <number>，讓 GSAP 能 sub-pixel 補間
+*/
+@property --vf-opsz {
+    syntax: '<number>';
+    inherits: false;
+    initial-value: 144;
+}
+@property --vf-wght {
+    syntax: '<number>';
+    inherits: false;
+    initial-value: 200;
+}
+@property --vf-soft {
+    syntax: '<number>';
+    inherits: false;
+    initial-value: 80;
+}
+
+.hero__bg-text {
+    position: absolute;
+    top: 14%;
+    left: -3vw;
+    font-family: var(--f-serif);
+    font-size: clamp(6rem, 18vw, 20rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(var(--c-stellar-rgb), 0.12);
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    white-space: nowrap;
+    --vf-opsz: 144;
+    --vf-wght: 200;
+    --vf-soft: 80;
+    font-variation-settings: "opsz" var(--vf-opsz), "wght" var(--vf-wght), "SOFT" var(--vf-soft);
+    font-style: italic;
+    will-change: font-variation-settings;
+}
+
+@media (max-width: 900px) {
+    .hero__bg-text {
+        font-size: clamp(4rem, 22vw, 9rem);
+        top: 8%;
+        left: -6vw;
+        opacity: 0.75;
+    }
+}
+
 .hero__inner {
     position: relative;
     z-index: 2;
-    display: grid;
-    grid-template-columns: 1fr 480px;
-    gap: var(--sp-xl);
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     width: 100%;
     max-width: var(--max-w);
     margin: 0 auto;
     padding: 0 var(--sec-px);
-    padding-top: 7rem;
-    padding-bottom: 5rem;
+    padding-top: 5rem;                  /* 上移：內容浮在視口上半部，下方黑空間深邃 */
+    padding-bottom: 7rem;
 }
 
+/* 左欄：語意三段式（敘事 / 行動 / 引導），不用統一 gap，改用各段明確 margin */
 .hero__content {
     display: flex;
     flex-direction: column;
-    gap: var(--sp-md);
+    padding-left: 1.5rem;
 }
 
 /* 品牌 tag */
@@ -69,38 +173,66 @@ body {
     width: fit-content;
 }
 
-/* 主標題 */
+/* 主標題（2026-04-21 深空舞台版：均一字級，收緊字距讓字型本身說話）
+   letter-spacing 0.06em：Chiron Sung 明朝骨架在深黑背景上的俐落存在感 */
 .hero__title {
-    font-size: clamp(2.75rem, 5.5vw, 5rem);
+    font-family: var(--f-serif-cjk);
+    font-size: clamp(2rem, 3.8vw, 3.8rem);
     font-weight: 900;
-    line-height: 1.1;
-    letter-spacing: -0.03em;
+    line-height: 1.75;
+    letter-spacing: 0.06em;
 }
 
+/* 每行只需 block 換行，其餘全部繼承父層 */
 .hero__title .line {
     display: block;
 }
 
-.hero__title .highlight {
-    color: var(--c-yellow);
+/* 第 3、4 行「卻永遠 / 解決不了的問題」底線（保留冷光線設計元素） */
+.hero__title .line:nth-child(3),
+.hero__title .line:nth-child(4) {
     position: relative;
+    width: fit-content;
 }
 
-/* 副標 */
-.hero__subtitle {
-    font-size: clamp(var(--fs-base), 1.5vw, var(--fs-md));
-    color: var(--c-muted);
-    line-height: 1.7;
-    max-width: 460px;
+.hero__title .line:nth-child(3)::after,
+.hero__title .line:nth-child(4)::after {
+    content: '';
+    position: absolute;
+    bottom: 0.12em;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--c-blue) 50%, transparent 100%);
+    opacity: 0.7;
+}
+
+/* 「跳躍思維」：黃色高亮即足夠，字級與全行一致 */
+.hero__title .highlight {
+    color: var(--c-yellow);
+    text-shadow:
+        0 0 28px rgba(var(--c-yellow-rgb), 0.5),
+        0 0 64px rgba(var(--c-yellow-rgb), 0.22);
 }
 
 /* CTA 按鈕組 */
 .hero__cta-group {
     display: flex;
     align-items: center;
-    gap: var(--sp-sm);
+    gap: 1.25rem;
     flex-wrap: wrap;
-    margin-top: var(--sp-xs);
+    /* 副標已移至 Hero 底部讀出條，CTA 直接接標題，需補上留白 */
+    margin-top: 2.25rem;
+}
+
+/* Hero 範圍內 CTA：字級收小
+   Primary 保留自己的 1.6rem 側邊距（有形存在感）
+   Ghost 文字對齊左欄（無側邊距，虛空型） */
+.hero__cta-group .btn {
+    font-size: 0.9375rem;
+}
+.hero__cta-group .btn--ghost {
+    padding: 0.7rem 0;
 }
 
 /* 向下捲動提示 */
@@ -121,7 +253,242 @@ body {
     background: rgba(255, 255, 255, 0.15);
 }
 
-/* 太空人容器（Three.js canvas 插入位置） */
+/* ════════════════════════════════════════════════════════════
+   Hero 能量場裂縫副標（2026-04-26 第二版：體積光源機制）
+   視覺概念：文字從一個空間能量場中被推出來
+   ────────────────────────────────────────────────────────────
+   設計決策記錄（第二版，取代 SVG zig-zag 折線失敗版）：
+
+   前版失敗原因：SVG stroke zig-zag 折線 = 線條 = 卡通閃電，
+   零體積感、零光源、沒有方向性焦點，與電影感完全無關。
+
+   新機制：多層 radial gradient 純 CSS 疊加光源（聚焦能量場）
+   - 光源是能量場（面），不是線條
+   - 三層光源結構：核心亮斑 → 中圈冷藍 → 外暈大範圍
+   - 外暈層 filter: blur(60px) 製造 volumetric light scattering 感
+   - mix-blend-mode: screen 讓光場和背後星空互動，光「污染」星場
+   - SVG 僅作 feTurbulence displacementMap 濾鏡容器（不畫線條），
+     讓光場邊緣有不規則有機擾動，取代幾何鋸齒
+   - 文字壓在光場正上方，backdrop 有光場照射感
+   - 電影參考：Doctor Strange 傳送門能量場 × Marvel 片頭撕裂光帶
+   ════════════════════════════════════════════════════════════ */
+
+/* ─── 裂縫容器：Hero 下半部置中定位 ─── */
+.hero__rift {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 42%;            /* 佔 Hero 下方 42%，讓副標落在主標之下但不貼底 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 5rem;   /* 底部留呼吸空間，不貼邊 */
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* ─── 能量場光源容器（取代 SVG zig-zag）─── */
+.hero__rift-crack {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+}
+
+/* SVG 濾鏡容器（僅提供 feTurbulence displacement，不畫任何可見線條）
+   SVG 本身透明且寬高為零，濾鏡透過 id 被其他元素引用 */
+.hero__rift-crack svg {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: visible;
+    pointer-events: none;
+}
+
+/* ─── 三層光源（純 CSS radial gradient 疊加，不依賴 SVG stroke）─── */
+
+/* 層一：外暈大橢圓（最底層，大範圍 volumetric scatter）
+   背景：深黑 #020b1e，合成色預算：
+   rgba(23,54,245, 0.08) screen 疊在深黑上 → 合成約 #07132a，極深藍黑
+   這層的任務是「讓周圍空氣感受到光的存在」，不需要可見的顏色 */
+.hero__rift-crack::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    /* 橫向橢圓：寬 110vw 確保從中心擴散到兩側，高 180px 是光帶厚度 */
+    width: 110vw;
+    height: 180px;
+    transform: translate(-50%, -50%);
+    background:
+        /* 最外圍：極低 opacity 的大暈，製造空間光污染感 */
+        radial-gradient(
+            ellipse 100% 100% at 50% 50%,
+            rgba(var(--c-blue-rgb), 0.22) 0%,
+            rgba(var(--c-blue-rgb), 0.08) 40%,
+            transparent 70%
+        );
+    filter: blur(55px);
+    mix-blend-mode: screen;
+    /* feTurbulence 置換讓邊緣有不規則有機擾動（非幾何鋸齒）*/
+    /* filter 後半段：url(#rift-turbulence) 需在同文件 SVG 內定義 */
+}
+
+/* 層二：中圈冷藍能量帶（光源的中間層，帶狀聚焦）
+   合成色計算：rgba(0,200,255, 0.35) screen 在深黑上 → 合成約 #083844，深青藍
+   這層讓光帶「有形狀」——橫向橢圓的能量集中帶 */
+.hero__rift-crack::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 70vw;
+    height: 80px;
+    transform: translate(-50%, -50%);
+    background:
+        radial-gradient(
+            ellipse 100% 100% at 50% 50%,
+            rgba(var(--c-cyan-rgb), 0.50) 0%,
+            rgba(var(--c-blue-rgb), 0.30) 30%,
+            rgba(var(--c-blue-rgb), 0.10) 60%,
+            transparent 100%
+        );
+    filter: blur(22px);
+    mix-blend-mode: screen;
+}
+
+/* 層三：核心亮斑（最亮，焦點集中，模擬光從深空最內側噴出）
+   用 .hero__rift-crack 本體的 background 實現，避免偽元素用完
+   但因偽元素已用，改用 JS 注入的 .rift-core-glow div 處理 */
+
+/* ─── JS 注入的核心亮斑元素（.rift-core-glow）─── */
+.rift-core-glow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    /* 核心亮斑：小範圍、極亮、接近星白
+       合成色計算：rgba(232,240,255, 0.90) screen 在深黑上 → 合成接近 #d8e0f5，極亮 */
+    width: clamp(200px, 28vw, 380px);
+    height: 40px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+        ellipse 100% 100% at 50% 50%,
+        rgba(var(--c-stellar-rgb), 0.95) 0%,
+        rgba(var(--c-stellar-rgb), 0.55) 15%,
+        rgba(var(--c-cyan-rgb), 0.45) 35%,
+        rgba(var(--c-blue-rgb), 0.20) 60%,
+        transparent 100%
+    );
+    filter: blur(6px);
+    mix-blend-mode: screen;
+    pointer-events: none;
+}
+
+/* ─── 不規則邊緣擾動遮罩（JS 注入，用 SVG feTurbulence clip）─── */
+/* .rift-displacement-mask 是 JS 在 SVG 內建立的 feImage / feDisplacementMap 濾鏡
+   此 CSS 規則為備用——若不支援 SVG filter，降格為純 CSS 光場即可，不影響結構 */
+.rift-displacement-mask {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+/* ─── 副標文字（從能量場被推出的核心文字）─── */
+.hero__readout {
+    position: relative;
+    z-index: 2;
+
+    /* 置中，成為 Hero 第二視覺重心 */
+    text-align: center;
+    padding: 0 var(--sec-px);
+    max-width: 900px;
+    width: 100%;
+
+    /* 字型：Chiron Sung HK WS 明朝體骨架，在深黑背景有剛性線條感 */
+    font-family: var(--f-serif-cjk);
+    font-size: clamp(1rem, 1.55vw, 1.3rem);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1.55;
+    color: rgba(var(--c-stellar-rgb), 0.72);
+
+    margin: 0;
+    white-space: normal;
+
+    /* 文字背面有能量場照射感：backdrop 上有 screen 混合的光源
+       這個 text-shadow 讓文字本身感覺是被光推出來的，不是疊在光上面 */
+    text-shadow:
+        0 0 40px rgba(var(--c-blue-rgb), 0.18),
+        0 2px 60px rgba(var(--c-blue-rgb), 0.08);
+}
+
+/* 被否定的舊路「不是更努力」：壓暗 + 輕量，語意上是「被超越的」*/
+.hero__readout-dim {
+    opacity: 0.45;
+    font-weight: 400;
+}
+
+/* 破折號：語意分隔符，視覺上是喘息點 */
+.hero__readout em {
+    font-style: normal;
+    padding: 0 0.25em;
+    letter-spacing: 0;
+    opacity: 0.55;
+}
+
+/* 核心訴求「而是一個敢用不同方法的團隊」：最大重量 + 冷藍光暈
+   字重 900 + 冷藍 text-shadow，與背後能量場的光色呼應 */
+.hero__readout strong {
+    font-weight: 900;
+    color: var(--c-stellar);
+    text-shadow:
+        0 0 20px rgba(var(--c-blue-rgb), 0.60),
+        0 0 50px rgba(var(--c-blue-rgb), 0.30),
+        0 0 90px rgba(var(--c-blue-rgb), 0.12);
+}
+
+/* 手機：維持可讀性，字級縮小，允許換行 */
+@media (max-width: 900px) {
+    .hero__rift {
+        padding-bottom: 3rem;
+        height: 45%;
+    }
+
+    /* 外暈層手機縮小 */
+    .hero__rift-crack::before {
+        width: 130vw;
+        height: 130px;
+        filter: blur(40px);
+    }
+
+    /* 中圈手機縮小 */
+    .hero__rift-crack::after {
+        width: 90vw;
+        height: 60px;
+        filter: blur(16px);
+    }
+
+    .rift-core-glow {
+        width: 160px;
+        height: 28px;
+        filter: blur(5px);
+    }
+
+    .hero__readout {
+        font-size: 0.92rem;
+        letter-spacing: 0.03em;
+        color: rgba(var(--c-stellar-rgb), 0.80);
+    }
+
+    /* 手機版暗字段也要稍微提亮，小尺寸 opacity 0.45 會太暗看不清 */
+    .hero__readout-dim {
+        opacity: 0.60;
+    }
+}
+
+/* 太空人容器（grid 右欄，正常文件流） */
 .hero__astronaut {
     position: relative;
     display: flex;
@@ -130,29 +497,26 @@ body {
     height: 480px;
 }
 
-/* fallback: 若 Three.js 未載入，顯示既有 PNG */
+/* PNG 圖片（Three.js 暫停使用，直接顯示） */
 .hero__astronaut-fallback {
     width: 100%;
     height: 100%;
     object-fit: contain;
     animation: float 8s ease-in-out infinite;
-    filter: drop-shadow(0 0 40px rgba(var(--c-blue-rgb), 0.4));
-    opacity: 0;
+    filter: drop-shadow(0 0 60px rgba(var(--c-blue-rgb), 0.5));
+    opacity: 1;
 }
 
-/* Three.js canvas 蓋在上面 */
+/* Three.js canvas（暫時隱藏，未來啟用時移除此規則） */
 #astronaut-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    display: none;
 }
 
 @media (max-width: 900px) {
     .hero__inner {
         grid-template-columns: 1fr;
         padding-top: 6rem;
+        padding-bottom: 4rem;
     }
 
     .hero__astronaut {
@@ -160,9 +524,7 @@ body {
         order: -1;
     }
 
-    .hero__astronaut-fallback {
-        opacity: 1;
-    }
+    /* .hero__bg-text 已移除（大字移至 Section 2） */
 }
 
 
@@ -176,6 +538,49 @@ body {
     align-items: center;
     padding: var(--sp-xl) 0;
     overflow: hidden;
+    position: relative;
+}
+
+/* UNCONVENTIONAL 水印（2026-04-18 從 Hero 搬移過來）───
+   位於 Section 2 左側大字裝飾，與右側「非常規，才是真解法」形成中英對話
+   位置：左側貼邊，垂直置中，超大描邊字
+*/
+.manifesto__bg-text {
+    position: absolute;
+    top: 50%;
+    left: -2%;
+    transform: translateY(-50%);
+    font-family: var(--f-serif);
+    font-size: clamp(4rem, 14vw, 14rem);
+    line-height: 0.9;
+    letter-spacing: -0.035em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(var(--c-stellar-rgb), 0.10);
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    white-space: nowrap;
+    /* Variable Font 軸動（與 Hero 同一元素 utility） */
+    --vf-opsz: 144;
+    --vf-wght: 200;
+    --vf-soft: 90;
+    font-variation-settings: "opsz" var(--vf-opsz), "wght" var(--vf-wght), "SOFT" var(--vf-soft);
+    font-style: italic;
+    will-change: font-variation-settings;
+}
+
+/* Manifesto 內容層要在水印之上 */
+.manifesto__inner {
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 900px) {
+    .manifesto__bg-text {
+        font-size: clamp(3rem, 16vw, 7rem);
+        left: -4%;
+        opacity: 0.9;
+    }
 }
 
 .manifesto__inner {
@@ -190,15 +595,18 @@ body {
 }
 
 .manifesto__big-text {
-    font-size: clamp(3.5rem, 9vw, 8rem);
+    font-family: var(--f-serif-cjk);
+    font-size: clamp(4.5rem, 13vw, 13rem);
     font-weight: 900;
-    line-height: 1.05;
-    letter-spacing: -0.04em;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
     text-align: right;
 }
 
 .manifesto__big-text .accent {
-    color: var(--c-yellow);
+    /* 桌機版：空心描邊，更有震撼感 */
+    color: transparent;
+    -webkit-text-stroke: 3px var(--c-yellow);
     display: inline-block;
     position: relative;
 }
@@ -235,6 +643,12 @@ body {
     .manifesto__body {
         text-align: left;
     }
+
+    /* 小尺寸描邊太細，改回實心黃 */
+    .manifesto__big-text .accent {
+        color: var(--c-yellow);
+        -webkit-text-stroke: 0;
+    }
 }
 
 
@@ -259,244 +673,4 @@ body {
     grid-template-rows: auto auto auto;
     gap: 1rem;
     margin-top: var(--sp-lg);
-}
-
-/* A 社群服務 — 左上，一般大小 */
-.bento--a {
-    grid-column: 1 / 2;
-    grid-row: 1 / 2;
-    min-height: 260px;
-}
-
-/* C AI 虛擬網紅 — 右上大塊，featured */
-.bento--c {
-    grid-column: 2 / 4;
-    grid-row: 1 / 2;
-    min-height: 260px;
-    border-color: rgba(var(--c-blue-rgb), 0.5);
-    background: linear-gradient(135deg, rgba(var(--c-blue-rgb), 0.15), rgba(var(--c-navy-rgb), 0.2));
-}
-
-.bento--c::after {
-    content: 'FEATURED';
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    font-family: var(--f-mono);
-    font-size: var(--fs-xs);
-    color: var(--c-yellow);
-    letter-spacing: 0.12em;
-    opacity: 0.7;
-}
-
-/* B 網站 — 左中，小塊 */
-.bento--b-web {
-    grid-column: 1 / 2;
-    grid-row: 2 / 3;
-    min-height: 200px;
-}
-
-/* B 系統 — 中，一般 */
-.bento--b-sys {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
-    min-height: 200px;
-}
-
-/* D 顧問 — 右，跨兩行 */
-.bento--d {
-    grid-column: 3 / 4;
-    grid-row: 2 / 4;
-    min-height: 300px;
-}
-
-/* E 跳動E投放 — 左下，跨兩欄 */
-.bento--e {
-    grid-column: 1 / 3;
-    grid-row: 3 / 4;
-    min-height: 180px;
-    background: linear-gradient(135deg, rgba(var(--c-yellow-rgb), 0.06), rgba(var(--c-blue-rgb), 0.08));
-    border-color: rgba(var(--c-yellow-rgb), 0.2);
-}
-
-/* F 社群增長 — 右下 */
-/* F 合進 D 下方同欄，已由 bento--d 跨行處理 */
-/* 若 F 需獨立，補一行 */
-
-
-/* 卡片內 icon 圓圈 */
-.service-card__icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: rgba(var(--c-blue-rgb), 0.15);
-    border: 1px solid rgba(var(--c-blue-rgb), 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    color: var(--c-blue);
-    margin-bottom: var(--sp-sm);
-    transition: background var(--t-base), border-color var(--t-base);
-}
-
-.card:hover .service-card__icon {
-    background: rgba(var(--c-yellow-rgb), 0.12);
-    border-color: rgba(var(--c-yellow-rgb), 0.4);
-    color: var(--c-yellow);
-}
-
-@media (max-width: 900px) {
-    .bento-grid {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto;
-    }
-
-    .bento--a  { grid-column: 1 / 2; grid-row: auto; }
-    .bento--c  { grid-column: 1 / 3; grid-row: auto; min-height: 220px; }
-    .bento--b-web { grid-column: 1 / 2; grid-row: auto; }
-    .bento--b-sys { grid-column: 2 / 3; grid-row: auto; }
-    .bento--d  { grid-column: 1 / 2; grid-row: auto; min-height: 200px; }
-    .bento--e  { grid-column: 1 / 3; grid-row: auto; }
-}
-
-@media (max-width: 540px) {
-    .bento-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .bento--c,
-    .bento--e {
-        grid-column: 1 / 2;
-    }
-}
-
-
-/* ════════════════════════════════════════════════════════════
-   Section 4｜品牌故事預告
-   ════════════════════════════════════════════════════════════ */
-
-.brand-preview {
-    padding: var(--sp-xl) 0;
-    overflow: hidden;
-}
-
-.brand-preview__inner {
-    max-width: var(--max-w);
-    margin: 0 auto;
-    padding: 0 var(--sec-px);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--sp-xl);
-    align-items: center;
-}
-
-.brand-preview__left .big-label {
-    font-size: clamp(2.5rem, 6vw, 5.5rem);
-    font-weight: 900;
-    line-height: 1.1;
-    letter-spacing: -0.03em;
-}
-
-.brand-preview__left .big-label em {
-    font-style: normal;
-    color: var(--c-yellow);
-}
-
-.brand-preview__right p {
-    font-size: var(--fs-md);
-    line-height: 1.85;
-    color: var(--c-muted);
-    margin-bottom: var(--sp-sm);
-
-    /* 截斷 3 行 */
-    display: -webkit-box;
-    -webkit-line-clamp: 6;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.brand-preview__right .fade-mask {
-    height: 40px;
-    background: linear-gradient(0deg, var(--c-black) 0%, transparent 100%);
-    margin-top: -40px;
-    position: relative;
-}
-
-@media (max-width: 900px) {
-    .brand-preview__inner {
-        grid-template-columns: 1fr;
-        gap: var(--sp-lg);
-    }
-}
-
-
-/* ════════════════════════════════════════════════════════════
-   Section 5｜終點 CTA
-   ════════════════════════════════════════════════════════════ */
-
-.final-cta {
-    padding: calc(var(--sp-xl) * 1.5) 0;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-/* 放射狀光暈 */
-.final-cta__glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(
-        ellipse at center,
-        rgba(var(--c-blue-rgb), 0.35) 0%,
-        rgba(var(--c-navy-rgb), 0.18) 45%,
-        transparent 70%
-    );
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    animation: radiate 6s ease-in-out infinite;
-}
-
-.final-cta__inner {
-    position: relative;
-    z-index: 1;
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 0 var(--sec-px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--sp-md);
-}
-
-.final-cta__title {
-    font-size: clamp(var(--fs-2xl), 4.5vw, var(--fs-4xl));
-    font-weight: 900;
-    line-height: 1.2;
-}
-
-.final-cta__subtitle {
-    font-size: var(--fs-md);
-    color: var(--c-muted);
-    text-align: center;
-}
-
-.final-cta__btns {
-    display: flex;
-    gap: var(--sp-sm);
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: var(--sp-xs);
-}
-
-/* 座標裝飾（mono font） */
-.final-cta__coords {
-    font-family: var(--f-mono);
-    font-size: var(--fs-xs);
-    color: rgba(255, 255, 255, 0.2);
-    letter-spacing: 0.1em;
-    margin-top: var(--sp-sm);
 }

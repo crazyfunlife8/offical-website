@@ -8,99 +8,208 @@
    1. 導覽列 (Nav)
    ════════════════════════════════════════════════════════════ */
 
+/* ─── 觀測站儀表橫條 Nav（2026-04-19 重構）───
+   放棄 SaaS 慣用的 floating glass pill，改為貼頂滿寬橫楣
+   品牌以等寬字 + 日期戳模擬觀測站儀器刻度，連結用 Mono uppercase
+   hover 時 Fraunces wght 軸動 + cyan hairline 滑入
+*/
 .site-nav {
     position: fixed;
-    top: var(--sp-sm);
-    left: 50%;
-    transform: translateX(-50%);
+    top: 0;
+    left: 0;
+    right: 0;
     z-index: var(--z-nav);
-    width: calc(100% - var(--sp-md) * 2);
-    max-width: var(--max-w);
+    width: 100%;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--sp-md);
 
-    background: rgba(var(--c-black-rgb), 0.7);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-pill);
-    padding: 0.65rem 1.75rem;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom: 1px solid rgba(var(--c-stellar-rgb), 0.08);
+    padding: 0 clamp(1.25rem, 3vw, 2.5rem);
+    height: 56px;
 
-    transition: background var(--t-base), box-shadow var(--t-base);
+    transition: background var(--t-base), border-color var(--t-base), box-shadow var(--t-base);
+}
+
+/* 底緣刻度光線（與左側 .manifesto__line 同結構：全色值漸層 + opacity 控亮度）
+   manifesto__line: linear-gradient(180deg, transparent, var(--c-blue), transparent) opacity 1
+   此線: 同色同結構，90deg 水平版，idle 0.55 → hover 1
+   2026-04-19 */
+.site-nav::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--c-blue) 50%,
+        transparent 100%
+    );
+    opacity: 0.55;
+    transition: opacity var(--t-base);
+    pointer-events: none;
+}
+
+.site-nav:hover::before {
+    opacity: 1;
 }
 
 .site-nav.scrolled {
-    background: rgba(var(--c-black-rgb), 0.95);
-    box-shadow: var(--shadow-card);
+    background: rgba(var(--c-black-rgb), 0.92);
+    border-bottom-color: rgba(var(--c-stellar-rgb), 0.14);
+    box-shadow: 0 1px 0 rgba(var(--c-blue-rgb), 0.18);
 }
 
+/* ─── 品牌區：三段（dot / 主標 / 戳記）──── */
 .nav__brand {
     display: flex;
     align-items: center;
-    gap: var(--sp-xs);
-    font-family: var(--f-disp);
-    font-weight: 700;
-    font-size: var(--fs-sm);
-    letter-spacing: 0.04em;
-    white-space: nowrap;
-    color: var(--c-white);
+    gap: 12px;
     text-decoration: none;
+    white-space: nowrap;
+    color: var(--c-stellar);
 }
 
-.nav__brand-dot {
-    width: 8px;
-    height: 8px;
-    background: var(--c-yellow);
+/* 遠方星點：極小暖白核 + 三層遞減光暈，模擬望遠鏡下的恆星
+   不是飽和圓點，是「光」本身 */
+.nav__brand-star {
+    width: 3px;
+    height: 3px;
+    background: #fffaf0;
     border-radius: 50%;
     flex-shrink: 0;
-    animation: pulse-dot 2.5s ease-in-out infinite;
+    box-shadow:
+        0 0 1px   rgba(255, 255, 255, 1.00),
+        0 0 3px   rgba(255, 230, 160, 0.85),
+        0 0 7px   rgba(255, 199, 9,   0.42),
+        0 0 14px  rgba(255, 199, 9,   0.16);
+    animation: star-twinkle 4.2s ease-in-out infinite;
 }
 
+.nav__brand-mark {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--c-stellar);
+}
+
+.nav__brand-sep {
+    color: rgba(var(--c-stellar-rgb), 0.35);
+    margin: 0 2px;
+}
+
+/* ─── 連結區：絕對置中，品牌 / CTA 維持兩端對齊不受影響 ──── */
 .nav__links {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: var(--sp-md);
+    gap: clamp(24px, 3vw, 44px);
 }
 
 .nav__links a {
-    font-size: var(--fs-sm);
-    color: var(--c-muted);
-    transition: color var(--t-fast);
+    font-family: var(--f-serif-cjk);
+    font-size: 15px;
+    font-weight: 300;
+    letter-spacing: 0.35em;
+    color: color-mix(in srgb, var(--c-blue), white 45%); /* 冷光線同源色，兌白 45% ≈ #7a8ff8 */
+    text-shadow: 0 0 14px rgba(var(--c-blue-rgb), 0.5); /* idle：藍底暈光，增加儀器發光感 */
     position: relative;
+    padding: 18px 0;
+    transition: color 0.18s ease, text-shadow 0.18s ease;
 }
 
-.nav__links a:hover,
+/* Hover hairline：從中心向兩側拉開的 cyan 細線 */
+.nav__links a::after {
+    content: '';
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    width: 0;
+    height: 1px;
+    background: var(--c-cyan);
+    box-shadow: 0 0 6px rgba(var(--c-cyan-rgb), 0.6);
+    transform: translateX(-50%);
+    transition: width 0.22s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.nav__links a:hover {
+    color: var(--c-cyan);
+    text-shadow:
+        0 0 8px rgba(var(--c-cyan-rgb), 1),
+        0 0 22px rgba(var(--c-cyan-rgb), 0.5);
+}
+
+.nav__links a:hover::after {
+    width: 100%;
+}
+
+/* Active：短刻度劃 + cyan 冷光（與 hover 同調，表示「當前頁」） */
 .nav__links a.active {
-    color: var(--c-white);
+    color: var(--c-cyan);
+    text-shadow:
+        0 0 8px rgba(var(--c-cyan-rgb), 0.8),
+        0 0 20px rgba(var(--c-cyan-rgb), 0.35);
 }
 
 .nav__links a.active::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: var(--c-yellow);
+    width: 18px;
+    background: rgba(var(--c-stellar-rgb), 0.9);
+    box-shadow: none;
 }
 
+/* ─── CTA：冷電藍描邊，inner glow，無實填 ──── */
 .nav__cta {
-    background: var(--c-blue);
-    color: var(--c-white) !important;
-    border-radius: var(--radius-pill);
-    padding: 0.45rem 1.25rem;
-    font-size: var(--fs-sm);
-    font-weight: 700;
-    transition: background var(--t-fast), box-shadow var(--t-fast) !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--f-serif-cjk);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    color: var(--c-stellar) !important;
+    background: transparent;
+    border: 1px solid rgba(var(--c-cyan-rgb), 0.45);
+    border-radius: 2px;
+    padding: 9px 14px 9px 18px;
+    text-decoration: none;
     white-space: nowrap;
+    position: relative;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.nav__cta-arrow {
+    display: inline-block;
+    font-family: var(--f-mono);
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: 0;
+    margin-left: 4px;
+    transform: translateX(0);
+    transition: transform 0.22s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .nav__cta:hover {
-    background: #2948ff !important;
-    box-shadow: var(--shadow-glow) !important;
+    border-color: rgba(var(--c-cyan-rgb), 0.9);
+    background: rgba(var(--c-cyan-rgb), 0.05);
+    box-shadow:
+        inset 0 0 20px rgba(var(--c-cyan-rgb), 0.12),
+        0 0 18px rgba(var(--c-cyan-rgb), 0.18);
+}
+
+.nav__cta:hover .nav__cta-arrow {
+    transform: translateX(3px);
 }
 
 .nav__cta::after {
@@ -212,8 +321,8 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    border-radius: var(--radius-pill);
-    font-family: var(--f-sans);
+    border-radius: 6px;
+    font-family: var(--f-serif-cjk);
     font-weight: 700;
     font-size: var(--fs-base);
     cursor: pointer;
@@ -221,32 +330,43 @@
     text-decoration: none;
     transition: all var(--t-base);
     padding: 0.8rem 2rem;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.06em;
     white-space: nowrap;
 }
 
+/* ── 訊號型（深空舞台）：精確邊框 + 幽藍底色，hover 時藍光暈放
+   電影感：暗房中那個發著光的按鈕，存在感清晰但不張揚 ── */
 .btn--primary {
-    background: var(--c-blue);
-    color: var(--c-white);
-    box-shadow: 0 4px 16px rgba(var(--c-blue-rgb), 0.35);
+    background: rgba(var(--c-blue-rgb), 0.10);
+    border: 1px solid rgba(var(--c-blue-rgb), 0.38);
+    border-radius: 2px;
+    color: var(--c-stellar);
+    padding: 0.75rem 1.6rem;
+    letter-spacing: 0.08em;
+    transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, color 0.22s ease;
 }
 
 .btn--primary:hover {
-    background: #2948ff;
-    box-shadow: var(--shadow-glow);
-    transform: translateY(-2px);
+    background: rgba(var(--c-blue-rgb), 0.18);
+    border-color: rgba(var(--c-blue-rgb), 0.70);
+    box-shadow: 0 0 16px rgba(var(--c-blue-rgb), 0.30), 0 0 40px rgba(var(--c-blue-rgb), 0.12);
+    color: var(--c-stellar);
 }
 
+/* ── 虛空型（深空舞台）：純文字在深黑中，對比 primary 的有形存在
+   不裝飾，不框架，靠 opacity 說話 ── */
 .btn--ghost {
     background: transparent;
-    color: var(--c-white);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: none;
+    border-radius: 0;
+    color: rgba(var(--c-stellar-rgb), 0.40);
+    padding: 0.75rem 0;
+    letter-spacing: 0.08em;
+    transition: color 0.25s ease;
 }
 
 .btn--ghost:hover {
-    border-color: var(--c-yellow);
-    color: var(--c-yellow);
-    transform: translateY(-2px);
+    color: rgba(var(--c-stellar-rgb), 0.82);
 }
 
 .btn--yellow {
@@ -262,6 +382,11 @@
 }
 
 /* 箭頭 icon 動畫 */
+/* 外連結圖示（arrow up right）於 btn 內縮小，不與文字等大 */
+.btn .fa-arrow-up-right-from-square {
+    font-size: 0.75em;
+}
+
 .btn .btn-arrow {
     display: inline-block;
     transition: transform var(--t-fast);
@@ -280,7 +405,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    font-family: var(--f-disp);
+    font-family: var(--f-serif);
     font-size: var(--fs-xs);
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -304,6 +429,12 @@
     color: #7a9dff;
 }
 
+/* Size modifier — 卡片內標籤縮小變體 */
+.tag--xs {
+    font-size: 0.65rem;
+    padding: 0.22rem 0.6rem;
+}
+
 .tag__dot {
     width: 5px;
     height: 5px;
@@ -321,7 +452,7 @@
 }
 
 .section-header__eyebrow {
-    font-family: var(--f-disp);
+    font-family: var(--f-serif);
     font-size: var(--fs-xs);
     font-weight: 700;
     letter-spacing: 0.2em;
@@ -427,10 +558,15 @@
 }
 
 .site-footer__brand {
-    font-family: var(--f-disp);
+    font-family: var(--f-serif);
     font-size: var(--fs-sm);
     font-weight: 700;
     color: var(--c-muted);
+}
+
+/* 品牌行分隔點 · 淡化 */
+.site-footer__sep {
+    opacity: 0.4;
 }
 
 .site-footer__copy {
@@ -461,4 +597,69 @@
     .site-footer__links {
         justify-content: center;
     }
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   9. 天文觀測站質感元件（2026-04-18 新增）
+   ════════════════════════════════════════════════════════════ */
+
+/* ─── 光與影的雕刻（通用文字雕刻類別） ─── */
+.text-sculpted {
+    text-shadow: var(--ts-sculpt);
+}
+
+.text-embossed {
+    text-shadow: var(--ts-emboss);
+}
+
+.text-debossed {
+    text-shadow: var(--ts-deboss);
+}
+
+
+/* ─── 磁性按鈕（JS 處理偏移，CSS 負責視覺） ─── */
+.btn--magnetic {
+    position: relative;
+    will-change: transform;
+    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow:
+        0 4px 16px rgba(var(--c-blue-rgb), 0.35),
+        var(--shadow-inset);
+}
+
+/* 磁性按鈕上的琥珀金小光點（全站唯一琥珀金位置候選之一） */
+.btn--magnetic .btn-amber-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--c-amber);
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(var(--c-amber-rgb), 0.85);
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    animation: pulse-dot 2.8s ease-in-out infinite;
+}
+
+
+/* ─── SVG 描邊框（服務卡 Hover 或進場時觸發） ─── */
+.frame-drawn {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    overflow: hidden;
+}
+
+.frame-drawn rect {
+    fill: none;
+    stroke: rgba(var(--c-cyan-rgb), 0.65);
+    stroke-width: 1;
+    stroke-dasharray: 1200;
+    stroke-dashoffset: 1200;
+}
+
+/* 進入視野時 GSAP 觸發 .is-drawn，或 JS 套 style */
+.frame-drawn.is-drawn rect {
+    animation: stroke-draw 1.2s ease-out forwards;
 }

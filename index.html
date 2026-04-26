@@ -48,7 +48,10 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Exo+2:wght@700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght,SOFT@9..144,100..900,0..100&family=Noto+Sans+TC:wght@100;300;400;700;900&family=Noto+Serif+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- Chiron Sung HK（港產明朝活字；中文主宋體，替代 Noto Serif 的通用感） -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
 
     <!-- CSS（順序不得更改）-->
     <link rel="stylesheet" href="assets/css/tokens.css">
@@ -62,6 +65,9 @@
     <!-- 星空 canvas（全站固定後層，Three.js 渲染目標） -->
     <canvas id="starfield-canvas" aria-hidden="true"></canvas>
 
+    <!-- 黑洞虛空（CSS radial-gradient，避免 Canvas 8-bit 色階問題） -->
+    <div id="blackhole" aria-hidden="true"></div>
+
     <!-- Nav 由 nav.js 動態注入 -->
 
     <main>
@@ -71,35 +77,26 @@
         ════════════════════════════════════════════════ -->
         <section class="hero" aria-labelledby="hero-title">
 
+            <!-- 體積光 God Rays（天文觀測站質感） -->
+            <div class="hero__god-rays" aria-hidden="true"></div>
+
             <div class="hero__glow" aria-hidden="true"></div>
+
+            <!-- Variable Font 軸動文字（Fraunces，捲動驅動 opsz/wght/SOFT） -->
+            <div class="hero__bg-text" aria-hidden="true">ANOMALY</div>
 
             <div class="hero__inner">
 
                 <!-- 左側文字區 -->
                 <div class="hero__content">
 
-                    <!-- 品牌 Tag -->
-                    <div class="hero__brand-tag js-hidden">
-                        <span class="tag tag--blue">
-                            <span class="tag__dot"></span>
-                            創巢數位 · Nest Digital
-                        </span>
-                    </div>
-
                     <!-- 主標題（品牌宣言） -->
                     <h1 class="hero__title js-hidden" id="hero-title">
-                        <span class="line">用非常規的</span>
-                        <span class="line"><span class="highlight">跳躍思維</span></span>
+                        <span class="line">用非常規的<span class="highlight">跳躍思維</span></span>
                         <span class="line">解決習以為常</span>
-                        <span class="line">卻永遠解決</span>
-                        <span class="line">不了的問題</span>
+                        <span class="line">卻永遠</span>
+                        <span class="line">解決不了的問題</span>
                     </h1>
-
-                    <!-- 副標 -->
-                    <p class="hero__subtitle js-hidden">
-                        傳統做法不夠用時，你需要的不是更努力——<br>
-                        而是一個敢用不同方法的團隊。
-                    </p>
 
                     <!-- CTA 按鈕組 -->
                     <div class="hero__cta-group js-hidden">
@@ -109,7 +106,7 @@
                         </a>
                         <a href="about.html" class="btn btn--ghost">
                             了解我們
-                            <i class="fas fa-arrow-up-right-from-square" aria-hidden="true" style="font-size:0.75em;"></i>
+                            <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
                         </a>
                     </div>
 
@@ -121,22 +118,25 @@
 
                 </div>
 
-                <!-- 右側太空人 -->
-                <div class="hero__astronaut" aria-hidden="true">
-                    <!-- Three.js 太空人渲染 canvas -->
-                    <canvas id="astronaut-canvas"></canvas>
-                    <!-- PNG fallback（Three.js 未載入或手機版時顯示） -->
-                    <img
-                        src="assets/images/brand/astronaut_07.png"
-                        alt="太空人插圖"
-                        class="hero__astronaut-fallback"
-                        width="480"
-                        height="480"
-                        loading="eager"
-                    >
-                </div>
+                <!-- 太空人暫時移除 2026-04-21 -->
 
             </div>
+
+            <!-- ─────────────────────────────────────────────
+                 Hero 裂縫副標（2026-04-26 重設計）
+                 視覺概念：文字從深空撕裂的縫中炸出來
+                 .hero__rift         — 整體定位容器（absolute，Hero 下半部居中）
+                 .hero__rift-crack   — SVG 裂縫，由 JS 動態注入（裂縫發光層）
+                 .hero__readout      — 文字層，壓在裂縫上方
+                 ───────────────────────────────────────────── -->
+            <div class="hero__rift js-hidden" aria-hidden="false">
+                <!-- SVG 裂縫由 index.js initRift() 注入，此處佔位 -->
+                <div class="hero__rift-crack" aria-hidden="true"></div>
+                <p class="hero__readout">
+                    傳統做法不夠用時，你需要的<span class="hero__readout-dim">不是更努力</span><em>——</em><strong>而是一個敢用不同方法的團隊</strong>。
+                </p>
+            </div>
+
         </section>
 
 
@@ -146,10 +146,13 @@
         <section class="manifesto" aria-label="品牌宣言">
             <div class="manifesto__line" aria-hidden="true"></div>
 
+            <!-- 背景裝飾大字（UNCONVENTIONAL = 非常規 中英雙語視覺對話） -->
+            <div class="manifesto__bg-text" aria-hidden="true">UNCONVENTIONAL</div>
+
             <div class="manifesto__inner">
-                <h2 class="manifesto__big-text f-disp">
-                    <span class="line">非常規，</span>
-                    <span class="line"><span class="accent">才是真解法</span></span>
+                <h2 class="manifesto__big-text">
+                    <span class="line"><span class="accent">非常規，</span></span>
+                    <span class="line" data-text="才是真解法">才是真解法</span>
                 </h2>
 
                 <div class="manifesto__body">
@@ -175,7 +178,8 @@
                 </div>
 
                 <!-- Bento Grid -->
-                <div class="bento-grid" data-stagger-group="0.10">
+                <!-- data-stagger-group 移除：index.js 已用 ScrollTrigger 獨立控制，避免 core.js 雙重動畫 -->
+                <div class="bento-grid">
 
                     <!-- A 社群服務 -->
                     <a href="social.html" class="card bento--a service-card" aria-label="A 社群服務">
@@ -195,7 +199,7 @@
                     <!-- C AI 虛擬網紅（Featured） -->
                     <a href="virtual.html" class="card bento--c service-card" aria-label="C AI 虛擬網紅（精選）">
                         <div>
-                            <div class="service-card__icon" style="background:rgba(23,54,245,0.2);border-color:rgba(23,54,245,0.5);">
+                            <div class="service-card__icon">
                                 <i class="fas fa-user-astronaut" aria-hidden="true"></i>
                             </div>
                             <span class="service-card__label">C — AI 虛擬網紅</span>
@@ -247,8 +251,8 @@
                             <h3 class="service-card__title">產業顧問<br>導入</h3>
                             <p class="service-card__desc">大部分公司的問題，不在執行力，在診斷。我們跨產業歷練，AI 輔助，帶你找到卡關在哪。</p>
                         </div>
-                        <div style="margin-top:var(--sp-sm);">
-                            <span class="tag tag--yellow" style="font-size:0.65rem;">詢價制</span>
+                        <div class="service-card__tag-row">
+                            <span class="tag tag--yellow tag--xs">詢價制</span>
                         </div>
                         <span class="service-card__arrow">
                             了解更多 <span aria-hidden="true">→</span>
@@ -257,15 +261,15 @@
 
                     <!-- E 跳動E投放（跨兩欄） -->
                     <a href="tiktok.html" class="card bento--e service-card" aria-label="E 跳動E投放">
-                        <div style="display:flex;gap:var(--sp-md);align-items:flex-start;flex-wrap:wrap;">
+                        <div class="bento--e__layout">
                             <div>
-                                <div class="service-card__icon" style="background:rgba(255,199,9,0.08);border-color:rgba(255,199,9,0.3);color:var(--c-yellow);">
+                                <div class="service-card__icon">
                                     <i class="fab fa-tiktok" aria-hidden="true"></i>
                                 </div>
-                                <span class="service-card__label" style="color:var(--c-yellow);">E — 自營平台</span>
+                                <span class="service-card__label">E — 自營平台</span>
                                 <h3 class="service-card__title">跳動E投放</h3>
                             </div>
-                            <p class="service-card__desc" style="max-width:340px;padding-top:0.25rem;">
+                            <p class="service-card__desc">
                                 台灣個人戶也能投 TikTok 廣告——我們發現市場缺口，直接做了一個平台解決它。免營業登記，最快 24 小時開通。
                             </p>
                         </div>
@@ -274,14 +278,21 @@
                         </span>
                     </a>
 
-                </div>
-
-                <!-- F 補充說明 -->
-                <div style="margin-top:var(--sp-md);text-align:right;" data-reveal>
-                    <a href="growth.html" class="btn btn--ghost" style="font-size:var(--fs-sm);">
-                        另有 F 社群增長服務
-                        <span class="btn-arrow" aria-hidden="true">→</span>
+                    <!-- F 社群增長服務 -->
+                    <a href="growth.html" class="card bento--f service-card" aria-label="F 社群增長服務">
+                        <div>
+                            <div class="service-card__icon">
+                                <i class="fas fa-chart-line" aria-hidden="true"></i>
+                            </div>
+                            <span class="service-card__label">F — 社群增長</span>
+                            <h3 class="service-card__title">社群增長<br>服務</h3>
+                            <p class="service-card__desc">快速建立初期社群信任，讓後續自然流量有起跑點。</p>
+                        </div>
+                        <span class="service-card__arrow">
+                            了解更多 <span aria-hidden="true">→</span>
+                        </span>
                     </a>
+
                 </div>
 
             </div>
@@ -309,7 +320,7 @@
                         「不正常人類軟體開發」這個名字，不是標新立異，是一種直白的世界觀宣示：這個世界有太多問題，大部分人習以為常、視為正常，卻永遠解決不了。我們就是那種不願意接受「這樣就好」的人……
                     </p>
                     <div class="fade-mask" aria-hidden="true"></div>
-                    <a href="about.html" class="btn btn--ghost" style="margin-top:var(--sp-md);">
+                    <a href="about.html" class="btn btn--ghost brand-preview__cta">
                         看完整故事
                         <span class="btn-arrow" aria-hidden="true">→</span>
                     </a>
@@ -341,7 +352,8 @@
                 </p>
 
                 <div class="final-cta__btns">
-                    <a href="contact.html" class="btn btn--yellow">
+                    <a href="contact.html" class="btn btn--yellow btn--magnetic">
+                        <span class="btn-amber-dot" aria-hidden="true"></span>
                         立即聯絡
                         <span class="btn-arrow" aria-hidden="true">→</span>
                     </a>
@@ -366,7 +378,7 @@
         <div class="container">
             <div class="site-footer__inner">
                 <div class="site-footer__brand">
-                    創巢數位 &nbsp;<span style="opacity:.4;">·</span>&nbsp; Nest Digital
+                    創巢數位 &nbsp;<span class="site-footer__sep">·</span>&nbsp; Nest Digital
                 </div>
                 <nav class="site-footer__links" aria-label="頁尾連結">
                     <a href="about.html">關於我們</a>
