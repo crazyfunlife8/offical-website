@@ -122,10 +122,20 @@
 
             </div>
 
-            <!-- Hero 副標題（2026-05-05 裂縫設計完整移除，恢復純文字） -->
-            <p class="hero__readout js-hidden">
-                傳統做法不夠用時，你需要的<span class="hero__readout-dim">不是更努力</span><em>——</em><strong>而是一個敢用不同方法的團隊</strong>。
-            </p>
+            <!-- ─────────────────────────────────────────────
+                 Hero 裂縫副標（2026-04-26 重設計）
+                 視覺概念：文字從深空撕裂的縫中炸出來
+                 .hero__rift         — 整體定位容器（absolute，Hero 下半部居中）
+                 .hero__rift-crack   — SVG 裂縫，由 JS 動態注入（裂縫發光層）
+                 .hero__readout      — 文字層，壓在裂縫上方
+                 ───────────────────────────────────────────── -->
+            <div class="hero__rift js-hidden" aria-hidden="false">
+                <!-- SVG 裂縫由 index.js initRift() 注入，此處佔位 -->
+                <div class="hero__rift-crack" aria-hidden="true"></div>
+                <p class="hero__readout">
+                    傳統做法不夠用時，你需要的<span class="hero__readout-dim">不是更努力</span><em>——</em><strong>而是一個敢用不同方法的團隊</strong>。
+                </p>
+            </div>
 
         </section>
 

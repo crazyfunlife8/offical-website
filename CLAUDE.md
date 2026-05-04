@@ -165,4 +165,3 @@ about.html、contact.html、news.html、social.html、website.html、system.html
 | 等寬字型 | IBM Plex Mono | 維持 IBM Plex Mono |
 | Hero 太空人 | Three.js 3D 模型 | 2026-04-21 已從 Hero section 移除（HTML 以 `<!-- 太空人暫時移除 2026-04-21 -->` 標記保留位置） |
 | 四角座標文字 | 規格書原列為裝飾 | 2026-04-18 移除（HTML `.coords` div 與 components.css `.coords` 規則均已刪除） |
-| Hero 副標裂縫設計 | 2026-04-26 規劃「文字從深空撕裂的縫中炸出來」（`.hero__rift` + `::after` 暗橢圓 + `.hero__rift-crack` SVG zig-zag + `initRift()` JS 注入） | 2026-05-05 創辦人判定設計失敗，**完整移除**：HTML 的 `.hero__rift` 容器與 `.hero__rift-crack` 子層、CSS 的 `.hero__rift` / `::after` / `.hero__rift-crack` / `.rift-glow` / `.rift-main` / `.rift-branch` / `.rift-core` 全清、JS 的 `initRift()` 函式與其呼叫、以及 `initHeroEntrance()` 中所有針對 `.hero__rift` / `.hero__rift-crack` 的 GSAP 動畫全部刪除。副標恢復為純文字 `<p class="hero__readout">`，三段語意層級（dim/em/strong）保留但移除冷藍 text-shadow（原依附「能量場」概念）。**警示**：本次為第二輪移除，先前清理只刪 CSS 留下 JS+HTML 殘骸誤導後續判斷，本輪確認三層全清。後續若需重新設計副標題視覺，禁止再回 rift/crack 方向。 |

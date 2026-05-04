@@ -253,37 +253,98 @@ body {
     background: rgba(255, 255, 255, 0.15);
 }
 
-/* ─── Hero 副標題（純文字，待重新設計）──────────────────
-   2026-05-05：原 .hero__rift 裂縫設計（橢圓暗背景 + SVG zig-zag）
-   完整移除，副標恢復為純文字狀態。三段語意層級（dim/em/strong）保留。 */
-.hero__readout {
+/* ─── Hero 副標區容器 ─── */
+.hero__rift {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 42%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 5rem;
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* ─── 副標題正後方｜空間裂縫 ──────────────────────────────────────────
+   兩層結構，二段式深度：
+
+   L1（內層銳利核）：純 #000 elliptical core，~645×22px，aspect ~29:1
+                    ── 比背景深得多，是明確的「裂口」本體
+   L2（外層深邃暈）：alpha 漸變的深色暈，~1109×72px
+                    ── 所有 stop 顏色都比深空背景 #020b1e 更深（#000307/#00060d/#010814），
+                       永不繞到 #020b1e 那段（會與背景同色失去對比）
+                    ── 向 #blackhole 致敬：邊緣漸進到 transparent，產生深邃感 */
+.hero__rift::after {
+    content: '';
     position: absolute;
     left: 50%;
-    bottom: 5rem;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 900px;
-    padding: 0 var(--sec-px);
-    z-index: 3;
+    bottom: 6rem;
+    width: 70vw;
+    height: 5rem;
+    transform: translate(-50%, 50%);
+    pointer-events: none;
+    background:
+        /* L1：銳利裂口核（擴大範圍 + 維持高 alpha 純黑） */
+        radial-gradient(
+            ellipse 38% 18% at center,
+            #000 0%,
+            #000 78%,
+            rgba(0, 0, 0, 0.6) 92%,
+            transparent 100%
+        ),
+        /* L2：大範圍深邃暈（rx=50% 剛好觸及元素水平邊中點，gradient 在邊界內完成 fade，不被 element box 砍出硬切線） */
+        radial-gradient(
+            ellipse 50% 50% at center,
+            rgba(0, 3, 7, 0.95) 0%,
+            rgba(0, 3, 7, 0.80) 25%,
+            rgba(0, 6, 13, 0.60) 50%,
+            rgba(1, 8, 20, 0.35) 75%,
+            rgba(1, 8, 20, 0.12) 92%,
+            transparent 100%
+        );
+}
 
+/* ─── 副標文字（從能量場被推出的核心文字）─── */
+.hero__readout {
+    position: relative;
+    z-index: 2;
+
+    /* 置中，成為 Hero 第二視覺重心 */
     text-align: center;
+    padding: 0 var(--sec-px);
+    max-width: 900px;
+    width: 100%;
+
+    /* 字型：Noto Sans TC，無襯線幾何骨架（俐落基調，跟主標明朝體形成對話） */
     font-family: var(--f-sans);
     font-size: clamp(1rem, 1.55vw, 1.3rem);
     font-weight: 500;
     letter-spacing: 0.06em;
     line-height: 1.55;
     color: rgba(var(--c-stellar-rgb), 0.72);
+
     margin: 0;
     white-space: normal;
+
+    /* 文字背面有能量場照射感：backdrop 上有 screen 混合的光源
+       這個 text-shadow 讓文字本身感覺是被光推出來的，不是疊在光上面 */
+    text-shadow:
+        0 0 40px rgba(var(--c-blue-rgb), 0.18),
+        0 2px 60px rgba(var(--c-blue-rgb), 0.08);
 }
 
-/* 弱化段（被否定的舊路） */
+/* 被否定的舊路「不是更努力」：壓暗 + 輕量，語意上是「被超越的」
+   base 500 → dim 300，拉開 -200 weight 差讓 sans-serif 也讀得出層級 */
 .hero__readout-dim {
     opacity: 0.45;
     font-weight: 300;
 }
 
-/* 破折號 */
+/* 破折號：語意分隔符，視覺上是喘息點 */
 .hero__readout em {
     font-style: normal;
     padding: 0 0.25em;
@@ -291,20 +352,31 @@ body {
     opacity: 0.55;
 }
 
-/* 強化段（核心訴求） */
+/* 核心訴求「而是一個敢用不同方法的團隊」：最大重量 + 冷藍光暈
+   字重 900 + 冷藍 text-shadow，與背後能量場的光色呼應 */
 .hero__readout strong {
     font-weight: 900;
     color: var(--c-stellar);
+    text-shadow:
+        0 0 20px rgba(var(--c-blue-rgb), 0.60),
+        0 0 50px rgba(var(--c-blue-rgb), 0.30),
+        0 0 90px rgba(var(--c-blue-rgb), 0.12);
 }
 
-/* 手機：副標位置與字級調整 */
+/* 手機：維持可讀性，字級縮小，允許換行 */
 @media (max-width: 900px) {
+    .hero__rift {
+        padding-bottom: 3rem;
+        height: 45%;
+    }
+
     .hero__readout {
-        bottom: 3rem;
         font-size: 0.92rem;
         letter-spacing: 0.03em;
         color: rgba(var(--c-stellar-rgb), 0.80);
     }
+
+    /* 手機版暗字段也要稍微提亮，小尺寸 opacity 0.45 會太暗看不清 */
     .hero__readout-dim {
         opacity: 0.60;
     }
