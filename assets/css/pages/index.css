@@ -253,146 +253,59 @@ body {
     background: rgba(255, 255, 255, 0.15);
 }
 
-/* ════════════════════════════════════════════════════════════
-   Hero 能量場裂縫副標（2026-04-26 第二版：體積光源機制）
-   視覺概念：文字從一個空間能量場中被推出來
-   ────────────────────────────────────────────────────────────
-   設計決策記錄（第二版，取代 SVG zig-zag 折線失敗版）：
-
-   前版失敗原因：SVG stroke zig-zag 折線 = 線條 = 卡通閃電，
-   零體積感、零光源、沒有方向性焦點，與電影感完全無關。
-
-   新機制：多層 radial gradient 純 CSS 疊加光源（聚焦能量場）
-   - 光源是能量場（面），不是線條
-   - 三層光源結構：核心亮斑 → 中圈冷藍 → 外暈大範圍
-   - 外暈層 filter: blur(60px) 製造 volumetric light scattering 感
-   - mix-blend-mode: screen 讓光場和背後星空互動，光「污染」星場
-   - SVG 僅作 feTurbulence displacementMap 濾鏡容器（不畫線條），
-     讓光場邊緣有不規則有機擾動，取代幾何鋸齒
-   - 文字壓在光場正上方，backdrop 有光場照射感
-   - 電影參考：Doctor Strange 傳送門能量場 × Marvel 片頭撕裂光帶
-   ════════════════════════════════════════════════════════════ */
-
-/* ─── 裂縫容器：Hero 下半部置中定位 ─── */
+/* ─── Hero 副標區容器 ─── */
 .hero__rift {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    height: 42%;            /* 佔 Hero 下方 42%，讓副標落在主標之下但不貼底 */
+    height: 42%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
-    padding-bottom: 5rem;   /* 底部留呼吸空間，不貼邊 */
+    padding-bottom: 5rem;
     z-index: 3;
     pointer-events: none;
 }
 
-/* ─── 能量場光源容器（取代 SVG zig-zag）─── */
-.hero__rift-crack {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: visible;
-}
+/* ─── 副標題正後方｜空間裂縫 ──────────────────────────────────────────
+   兩層結構，二段式深度：
 
-/* SVG 濾鏡容器（僅提供 feTurbulence displacement，不畫任何可見線條）
-   SVG 本身透明且寬高為零，濾鏡透過 id 被其他元素引用 */
-.hero__rift-crack svg {
-    position: absolute;
-    width: 0;
-    height: 0;
-    overflow: visible;
-    pointer-events: none;
-}
-
-/* ─── 三層光源（純 CSS radial gradient 疊加，不依賴 SVG stroke）─── */
-
-/* 層一：外暈大橢圓（最底層，大範圍 volumetric scatter）
-   背景：深黑 #020b1e，合成色預算：
-   rgba(23,54,245, 0.08) screen 疊在深黑上 → 合成約 #07132a，極深藍黑
-   這層的任務是「讓周圍空氣感受到光的存在」，不需要可見的顏色 */
-.hero__rift-crack::before {
+   L1（內層銳利核）：純 #000 elliptical core，~645×22px，aspect ~29:1
+                    ── 比背景深得多，是明確的「裂口」本體
+   L2（外層深邃暈）：alpha 漸變的深色暈，~1109×72px
+                    ── 所有 stop 顏色都比深空背景 #020b1e 更深（#000307/#00060d/#010814），
+                       永不繞到 #020b1e 那段（會與背景同色失去對比）
+                    ── 向 #blackhole 致敬：邊緣漸進到 transparent，產生深邃感 */
+.hero__rift::after {
     content: '';
     position: absolute;
     left: 50%;
-    top: 50%;
-    /* 橫向橢圓：寬 110vw 確保從中心擴散到兩側，高 180px 是光帶厚度 */
-    width: 110vw;
-    height: 180px;
-    transform: translate(-50%, -50%);
-    background:
-        /* 最外圍：極低 opacity 的大暈，製造空間光污染感 */
-        radial-gradient(
-            ellipse 100% 100% at 50% 50%,
-            rgba(var(--c-blue-rgb), 0.22) 0%,
-            rgba(var(--c-blue-rgb), 0.08) 40%,
-            transparent 70%
-        );
-    filter: blur(55px);
-    mix-blend-mode: screen;
-    /* feTurbulence 置換讓邊緣有不規則有機擾動（非幾何鋸齒）*/
-    /* filter 後半段：url(#rift-turbulence) 需在同文件 SVG 內定義 */
-}
-
-/* 層二：中圈冷藍能量帶（光源的中間層，帶狀聚焦）
-   合成色計算：rgba(0,200,255, 0.35) screen 在深黑上 → 合成約 #083844，深青藍
-   這層讓光帶「有形狀」——橫向橢圓的能量集中帶 */
-.hero__rift-crack::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
+    bottom: 6rem;
     width: 70vw;
-    height: 80px;
-    transform: translate(-50%, -50%);
+    height: 5rem;
+    transform: translate(-50%, 50%);
+    pointer-events: none;
     background:
+        /* L1：銳利裂口核（擴大範圍 + 維持高 alpha 純黑） */
         radial-gradient(
-            ellipse 100% 100% at 50% 50%,
-            rgba(var(--c-cyan-rgb), 0.50) 0%,
-            rgba(var(--c-blue-rgb), 0.30) 30%,
-            rgba(var(--c-blue-rgb), 0.10) 60%,
+            ellipse 38% 18% at center,
+            #000 0%,
+            #000 78%,
+            rgba(0, 0, 0, 0.6) 92%,
+            transparent 100%
+        ),
+        /* L2：大範圍深邃暈（rx=50% 剛好觸及元素水平邊中點，gradient 在邊界內完成 fade，不被 element box 砍出硬切線） */
+        radial-gradient(
+            ellipse 50% 50% at center,
+            rgba(0, 3, 7, 0.95) 0%,
+            rgba(0, 3, 7, 0.80) 25%,
+            rgba(0, 6, 13, 0.60) 50%,
+            rgba(1, 8, 20, 0.35) 75%,
+            rgba(1, 8, 20, 0.12) 92%,
             transparent 100%
         );
-    filter: blur(22px);
-    mix-blend-mode: screen;
-}
-
-/* 層三：核心亮斑（最亮，焦點集中，模擬光從深空最內側噴出）
-   用 .hero__rift-crack 本體的 background 實現，避免偽元素用完
-   但因偽元素已用，改用 JS 注入的 .rift-core-glow div 處理 */
-
-/* ─── JS 注入的核心亮斑元素（.rift-core-glow）─── */
-.rift-core-glow {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    /* 核心亮斑：小範圍、極亮、接近星白
-       合成色計算：rgba(232,240,255, 0.90) screen 在深黑上 → 合成接近 #d8e0f5，極亮 */
-    width: clamp(200px, 28vw, 380px);
-    height: 40px;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(
-        ellipse 100% 100% at 50% 50%,
-        rgba(var(--c-stellar-rgb), 0.95) 0%,
-        rgba(var(--c-stellar-rgb), 0.55) 15%,
-        rgba(var(--c-cyan-rgb), 0.45) 35%,
-        rgba(var(--c-blue-rgb), 0.20) 60%,
-        transparent 100%
-    );
-    filter: blur(6px);
-    mix-blend-mode: screen;
-    pointer-events: none;
-}
-
-/* ─── 不規則邊緣擾動遮罩（JS 注入，用 SVG feTurbulence clip）─── */
-/* .rift-displacement-mask 是 JS 在 SVG 內建立的 feImage / feDisplacementMap 濾鏡
-   此 CSS 規則為備用——若不支援 SVG filter，降格為純 CSS 光場即可，不影響結構 */
-.rift-displacement-mask {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
 }
 
 /* ─── 副標文字（從能量場被推出的核心文字）─── */
@@ -406,10 +319,10 @@ body {
     max-width: 900px;
     width: 100%;
 
-    /* 字型：Chiron Sung HK WS 明朝體骨架，在深黑背景有剛性線條感 */
-    font-family: var(--f-serif-cjk);
+    /* 字型：Noto Sans TC，無襯線幾何骨架（俐落基調，跟主標明朝體形成對話） */
+    font-family: var(--f-sans);
     font-size: clamp(1rem, 1.55vw, 1.3rem);
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: 0.06em;
     line-height: 1.55;
     color: rgba(var(--c-stellar-rgb), 0.72);
@@ -424,10 +337,11 @@ body {
         0 2px 60px rgba(var(--c-blue-rgb), 0.08);
 }
 
-/* 被否定的舊路「不是更努力」：壓暗 + 輕量，語意上是「被超越的」*/
+/* 被否定的舊路「不是更努力」：壓暗 + 輕量，語意上是「被超越的」
+   base 500 → dim 300，拉開 -200 weight 差讓 sans-serif 也讀得出層級 */
 .hero__readout-dim {
     opacity: 0.45;
-    font-weight: 400;
+    font-weight: 300;
 }
 
 /* 破折號：語意分隔符，視覺上是喘息點 */
@@ -454,26 +368,6 @@ body {
     .hero__rift {
         padding-bottom: 3rem;
         height: 45%;
-    }
-
-    /* 外暈層手機縮小 */
-    .hero__rift-crack::before {
-        width: 130vw;
-        height: 130px;
-        filter: blur(40px);
-    }
-
-    /* 中圈手機縮小 */
-    .hero__rift-crack::after {
-        width: 90vw;
-        height: 60px;
-        filter: blur(16px);
-    }
-
-    .rift-core-glow {
-        width: 160px;
-        height: 28px;
-        filter: blur(5px);
     }
 
     .hero__readout {
