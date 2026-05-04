@@ -592,84 +592,9 @@
     }
 
     /* ════════════════════════════════════════════════════════
-       3. Hero 裂縫副標（2026-04-26 重設計）
-       視覺概念：文字從深空撕裂的縫中炸出來
-
-       設計決策：
-       - SVG 裂縫從中心向兩側生長（clip-path 動畫），象徵空間被撕開
-       - 裂縫不是直線，是有 zig-zag 的不規則折線，有「撕裂」物理感
-       - 三層光效：背光寬模糊層（glow）+ 主線（main）+ 衍生細裂紋（branch）
-       - 文字在裂縫生長完成後從縫中推出（translateY + opacity）
-       - DESIGN_MODE=true 時直接設定 rest 狀態（裂縫完整、文字定位完成）
-       ════════════════════════════════════════════════════════ */
-
-    function initRift() {
-        const riftWrap = document.querySelector('.hero__rift');
-        const crackContainer = document.querySelector('.hero__rift-crack');
-        if (!riftWrap || !crackContainer) return;
-
-        // ── 裂縫路徑生成 ──────────────────────────────────────────
-        // viewBox 以容器 100% 為基準，裂縫水平橫跨，中央為爆發源
-        // 裂縫設計：從中心點向左右各延伸，不規則 zig-zag 模擬撕裂
-        // 數值為 viewBox 百分比座標（0-100 x, 0-100 y，y=50 為中線）
-
-        const svgNS = 'http://www.w3.org/2000/svg';
-        const svg = document.createElementNS(svgNS, 'svg');
-        svg.setAttribute('xmlns', svgNS);
-        svg.setAttribute('viewBox', '0 0 1000 200');
-        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-        svg.setAttribute('aria-hidden', 'true');
-
-        // 背光寬暈（模糊的能量面，最底層）
-        const glowPath = document.createElementNS(svgNS, 'path');
-        glowPath.setAttribute('class', 'rift-glow');
-        // 主裂縫路徑（相同路徑，寬 stroke + blur 做背光）
-        glowPath.setAttribute('d', 'M 500,100 L 472,93 L 445,107 L 415,96 L 382,104 L 348,92 L 310,100 L 268,95 L 225,105 L 178,98 L 128,103 L 75,97 L 30,102 M 500,100 L 528,107 L 555,93 L 585,104 L 618,96 L 652,108 L 690,100 L 732,105 L 775,95 L 822,102 L 872,97 L 925,103 L 970,98');
-
-        // 主裂縫（發光的主線）
-        const mainPath = document.createElementNS(svgNS, 'path');
-        mainPath.setAttribute('class', 'rift-main');
-        mainPath.setAttribute('d', 'M 500,100 L 472,93 L 445,107 L 415,96 L 382,104 L 348,92 L 310,100 L 268,95 L 225,105 L 178,98 L 128,103 L 75,97 L 30,102 M 500,100 L 528,107 L 555,93 L 585,104 L 618,96 L 652,108 L 690,100 L 732,105 L 775,95 L 822,102 L 872,97 L 925,103 L 970,98');
-
-        // 衍生細裂紋（從主縫上方和下方延伸的小分支）
-        const branch1 = document.createElementNS(svgNS, 'path');
-        branch1.setAttribute('class', 'rift-branch');
-        branch1.setAttribute('d', 'M 472,93 L 462,78 L 468,65 M 445,107 L 438,120 L 432,130 M 382,104 L 375,118 M 310,100 L 305,88 L 298,78 M 225,105 L 220,92 M 178,98 L 170,85 L 162,76');
-
-        const branch2 = document.createElementNS(svgNS, 'path');
-        branch2.setAttribute('class', 'rift-branch');
-        branch2.setAttribute('d', 'M 528,107 L 536,120 L 540,132 M 555,93 L 562,80 L 568,68 M 618,96 L 624,82 M 652,108 L 660,122 L 668,134 M 732,105 L 738,118 M 775,95 L 782,82 L 788,70');
-
-        // 爆發核心點（縫的起始交叉，最亮）
-        const coreCircle = document.createElementNS(svgNS, 'circle');
-        coreCircle.setAttribute('class', 'rift-core');
-        coreCircle.setAttribute('cx', '500');
-        coreCircle.setAttribute('cy', '100');
-        coreCircle.setAttribute('r', '3');
-
-        svg.appendChild(glowPath);
-        svg.appendChild(branch1);
-        svg.appendChild(branch2);
-        svg.appendChild(mainPath);
-        svg.appendChild(coreCircle);
-
-        crackContainer.appendChild(svg);
-
-        // ── DESIGN_MODE 處理 ──────────────────────────────────────
-        // DESIGN_MODE=true：直接設定 rest 狀態（裂縫完整展開、文字到位）
-        // DESIGN_MODE=false：GSAP 序列動畫（由 initHeroEntrance 整合）
-
-        if (DESIGN_MODE) {
-            // rest 狀態：裂縫完整、文字到位
-            // .hero__rift 的 .js-hidden 在 DESIGN_MODE 下由 base.css 的規則
-            // body.design-mode .js-hidden { opacity:1; transform:none } 處理
-            // SVG 本身不需要額外操作，直接可見
-        }
-        // DESIGN_MODE=false 時的動畫在 initHeroEntrance() 中處理
-    }
-
-    /* ════════════════════════════════════════════════════════
-       4. Hero GSAP 入場序列（2026-04-26 更新加入裂縫副標）
+       3. Hero GSAP 入場序列
+       （2026-05-05：SVG zig-zag 裂縫線條設計失敗，initRift() 完整移除；
+                     ::after 暗橢圓背景與文字冷藍光暈保留）
        ════════════════════════════════════════════════════════ */
 
     function initHeroEntrance() {
@@ -700,32 +625,22 @@
             0.15
         )
 
-        // ── 裂縫副標進場序列（2026-04-26）──
-        // 時序：主標進場中段（0.8s 後）裂縫開始生長，文字隨後推出
-        // 裂縫主線先從 clipPath 0→100% 展開（模擬從中心撕開到兩端）
-        // 然後文字從縫中向上推出（translateY -18px → 0 + opacity）
+        // ── 副標題進場序列 ──
+        // 2026-05-05：原 SVG 裂縫生長動畫（.hero__rift-crack scaleX）已隨 SVG 設計移除
+        // 保留容器 fade-in 與文字推出（::after 暗橢圓背景靜態存在，無需動畫）
 
-        // 整個裂縫容器先出現（opacity 0 → 1）
+        // 副標容器先 fade-in
         .fromTo('.hero__rift',
             { opacity: 0 },
             { opacity: 1, duration: 0.4, ease: 'power2.out' },
             0.75
         )
 
-        // SVG 裂縫線：用 stroke-dasharray / stroke-dashoffset 從中心向兩端生長
-        // 這個效果需要在 initRift() 後計算路徑長度，此處用 scaleX 替代
-        // scaleX 從 0.02 → 1（以中心為錨點），視覺上是「從中心向兩端裂開」
-        .fromTo('.hero__rift-crack',
-            { scaleX: 0.02, opacity: 0, transformOrigin: '50% 50%' },
-            { scaleX: 1, opacity: 1, duration: 0.65, ease: 'power4.out' },
-            0.78
-        )
-
-        // 文字從縫中向上「推出」（縫是能量源，文字從縫往上冒出）
+        // 文字從下方推出（保留原本的 y/blur 進場語彙）
         .fromTo('.hero__readout',
             { opacity: 0, y: 22, filter: 'blur(4px)' },
             { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.75, ease: 'power2.out' },
-            1.1
+            1.0
         );
     }
 
@@ -1044,9 +959,6 @@
             const fallback = document.querySelector('.hero__astronaut-fallback');
             if (fallback) fallback.style.opacity = '1';
         }
-
-        // 裂縫 SVG 注入（L1 層級，DESIGN_MODE 下也需執行以顯示 rest 狀態）
-        try { initRift(); } catch(e) { console.warn('[index.js] initRift failed:', e); }
 
         // DESIGN_MODE：凍結 L2（進場）+ L3（捲動驅動），加 body class 讓 CSS 提供救援
         if (DESIGN_MODE) {

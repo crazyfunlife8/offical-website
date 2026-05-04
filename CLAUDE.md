@@ -165,3 +165,4 @@ about.html、contact.html、news.html、social.html、website.html、system.html
 | 等寬字型 | IBM Plex Mono | 維持 IBM Plex Mono |
 | Hero 太空人 | Three.js 3D 模型 | 2026-04-21 已從 Hero section 移除（HTML 以 `<!-- 太空人暫時移除 2026-04-21 -->` 標記保留位置） |
 | 四角座標文字 | 規格書原列為裝飾 | 2026-04-18 移除（HTML `.coords` div 與 components.css `.coords` 規則均已刪除） |
+| Hero 副標 SVG zig-zag 裂縫線 | 2026-04-26 規劃為「文字從深空撕裂的縫中炸出來」視覺，由 `initRift()` 動態注入 5 條 SVG path（glow/main/branch×2/core）疊在 `::after` 暗橢圓上 | 2026-05-05 創辦人判定 SVG zig-zag「像閃電線」設計失敗，徹底移除：HTML 的 `.hero__rift-crack` 子層、JS 的 `initRift()` 函式與其呼叫、`initHeroEntrance()` 中針對 `.hero__rift-crack` 的 GSAP scaleX 動畫全部刪除。**保留**：`.hero__rift` 容器、`::after` 暗橢圓背景、`.hero__readout` 文字與冷藍 text-shadow（含 strong 段冷藍光暈）——這些是創辦人原本就要保留的設計。**警示**：本次清理發生時主 session 一度誤判用戶意圖，把整個裂縫設計（含 ::after 暗橢圓與文字光暈）一起移除，被立即糾正後 revert 並改執行精確切除。SVG 注入殘骸源自更早一輪「只刪 CSS 留下 JS+HTML」的不徹底清理，導致 SVG 隱形存在於 codebase 中。後續若需重新設計副標題視覺，禁止再回 SVG zig-zag 線條方向。 |
