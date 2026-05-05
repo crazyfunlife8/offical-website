@@ -353,6 +353,25 @@ body {
     font-weight: normal;
 }
 
+/* ─── 副標下方英文（同義重寫，非逐字翻譯）2026-05-05 新增 ───
+   Fraunces italic、字級小於中文、低透明度、無光暈
+   定位：中文為主訴求，英文為編輯感 echo / refrain，視覺上明顯次於中文 */
+.hero__readout-en {
+    text-align: center;
+    padding: 0 var(--sec-px);
+    max-width: 800px;
+    width: 100%;
+    margin: 0.55em 0 0;
+
+    font-family: var(--f-serif);  /* Fraunces 變動字型 */
+    font-size: 0.875rem;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 0.025em;
+    line-height: 1.5;
+    color: rgba(var(--c-stellar-rgb), 0.45);
+}
+
 /* 手機：維持可讀性，字級縮小，允許換行 */
 @media (max-width: 900px) {
     .hero__rift {
@@ -364,6 +383,11 @@ body {
         font-size: 0.92rem;
         letter-spacing: 0.03em;
         color: rgba(var(--c-stellar-rgb), 0.80);
+    }
+
+    .hero__readout-en {
+        font-size: 0.78rem;
+        margin-top: 0.5em;
     }
 }
 
