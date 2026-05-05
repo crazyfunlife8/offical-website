@@ -313,8 +313,8 @@ body {
     position: relative;
     z-index: 2;
 
-    /* 置中，成為 Hero 第二視覺重心 */
-    text-align: center;
+    /* 2026-05-06：text-align center → right（副標靠右切齊） */
+    text-align: right;
     padding: 0 var(--sec-px);
     max-width: 900px;
     width: 100%;
@@ -386,7 +386,7 @@ body {
     position: relative;
     z-index: 2;
 
-    text-align: center;
+    text-align: right;  /* 2026-05-06：副標靠右切齊，與中文同 */
     padding: 0 var(--sec-px);
     max-width: 900px;
     width: 100%;
