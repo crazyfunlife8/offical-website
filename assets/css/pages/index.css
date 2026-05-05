@@ -337,28 +337,20 @@ body {
         0 2px 60px rgba(var(--c-blue-rgb), 0.08);
 }
 
-/* 被否定的舊路「不是更努力」：靠 opacity 製造淡出感
-   仿宋無多字重對比，hierarchy 全由透明度承擔，故 dim 拉得比之前更低 */
-.hero__readout-dim {
-    opacity: 0.40;
-}
+/* 三段語意層級（dim / em / strong）2026-05-05 視覺扁平化：
+   創辦人要求文字顏色全部與「傳統做法」一致、且粗體拿掉。
+   HTML 語意標籤保留供無障礙；視覺上回到單一風格無對比。 */
 
-/* 破折號：語意分隔符，視覺上是喘息點 */
+/* em 破折號：保留排版用 padding（避免破折號緊貼鄰字），其餘無差異 */
 .hero__readout em {
     font-style: normal;
     padding: 0 0.25em;
     letter-spacing: 0;
-    opacity: 0.55;
 }
 
-/* 核心訴求「而是一個敢用不同方法的團隊」：滿透明度 + 冷藍光暈
-   仿宋單字重，強調靠「滿色 + 光暈」承擔，不靠字重加重 */
+/* strong：明確設 font-weight: normal，避免瀏覽器在仿宋單字重上合成假粗體 */
 .hero__readout strong {
-    color: var(--c-stellar);
-    text-shadow:
-        0 0 20px rgba(var(--c-blue-rgb), 0.60),
-        0 0 50px rgba(var(--c-blue-rgb), 0.30),
-        0 0 90px rgba(var(--c-blue-rgb), 0.12);
+    font-weight: normal;
 }
 
 /* 手機：維持可讀性，字級縮小，允許換行 */
@@ -372,11 +364,6 @@ body {
         font-size: 0.92rem;
         letter-spacing: 0.03em;
         color: rgba(var(--c-stellar-rgb), 0.80);
-    }
-
-    /* 手機版暗字段也要稍微提亮，小尺寸 opacity 0.45 會太暗看不清 */
-    .hero__readout-dim {
-        opacity: 0.60;
     }
 }
 
