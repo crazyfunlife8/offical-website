@@ -369,9 +369,10 @@ body {
         rgba(var(--c-cyan-rgb), 0.70) 90%,
         rgba(var(--c-cyan-rgb), 0.90) 100%
     );
-    box-shadow:
-        0 0 8px rgba(var(--c-cyan-rgb), 0.20),
-        12px 0 20px rgba(var(--c-cyan-rgb), 0.30);  /* 右側偏移強光，強化射出感 */
+    /* 2026-05-06：移除原本的全向 box-shadow（0 0 8px rgba 0.20），
+       原因：1px 線左半部 gradient alpha < 0.16，全向光暈 0.20 反而比線亮，
+       視覺上線變成「淡光暈中夾的暗縫」（看似黑線）。改為僅保留右側偏移光暈。 */
+    box-shadow: 12px 0 20px rgba(var(--c-cyan-rgb), 0.30);
 }
 
 /* ─── 副標下方英文（同義重寫，非逐字翻譯）2026-05-05 新增 ───
