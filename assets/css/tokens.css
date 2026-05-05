@@ -54,8 +54,8 @@
                                                                         /* 中文大標／宣言，港產明朝活字；與 Fraunces 英宋對位 */
     --f-fang-cjk:  'cwTeX Q Fangsong', 'STFangsong', '標楷體', 'BiauKai', serif;
                                                                         /* 中文 display 副標／編輯感仿宋；單一 Medium 字重（cwTeX OFL），與 Chiron Sung 主標形成「印刷明朝×編輯仿宋」對話 */
-    --f-display-en: 'Tangerine', 'Pinyon Script', 'Italianno', cursive;
-                                                                        /* 英文 display 副標／中世紀羽毛筆書法（copperplate nib）細長連筆 script；本站僅以 weight 400 載入；Tangerine 自帶 cursive 不需 font-style: italic、letter-spacing 須為 0 避免破壞連筆 */
+    --f-display-en: 'Allura', 'Pinyon Script', 'Sacramento', cursive;
+                                                                        /* 英文 display 副標／copperplate 書法 script；ascender 比 Tangerine 收斂、descender 保留書法尾；本站僅以 weight 400 載入；自帶 cursive 不需 font-style: italic、letter-spacing 須為 0 避免破壞連筆 */
     --f-mono:  'JetBrains Mono', monospace;                             /* 座標文字、技術細節、數據 */
     /* --f-bebas 於 2026-04-19 移除（Fraunces 接手所有英文大字，含 Manifesto UNCONVENTIONAL） */
 
