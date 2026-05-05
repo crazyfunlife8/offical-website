@@ -337,16 +337,10 @@ body {
         0 2px 60px rgba(var(--c-blue-rgb), 0.08);
 }
 
-/* 三段語意層級（dim / em / strong）2026-05-05 視覺扁平化：
+/* 兩段語意層級（dim / strong）2026-05-05 視覺扁平化：
    創辦人要求文字顏色全部與「傳統做法」一致、且粗體拿掉。
-   HTML 語意標籤保留供無障礙；視覺上回到單一風格無對比。 */
-
-/* em 破折號：保留排版用 padding（避免破折號緊貼鄰字），其餘無差異 */
-.hero__readout em {
-    font-style: normal;
-    padding: 0 0.25em;
-    letter-spacing: 0;
-}
+   HTML 語意標籤保留供無障礙；視覺上回到單一風格無對比。
+   2026-05-06：原 <em>——</em> 破折號改為純文字「；」，em 規則移除。 */
 
 /* strong：明確設 font-weight: normal，避免瀏覽器在仿宋單字重上合成假粗體 */
 .hero__readout strong {
