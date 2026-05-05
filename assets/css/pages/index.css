@@ -269,44 +269,8 @@ body {
     pointer-events: none;
 }
 
-/* ─── 副標題正後方｜空間裂縫 ──────────────────────────────────────────
-   兩層結構，二段式深度：
-
-   L1（內層銳利核）：純 #000 elliptical core，~645×22px，aspect ~29:1
-                    ── 比背景深得多，是明確的「裂口」本體
-   L2（外層深邃暈）：alpha 漸變的深色暈，~1109×72px
-                    ── 所有 stop 顏色都比深空背景 #020b1e 更深（#000307/#00060d/#010814），
-                       永不繞到 #020b1e 那段（會與背景同色失去對比）
-                    ── 向 #blackhole 致敬：邊緣漸進到 transparent，產生深邃感 */
-.hero__rift::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: 6rem;
-    width: 70vw;
-    height: 5rem;
-    transform: translate(-50%, 50%);
-    pointer-events: none;
-    background:
-        /* L1：銳利裂口核（擴大範圍 + 維持高 alpha 純黑） */
-        radial-gradient(
-            ellipse 38% 18% at center,
-            #000 0%,
-            #000 78%,
-            rgba(0, 0, 0, 0.6) 92%,
-            transparent 100%
-        ),
-        /* L2：大範圍深邃暈（rx=50% 剛好觸及元素水平邊中點，gradient 在邊界內完成 fade，不被 element box 砍出硬切線） */
-        radial-gradient(
-            ellipse 50% 50% at center,
-            rgba(0, 3, 7, 0.95) 0%,
-            rgba(0, 3, 7, 0.80) 25%,
-            rgba(0, 6, 13, 0.60) 50%,
-            rgba(1, 8, 20, 0.35) 75%,
-            rgba(1, 8, 20, 0.12) 92%,
-            transparent 100%
-        );
-}
+/* 2026-05-06：原 .hero__rift::after 暗橢圓「空間裂縫」背景完整移除（創辦人判定不再需要）。
+   .hero__rift 容器保留作為副標 flex 排版（中文 / 分隔線 / 英文）的右對齊定位 wrapper。 */
 
 /* ─── 副標文字（仿宋編輯感，從能量場被推出的核心文字）─── */
 .hero__readout {
