@@ -347,6 +347,30 @@ body {
     font-weight: normal;
 }
 
+/* ─── 中英文之間的冷光分隔線（2026-05-06 新增）──
+   線寬超出文字容器（max-width 1200 vs 文字 max-width 900），
+   兩端 transparent 中間 cyan，雙層光暈呈現「光劃過去」感
+   margin 0.2em 上下取代英文原本的 0.55em margin-top，整體行距縮小 */
+.hero__readout-divider {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1200px;
+    height: 1px;
+    margin: 0.2em 0;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(var(--c-cyan-rgb), 0.20) 20%,
+        rgba(var(--c-cyan-rgb), 0.60) 50%,
+        rgba(var(--c-cyan-rgb), 0.20) 80%,
+        transparent 100%
+    );
+    box-shadow:
+        0 0 8px rgba(var(--c-cyan-rgb), 0.25),
+        0 0 16px rgba(var(--c-cyan-rgb), 0.15);
+}
+
 /* ─── 副標下方英文（同義重寫，非逐字翻譯）2026-05-05 新增 ───
    Fraunces italic、字級小於中文、低透明度、無光暈
    定位：中文為主訴求，英文為編輯感 echo / refrain，視覺上明顯次於中文
@@ -366,7 +390,7 @@ body {
     padding: 0 var(--sec-px);
     max-width: 900px;
     width: 100%;
-    margin: 0.55em 0 0;
+    margin: 0;  /* 2026-05-06 改：spacing 由 .hero__readout-divider 自身 margin 接管 */
 
     font-family: var(--f-display-en);  /* Italianno（copperplate 極細草書，hairline 髮絲筆畫，全字符連筆） */
     font-size: clamp(1.4rem, 2.1vw, 1.8rem);  /* Italianno 筆畫極細需略放大確保可讀，~1.5× */
@@ -392,7 +416,10 @@ body {
 
     .hero__readout-en {
         font-size: 1.2rem;  /* Italianno 髮絲筆畫，手機尺度需略放大維持可讀 */
-        margin-top: 0.5em;
+    }
+
+    .hero__readout-divider {
+        margin: 0.15em 0;  /* 手機行距更緊 */
     }
 }
 
