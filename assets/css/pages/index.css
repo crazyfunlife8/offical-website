@@ -286,7 +286,7 @@ body {
     /* 字型：cwTeX Q Fangsong（繁體仿宋體，單一 Medium 字重）
        2026-05-05 從黑體換成仿宋；橫筆右斜的編輯感骨架，與 h1 Chiron Sung 印刷明朝形成對位 */
     font-family: var(--f-fang-cjk);
-    font-size: clamp(1rem, 1.55vw, 1.3rem);
+    font-size: clamp(0.875rem, 1.4vw, 1.175rem);  /* 2026-05-06：縮小 ~2px（原 clamp(1, 1.55vw, 1.3rem)） */
     /* 不指定 font-weight：仿宋僅一個 Medium 字重，避免瀏覽器合成假粗體 */
     letter-spacing: 0.06em;
     line-height: 1.7;
@@ -321,7 +321,7 @@ body {
     width: 100%;
     max-width: 1200px;
     height: 1px;
-    margin: 0.2em 0;
+    margin: 0.05em 0 0.2em;  /* 2026-05-06：top 由 0.2em → 0.05em，中文底部靠近冷光線；bottom 保留 0.2em */
     /* 2026-05-06：原對稱 gradient 改為右側射出
        左端 transparent 漸進至右端 0.90 alpha 高峰，搭配右側強光 box-shadow，
        配合副標靠右對齊形成「光從右方射出，照向左方」的視覺敘事 */
@@ -377,17 +377,17 @@ body {
     }
 
     .hero__readout {
-        font-size: 0.92rem;
+        font-size: 0.795rem;  /* 2026-05-06：縮小 ~2px（原 0.92rem） */
         letter-spacing: 0.03em;
         /* 2026-05-06：移除手機 color 覆寫，繼承桌機 0.85（與英文一致） */
     }
 
-    .hero__readout-en {
-        font-size: 1.2rem;  /* Italianno 髮絲筆畫，手機尺度需略放大維持可讀 */
+    .hero__readout-divider {
+        margin: 0.05em 0 0.15em;  /* 2026-05-06：top 同步收緊 */
     }
 
-    .hero__readout-divider {
-        margin: 0.15em 0;  /* 手機行距更緊 */
+    .hero__readout-en {
+        font-size: 1.2rem;  /* Italianno 髮絲筆畫，手機尺度需略放大維持可讀 */
     }
 }
 
