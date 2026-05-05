@@ -172,17 +172,19 @@ body {
     position: absolute;
     bottom: 0.12em;
     left: 0;
-    width: 100%;
+    width: 130%;  /* 2026-05-06：超出文字向右延展 30%，作為光線射出的尾段 */
     height: 1px;
     /* 2026-05-06：原對稱（transparent → blue 50% → transparent + opacity 0.7）改為左側射出。
        光源在左、向右漸弱，與副標分隔線（光從右射出）形成鏡像呼應。
-       opacity 模式改為直接 alpha in stops，效果更乾淨可控。 */
+       opacity 模式改為直接 alpha in stops，效果更乾淨可控。
+       gradient stops 對齊新 width：text 占 0-77%（100/130），77-100% 為超出文字的延伸段 */
     background: linear-gradient(
         90deg,
         rgba(var(--c-blue-rgb), 0.75) 0%,
-        rgba(var(--c-blue-rgb), 0.55) 15%,
-        rgba(var(--c-blue-rgb), 0.25) 45%,
-        rgba(var(--c-blue-rgb), 0.05) 75%,
+        rgba(var(--c-blue-rgb), 0.60) 20%,
+        rgba(var(--c-blue-rgb), 0.40) 50%,
+        rgba(var(--c-blue-rgb), 0.20) 77%,    /* 文字右邊緣，仍可見 */
+        rgba(var(--c-blue-rgb), 0.08) 90%,
         transparent 100%
     );
 }
