@@ -359,19 +359,23 @@ body {
 
    z-index 處理：必須與 .hero__readout 一樣 position:relative + z-index:2，
                  否則會被 .hero__rift::after 暗橢圓物理堆疊遮擋（pseudo
-                 ::after 預設 stacking 高於 static 兄弟元素） */
+                 ::after 預設 stacking 高於 static 兄弟元素）
+
+   等寬對齊：font-size 與 max-width 從中文反推，讓英文自然渲染寬度逼近中文
+            中文 clamp(1rem, 1.55vw, 1.3rem) × 比例 0.88 = clamp(0.88rem, 1.36vw, 1.15rem)
+            max-width 同步從 800px 放到 900px 對齊中文容器 */
 .hero__readout-en {
     position: relative;
     z-index: 2;
 
     text-align: center;
     padding: 0 var(--sec-px);
-    max-width: 800px;
+    max-width: 900px;
     width: 100%;
     margin: 0.55em 0 0;
 
     font-family: var(--f-serif);  /* Fraunces 變動字型 */
-    font-size: 0.875rem;
+    font-size: clamp(0.88rem, 1.36vw, 1.15rem);
     font-style: italic;
     font-weight: 300;
     letter-spacing: 0.025em;
