@@ -113,36 +113,7 @@ body {
     initial-value: 80;
 }
 
-.hero__bg-text {
-    position: absolute;
-    top: 14%;
-    left: -3vw;
-    font-family: var(--f-serif);
-    font-size: clamp(6rem, 18vw, 20rem);
-    line-height: 0.9;
-    letter-spacing: -0.04em;
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(var(--c-stellar-rgb), 0.12);
-    pointer-events: none;
-    user-select: none;
-    z-index: 0;
-    white-space: nowrap;
-    --vf-opsz: 144;
-    --vf-wght: 200;
-    --vf-soft: 80;
-    font-variation-settings: "opsz" var(--vf-opsz), "wght" var(--vf-wght), "SOFT" var(--vf-soft);
-    font-style: italic;
-    will-change: font-variation-settings;
-}
-
-@media (max-width: 900px) {
-    .hero__bg-text {
-        font-size: clamp(4rem, 22vw, 9rem);
-        top: 8%;
-        left: -6vw;
-        opacity: 0.75;
-    }
-}
+/* .hero__bg-text ANOMALY 背景大字 2026-05-06 移除（@property --vf-* 保留供 .manifesto__bg-text UNCONVENTIONAL 使用） */
 
 .hero__inner {
     position: relative;

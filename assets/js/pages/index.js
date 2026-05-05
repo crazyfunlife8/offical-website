@@ -814,24 +814,7 @@
     function initVariableFontAxis() {
         if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
-        const heroBg = document.querySelector('.hero__bg-text');
-        if (heroBg) {
-            gsap.fromTo(heroBg,
-                { '--vf-opsz': 144, '--vf-wght': 200, '--vf-soft': 80 },
-                {
-                    '--vf-opsz': 36,
-                    '--vf-wght': 600,
-                    '--vf-soft': 10,
-                    ease: 'none',
-                    scrollTrigger: {
-                        trigger: '.hero',
-                        start: 'top top',
-                        end: 'bottom top',
-                        scrub: 0.6,
-                    },
-                }
-            );
-        }
+        // 2026-05-06：原 hero__bg-text ANOMALY 軸動已隨元素移除；保留 manifesto 部分
 
         const maniBg = document.querySelector('.manifesto__bg-text');
         if (maniBg) {
