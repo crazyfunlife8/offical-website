@@ -319,29 +319,29 @@ body {
     max-width: 900px;
     width: 100%;
 
-    /* 字型：Noto Sans TC，無襯線幾何骨架（俐落基調，跟主標明朝體形成對話） */
-    font-family: var(--f-sans);
+    /* 字型：Chiron Hei HK WS（港產黑體可變字型，與 h1 主標的 Chiron Sung HK 同作者）
+       幾何骨架較 Noto Sans TC 俐落收斂；2026-05-05 從 --f-sans 切換 */
+    font-family: var(--f-hei-cjk);
     font-size: clamp(1rem, 1.55vw, 1.3rem);
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    line-height: 1.55;
+    font-weight: 350;        /* 變動字型 200-900，350 為輕中量，俐落不單薄 */
+    letter-spacing: 0.08em;  /* Chiron Hei 比 Noto Sans 緊實，加 spacing 補回呼吸 */
+    line-height: 1.65;
     color: rgba(var(--c-stellar-rgb), 0.72);
 
     margin: 0;
     white-space: normal;
 
-    /* 文字背面有能量場照射感：backdrop 上有 screen 混合的光源
-       這個 text-shadow 讓文字本身感覺是被光推出來的，不是疊在光上面 */
+    /* 文字背面有能量場照射感：backdrop 上有 screen 混合的光源 */
     text-shadow:
         0 0 40px rgba(var(--c-blue-rgb), 0.18),
         0 2px 60px rgba(var(--c-blue-rgb), 0.08);
 }
 
-/* 被否定的舊路「不是更努力」：壓暗 + 輕量，語意上是「被超越的」
-   base 500 → dim 300，拉開 -200 weight 差讓 sans-serif 也讀得出層級 */
+/* 被否定的舊路「不是更努力」：最細 + 半透明，淡出感
+   base 350 → dim 200，拉開 -150 weight 差（Chiron Hei 在 200 仍可讀） */
 .hero__readout-dim {
     opacity: 0.45;
-    font-weight: 300;
+    font-weight: 200;
 }
 
 /* 破折號：語意分隔符，視覺上是喘息點 */
@@ -352,10 +352,10 @@ body {
     opacity: 0.55;
 }
 
-/* 核心訴求「而是一個敢用不同方法的團隊」：最大重量 + 冷藍光暈
-   字重 900 + 冷藍 text-shadow，與背後能量場的光色呼應 */
+/* 核心訴求「而是一個敢用不同方法的團隊」：俐落收斂的強調
+   base 350 → strong 600（+250 差距），不再粗暴的 900，與背後能量場的冷藍光暈呼應 */
 .hero__readout strong {
-    font-weight: 900;
+    font-weight: 600;
     color: var(--c-stellar);
     text-shadow:
         0 0 20px rgba(var(--c-blue-rgb), 0.60),
