@@ -374,8 +374,8 @@ body {
     width: 100%;
     margin: 0.55em 0 0;
 
-    font-family: var(--f-display-en);  /* Allura（copperplate script，ascender 較 Tangerine 收斂、descender 保留書法尾） */
-    font-size: clamp(1.3rem, 2vw, 1.7rem);   /* Allura 字符比 Tangerine 標準，補償略小（~1.5×） */
+    font-family: var(--f-display-en);  /* Mrs Saint Delafield（Spencerian 細長書法，筆畫比 Allura 更纖細） */
+    font-size: clamp(1.3rem, 2vw, 1.7rem);   /* Mrs Saint Delafield 字符比例與 Allura 接近，沿用同 clamp */
     font-style: normal;                      /* Allura 自帶 cursive，不需 italic */
     font-weight: 400;
     letter-spacing: 0;                       /* 0 不破壞連筆，正值會切斷字母連接 */
