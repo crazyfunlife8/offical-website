@@ -54,6 +54,8 @@
                                                                         /* 中文大標／宣言，港產明朝活字；與 Fraunces 英宋對位 */
     --f-fang-cjk:  'cwTeX Q Fangsong', 'STFangsong', '標楷體', 'BiauKai', serif;
                                                                         /* 中文 display 副標／編輯感仿宋；單一 Medium 字重（cwTeX OFL），與 Chiron Sung 主標形成「印刷明朝×編輯仿宋」對話 */
+    --f-display-en: 'Playfair Display', 'Fraunces', Georgia, serif;
+                                                                        /* 英文 display 副標／時尚雜誌高對比 italic；本站僅以 italic 400 載入 */
     --f-mono:  'JetBrains Mono', monospace;                             /* 座標文字、技術細節、數據 */
     /* --f-bebas 於 2026-04-19 移除（Fraunces 接手所有英文大字，含 Manifesto UNCONVENTIONAL） */
 
