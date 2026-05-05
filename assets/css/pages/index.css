@@ -374,8 +374,8 @@ body {
     width: 100%;
     margin: 0.55em 0 0;
 
-    font-family: var(--f-display-en);  /* Caveat（現代手寫微草，自然 descender，比書法 script 更接近 body 字型尺度） */
-    font-size: clamp(1.1rem, 1.65vw, 1.4rem);  /* Caveat 字高接近常規 body type，補償需求較書法 script 少（~1.1×） */
+    font-family: var(--f-display-en);  /* Italianno（copperplate 極細草書，hairline 髮絲筆畫，全字符連筆） */
+    font-size: clamp(1.4rem, 2.1vw, 1.8rem);  /* Italianno 筆畫極細需略放大確保可讀，~1.5× */
     font-style: normal;                      /* Allura 自帶 cursive，不需 italic */
     font-weight: 400;
     letter-spacing: 0;                       /* 0 不破壞連筆，正值會切斷字母連接 */
@@ -397,7 +397,7 @@ body {
     }
 
     .hero__readout-en {
-        font-size: 1rem;  /* Caveat 手機尺度，比 Allura/Mrs Saint Delafield 補償少 */
+        font-size: 1.2rem;  /* Italianno 髮絲筆畫，手機尺度需略放大維持可讀 */
         margin-top: 0.5em;
     }
 }
