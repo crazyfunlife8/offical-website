@@ -262,7 +262,7 @@ body {
     height: 42%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-end;  /* 2026-05-06：副標靠齊畫面最右側 */
     justify-content: flex-end;
     padding-bottom: 5rem;
     z-index: 3;
