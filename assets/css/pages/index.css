@@ -295,7 +295,7 @@ body {
 
 /* ─── 中英文之間的冷光分隔線（2026-05-06 新增）──
    線寬超出文字容器（max-width 1200 vs 文字 max-width 900），
-   兩端 transparent 中間 cyan，雙層光暈呈現「光劃過去」感
+   兩端 transparent 中間深電藍 c-blue，雙層光暈呈現「光劃過去」感（2026-05-06 由 cyan 換 blue）
    margin 0.2em 上下取代英文原本的 0.55em margin-top，整體行距縮小 */
 .hero__readout-divider {
     position: relative;
@@ -310,15 +310,15 @@ body {
     background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(var(--c-cyan-rgb), 0.08) 40%,
-        rgba(var(--c-cyan-rgb), 0.35) 70%,
-        rgba(var(--c-cyan-rgb), 0.70) 90%,
-        rgba(var(--c-cyan-rgb), 0.90) 100%
+        rgba(var(--c-blue-rgb), 0.08) 40%,
+        rgba(var(--c-blue-rgb), 0.35) 70%,
+        rgba(var(--c-blue-rgb), 0.70) 90%,
+        rgba(var(--c-blue-rgb), 0.90) 100%
     );
     /* 2026-05-06：移除原本的全向 box-shadow（0 0 8px rgba 0.20），
        原因：1px 線左半部 gradient alpha < 0.16，全向光暈 0.20 反而比線亮，
        視覺上線變成「淡光暈中夾的暗縫」（看似黑線）。改為僅保留右側偏移光暈。 */
-    box-shadow: 12px 0 20px rgba(var(--c-cyan-rgb), 0.30);
+    box-shadow: 12px 0 20px rgba(var(--c-blue-rgb), 0.30);
 }
 
 /* ─── 副標下方英文（同義重寫，非逐字翻譯）2026-05-05 新增 ───

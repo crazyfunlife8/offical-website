@@ -37,9 +37,8 @@
 }
 
 /* 底緣刻度光線（與左側 .manifesto__line 同結構：全色值漸層 + opacity 控亮度）
-   manifesto__line: linear-gradient(180deg, transparent, var(--c-blue), transparent) opacity 1
-   此線: 同色同結構，90deg 水平版，idle 0.55 → hover 1
-   2026-04-19 */
+   2026-04-19 原為深電藍 var(--c-blue)；2026-05-06 改為亮青 var(--c-cyan)
+   2026-05-06 同步：.site-nav.scrolled box-shadow 也由 c-blue-rgb → c-cyan-rgb 保持一致 */
 .site-nav::before {
     content: '';
     position: absolute;
@@ -50,7 +49,7 @@
     background: linear-gradient(
         90deg,
         transparent 0%,
-        var(--c-blue) 50%,
+        var(--c-cyan) 50%,
         transparent 100%
     );
     opacity: 0.55;
@@ -65,7 +64,7 @@
 .site-nav.scrolled {
     background: rgba(var(--c-black-rgb), 0.92);
     border-bottom-color: rgba(var(--c-stellar-rgb), 0.14);
-    box-shadow: 0 1px 0 rgba(var(--c-blue-rgb), 0.18);
+    box-shadow: 0 1px 0 rgba(var(--c-cyan-rgb), 0.18);
 }
 
 /* ─── 品牌區：三段（dot / 主標 / 戳記）──── */
