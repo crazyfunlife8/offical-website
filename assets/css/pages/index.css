@@ -326,7 +326,7 @@ body {
     /* 不指定 font-weight：仿宋僅一個 Medium 字重，避免瀏覽器合成假粗體 */
     letter-spacing: 0.06em;
     line-height: 1.7;
-    color: rgba(var(--c-stellar-rgb), 0.85);  /* 補回單字重的存在感 */
+    color: rgba(var(--c-stellar-rgb), 0.45);  /* 2026-05-05 與英文顏色對調，中文退到次視覺 */
 
     margin: 0;
     white-space: normal;
@@ -380,7 +380,7 @@ body {
     font-weight: 400;
     letter-spacing: 0.02em;
     line-height: 1.5;
-    color: rgba(var(--c-stellar-rgb), 0.45);
+    color: rgba(var(--c-stellar-rgb), 0.85);  /* 2026-05-05 與中文顏色對調，英文升為主視覺 */
 }
 
 /* 手機：維持可讀性，字級縮小，允許換行 */
@@ -393,7 +393,7 @@ body {
     .hero__readout {
         font-size: 0.92rem;
         letter-spacing: 0.03em;
-        color: rgba(var(--c-stellar-rgb), 0.80);
+        color: rgba(var(--c-stellar-rgb), 0.50);  /* 2026-05-05 對調：中文退次視覺，手機略高於桌機 0.45 補可讀性 */
     }
 
     .hero__readout-en {
