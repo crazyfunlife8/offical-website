@@ -359,7 +359,7 @@
                 positions[i3+1] = px*SIN_T + py*COS_T;
                 positions[i3+2] = zOff;
 
-                // 連續色溫：依實際 r 決定，仿天文溫度序列
+                // 連續色溫：依實際 r 決定，由暖到冷的線性插值
                 const heatCore = r < 1.2 ? Math.max(0, (1.2 - r) / 0.78) : 0;
                 const normR    = Math.max(0, Math.min(1, (r - 0.42) / 5.08));
                 let cr, cg, cb;
@@ -953,7 +953,7 @@
         initHeroEntrance();
         initScrollAnimations();
 
-        // ─── 天文觀測站質感元素（2026-04-18）───
+        // ─── 額外裝飾元素（2026-04-18，原「觀測儀」框架已棄用）───
         // 軌道環：2026-04-18 使用者回饋「多餘」，停用；程式保留供未來評估
         // try { initOrbitRings(); }  catch(e) { console.warn('[index.js] orbits failed:', e); }
         try { initConstellation(); }  catch(e) { console.warn('[index.js] constellation failed:', e); }
