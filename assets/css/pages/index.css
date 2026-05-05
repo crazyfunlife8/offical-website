@@ -308,7 +308,7 @@ body {
         );
 }
 
-/* ─── 副標文字（從能量場被推出的核心文字）─── */
+/* ─── 副標文字（仿宋編輯感，從能量場被推出的核心文字）─── */
 .hero__readout {
     position: relative;
     z-index: 2;
@@ -319,14 +319,14 @@ body {
     max-width: 900px;
     width: 100%;
 
-    /* 字型：Chiron Hei HK WS（港產黑體可變字型，與 h1 主標的 Chiron Sung HK 同作者）
-       幾何骨架較 Noto Sans TC 俐落收斂；2026-05-05 從 --f-sans 切換 */
-    font-family: var(--f-hei-cjk);
+    /* 字型：cwTeX Q Fangsong（繁體仿宋體，單一 Medium 字重）
+       2026-05-05 從黑體換成仿宋；橫筆右斜的編輯感骨架，與 h1 Chiron Sung 印刷明朝形成對位 */
+    font-family: var(--f-fang-cjk);
     font-size: clamp(1rem, 1.55vw, 1.3rem);
-    font-weight: 350;        /* 變動字型 200-900，350 為輕中量，俐落不單薄 */
-    letter-spacing: 0.08em;  /* Chiron Hei 比 Noto Sans 緊實，加 spacing 補回呼吸 */
-    line-height: 1.65;
-    color: rgba(var(--c-stellar-rgb), 0.72);
+    /* 不指定 font-weight：仿宋僅一個 Medium 字重，避免瀏覽器合成假粗體 */
+    letter-spacing: 0.06em;
+    line-height: 1.7;
+    color: rgba(var(--c-stellar-rgb), 0.85);  /* 補回單字重的存在感 */
 
     margin: 0;
     white-space: normal;
@@ -337,11 +337,10 @@ body {
         0 2px 60px rgba(var(--c-blue-rgb), 0.08);
 }
 
-/* 被否定的舊路「不是更努力」：最細 + 半透明，淡出感
-   base 350 → dim 200，拉開 -150 weight 差（Chiron Hei 在 200 仍可讀） */
+/* 被否定的舊路「不是更努力」：靠 opacity 製造淡出感
+   仿宋無多字重對比，hierarchy 全由透明度承擔，故 dim 拉得比之前更低 */
 .hero__readout-dim {
-    opacity: 0.45;
-    font-weight: 200;
+    opacity: 0.40;
 }
 
 /* 破折號：語意分隔符，視覺上是喘息點 */
@@ -352,10 +351,9 @@ body {
     opacity: 0.55;
 }
 
-/* 核心訴求「而是一個敢用不同方法的團隊」：俐落收斂的強調
-   base 350 → strong 600（+250 差距），不再粗暴的 900，與背後能量場的冷藍光暈呼應 */
+/* 核心訴求「而是一個敢用不同方法的團隊」：滿透明度 + 冷藍光暈
+   仿宋單字重，強調靠「滿色 + 光暈」承擔，不靠字重加重 */
 .hero__readout strong {
-    font-weight: 600;
     color: var(--c-stellar);
     text-shadow:
         0 0 20px rgba(var(--c-blue-rgb), 0.60),

@@ -3,6 +3,18 @@
    創巢數位 Nest Digital | 版本 redesign-v1
    ============================================================ */
 
+/* @font-face：cwTeX Q Fangsong（繁體仿宋體，單一 Medium 字重，OFL 1.1 授權）
+   來源：l10n-tw/cwtex-q-fonts-TTFs v0.42（Tsong-Min Wu / Tsong-Huey Wu / Edward G.J. Lee 原作，
+        Chen-Pan Liao 修正版本；ZH 版僅含中文字符與標點，OFL 而非 GPL）
+   用途：副標題等 display 場景，與 Chiron Sung 主標形成編輯感對位 */
+@font-face {
+    font-family: 'cwTeX Q Fangsong';
+    src: url('https://cdn.jsdelivr.net/gh/l10n-tw/cwtex-q-fonts-TTFs@v0.42/ttf/cwTeXQFangsongZH-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     /* ─── Colors ─── */
     --c-blue:    #1736F5;
@@ -40,8 +52,8 @@
     --f-serif: 'Fraunces', serif;                                       /* 英文大標／副標／引言，opsz+wght+SOFT 三軸 */
     --f-serif-cjk: 'Chiron Sung HK WS', 'Noto Serif TC', 'Songti TC', serif;
                                                                         /* 中文大標／宣言，港產明朝活字；與 Fraunces 英宋對位 */
-    --f-hei-cjk:   'Chiron Hei HK WS', 'Noto Sans TC', sans-serif;
-                                                                        /* 中文 display 副標／俐落黑體；與 Chiron Sung 同作者形成「明朝×黑體」對話（可變字型 200-900） */
+    --f-fang-cjk:  'cwTeX Q Fangsong', 'STFangsong', '標楷體', 'BiauKai', serif;
+                                                                        /* 中文 display 副標／編輯感仿宋；單一 Medium 字重（cwTeX OFL），與 Chiron Sung 主標形成「印刷明朝×編輯仿宋」對話 */
     --f-mono:  'JetBrains Mono', monospace;                             /* 座標文字、技術細節、數據 */
     /* --f-bebas 於 2026-04-19 移除（Fraunces 接手所有英文大字，含 Manifesto UNCONVENTIONAL） */
 
