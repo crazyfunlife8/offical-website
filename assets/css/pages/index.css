@@ -354,12 +354,16 @@ body {
 }
 
 /* ─── 副標下方英文（同義重寫，非逐字翻譯）2026-05-05 新增 ───
-   Fraunces italic、字級小於中文、低透明度、輕量冷藍光暈
+   Fraunces italic、字級小於中文、低透明度、無光暈
    定位：中文為主訴求，英文為編輯感 echo / refrain，視覺上明顯次於中文
-   2026-05-05 修：原 alpha 0.45 + 無光暈在 ::after 暗橢圓上讀不出來，
-                改 alpha 0.62 + 加中文光暈 ~25% 強度的淡冷藍 shadow，
-                讓文字能浮在暗背景上但仍明顯次於中文 */
+
+   z-index 處理：必須與 .hero__readout 一樣 position:relative + z-index:2，
+                 否則會被 .hero__rift::after 暗橢圓物理堆疊遮擋（pseudo
+                 ::after 預設 stacking 高於 static 兄弟元素） */
 .hero__readout-en {
+    position: relative;
+    z-index: 2;
+
     text-align: center;
     padding: 0 var(--sec-px);
     max-width: 800px;
@@ -372,10 +376,7 @@ body {
     font-weight: 300;
     letter-spacing: 0.025em;
     line-height: 1.5;
-    color: rgba(var(--c-stellar-rgb), 0.62);
-    text-shadow:
-        0 0 30px rgba(var(--c-blue-rgb), 0.05),
-        0 1px 20px rgba(var(--c-blue-rgb), 0.04);
+    color: rgba(var(--c-stellar-rgb), 0.45);
 }
 
 /* 手機：維持可讀性，字級縮小，允許換行 */
