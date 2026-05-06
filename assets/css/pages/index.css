@@ -687,7 +687,8 @@ body {
         0 6px 16px rgba(0, 0, 0, 1);
 }
 
-/* 副標題英文 echo（Italiana，更弱的 cyan 微光） */
+/* 副標題英文 echo（Italiana，更弱的 cyan 微光）
+   text-shadow 三層（與中文副標同設計）：印刷凸版 + 字邊描邊 + 厚實墊底 */
 .final-cta__subtitle-en {
     font-family: var(--f-display-en);
     font-size: clamp(0.875rem, 1.2vw, 1.125rem);
@@ -696,6 +697,10 @@ body {
     line-height: 1.4;
     color: rgba(var(--c-cyan-rgb), 0.55);
     margin: 0.5em 0 0;
+    text-shadow:
+        0 3px 0 rgba(0, 0, 0, 1),
+        0 0 4px rgba(0, 0, 0, 1),
+        0 6px 16px rgba(0, 0, 0, 1);
 }
 
 /* CTA 按鈕外距（樣式本體由 components.css 的 .btn--yellow 接管） */
