@@ -137,6 +137,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    margin-left: auto;  /* 2026-05-06：強制推到右側，不依賴 brand 存在於左側形成 space-between 兩端配置 */
     font-family: var(--f-serif-cjk);
     font-size: 14px;
     font-weight: 500;
