@@ -172,56 +172,120 @@
                     </h2>
                 </div>
 
-                <!-- Asymmetric Editorial Flow（2026-05-06：原 Bento Grid 改寫，等服務細節定案後可進階為球體軌道） -->
-                <div class="services-flow">
+                <!-- Bento Grid -->
+                <!-- data-stagger-group 移除：index.js 已用 ScrollTrigger 獨立控制，避免 core.js 雙重動畫 -->
+                <div class="bento-grid">
 
-                    <a href="social.html" class="service-flow-item service-flow-item--01" aria-label="A 社群服務">
-                        <span class="service-flow-item__num">01 ─ SOCIAL</span>
-                        <h3 class="service-flow-item__title">社群經營 &amp; 廣告代投</h3>
-                        <p class="service-flow-item__desc">幫你建立能長期燃燒的社群引擎，不只代發文。</p>
-                        <span class="service-flow-item__arrow" aria-hidden="true">→</span>
+                    <!-- A 社群服務 -->
+                    <a href="social.html" class="card bento--a service-card" aria-label="A 社群服務">
+                        <div>
+                            <div class="service-card__icon">
+                                <i class="fas fa-mobile-alt" aria-hidden="true"></i>
+                            </div>
+                            <span class="service-card__label">A — 社群服務</span>
+                            <h3 class="service-card__title">社群經營<br>& 廣告代投</h3>
+                            <p class="service-card__desc">幫你建立能長期燃燒的社群引擎，不只代發文。</p>
+                        </div>
+                        <span class="service-card__arrow">
+                            了解更多 <span aria-hidden="true">→</span>
+                        </span>
                     </a>
 
-                    <a href="virtual.html" class="service-flow-item service-flow-item--02" aria-label="C AI 虛擬網紅">
-                        <span class="service-flow-item__num">02 ─ AI VIRTUAL</span>
-                        <h3 class="service-flow-item__title">THE 2ND LIFE OF BRAND</h3>
-                        <p class="service-flow-item__desc">我們做的不是虛擬人，而是可被長期經營的角色系統。情緒穩定、形象可控、精準導流。</p>
-                        <span class="service-flow-item__arrow" aria-hidden="true">→</span>
+                    <!-- C AI 虛擬網紅（Featured） -->
+                    <a href="virtual.html" class="card bento--c service-card" aria-label="C AI 虛擬網紅（精選）">
+                        <div>
+                            <div class="service-card__icon">
+                                <i class="fas fa-user-astronaut" aria-hidden="true"></i>
+                            </div>
+                            <span class="service-card__label">C — AI 虛擬網紅</span>
+                            <h3 class="service-card__title">THE 2ND LIFE<br>OF BRAND</h3>
+                            <p class="service-card__desc">我們做的不是虛擬人，而是可被長期經營的角色系統。情緒穩定、形象可控、精準導流。</p>
+                        </div>
+                        <span class="service-card__arrow">
+                            了解更多 <span aria-hidden="true">→</span>
+                        </span>
                     </a>
 
-                    <a href="website.html" class="service-flow-item service-flow-item--03" aria-label="B 網站架設">
-                        <span class="service-flow-item__num">03 ─ WEBSITE</span>
-                        <h3 class="service-flow-item__title">網站架設</h3>
-                        <p class="service-flow-item__desc">一頁式到企業電商，讓你說清楚你是誰。</p>
-                        <span class="service-flow-item__arrow" aria-hidden="true">→</span>
+                    <!-- B 網站架設 -->
+                    <a href="website.html" class="card bento--b-web service-card" aria-label="B 網站架設">
+                        <div>
+                            <div class="service-card__icon">
+                                <i class="fas fa-laptop-code" aria-hidden="true"></i>
+                            </div>
+                            <span class="service-card__label">B — 開發</span>
+                            <h3 class="service-card__title">網站架設</h3>
+                            <p class="service-card__desc">一頁式到企業電商，讓你說清楚你是誰。</p>
+                        </div>
+                        <span class="service-card__arrow">
+                            了解更多 <span aria-hidden="true">→</span>
+                        </span>
                     </a>
 
-                    <a href="system.html" class="service-flow-item service-flow-item--04" aria-label="B 客製化系統開發">
-                        <span class="service-flow-item__num">04 ─ SYSTEM</span>
-                        <h3 class="service-flow-item__title">客製系統開發</h3>
-                        <p class="service-flow-item__desc">把重複性人力換成系統，讓流程自動化。</p>
-                        <span class="service-flow-item__arrow" aria-hidden="true">→</span>
+                    <!-- B 客製化系統 -->
+                    <a href="system.html" class="card bento--b-sys service-card" aria-label="B 客製化系統開發">
+                        <div>
+                            <div class="service-card__icon">
+                                <i class="fas fa-cogs" aria-hidden="true"></i>
+                            </div>
+                            <span class="service-card__label">B — 開發</span>
+                            <h3 class="service-card__title">客製系統<br>開發</h3>
+                            <p class="service-card__desc">把重複性人力換成系統，讓流程自動化。</p>
+                        </div>
+                        <span class="service-card__arrow">
+                            了解更多 <span aria-hidden="true">→</span>
+                        </span>
                     </a>
 
-                    <a href="consultant.html" class="service-flow-item service-flow-item--05" aria-label="D 顧問服務">
-                        <span class="service-flow-item__num">05 ─ CONSULTING</span>
-                        <h3 class="service-flow-item__title">產業顧問導入</h3>
-                        <p class="service-flow-item__desc">大部分公司的問題，不在執行力，在診斷。我們跨產業歷練，AI 輔助，帶你找到卡關在哪。</p>
-                        <span class="service-flow-item__arrow" aria-hidden="true">→</span>
+                    <!-- D 顧問服務（跨兩行） -->
+                    <a href="consultant.html" class="card bento--d service-card" aria-label="D 顧問服務">
+                        <div>
+                            <div class="service-card__icon">
+                                <i class="fas fa-magnifying-glass-chart" aria-hidden="true"></i>
+                            </div>
+                            <span class="service-card__label">D — 顧問服務</span>
+                            <h3 class="service-card__title">產業顧問<br>導入</h3>
+                            <p class="service-card__desc">大部分公司的問題，不在執行力，在診斷。我們跨產業歷練，AI 輔助，帶你找到卡關在哪。</p>
+                        </div>
+                        <div class="service-card__tag-row">
+                            <span class="tag tag--yellow tag--xs">詢價制</span>
+                        </div>
+                        <span class="service-card__arrow">
+                            了解更多 <span aria-hidden="true">→</span>
+                        </span>
                     </a>
 
-                    <a href="tiktok.html" class="service-flow-item service-flow-item--06" aria-label="E 跳動E投放">
-                        <span class="service-flow-item__num">06 ─ TIKTOK ADS</span>
-                        <h3 class="service-flow-item__title">跳動 E 投放</h3>
-                        <p class="service-flow-item__desc">台灣個人戶也能投 TikTok 廣告——我們發現市場缺口，直接做了一個平台解決它。免營業登記，最快 24 小時開通。</p>
-                        <span class="service-flow-item__arrow" aria-hidden="true">→</span>
+                    <!-- E 跳動E投放（跨兩欄） -->
+                    <a href="tiktok.html" class="card bento--e service-card" aria-label="E 跳動E投放">
+                        <div class="bento--e__layout">
+                            <div>
+                                <div class="service-card__icon">
+                                    <i class="fab fa-tiktok" aria-hidden="true"></i>
+                                </div>
+                                <span class="service-card__label">E — 自營平台</span>
+                                <h3 class="service-card__title">跳動E投放</h3>
+                            </div>
+                            <p class="service-card__desc">
+                                台灣個人戶也能投 TikTok 廣告——我們發現市場缺口，直接做了一個平台解決它。免營業登記，最快 24 小時開通。
+                            </p>
+                        </div>
+                        <span class="service-card__arrow">
+                            前往平台 <span aria-hidden="true">→</span>
+                        </span>
                     </a>
 
-                    <a href="growth.html" class="service-flow-item service-flow-item--07" aria-label="F 社群增長服務">
-                        <span class="service-flow-item__num">07 ─ GROWTH</span>
-                        <h3 class="service-flow-item__title">社群增長服務</h3>
-                        <p class="service-flow-item__desc">快速建立初期社群信任，讓後續自然流量有起跑點。</p>
-                        <span class="service-flow-item__arrow" aria-hidden="true">→</span>
+                    <!-- F 社群增長服務 -->
+                    <a href="growth.html" class="card bento--f service-card" aria-label="F 社群增長服務">
+                        <div>
+                            <div class="service-card__icon">
+                                <i class="fas fa-chart-line" aria-hidden="true"></i>
+                            </div>
+                            <span class="service-card__label">F — 社群增長</span>
+                            <h3 class="service-card__title">社群增長<br>服務</h3>
+                            <p class="service-card__desc">快速建立初期社群信任，讓後續自然流量有起跑點。</p>
+                        </div>
+                        <span class="service-card__arrow">
+                            了解更多 <span aria-hidden="true">→</span>
+                        </span>
                     </a>
 
                 </div>
