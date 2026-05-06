@@ -698,9 +698,10 @@ body {
 }
 
 /* 副標題英文 echo（Italiana，更弱的 cyan 微光）
-   text-shadow：8 方向 1px 描邊 + 浮雕投影（取代前版誤做的光暈擴散）
-   ① 8 方向 1px 純黑描邊（字邊銳利黑邊，cyan → 黑邊 → 深藍背景三段對比）
-   ② 浮雕投影（右下 2-3px 偏移 + 模糊柔影） */
+   text-shadow 三段組合：8 方向描邊 + 浮雕投影 + 擴散光暈
+   ① 8 方向 1px 純黑描邊（字邊銳利黑邊）
+   ② 浮雕投影（右下偏移立體陰影）
+   ③ 擴散光暈（字邊外圍 360° 漸層黑暈，亮 cyan 字色下與字邊形成柔軟過渡）*/
 .final-cta__subtitle-en {
     font-family: var(--f-display-en);
     font-size: clamp(0.875rem, 1.2vw, 1.125rem);
@@ -719,7 +720,10 @@ body {
         -1px 1px 0 #000,
         -1px 0 0 #000,
         2px 3px 0 rgba(0, 0, 0, 0.9),
-        3px 4px 5px rgba(0, 0, 0, 0.6);
+        3px 4px 5px rgba(0, 0, 0, 0.6),
+        0 0 16px rgba(0, 0, 0, 1),
+        0 0 32px rgba(0, 0, 0, 0.7),
+        0 0 56px rgba(0, 0, 0, 0.4);
 }
 
 /* CTA 按鈕外距（樣式本體由 components.css 的 .btn--yellow 接管） */
