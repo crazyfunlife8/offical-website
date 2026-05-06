@@ -508,62 +508,63 @@ body {
 /* 非對稱 Bento Grid */
 .bento-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-auto-rows: minmax(220px, auto);
+    grid-template-columns: 1.3fr 1fr 1.2fr;       /* 不對稱欄寬：寬-窄-中 */
+    grid-template-rows: 220px 240px 200px;        /* 不對稱列高：中-高-短 */
     gap: 1rem;
     margin-top: var(--sp-lg);
 }
 
-/* ─── Bento 不規則 modifier ─── */
+/* ─── Bento 不規則 modifier（all 1×1）─── */
 
-/* 3×3 grid 配置：5 個 1×1 小卡 + 2 個 2-cell 雙卡（C 直立 + E 橫寬）
-   不規則來源：tall 與 wide 形狀對比 + 5 singles 散布
-   每個雙卡都只 2 cells（避免單卡過大）
+/* 不規則來源：
+   - 所有卡片都是 1×1 single cell，沒有任何卡片跨 cells（避免單卡過大）
+   - 欄寬不對稱（1.3 / 1.0 / 1.2 fr），列高不對稱（220 / 240 / 200 px）→ 9 個 cell 各自尺寸都不同
+   - 7 卡填 7 cells，留 2 個 empty cells 做設計性留白（Pinterest masonry 感）
 
    視覺布局：
-   | A   | C   | B-web |
-   | B-sys| C  | D     |
-   | F   | E   E       |
+   | A    | C    | B-web |
+   | _    | B-sys| D     |
+   | E    | _    | F     |
 */
 
-/* A 社群（1×1，左上） */
+/* A 社群（左上） */
 .bento--a {
     grid-column: 1;
     grid-row: 1;
 }
 
-/* C AI 虛擬網紅（Featured，1×2 tall，第二欄跨上中兩列） */
+/* C AI 虛擬網紅（中上） */
 .bento--c {
     grid-column: 2;
-    grid-row: 1 / span 2;
+    grid-row: 1;
 }
 
-/* B 網站（1×1，右上） */
+/* B 網站（右上） */
 .bento--b-web {
     grid-column: 3;
     grid-row: 1;
 }
 
-/* B 客製系統（1×1，左中） */
+/* B 客製系統（中中） */
 .bento--b-sys {
-    grid-column: 1;
+    grid-column: 2;
     grid-row: 2;
 }
 
-/* D 顧問（1×1，右中） */
+/* D 顧問（右中） */
 .bento--d {
     grid-column: 3;
     grid-row: 2;
 }
 
-/* F 社群增長（1×1，左下） */
-.bento--f {
+/* E 跳動E投放（左下） */
+.bento--e {
     grid-column: 1;
     grid-row: 3;
 }
 
-/* E 跳動E投放（2×1 wide，第三列跨中右兩欄） */
-.bento--e {
-    grid-column: 2 / span 2;
+/* F 社群增長（右下） */
+.bento--f {
+    grid-column: 3;
     grid-row: 3;
 }
