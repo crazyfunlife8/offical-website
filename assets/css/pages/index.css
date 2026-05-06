@@ -415,7 +415,6 @@ body {
 
 /* 下方說明文字 */
 .manifesto__body {
-    max-width: 500px;
     text-align: right;
 }
 
@@ -423,6 +422,7 @@ body {
     font-size: var(--fs-md);
     line-height: 1.8;
     color: var(--c-muted);
+    white-space: nowrap;  /* 2026-05-06：不分行（單行右對齊） */
 }
 
 /* 左側裝飾線 */
