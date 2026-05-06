@@ -669,7 +669,10 @@ body {
     box-shadow: 0 0 12px rgba(var(--c-blue-rgb), 0.40);
 }
 
-/* 副標題「除非你準備好不正常一次。」— 仿宋編輯感，反轉接續主標 */
+/* 副標題「除非你準備好不正常一次。」— 仿宋編輯感，反轉接續主標
+   text-shadow 雙層：
+   ① 銳利偏移黑字（印刷凸版感，視覺風格）
+   ② 模糊光暈（補強可讀性，避免疊在亮背景時吃字） */
 .final-cta__subtitle {
     font-family: var(--f-fang-cjk);
     font-size: clamp(1rem, 1.6vw, 1.375rem);
@@ -678,6 +681,9 @@ body {
     line-height: 1.6;
     color: rgba(var(--c-stellar-rgb), 0.85);
     margin: 0;
+    text-shadow:
+        0 2px 0 rgba(0, 0, 0, 1),
+        0 4px 12px rgba(0, 0, 0, 0.7);
 }
 
 /* 副標題英文 echo（Italiana，更弱的 cyan 微光） */
