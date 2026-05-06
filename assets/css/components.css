@@ -68,46 +68,10 @@
 }
 
 /* ─── 品牌區：三段（dot / 主標 / 戳記）──── */
-.nav__brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-    white-space: nowrap;
-    color: var(--c-stellar);
-}
+/* .nav__brand / .nav__brand-star / .nav__brand-mark / .nav__brand-sep
+   整組規則 2026-05-06 移除（左上品牌整個設計拿掉，待重設計） */
 
-/* 暖白光點：3px 核 + 三層遞減光暈
-   2026-05-06 標記：原「望遠鏡下的恆星」觀測儀符號，待重設計改為跳躍思維方向 */
-.nav__brand-star {
-    width: 3px;
-    height: 3px;
-    background: #fffaf0;
-    border-radius: 50%;
-    flex-shrink: 0;
-    box-shadow:
-        0 0 1px   rgba(255, 255, 255, 1.00),
-        0 0 3px   rgba(255, 230, 160, 0.85),
-        0 0 7px   rgba(255, 199, 9,   0.42),
-        0 0 14px  rgba(255, 199, 9,   0.16);
-    animation: star-twinkle 4.2s ease-in-out infinite;
-}
-
-.nav__brand-mark {
-    font-family: var(--f-mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--c-stellar);
-}
-
-.nav__brand-sep {
-    color: rgba(var(--c-stellar-rgb), 0.35);
-    margin: 0 2px;
-}
-
-/* ─── 連結區：絕對置中，品牌 / CTA 維持兩端對齊不受影響 ──── */
+/* ─── 連結區：絕對置中，CTA 維持兩端對齊不受影響 ──── */
 .nav__links {
     position: absolute;
     left: 50%;

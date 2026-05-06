@@ -30,11 +30,7 @@
     50%       { opacity: 0.5; transform: scale(1.4); }
 }
 
-/* ─── 光點微閃：極小幅度、極緩、呼吸式 ─── */
-@keyframes star-twinkle {
-    0%, 100% { opacity: 0.88; transform: scale(1); }
-    50%       { opacity: 1;    transform: scale(1.12); }
-}
+/* @keyframes star-twinkle 2026-05-06 移除（原唯一使用者 .nav__brand-star 已隨左上品牌整組刪除） */
 
 /* ─── 星點閃爍 ─── */
 @keyframes twinkle {
