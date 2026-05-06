@@ -318,12 +318,12 @@ body {
     width: 100%;
     margin: 0;  /* spacing 由 .hero__readout-divider 自身 margin 接管 */
 
-    font-family: var(--f-display-en);  /* Italianno（copperplate 極細草書，hairline 髮絲筆畫，全字符連筆） */
-    font-size: clamp(1.4rem, 2.1vw, 1.8rem);  /* Italianno 筆畫極細需略放大確保可讀，~1.5× */
-    font-style: normal;                      /* Allura 自帶 cursive，不需 italic */
+    font-family: var(--f-display-en);  /* Italiana（文藝復興雜誌封面感，hairline 高對比 Roman serif） */
+    font-size: clamp(1rem, 1.5vw, 1.3rem);   /* 略大於中文，補償 Italiana hairline 視覺偏細感 */
+    font-style: normal;
     font-weight: 400;
-    letter-spacing: 0;                       /* 0 不破壞連筆，正值會切斷字母連接 */
-    line-height: 1.4;                        /* script 字型升降部較長，行距略收緊 */
+    letter-spacing: 0.06em;                  /* 雜誌排版常用的開放字距，襯托 hairline 優雅感 */
+    line-height: 1.5;
     color: rgba(var(--c-stellar-rgb), 0.85);
 }
 
@@ -344,7 +344,7 @@ body {
     }
 
     .hero__readout-en {
-        font-size: 1.2rem;  /* Italianno 髮絲筆畫，手機尺度需略放大維持可讀 */
+        font-size: 1rem;  /* Italiana 手機尺度，避免 hairline 過細 */
     }
 }
 
