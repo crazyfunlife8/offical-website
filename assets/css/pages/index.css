@@ -505,6 +505,78 @@ body {
     padding: 0 var(--sec-px);
 }
 
+/* ─── Asymmetric Editorial Flow（2026-05-06）──
+   7 個服務刻意左右錯位排版，純 typography 編輯感無 card 框
+   每個 item 自己用 align-self / margin 做不規則定位，視覺像雜誌 layout 自由流動 */
+.services-flow {
+    display: flex;
+    flex-direction: column;
+    margin-top: var(--sp-lg);
+}
+
+.service-flow-item {
+    display: block;
+    max-width: 480px;
+    text-decoration: none;
+    color: inherit;
+    padding: 1rem 0;
+    transition: transform 0.25s ease;
+}
+
+.service-flow-item:hover {
+    transform: translateX(6px);
+}
+
+.service-flow-item__num {
+    display: block;
+    font-family: var(--f-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    color: var(--c-cyan);
+    margin-bottom: 0.6rem;
+}
+
+.service-flow-item__title {
+    font-family: var(--f-serif-cjk);
+    font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--c-stellar);
+    margin: 0 0 0.6rem;
+}
+
+.service-flow-item__desc {
+    font-family: var(--f-fang-cjk);
+    font-size: 1rem;
+    line-height: 1.7;
+    color: rgba(var(--c-stellar-rgb), 0.65);
+    margin: 0;
+}
+
+.service-flow-item__arrow {
+    display: inline-block;
+    margin-top: 0.7rem;
+    font-family: var(--f-mono);
+    font-size: 1.3rem;
+    color: rgba(var(--c-cyan-rgb), 0.7);
+    transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.service-flow-item:hover .service-flow-item__arrow {
+    transform: translateX(8px);
+    color: var(--c-cyan);
+}
+
+/* 7 個 item 各自不規則定位（左右錯位 + 垂直間距變化）*/
+.service-flow-item--01 { align-self: flex-start; margin-left: 6%;  margin-top: 1.5rem; }
+.service-flow-item--02 { align-self: flex-end;   margin-right: 4%; margin-top: 2rem; }
+.service-flow-item--03 { align-self: flex-start; margin-left: 22%; margin-top: 2.5rem; }
+.service-flow-item--04 { align-self: flex-end;   margin-right: 14%; margin-top: 1.5rem; }
+.service-flow-item--05 { align-self: flex-start; margin-left: 2%;  margin-top: 2.5rem; }
+.service-flow-item--06 { align-self: flex-end;   margin-right: 22%; margin-top: 2rem; }
+.service-flow-item--07 { align-self: flex-start; margin-left: 12%; margin-top: 1.5rem; }
+
 /* 非對稱 Bento Grid */
 .bento-grid {
     display: grid;
