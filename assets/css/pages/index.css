@@ -670,12 +670,11 @@ body {
 }
 
 /* 副標題「除非你準備好不正常一次。」— 仿宋編輯感，反轉接續主標
-   text-shadow 五層：浮雕（emboss）+ 360° 全方向包圍光暈
-   ① 左上 45° 高光（光源照亮上緣）
-   ② 右下 45° 銳影（凸起投影硬邊）
-   ③ 右下 45° 柔影（投影過渡）
-   ④ 360° 中暈（包圍墊底）
-   ⑤ 360° 大暈（更外圍黑色擴散）*/
+   text-shadow 四層：右下偏移投影 + 360° 包圍（拿掉白色高光避免改變字形輪廓）
+   ① 右下 45° 銳影（硬邊偏移）
+   ② 右下 45° 柔影（投影過渡）
+   ③ 360° 中暈（包圍墊底）
+   ④ 360° 大暈（外圍擴散）*/
 .final-cta__subtitle {
     font-family: var(--f-fang-cjk);
     font-size: clamp(1rem, 1.6vw, 1.375rem);
@@ -685,7 +684,6 @@ body {
     color: rgba(var(--c-stellar-rgb), 0.85);
     margin: 0;
     text-shadow:
-        -1px -1px 0 rgba(255, 255, 255, 0.35),
         1px 1px 0 rgba(0, 0, 0, 1),
         2px 2px 3px rgba(0, 0, 0, 0.85),
         0 0 12px rgba(0, 0, 0, 1),
@@ -693,7 +691,7 @@ body {
 }
 
 /* 副標題英文 echo（Italiana，更弱的 cyan 微光）
-   text-shadow 五層（與中文副標同設計）：浮雕 + 360° 全方向包圍 */
+   text-shadow 四層（與中文副標同設計）：右下偏移投影 + 360° 包圍 */
 .final-cta__subtitle-en {
     font-family: var(--f-display-en);
     font-size: clamp(0.875rem, 1.2vw, 1.125rem);
@@ -703,7 +701,6 @@ body {
     color: rgba(var(--c-cyan-rgb), 0.55);
     margin: 0.5em 0 0;
     text-shadow:
-        -1px -1px 0 rgba(255, 255, 255, 0.35),
         1px 1px 0 rgba(0, 0, 0, 1),
         2px 2px 3px rgba(0, 0, 0, 0.85),
         0 0 12px rgba(0, 0, 0, 1),
