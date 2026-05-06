@@ -533,8 +533,7 @@ body {
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 0.25em;
-    color: var(--c-yellow);                  /* 與原 .service-card__label 一致：琥珀金當品牌內容 accent */
-    text-transform: uppercase;
+    color: var(--c-cyan);
     margin-bottom: 0.6rem;
 }
 
@@ -543,7 +542,7 @@ body {
     font-size: clamp(1.5rem, 2.5vw, 2.2rem);
     font-weight: 500;
     line-height: 1.3;
-    color: var(--c-white);                   /* 與原 .service-card__title 一致：純白標題 */
+    color: var(--c-stellar);
     margin: 0 0 0.6rem;
 }
 
@@ -551,7 +550,7 @@ body {
     font-family: var(--f-fang-cjk);
     font-size: 1rem;
     line-height: 1.7;
-    color: var(--c-muted);                   /* 與原 .service-card__desc 一致 */
+    color: rgba(var(--c-stellar-rgb), 0.65);
     margin: 0;
 }
 
@@ -560,13 +559,13 @@ body {
     margin-top: 0.7rem;
     font-family: var(--f-mono);
     font-size: 1.3rem;
-    color: var(--c-white);                   /* idle 白，hover 切到 yellow（與原版同切換邏輯） */
+    color: rgba(var(--c-cyan-rgb), 0.7);
     transition: transform 0.25s ease, color 0.25s ease;
 }
 
 .service-flow-item:hover .service-flow-item__arrow {
     transform: translateX(8px);
-    color: var(--c-yellow);
+    color: var(--c-cyan);
 }
 
 /* 7 個 item 各自不規則定位（左右錯位 + 垂直間距變化）*/
