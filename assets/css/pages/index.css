@@ -93,26 +93,6 @@ body {
     z-index: 0;
 }
 
-/* ─── Variable Font 軸動文字（2026-04-19 視覺元素庫 v2.0 #1） ───
-   Fraunces 三軸（opsz / wght / SOFT）由 GSAP ScrollTrigger 依捲動進度插值
-   @property 將 CSS 變數註冊為可動畫的 <number>，讓 GSAP 能 sub-pixel 補間
-*/
-@property --vf-opsz {
-    syntax: '<number>';
-    inherits: false;
-    initial-value: 144;
-}
-@property --vf-wght {
-    syntax: '<number>';
-    inherits: false;
-    initial-value: 200;
-}
-@property --vf-soft {
-    syntax: '<number>';
-    inherits: false;
-    initial-value: 80;
-}
-
 .hero__inner {
     position: relative;
     z-index: 2;
@@ -399,46 +379,10 @@ body {
     position: relative;
 }
 
-/* UNCONVENTIONAL 水印（2026-04-18 從 Hero 搬移過來）───
-   位於 Section 2 左側大字裝飾，與右側「非常規，才是真解法」形成中英對話
-   位置：左側貼邊，垂直置中，超大描邊字
-*/
-.manifesto__bg-text {
-    position: absolute;
-    top: 50%;
-    left: -2%;
-    transform: translateY(-50%);
-    font-family: var(--f-serif);
-    font-size: clamp(4rem, 14vw, 14rem);
-    line-height: 0.9;
-    letter-spacing: -0.035em;
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(var(--c-stellar-rgb), 0.10);
-    pointer-events: none;
-    user-select: none;
-    z-index: 0;
-    white-space: nowrap;
-    /* Variable Font 軸動（與 Hero 同一元素 utility） */
-    --vf-opsz: 144;
-    --vf-wght: 200;
-    --vf-soft: 90;
-    font-variation-settings: "opsz" var(--vf-opsz), "wght" var(--vf-wght), "SOFT" var(--vf-soft);
-    font-style: italic;
-    will-change: font-variation-settings;
-}
-
-/* Manifesto 內容層要在水印之上 */
+/* Manifesto 內容層 */
 .manifesto__inner {
     position: relative;
     z-index: 1;
-}
-
-@media (max-width: 900px) {
-    .manifesto__bg-text {
-        font-size: clamp(3rem, 16vw, 7rem);
-        left: -4%;
-        opacity: 0.9;
-    }
 }
 
 .manifesto__inner {

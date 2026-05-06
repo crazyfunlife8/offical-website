@@ -800,38 +800,6 @@
     }
 
 
-    /* ════════════════════════════════════════════════════════
-       7. Variable Font 軸動（視覺元素庫 v2.0 #1，2026-04-19）
-       Fraunces 三軸（opsz / wght / SOFT）由捲動進度插值
-       錨點 A：Hero ANOMALY — 光學尺寸粗化、字重增重
-       錨點 B：Manifesto UNCONVENTIONAL — 由輕盈細長收斂為厚實宣告
-       （取代原金屬掃光，v2.0 廢止）
-       ════════════════════════════════════════════════════════ */
-
-    function initVariableFontAxis() {
-        if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-
-        // hero__bg-text 已移除，本函式只剩 manifesto 軸動
-
-        const maniBg = document.querySelector('.manifesto__bg-text');
-        if (maniBg) {
-            gsap.fromTo(maniBg,
-                { '--vf-opsz': 144, '--vf-wght': 200, '--vf-soft': 90 },
-                {
-                    '--vf-opsz': 20,
-                    '--vf-wght': 800,
-                    '--vf-soft': 0,
-                    ease: 'none',
-                    scrollTrigger: {
-                        trigger: '.manifesto',
-                        start: 'top 80%',
-                        end: 'center center',
-                        scrub: 0.8,
-                    },
-                }
-            );
-        }
-    }
 
 
     /* ════════════════════════════════════════════════════════
@@ -954,7 +922,6 @@
         // 軌道環：2026-04-18 使用者回饋「多餘」，停用；程式保留供未來評估
         // try { initOrbitRings(); }  catch(e) { console.warn('[index.js] orbits failed:', e); }
         try { initConstellation(); }  catch(e) { console.warn('[index.js] constellation failed:', e); }
-        try { initVariableFontAxis(); } catch(e) { console.warn('[index.js] VF axis failed:', e); }
         try { initPrismaticSweep(); } catch(e) { console.warn('[index.js] prismatic failed:', e); }
     }
 
