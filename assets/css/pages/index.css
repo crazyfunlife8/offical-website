@@ -707,7 +707,7 @@ body {
     font-weight: 400;
     letter-spacing: 0.08em;
     line-height: 1.4;
-    color: rgba(var(--c-cyan-rgb), 0.75);
+    color: rgba(var(--c-cyan-rgb), 0.95);
     margin: 0.5em 0 0;
     text-shadow:
         -1px -1px 0 #000,
