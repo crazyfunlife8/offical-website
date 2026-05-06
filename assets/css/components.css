@@ -88,11 +88,12 @@
     transition: color 0.18s ease, text-shadow 0.18s ease;
 }
 
-/* Hover hairline：從中心向兩側拉開的 cyan 細線（2026-05-06 由 bottom 改為 top） */
+/* Hover hairline：從中心向兩側拉開的 cyan 細線
+   位於文字上方靠 nav 頂端區域（top: 8px from element top，元素 padding-top 18px 內，距文字上緣 ~10px） */
 .nav__links a::after {
     content: '';
     position: absolute;
-    top: 14px;
+    top: 8px;
     left: 50%;
     width: 0;
     height: 1px;
