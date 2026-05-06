@@ -678,23 +678,6 @@
             }
         );
 
-        // ── Section 4：品牌故事 ──
-        gsap.fromTo('.brand-preview__left .big-label',
-            { opacity: 0, x: -50 },
-            {
-                opacity: 1, x: 0, duration: 0.9, ease: 'power3.out',
-                scrollTrigger: { trigger: '.brand-preview', start: 'top 78%', toggleActions: 'play none none none' }
-            }
-        );
-
-        gsap.fromTo('.brand-preview__right',
-            { opacity: 0, y: 30 },
-            {
-                opacity: 1, y: 0, duration: 0.8, delay: 0.15, ease: 'power2.out',
-                scrollTrigger: { trigger: '.brand-preview', start: 'top 75%', toggleActions: 'play none none none' }
-            }
-        );
-
         // ── Section 5：終點 CTA ──
         const ctaEls = document.querySelectorAll('.final-cta__inner > *');
         gsap.fromTo(ctaEls,
@@ -803,38 +786,7 @@
 
 
     /* ════════════════════════════════════════════════════════
-       8. 稜鏡折射光斑（品牌故事區塊進場時單次觸發）
-       ════════════════════════════════════════════════════════ */
-
-    function initPrismaticSweep() {
-        const target = document.querySelector('.brand-preview');
-        if (!target) return;
-
-        // 注入稜鏡元素（避免改 HTML）
-        if (!target.querySelector('.brand-preview__prism')) {
-            const prism = document.createElement('div');
-            prism.className = 'brand-preview__prism';
-            prism.setAttribute('aria-hidden', 'true');
-            target.insertBefore(prism, target.firstChild);
-        }
-
-        if (typeof ScrollTrigger !== 'undefined') {
-            ScrollTrigger.create({
-                trigger: target,
-                start: 'top 70%',
-                onEnter: () => {
-                    target.classList.add('is-prism-active');
-                    // 12 秒動畫完成後保留 class，不重播
-                },
-            });
-        } else {
-            target.classList.add('is-prism-active');
-        }
-    }
-
-
-    /* ════════════════════════════════════════════════════════
-       9. 軌道環 DOM 注入（Hero 太空人外圍）
+       8. 軌道環 DOM 注入（Hero 太空人外圍）
        ════════════════════════════════════════════════════════ */
 
     function initOrbitRings() {
@@ -922,7 +874,6 @@
         // 軌道環：2026-04-18 使用者回饋「多餘」，停用；程式保留供未來評估
         // try { initOrbitRings(); }  catch(e) { console.warn('[index.js] orbits failed:', e); }
         try { initConstellation(); }  catch(e) { console.warn('[index.js] constellation failed:', e); }
-        try { initPrismaticSweep(); } catch(e) { console.warn('[index.js] prismatic failed:', e); }
     }
 
     if (document.readyState === 'loading') {

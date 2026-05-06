@@ -178,7 +178,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 
 | 層 | 項目 | 凍結機制 |
 |----|------|---------|
-| L2 進場動畫 | `initHeroEntrance()` / `initScrollAnimations()` / `initConstellation()` / `initPrismaticSweep()` | 條件式不呼叫（函式保留） |
+| L2 進場動畫 | `initHeroEntrance()` / `initScrollAnimations()` / `initConstellation()` | 條件式不呼叫（函式保留） |
 | CSS animation | 全站 keyframes | `body.design-mode * { animation-play-state: paused !important }`（`base.css:192`） |
 | Three.js RAF | 星場 `animate()` | `if (!DESIGN_MODE) requestAnimationFrame(...)` — 暖機 6000 幀後 render 單幀停住 |
 | WebGL 緩衝區 | 星場 canvas 單幀保留 | `preserveDrawingBuffer: DESIGN_MODE` |
@@ -203,6 +203,7 @@ about.html、contact.html、news.html、social.html、website.html、system.html
 | 等寬字型 | IBM Plex Mono | 維持 IBM Plex Mono |
 | Hero 太空人 | Three.js 3D 模型 | 2026-04-21 已從 Hero section 移除（HTML 以 `<!-- 太空人暫時移除 2026-04-21 -->` 標記保留位置） |
 | 四角座標文字 | 規格書原列為裝飾 | 2026-04-18 移除（HTML `.coords` div 與 components.css `.coords` 規則均已刪除） |
+| Section 4 品牌故事預告 | 規劃為「不正常人類的故事」介紹區塊 + initPrismaticSweep 稜鏡光斑動畫 | 2026-05-07 創辦人要求拿掉。HTML `.brand-preview` 整段刪除、JS 兩段 scrollTrigger 動畫（big-label / brand-preview__right）+ `initPrismaticSweep()` 函式整段 + 其呼叫全部移除。CSS 本來就沒實作（HTML 有 brand-preview 相關 class 但 CSS 從未對應）。 |
 | Hero 副標 SVG zig-zag 裂縫線 | 2026-04-26 規劃為「文字從深空撕裂的縫中炸出來」視覺，由 `initRift()` 動態注入 5 條 SVG path（glow/main/branch×2/core）疊在 `::after` 暗橢圓上 | 2026-05-05 創辦人判定 SVG zig-zag「像閃電線」設計失敗，徹底移除：HTML 的 `.hero__rift-crack` 子層、JS 的 `initRift()` 函式與其呼叫、`initHeroEntrance()` 中針對 `.hero__rift-crack` 的 GSAP scaleX 動畫全部刪除。當時保留 `.hero__rift::after` 暗橢圓背景與文字冷藍光暈（創辦人當下要保留）。**警示**：清理當下主 session 一度誤判用戶意圖把整個裂縫設計一起移除，被糾正後 revert 並改精確切除。SVG 注入殘骸源自更早一輪「只刪 CSS 留下 JS+HTML」的不徹底清理。後續若需重新設計副標題視覺，禁止再回 SVG zig-zag 線條方向。 |
 | Hero 副標 `::after` 暗橢圓背景 | 2026-05-05 SVG zig-zag 移除時保留 | 2026-05-06 創辦人決定一併移除（覺得「黑色裂縫」已不再需要）。`.hero__rift::after` 規則整段刪除。`.hero__rift` 容器仍保留作為副標 flex 排版（中文 / `.hero__readout-divider` 冷光分隔線 / 英文）的右對齊定位 wrapper。Hero 副標目前的設計演化：仿宋中文 + 深藍冷光分隔線（max-width 1200，向右側射出 gradient）+ Italianno 英文，全部 `align-items: flex-end` 靠齊畫面右側。後續演化：分隔線色由 cyan 換深電藍 c-blue 與 h1 主標冷光線同色系（commit a76a887）；中文字級縮 2px 底部靠近冷光線（commit ed79b07）；中文顏色改回與英文一致 0.85 alpha（commit 7f7eeb9）。 |
 | Hero ANOMALY 背景大字 | 2026-04-19 規劃為 Variable Font 軸動文字（Fraunces 三軸 opsz/wght/SOFT 由 GSAP ScrollTrigger 驅動） | 2026-05-06 創辦人要求移除（commit d7c4913）。HTML `.hero__bg-text` div、CSS 桌機規則與手機 media query、JS `initVariableFontAxis()` 中針對 hero 的 GSAP scrollTrigger 區塊全部刪除。當時保留 `@property --vf-*` 與 `initVariableFontAxis()` 函式（供 `.manifesto__bg-text` UNCONVENTIONAL 用）；2026-05-06 後續 UNCONVENTIONAL 也移除（見下一行），整套 Variable Font 軸動系統全退役。 |
