@@ -12,6 +12,7 @@
 <nav class="site-nav" role="navigation" aria-label="主導覽列">
     <a href="index.html" class="nav__brand" aria-label="創巢數位 Nest Digital 首頁">
         <span class="nav__brand-zh">創巢數位</span>
+        <span class="nav__brand-divider" aria-hidden="true"></span>
         <span class="nav__brand-en">NEST DIGITAL</span>
     </a>
 

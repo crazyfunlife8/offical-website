@@ -93,6 +93,24 @@
     color: var(--c-cyan);
 }
 
+/* 中英文之間的垂直冷光線：從中心向上下兩端 emit
+   高度 60px 大於 nav 56px，align-self: center 後再 translateY(2px) 形成下偏：
+   top y=0（nav 頂部）→ bottom y=60（nav 底部 56 + 4px 微超出 .site-nav::before 底緣冷光線） */
+.nav__brand-divider {
+    width: 1px;
+    height: 60px;
+    align-self: center;
+    flex-shrink: 0;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        rgba(var(--c-cyan-rgb), 0.30) 25%,
+        rgba(var(--c-cyan-rgb), 0.85) 50%,
+        rgba(var(--c-cyan-rgb), 0.30) 75%,
+        transparent 100%
+    );
+    transform: translateY(2px);
+}
+
 /* ─── 連結區：絕對置中，CTA 靠右（margin-left: auto） ──── */
 .nav__links {
     position: absolute;
