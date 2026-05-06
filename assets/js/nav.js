@@ -10,6 +10,11 @@
     // ─── 導覽列 HTML ──────────────────────────────────────────
     const NAV_HTML = `
 <nav class="site-nav" role="navigation" aria-label="主導覽列">
+    <a href="index.html" class="nav__brand" aria-label="創巢數位 Nest Digital 首頁">
+        <span class="nav__brand-zh">創巢數位</span>
+        <span class="nav__brand-en">NEST DIGITAL</span>
+    </a>
+
     <ul class="nav__links" role="list">
         <li><a href="about.html">關於</a></li>
         <li><a href="services.html">服務</a></li>

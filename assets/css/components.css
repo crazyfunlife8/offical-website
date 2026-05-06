@@ -65,7 +65,47 @@
     box-shadow: 0 1px 0 rgba(var(--c-cyan-rgb), 0.18);
 }
 
-/* ─── 品牌區：三段（dot / 主標 / 戳記）──── */
+/* ─── 品牌區：純文字錯位 stack（2026-05-06 重設計）
+   設計敘事：對齊—然後刻意打破。中文上排齊左、英文下排向右縮排 ~2em，
+   形成「文字本身就是設計」的視覺記憶點，不依賴 logo 圖形。 */
+.nav__brand {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    text-decoration: none;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+
+.nav__brand-zh {
+    font-family: var(--f-serif-cjk);   /* Chiron Sung HK，與 h1 主標同家族延續品牌個性 */
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: rgba(var(--c-stellar-rgb), 0.95);
+    transition: color 0.2s ease;
+}
+
+.nav__brand-en {
+    font-family: var(--f-mono);        /* JetBrains Mono，technical wordmark 質感 */
+    font-size: 9.5px;
+    font-weight: 400;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(var(--c-cyan-rgb), 0.55);
+    margin-left: 2em;                  /* 從中文「巢」字位置開始 → 錯位設計記憶點 */
+    transition: color 0.2s ease;
+}
+
+.nav__brand:hover .nav__brand-zh {
+    color: var(--c-stellar);
+}
+
+.nav__brand:hover .nav__brand-en {
+    color: var(--c-cyan);
+}
+
 /* ─── 連結區：絕對置中，CTA 靠右（margin-left: auto） ──── */
 .nav__links {
     position: absolute;
