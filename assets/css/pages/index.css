@@ -506,65 +506,76 @@ body {
 }
 
 /* 非對稱 Bento Grid */
+/* 非對稱 Bento Grid（2026-04-16 原始設計，從舊版 創巢官網/ 恢復） */
 .bento-grid {
     display: grid;
-    grid-template-columns: 1.3fr 1fr 1.2fr;       /* 不對稱欄寬：寬-窄-中 */
-    grid-template-rows: 220px 240px 200px;        /* 不對稱列高：中-高-短 */
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto auto;
     gap: 1rem;
     margin-top: var(--sp-lg);
 }
 
-/* ─── Bento 不規則 modifier（all 1×1）─── */
-
-/* 不規則來源：
-   - 所有卡片都是 1×1 single cell，沒有任何卡片跨 cells（避免單卡過大）
-   - 欄寬不對稱（1.3 / 1.0 / 1.2 fr），列高不對稱（220 / 240 / 200 px）→ 9 個 cell 各自尺寸都不同
-   - 7 卡填 7 cells，留 2 個 empty cells 做設計性留白（Pinterest masonry 感）
-
-   視覺布局：
-   | A    | C    | B-web |
-   | _    | B-sys| D     |
-   | E    | _    | F     |
-*/
-
-/* A 社群（左上） */
+/* A 社群服務 — 左上，一般大小 */
 .bento--a {
-    grid-column: 1;
-    grid-row: 1;
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    min-height: 260px;
 }
 
-/* C AI 虛擬網紅（中上） */
+/* C AI 虛擬網紅 — 右上大塊，Featured（跨兩欄） */
 .bento--c {
-    grid-column: 2;
-    grid-row: 1;
+    grid-column: 2 / 4;
+    grid-row: 1 / 2;
+    min-height: 260px;
+    border-color: rgba(var(--c-blue-rgb), 0.5);
+    background: linear-gradient(135deg, rgba(var(--c-blue-rgb), 0.15), rgba(var(--c-navy-rgb), 0.2));
 }
 
-/* B 網站（右上） */
+.bento--c::after {
+    content: 'FEATURED';
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-family: var(--f-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-yellow);
+    letter-spacing: 0.12em;
+    opacity: 0.7;
+}
+
+/* B 網站 — 左中，小塊 */
 .bento--b-web {
-    grid-column: 3;
-    grid-row: 1;
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+    min-height: 200px;
 }
 
-/* B 客製系統（中中） */
+/* B 系統 — 中，一般 */
 .bento--b-sys {
-    grid-column: 2;
-    grid-row: 2;
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    min-height: 200px;
 }
 
-/* D 顧問（右中） */
+/* D 顧問 — 右，跨兩行 */
 .bento--d {
-    grid-column: 3;
-    grid-row: 2;
+    grid-column: 3 / 4;
+    grid-row: 2 / 4;
+    min-height: 300px;
 }
 
-/* E 跳動E投放（左下） */
+/* E 跳動E投放 — 左下，跨兩欄 */
 .bento--e {
-    grid-column: 1;
-    grid-row: 3;
+    grid-column: 1 / 3;
+    grid-row: 3 / 4;
+    min-height: 180px;
+    background: linear-gradient(135deg, rgba(var(--c-yellow-rgb), 0.06), rgba(var(--c-blue-rgb), 0.08));
+    border-color: rgba(var(--c-yellow-rgb), 0.2);
 }
 
-/* F 社群增長（右下） */
+/* F 社群增長 — 補入第 4 列左下（原 4/16 設計沒有 F，後加）*/
 .bento--f {
-    grid-column: 3;
-    grid-row: 3;
+    grid-column: 1 / 2;
+    grid-row: 4 / 5;
+    min-height: 200px;
 }
