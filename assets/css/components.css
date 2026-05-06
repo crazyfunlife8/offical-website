@@ -65,14 +65,13 @@
     box-shadow: 0 1px 0 rgba(var(--c-cyan-rgb), 0.18);
 }
 
-/* ─── 品牌區：純文字錯位 stack（2026-05-06 重設計）
-   設計敘事：對齊—然後刻意打破。中文上排齊左、英文下排向右縮排 ~2em，
-   形成「文字本身就是設計」的視覺記憶點，不依賴 logo 圖形。 */
+/* ─── 品牌區：純文字並行排版（中文在前、英文在後）2026-05-06 重設計
+   單行 baseline 對齊，中英並列形成「主訴求 + 副標」連續閱讀節奏。 */
 .nav__brand {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 1em;
     text-decoration: none;
     line-height: 1;
 }
@@ -92,7 +91,6 @@
     letter-spacing: 0.4em;
     text-transform: uppercase;
     color: var(--c-cyan);
-    margin-left: 2em;                  /* 從中文「巢」字位置開始 → 錯位設計記憶點 */
 }
 
 /* ─── 連結區：絕對置中，CTA 靠右（margin-left: auto） ──── */
