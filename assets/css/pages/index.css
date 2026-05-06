@@ -590,3 +590,117 @@ body {
     grid-row: 1 / 2;
     min-height: 200px;
 }
+
+/* ════════════════════════════════════════════════════════════
+   Section 5｜終點 CTA（反轉 CTA：「先別點」）
+   居中布局（與服務區塊 cetered grid 視覺重心一致）
+   設計策略：句號為視覺重音（停下來）→ 對稱冷光線 → 副標反轉接續
+   ════════════════════════════════════════════════════════════ */
+
+.final-cta {
+    position: relative;
+    padding: var(--sp-w1) 0;
+    overflow: hidden;
+    text-align: center;
+}
+
+/* 背景中央微光暈：暗黑底上的「終點之光」，呼應「準備好了」這個承諾 */
+.final-cta__glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+        ellipse 60% 50% at 50% 50%,
+        rgba(var(--c-blue-rgb), 0.14) 0%,
+        rgba(var(--c-blue-rgb), 0.06) 30%,
+        transparent 70%
+    );
+    z-index: 0;
+}
+
+.final-cta__inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 var(--sec-px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 主標題「先別點。」— 仿宋大字，句號是視覺重音停止符 */
+.final-cta__title {
+    font-family: var(--f-serif-cjk);
+    font-size: clamp(3.5rem, 9vw, 7.5rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    color: var(--c-stellar);
+    margin: 0;
+}
+
+/* 英文 echo「Don't click yet.」（Italiana hairline serif） */
+.final-cta__title-en {
+    font-family: var(--f-display-en);
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    line-height: 1.4;
+    color: rgba(var(--c-cyan-rgb), 0.65);
+    margin: 0.6em 0 0;
+}
+
+/* 對稱冷光分隔線：中央向兩端衰減
+   與 Hero / Manifesto 的「右側單向射出」線形成反差，呼應居中語境 */
+.final-cta__divider {
+    width: clamp(280px, 40vw, 480px);
+    height: 1px;
+    margin: var(--sp-md) 0 var(--sp-sm);
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(var(--c-blue-rgb), 0.30) 25%,
+        rgba(var(--c-blue-rgb), 0.85) 50%,
+        rgba(var(--c-blue-rgb), 0.30) 75%,
+        transparent 100%
+    );
+    box-shadow: 0 0 12px rgba(var(--c-blue-rgb), 0.40);
+}
+
+/* 副標題「除非你準備好不正常一次。」— 仿宋編輯感，反轉接續主標 */
+.final-cta__subtitle {
+    font-family: var(--f-fang-cjk);
+    font-size: clamp(1rem, 1.6vw, 1.375rem);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+    color: rgba(var(--c-stellar-rgb), 0.85);
+    margin: 0;
+}
+
+/* 副標題英文 echo（Italiana，更弱的 cyan 微光） */
+.final-cta__subtitle-en {
+    font-family: var(--f-display-en);
+    font-size: clamp(0.875rem, 1.2vw, 1.125rem);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    color: rgba(var(--c-cyan-rgb), 0.55);
+    margin: 0.5em 0 0;
+}
+
+/* CTA 按鈕外距（樣式本體由 components.css 的 .btn--yellow 接管） */
+.final-cta__btn {
+    margin-top: var(--sp-lg);
+}
+
+/* 座標文字 footer：等寬冷淡，遠遠收尾不喧賓奪主 */
+.final-cta__coords {
+    font-family: var(--f-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.16em;
+    color: rgba(var(--c-stellar-rgb), 0.40);
+    margin: var(--sp-md) 0 0;
+}
