@@ -501,6 +501,14 @@
     color: var(--c-white);
 }
 
+.service-card__label {
+    font-family: var(--f-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-yellow);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
 .service-card__title {
     font-size: var(--fs-xl);
     font-weight: 900;
