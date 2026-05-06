@@ -425,6 +425,17 @@ body {
     white-space: nowrap;  /* 2026-05-06：不分行（單行右對齊） */
 }
 
+/* 中文下方英文 echo（與 Hero 副標英文同設計語言：Italiana / cyan / 單行右對齊） */
+.manifesto__body-en {
+    font-family: var(--f-display-en);  /* Italiana 雜誌封面感 hairline serif */
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    line-height: 1.4;
+    color: rgba(var(--c-cyan-rgb), 0.65);
+    white-space: nowrap;
+    margin-top: 0.5em;
+}
+
 /* 左側裝飾線 */
 .manifesto__line {
     position: absolute;
