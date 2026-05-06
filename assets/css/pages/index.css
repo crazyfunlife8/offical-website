@@ -259,7 +259,7 @@ body {
 
     /* 字型：cwTeX Q Fangsong 繁體仿宋（單一 Medium 字重，編輯感骨架，與 h1 Chiron Sung 明朝對位） */
     font-family: var(--f-fang-cjk);
-    font-size: clamp(0.875rem, 1.4vw, 1.175rem);
+    font-size: clamp(0.75rem, 1.225vw, 1.05rem);  /* 縮小 ~2px（原 clamp(0.875, 1.4vw, 1.175rem)） */
     /* 不指定 font-weight：仿宋僅 Medium 一字重，避免瀏覽器合成假粗體 */
     letter-spacing: 0.06em;
     line-height: 1.7;
@@ -319,7 +319,7 @@ body {
     margin: 0;  /* spacing 由 .hero__readout-divider 自身 margin 接管 */
 
     font-family: var(--f-display-en);  /* Italiana（文藝復興雜誌封面感，hairline 高對比 Roman serif） */
-    font-size: clamp(0.9rem, 1.3vw, 1.15rem);   /* 峰值受 max-width 900px 限制，超過會在寬視窗下換行；Italiana hairline 視覺偏細，1.15rem 與中文 1.175rem 接近視覺等比 */
+    font-size: clamp(0.775rem, 1.16vw, 1.025rem);  /* 縮小 ~2px（原 clamp(0.9, 1.3vw, 1.15rem)）；峰值仍受 max-width 900px 限制不超過 ~789px 自然寬度 */
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0.06em;                  /* 雜誌排版常用的開放字距，襯托 hairline 優雅感 */
@@ -335,7 +335,7 @@ body {
     }
 
     .hero__readout {
-        font-size: 0.795rem;
+        font-size: 0.67rem;  /* 同步縮小 ~2px */
         letter-spacing: 0.03em;
     }
 
@@ -344,7 +344,7 @@ body {
     }
 
     .hero__readout-en {
-        font-size: 1rem;  /* Italiana 手機尺度，避免 hairline 過細 */
+        font-size: 0.875rem;  /* 同步縮小 ~2px */
     }
 }
 
