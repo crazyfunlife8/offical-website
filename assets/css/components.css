@@ -81,18 +81,18 @@
     font-size: 15px;
     font-weight: 300;
     letter-spacing: 0.35em;
-    color: color-mix(in srgb, var(--c-blue), white 45%); /* 冷光線同源色，兌白 45% ≈ #7a8ff8 */
-    text-shadow: 0 0 14px rgba(var(--c-blue-rgb), 0.5); /* idle：藍底暈光，增加儀器發光感 */
+    color: color-mix(in srgb, var(--c-blue), white 70%); /* 2026-05-06 由 white 45% (#7a8ff8) 調亮到 white 70% (~#b6c3fa) */
+    text-shadow: 0 0 14px rgba(var(--c-blue-rgb), 0.5); /* idle：藍底暈光 */
     position: relative;
     padding: 18px 0;
     transition: color 0.18s ease, text-shadow 0.18s ease;
 }
 
-/* Hover hairline：從中心向兩側拉開的 cyan 細線 */
+/* Hover hairline：從中心向兩側拉開的 cyan 細線（2026-05-06 由 bottom 改為 top） */
 .nav__links a::after {
     content: '';
     position: absolute;
-    bottom: 14px;
+    top: 14px;
     left: 50%;
     width: 0;
     height: 1px;
