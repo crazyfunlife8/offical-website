@@ -431,10 +431,13 @@ body {
     margin: 0;            /* spacing 由 .manifesto__body-divider 接管 */
 }
 
-/* 中英文之間冷光分隔線（與 Hero 副標 .hero__readout-divider 同設計語言：c-blue 右側射出） */
+/* 中英文之間冷光分隔線（與 Hero 副標 .hero__readout-divider 同設計語言：c-blue 右側射出）
+   寬度突破 .manifesto__body 容器，右邊緣延伸到 viewport 右側
+   公式：100% (.manifesto__body 寬) + max(padding, 50vw - max-w/2 + padding)
+   = 100% + max(40px, 50vw - 560px)
+   寬視窗：50vw-560 主導；窄視窗（< max-w）：40px 主導 */
 .manifesto__body-divider {
-    width: 100%;
-    max-width: 1200px;
+    width: calc(100% + max(var(--sec-px), 50vw - var(--max-w) / 2 + var(--sec-px)));
     height: 1px;
     margin: 0.5em 0 0.4em;
     background: linear-gradient(
