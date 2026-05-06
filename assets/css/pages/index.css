@@ -514,46 +514,56 @@ body {
     margin-top: var(--sp-lg);
 }
 
-/* ─── Bento 不規則 modifier（2026-05-06 補入，原本 modifier class 在 HTML 但 CSS 缺定義） ─── */
+/* ─── Bento 不規則 modifier ─── */
 
-/* A 社群（小卡 1×1，左上） */
+/* 3×3 grid 配置：5 個 1×1 小卡 + 2 個 2-cell 雙卡（C 直立 + E 橫寬）
+   不規則來源：tall 與 wide 形狀對比 + 5 singles 散布
+   每個雙卡都只 2 cells（避免單卡過大）
+
+   視覺布局：
+   | A   | C   | B-web |
+   | B-sys| C  | D     |
+   | F   | E   E       |
+*/
+
+/* A 社群（1×1，左上） */
 .bento--a {
     grid-column: 1;
     grid-row: 1;
 }
 
-/* C AI 虛擬網紅 — Featured 大卡 2×2（右上） */
+/* C AI 虛擬網紅（Featured，1×2 tall，第二欄跨上中兩列） */
 .bento--c {
-    grid-column: 2 / span 2;
+    grid-column: 2;
     grid-row: 1 / span 2;
 }
 
-/* B 網站（小卡 1×1） */
+/* B 網站（1×1，右上） */
 .bento--b-web {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+/* B 客製系統（1×1，左中） */
+.bento--b-sys {
     grid-column: 1;
     grid-row: 2;
 }
 
-/* B 客製系統（小卡 1×1） */
-.bento--b-sys {
-    grid-column: 1;
-    grid-row: 3;
-}
-
-/* D 顧問（寬卡 2×1，跨兩欄） */
+/* D 顧問（1×1，右中） */
 .bento--d {
-    grid-column: 2 / span 2;
-    grid-row: 3;
+    grid-column: 3;
+    grid-row: 2;
 }
 
-/* F 社群增長（小卡 1×1） */
+/* F 社群增長（1×1，左下） */
 .bento--f {
     grid-column: 1;
-    grid-row: 4;
+    grid-row: 3;
 }
 
-/* E 跳動E投放（寬卡 2×1，跨兩欄） */
+/* E 跳動E投放（2×1 wide，第三列跨中右兩欄） */
 .bento--e {
     grid-column: 2 / span 2;
-    grid-row: 4;
+    grid-row: 3;
 }
