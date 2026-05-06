@@ -599,62 +599,125 @@
 
 /* ════════════════════════════════════════════════════════════
    8. 頁尾 (Footer)
+   設計方向：電影片尾收束（end credits）
+   ─ 上方對稱冷光線（呼應 final-cta__divider，更克制）
+   ─ 巨型 NEST DIGITAL 大字（Italiana hairline serif）
+   ─ 雜誌式座標讀出條（地址）
+   ─ 兩欄資訊（CONTACT / STUDIO）
+   ─ 最底版權行
    ════════════════════════════════════════════════════════════ */
 
 .site-footer {
     position: relative;
     z-index: var(--z-content);
-    border-top: 1px solid var(--glass-border);
-    padding: var(--sp-lg) 0 var(--sp-md);
+    padding: var(--sp-w1) 0 var(--sp-md);
 }
 
 .site-footer__inner {
+    width: 100%;
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 var(--sec-px);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--sp-md);
-    flex-wrap: wrap;
+    text-align: center;
 }
 
-.site-footer__brand {
-    font-family: var(--f-serif);
-    font-size: var(--fs-sm);
-    font-weight: 700;
-    color: var(--c-muted);
+/* 上方對稱冷光線：與 final-cta__divider 同設計但更克制（更窄、更弱） */
+.site-footer__divider {
+    width: clamp(240px, 35vw, 400px);
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(var(--c-blue-rgb), 0.20) 25%,
+        rgba(var(--c-blue-rgb), 0.65) 50%,
+        rgba(var(--c-blue-rgb), 0.20) 75%,
+        transparent 100%
+    );
+    box-shadow: 0 0 8px rgba(var(--c-blue-rgb), 0.30);
 }
 
-/* 品牌行分隔點 · 淡化 */
-.site-footer__sep {
-    opacity: 0.4;
-}
-
-.site-footer__copy {
-    font-size: var(--fs-xs);
-    color: rgba(255, 255, 255, 0.25);
-}
-
-.site-footer__links {
+/* 品牌大字區塊 */
+.site-footer__brand-block {
+    margin-top: var(--sp-lg);
     display: flex;
-    gap: var(--sp-md);
+    flex-direction: column;
+    align-items: center;
 }
 
-.site-footer__links a {
+/* NEST DIGITAL 巨型大字 — Italiana hairline serif，雜誌封面尺度 */
+.site-footer__brand-mark {
+    font-family: var(--f-display-en);
+    font-size: clamp(2.5rem, 10vw, 9rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    color: rgba(var(--c-stellar-rgb), 0.92);
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* 大字下方地址（座標讀出條） */
+.site-footer__location {
+    font-family: var(--f-mono);
     font-size: var(--fs-xs);
-    color: var(--c-muted);
-    transition: color var(--t-fast);
+    letter-spacing: 0.16em;
+    color: rgba(var(--c-stellar-rgb), 0.45);
+    margin: 1.5em 0 0;
 }
 
-.site-footer__links a:hover {
-    color: var(--c-yellow);
+/* 兩欄資訊區（CONTACT / STUDIO） */
+.site-footer__info {
+    margin-top: var(--sp-w1);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-w1);
+    width: 100%;
+    max-width: 720px;
+    text-align: left;
 }
 
+.site-footer__col-label {
+    font-family: var(--f-mono);
+    font-size: var(--fs-xs);
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    color: rgba(var(--c-cyan-rgb), 0.55);
+    margin: 0 0 var(--sp-sm);
+}
+
+.site-footer__col p {
+    font-family: var(--f-sans);
+    font-size: var(--fs-sm);
+    color: rgba(var(--c-stellar-rgb), 0.78);
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* 最底版權行 */
+.site-footer__copy {
+    margin-top: var(--sp-lg);
+    font-family: var(--f-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.12em;
+    color: rgba(var(--c-stellar-rgb), 0.30);
+}
+
+/* 手機版（暫定基礎，待桌機定案後再精修） */
 @media (max-width: 900px) {
-    .site-footer__inner {
-        flex-direction: column;
-        text-align: center;
+    .site-footer {
+        padding: var(--sp-lg) 0 var(--sp-md);
     }
-    .site-footer__links {
-        justify-content: center;
+    .site-footer__brand-mark {
+        letter-spacing: 0.02em;
+    }
+    .site-footer__info {
+        grid-template-columns: 1fr;
+        gap: var(--sp-md);
+        text-align: center;
+        margin-top: var(--sp-lg);
     }
 }
 
