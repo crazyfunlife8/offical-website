@@ -8,10 +8,9 @@
    1. 導覽列 (Nav)
    ════════════════════════════════════════════════════════════ */
 
-/* ─── 全寬橫楣 Nav（2026-04-19 重構，2026-05-06 移除「觀測站儀表」框架描述）───
-   放棄 SaaS 慣用的 floating glass pill，改為貼頂滿寬橫楣
-   品牌以等寬字呈現工程感，連結用 Mono uppercase
-   hover 時 Fraunces wght 軸動 + cyan hairline 滑入
+/* ─── 全寬橫楣 Nav ───
+   貼頂滿寬橫楣（非 SaaS 慣用 floating glass pill）
+   連結用 Mono uppercase；hover 時 Fraunces wght 軸動 + cyan hairline 滑入
 */
 .site-nav {
     position: fixed;
@@ -36,9 +35,8 @@
     transition: background var(--t-base), border-color var(--t-base), box-shadow var(--t-base);
 }
 
-/* 底緣刻度光線（與左側 .manifesto__line 同結構：全色值漸層 + opacity 控亮度）
-   2026-04-19 原為深電藍 var(--c-blue)；2026-05-06 改為亮青 var(--c-cyan)
-   2026-05-06 同步：.site-nav.scrolled box-shadow 也由 c-blue-rgb → c-cyan-rgb 保持一致 */
+/* 底緣亮青光線（與左側 .manifesto__line 同結構：全色值漸層 + opacity 控亮度）
+   .site-nav::before 與 .scrolled box-shadow 都用 c-cyan 保持同色系 */
 .site-nav::before {
     content: '';
     position: absolute;
@@ -68,10 +66,7 @@
 }
 
 /* ─── 品牌區：三段（dot / 主標 / 戳記）──── */
-/* .nav__brand / .nav__brand-star / .nav__brand-mark / .nav__brand-sep
-   整組規則 2026-05-06 移除（左上品牌整個設計拿掉，待重設計） */
-
-/* ─── 連結區：絕對置中，CTA 維持兩端對齊不受影響 ──── */
+/* ─── 連結區：絕對置中，CTA 靠右（margin-left: auto） ──── */
 .nav__links {
     position: absolute;
     left: 50%;

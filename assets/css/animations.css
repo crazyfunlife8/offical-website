@@ -30,8 +30,6 @@
     50%       { opacity: 0.5; transform: scale(1.4); }
 }
 
-/* @keyframes star-twinkle 2026-05-06 移除（原唯一使用者 .nav__brand-star 已隨左上品牌整組刪除） */
-
 /* ─── 星點閃爍 ─── */
 @keyframes twinkle {
     0%, 100% { opacity: 0.2; }

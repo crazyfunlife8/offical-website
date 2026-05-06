@@ -10,8 +10,6 @@
     // ─── 導覽列 HTML ──────────────────────────────────────────
     const NAV_HTML = `
 <nav class="site-nav" role="navigation" aria-label="主導覽列">
-    <!-- 左上品牌 2026-05-06 整個拿掉，待重設計 -->
-
     <ul class="nav__links" role="list">
         <li><a href="about.html">關於</a></li>
         <li><a href="services.html">服務</a></li>

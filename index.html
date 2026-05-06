@@ -82,8 +82,6 @@
 
             <div class="hero__glow" aria-hidden="true"></div>
 
-            <!-- ANOMALY 背景大字 2026-05-06 移除 -->
-
             <div class="hero__inner">
 
                 <!-- 左側文字區 -->
@@ -121,14 +119,8 @@
 
             </div>
 
-            <!-- ─────────────────────────────────────────────
-                 Hero 副標題（裂縫設計：::after 暗橢圓背景 + 文字冷藍光暈）
-                 .hero__rift     — 整體定位容器（absolute，Hero 下半部居中）
-                 .hero__readout  — 文字層
-                 ─────────────────────────────────────────────
-                 註：2026-05-05 SVG zig-zag 線條設計已徹底移除
-                     （.hero__rift-crack 子層、initRift() JS、相關 GSAP）
-                 ───────────────────────────────────────────── -->
+            <!-- Hero 副標題：.hero__rift 定位容器（absolute, Hero 下半部右靠）
+                 .hero__readout (中文仿宋) / .hero__readout-divider (冷光分隔線) / .hero__readout-en (英文 Italianno) -->
             <div class="hero__rift js-hidden" aria-hidden="false">
                 <p class="hero__readout">
                     傳統做法不夠用時，你需要的<span class="hero__readout-dim">不是更努力</span>　<strong>而是一個敢用不同方法的團隊</strong>。

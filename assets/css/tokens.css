@@ -25,7 +25,7 @@
     --c-muted:   rgba(255, 255, 255, 0.55);
     --c-accent:  var(--c-yellow); /* 全站預設強調色；各頁可在 pages/[page].css 頂部 override */
 
-    /* ─── 強調色票（star-white / cool-cyan / amber-gold，比例 88/8/3/1）2026-05-06 移除「天文觀測站」框架描述 ─── */
+    /* ─── 強調色票（star-white / cool-cyan / amber-gold，比例 88/8/3/1） ─── */
     --c-stellar: #e8f0ff;   /* 星白：主要文字與星點（8%） */
     --c-cyan:    #00c8ff;   /* 冷電藍：Hover / 連結 / 軌道環（3%） */
     --c-amber:   #f5a623;   /* 琥珀金：全站僅單一位置畫龍點睛（1%） */
@@ -57,7 +57,6 @@
     --f-display-en: 'Italianno', 'Mrs Saint Delafield', 'Allura', cursive;
                                                                         /* 英文 display 副標／copperplate 極細草書；hairline 髮絲級筆畫，全字符連筆；本站以 weight 400 載入；letter-spacing 0 避免切斷連筆 */
     --f-mono:  'JetBrains Mono', monospace;                             /* 座標文字、技術細節、數據 */
-    /* --f-bebas 於 2026-04-19 移除（Fraunces 接手所有英文大字，含 Manifesto UNCONVENTIONAL） */
 
     /* ─── Font Sizes（1.333 Perfect Fourth 階梯，基底 16px） ─── */
     --fs-xs:   0.75rem;     /* 12px */

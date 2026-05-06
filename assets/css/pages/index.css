@@ -113,8 +113,6 @@ body {
     initial-value: 80;
 }
 
-/* .hero__bg-text ANOMALY 背景大字 2026-05-06 移除（@property --vf-* 保留供 .manifesto__bg-text UNCONVENTIONAL 使用） */
-
 .hero__inner {
     position: relative;
     z-index: 2;
@@ -172,18 +170,16 @@ body {
     position: absolute;
     bottom: 0.12em;
     left: 0;
-    width: 130%;  /* 2026-05-06：超出文字向右延展 30%，作為光線射出的尾段 */
+    width: 130%;  /* 超出文字向右延展 30%，作為光線射出的尾段 */
     height: 1px;
-    /* 2026-05-06：原對稱（transparent → blue 50% → transparent + opacity 0.7）改為左側射出。
-       光源在左、向右漸弱，與副標分隔線（光從右射出）形成鏡像呼應。
-       opacity 模式改為直接 alpha in stops，效果更乾淨可控。
-       gradient stops 對齊新 width：text 占 0-77%（100/130），77-100% 為超出文字的延伸段 */
+    /* 左側射出 gradient（與副標分隔線「光從右射出」形成鏡像呼應）
+       77% 對應文字右邊緣（width 130% × 100/130 = 77%），77-100% 為超出文字的尾段 */
     background: linear-gradient(
         90deg,
         rgba(var(--c-blue-rgb), 0.75) 0%,
         rgba(var(--c-blue-rgb), 0.60) 20%,
         rgba(var(--c-blue-rgb), 0.40) 50%,
-        rgba(var(--c-blue-rgb), 0.20) 77%,    /* 文字右邊緣，仍可見 */
+        rgba(var(--c-blue-rgb), 0.20) 77%,
         rgba(var(--c-blue-rgb), 0.08) 90%,
         transparent 100%
     );
@@ -244,69 +240,57 @@ body {
     height: 42%;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;  /* 2026-05-06：副標靠齊畫面最右側 */
+    align-items: flex-end;  /* 副標靠齊畫面最右側 */
     justify-content: flex-end;
     padding-bottom: 5rem;
     z-index: 3;
     pointer-events: none;
 }
 
-/* 2026-05-06：原 .hero__rift::after 暗橢圓「空間裂縫」背景完整移除（創辦人判定不再需要）。
-   .hero__rift 容器保留作為副標 flex 排版（中文 / 分隔線 / 英文）的右對齊定位 wrapper。 */
-
-/* ─── 副標文字（仿宋編輯感，從能量場被推出的核心文字）─── */
+/* ─── 副標文字（仿宋編輯感）─── */
 .hero__readout {
     position: relative;
     z-index: 2;
 
-    /* 2026-05-06：text-align center → right（副標靠右切齊） */
     text-align: right;
     padding: 0 var(--sec-px);
     max-width: 900px;
     width: 100%;
 
-    /* 字型：cwTeX Q Fangsong（繁體仿宋體，單一 Medium 字重）
-       2026-05-05 從黑體換成仿宋；橫筆右斜的編輯感骨架，與 h1 Chiron Sung 印刷明朝形成對位 */
+    /* 字型：cwTeX Q Fangsong 繁體仿宋（單一 Medium 字重，編輯感骨架，與 h1 Chiron Sung 明朝對位） */
     font-family: var(--f-fang-cjk);
-    font-size: clamp(0.875rem, 1.4vw, 1.175rem);  /* 2026-05-06：縮小 ~2px（原 clamp(1, 1.55vw, 1.3rem)） */
-    /* 不指定 font-weight：仿宋僅一個 Medium 字重，避免瀏覽器合成假粗體 */
+    font-size: clamp(0.875rem, 1.4vw, 1.175rem);
+    /* 不指定 font-weight：仿宋僅 Medium 一字重，避免瀏覽器合成假粗體 */
     letter-spacing: 0.06em;
     line-height: 1.7;
-    color: rgba(var(--c-stellar-rgb), 0.85);  /* 2026-05-06：中文顏色改回與英文一致（雙語同一視覺重量） */
+    color: rgba(var(--c-stellar-rgb), 0.85);
 
     margin: 0;
     white-space: normal;
 
-    /* 文字背面有能量場照射感：backdrop 上有 screen 混合的光源 */
+    /* 淡冷藍 text-shadow：文字背面光源感 */
     text-shadow:
         0 0 40px rgba(var(--c-blue-rgb), 0.18),
         0 2px 60px rgba(var(--c-blue-rgb), 0.08);
 }
 
-/* 兩段語意層級（dim / strong）2026-05-05 視覺扁平化：
-   創辦人要求文字顏色全部與「傳統做法」一致、且粗體拿掉。
-   HTML 語意標籤保留供無障礙；視覺上回到單一風格無對比。
-   2026-05-06：原 <em>——</em> 破折號改為純文字「；」，em 規則移除。 */
+/* 兩段語意 dim / strong 視覺扁平化：HTML 語意標籤保留供無障礙；視覺無差異對比 */
 
-/* strong：明確設 font-weight: normal，避免瀏覽器在仿宋單字重上合成假粗體 */
+/* strong：font-weight: normal 防瀏覽器在仿宋單字重上合成假粗體 */
 .hero__readout strong {
     font-weight: normal;
 }
 
-/* ─── 中英文之間的冷光分隔線（2026-05-06 新增）──
+/* ─── 中英文之間的冷光分隔線 ──
    線寬超出文字容器（max-width 1200 vs 文字 max-width 900），
-   兩端 transparent 中間深電藍 c-blue，雙層光暈呈現「光劃過去」感（2026-05-06 由 cyan 換 blue）
-   margin 0.2em 上下取代英文原本的 0.55em margin-top，整體行距縮小 */
+   gradient 左端 transparent 右端深電藍高峰（光從右射出，與右對齊文字方向呼應） */
 .hero__readout-divider {
     position: relative;
     z-index: 2;
     width: 100%;
     max-width: 1200px;
     height: 1px;
-    margin: 0.05em 0 0.2em;  /* 2026-05-06：top 由 0.2em → 0.05em，中文底部靠近冷光線；bottom 保留 0.2em */
-    /* 2026-05-06：原對稱 gradient 改為右側射出
-       左端 transparent 漸進至右端 0.90 alpha 高峰，搭配右側強光 box-shadow，
-       配合副標靠右對齊形成「光從右方射出，照向左方」的視覺敘事 */
+    margin: 0.05em 0 0.2em;  /* top 較緊讓中文底部靠近線、bottom 留隔英文間距 */
     background: linear-gradient(
         90deg,
         transparent 0%,
@@ -315,32 +299,24 @@ body {
         rgba(var(--c-blue-rgb), 0.70) 90%,
         rgba(var(--c-blue-rgb), 0.90) 100%
     );
-    /* 2026-05-06：移除原本的全向 box-shadow（0 0 8px rgba 0.20），
-       原因：1px 線左半部 gradient alpha < 0.16，全向光暈 0.20 反而比線亮，
-       視覺上線變成「淡光暈中夾的暗縫」（看似黑線）。改為僅保留右側偏移光暈。 */
+    /* 警示：勿加全向 box-shadow（0 0 Xpx），會在 line gradient 左半部 alpha < halo
+       時造成「淡光暈中夾的暗縫」黑線錯覺。只用方向性偏移光暈強化光從右射出感。 */
     box-shadow: 12px 0 20px rgba(var(--c-blue-rgb), 0.30);
 }
 
-/* ─── 副標下方英文（同義重寫，非逐字翻譯）2026-05-05 新增 ───
-   Fraunces italic、字級小於中文、低透明度、無光暈
-   定位：中文為主訴求，英文為編輯感 echo / refrain，視覺上明顯次於中文
-
-   z-index 處理：必須與 .hero__readout 一樣 position:relative + z-index:2，
-                 否則會被 .hero__rift::after 暗橢圓物理堆疊遮擋（pseudo
-                 ::after 預設 stacking 高於 static 兄弟元素）
-
-   等寬對齊：font-size 與 max-width 從中文反推，讓英文自然渲染寬度逼近中文
-            中文 clamp(1rem, 1.55vw, 1.3rem) × 比例 0.88 = clamp(0.88rem, 1.36vw, 1.15rem)
-            max-width 同步從 800px 放到 900px 對齊中文容器 */
+/* ─── 副標下方英文（同義重寫，非逐字翻譯）───
+   英文為編輯感 echo / refrain。
+   等寬對齊：clamp 比例 0.88×中文（中文 1-1.3rem → 英文 0.88-1.15rem 視覺寬度匹配）。
+   z-index：position:relative + z-index:2，防未來插入 pseudo 元素時被堆疊遮擋。 */
 .hero__readout-en {
     position: relative;
     z-index: 2;
 
-    text-align: right;  /* 2026-05-06：副標靠右切齊，與中文同 */
+    text-align: right;
     padding: 0 var(--sec-px);
     max-width: 900px;
     width: 100%;
-    margin: 0;  /* 2026-05-06 改：spacing 由 .hero__readout-divider 自身 margin 接管 */
+    margin: 0;  /* spacing 由 .hero__readout-divider 自身 margin 接管 */
 
     font-family: var(--f-display-en);  /* Italianno（copperplate 極細草書，hairline 髮絲筆畫，全字符連筆） */
     font-size: clamp(1.4rem, 2.1vw, 1.8rem);  /* Italianno 筆畫極細需略放大確保可讀，~1.5× */
@@ -348,7 +324,7 @@ body {
     font-weight: 400;
     letter-spacing: 0;                       /* 0 不破壞連筆，正值會切斷字母連接 */
     line-height: 1.4;                        /* script 字型升降部較長，行距略收緊 */
-    color: rgba(var(--c-stellar-rgb), 0.85);  /* 2026-05-05 與中文顏色對調，英文升為主視覺 */
+    color: rgba(var(--c-stellar-rgb), 0.85);
 }
 
 /* 手機：維持可讀性，字級縮小，允許換行 */
@@ -359,13 +335,12 @@ body {
     }
 
     .hero__readout {
-        font-size: 0.795rem;  /* 2026-05-06：縮小 ~2px（原 0.92rem） */
+        font-size: 0.795rem;
         letter-spacing: 0.03em;
-        /* 2026-05-06：移除手機 color 覆寫，繼承桌機 0.85（與英文一致） */
     }
 
     .hero__readout-divider {
-        margin: 0.05em 0 0.15em;  /* 2026-05-06：top 同步收緊 */
+        margin: 0.05em 0 0.15em;  /* 手機行距更緊 */
     }
 
     .hero__readout-en {
@@ -408,8 +383,6 @@ body {
         height: 280px;
         order: -1;
     }
-
-    /* .hero__bg-text 已移除（大字移至 Section 2） */
 }
 
 

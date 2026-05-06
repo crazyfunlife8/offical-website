@@ -593,8 +593,6 @@
 
     /* ════════════════════════════════════════════════════════
        3. Hero GSAP 入場序列
-       （2026-05-05：SVG zig-zag 裂縫線條設計失敗，initRift() 完整移除；
-                     ::after 暗橢圓背景與文字冷藍光暈保留）
        ════════════════════════════════════════════════════════ */
 
     function initHeroEntrance() {
@@ -626,7 +624,6 @@
         )
 
         // ── 副標題進場序列 ──
-        // 2026-05-05：原 SVG 裂縫生長動畫（.hero__rift-crack scaleX）已隨 SVG 設計移除
         // 保留容器 fade-in 與文字推出（::after 暗橢圓背景靜態存在，無需動畫）
 
         // 副標容器先 fade-in
@@ -814,7 +811,7 @@
     function initVariableFontAxis() {
         if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
-        // 2026-05-06：原 hero__bg-text ANOMALY 軸動已隨元素移除；保留 manifesto 部分
+        // hero__bg-text 已移除，本函式只剩 manifesto 軸動
 
         const maniBg = document.querySelector('.manifesto__bg-text');
         if (maniBg) {
