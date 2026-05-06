@@ -522,9 +522,9 @@ body {
     min-height: 260px;
 }
 
-/* C AI 虛擬網紅 — 右上大塊，Featured（跨兩欄） */
+/* C AI 虛擬網紅 — 右上 Featured（不再跨欄） */
 .bento--c {
-    grid-column: 2 / 4;
+    grid-column: 3 / 4;
     grid-row: 1 / 2;
     min-height: 260px;
     border-color: rgba(var(--c-blue-rgb), 0.5);
@@ -573,9 +573,9 @@ body {
     border-color: rgba(var(--c-yellow-rgb), 0.2);
 }
 
-/* F 社群增長 — 補入第 4 列左下（原 4/16 設計沒有 F，後加）*/
+/* F 社群增長 — 第一列中間（A 與 C 之間） */
 .bento--f {
-    grid-column: 1 / 2;
-    grid-row: 4 / 5;
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
     min-height: 200px;
 }
