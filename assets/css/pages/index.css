@@ -509,7 +509,51 @@ body {
 .bento-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: auto auto auto;
+    grid-auto-rows: minmax(220px, auto);
     gap: 1rem;
     margin-top: var(--sp-lg);
+}
+
+/* ─── Bento 不規則 modifier（2026-05-06 補入，原本 modifier class 在 HTML 但 CSS 缺定義） ─── */
+
+/* A 社群（小卡 1×1，左上） */
+.bento--a {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+/* C AI 虛擬網紅 — Featured 大卡 2×2（右上） */
+.bento--c {
+    grid-column: 2 / span 2;
+    grid-row: 1 / span 2;
+}
+
+/* B 網站（小卡 1×1） */
+.bento--b-web {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+/* B 客製系統（小卡 1×1） */
+.bento--b-sys {
+    grid-column: 1;
+    grid-row: 3;
+}
+
+/* D 顧問（寬卡 2×1，跨兩欄） */
+.bento--d {
+    grid-column: 2 / span 2;
+    grid-row: 3;
+}
+
+/* F 社群增長（小卡 1×1） */
+.bento--f {
+    grid-column: 1;
+    grid-row: 4;
+}
+
+/* E 跳動E投放（寬卡 2×1，跨兩欄） */
+.bento--e {
+    grid-column: 2 / span 2;
+    grid-row: 4;
 }
