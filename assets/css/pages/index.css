@@ -419,6 +419,7 @@ body {
 
 /* 下方說明文字 */
 .manifesto__body {
+    width: 100%;       /* fill .manifesto__inner content area，讓 divider 可以延伸到 1120px 寬 */
     text-align: right;
 }
 
@@ -426,7 +427,25 @@ body {
     font-size: var(--fs-md);
     line-height: 1.8;
     color: var(--c-muted);
-    white-space: nowrap;  /* 2026-05-06：不分行（單行右對齊） */
+    white-space: nowrap;  /* 不分行（單行右對齊） */
+    margin: 0;            /* spacing 由 .manifesto__body-divider 接管 */
+}
+
+/* 中英文之間冷光分隔線（與 Hero 副標 .hero__readout-divider 同設計語言：c-blue 右側射出） */
+.manifesto__body-divider {
+    width: 100%;
+    max-width: 1200px;
+    height: 1px;
+    margin: 0.5em 0 0.4em;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(var(--c-blue-rgb), 0.08) 40%,
+        rgba(var(--c-blue-rgb), 0.35) 70%,
+        rgba(var(--c-blue-rgb), 0.70) 90%,
+        rgba(var(--c-blue-rgb), 0.90) 100%
+    );
+    box-shadow: 12px 0 20px rgba(var(--c-blue-rgb), 0.30);
 }
 
 /* 中文下方英文 echo（與 Hero 副標英文同設計語言：Italiana / cyan / 單行右對齊） */
@@ -437,7 +456,7 @@ body {
     line-height: 1.4;
     color: rgba(var(--c-cyan-rgb), 0.65);
     white-space: nowrap;
-    margin-top: 0.5em;
+    margin-top: 0;  /* spacing 由 divider 接管 */
 }
 
 /* 左側裝飾線 */
