@@ -245,7 +245,10 @@ body {
     line-height: 1.7;
     color: rgba(var(--c-stellar-rgb), 0.85);
 
-    margin: 0;
+    /* 2026-05-06：text 右邊緣對齊 .manifesto__inner（max-w 1200 容器右邊），而非 viewport 右側。
+       寬視窗 (vw - max-w)/2 為向左推距離，narrow 視窗 < max-w 時收斂為 0。
+       divider 保留原 viewport 右側位置（不加此 margin） */
+    margin: 0 max(0px, calc((100vw - var(--max-w)) / 2)) 0 0;
     white-space: normal;
 
     /* 淡冷藍 text-shadow：文字背面光源感 */
@@ -296,7 +299,8 @@ body {
     padding: 0 var(--sec-px);
     max-width: 900px;
     width: 100%;
-    margin: 0;  /* spacing 由 .hero__readout-divider 自身 margin 接管 */
+    /* 2026-05-06：text 右邊緣對齊 .manifesto__inner（max-w 1200 容器右邊）；spacing 仍由 divider 接管 */
+    margin: 0 max(0px, calc((100vw - var(--max-w)) / 2)) 0 0;
 
     font-family: var(--f-display-en);  /* Italiana（文藝復興雜誌封面感，hairline 高對比 Roman serif） */
     font-size: clamp(0.775rem, 1.16vw, 1.025rem);  /* 縮小 ~2px（原 clamp(0.9, 1.3vw, 1.15rem)）；峰值仍受 max-width 900px 限制不超過 ~789px 自然寬度 */
