@@ -319,7 +319,7 @@ body {
     margin: 0;  /* spacing 由 .hero__readout-divider 自身 margin 接管 */
 
     font-family: var(--f-display-en);  /* Italiana（文藝復興雜誌封面感，hairline 高對比 Roman serif） */
-    font-size: clamp(1rem, 1.5vw, 1.3rem);   /* 略大於中文，補償 Italiana hairline 視覺偏細感 */
+    font-size: clamp(0.9rem, 1.3vw, 1.15rem);   /* 峰值受 max-width 900px 限制，超過會在寬視窗下換行；Italiana hairline 視覺偏細，1.15rem 與中文 1.175rem 接近視覺等比 */
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0.06em;                  /* 雜誌排版常用的開放字距，襯托 hairline 優雅感 */
