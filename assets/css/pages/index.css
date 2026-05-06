@@ -695,12 +695,3 @@ body {
 .final-cta__btn {
     margin-top: var(--sp-lg);
 }
-
-/* 座標文字 footer：等寬冷淡，遠遠收尾不喧賓奪主 */
-.final-cta__coords {
-    font-family: var(--f-mono);
-    font-size: var(--fs-xs);
-    letter-spacing: 0.16em;
-    color: rgba(var(--c-stellar-rgb), 0.40);
-    margin: var(--sp-md) 0 0;
-}
