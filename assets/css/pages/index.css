@@ -543,6 +543,17 @@ body {
     opacity: 0.7;
 }
 
+/* Featured C 內部視覺強化：title 加大 + icon 使用黃色強調 */
+.bento--c .service-card__title {
+    font-size: var(--fs-2xl);  /* 38px（標準卡片用 fs-xl 28px）*/
+}
+
+.bento--c .service-card__icon {
+    background: rgba(var(--c-yellow-rgb), 0.12);
+    border-color: rgba(var(--c-yellow-rgb), 0.4);
+    color: var(--c-yellow);
+}
+
 /* B 網站 — 左中，小塊 */
 .bento--b-web {
     grid-column: 1 / 2;
