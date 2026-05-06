@@ -95,7 +95,10 @@
 
 /* 中英文之間的垂直冷光線：從中心向上下兩端 emit
    高度 60px 大於 nav 56px，align-self: center 後再 translateY(2px) 形成下偏：
-   top y=0（nav 頂部）→ bottom y=60（nav 底部 56 + 4px 微超出 .site-nav::before 底緣冷光線） */
+   top y=0（nav 頂部）→ bottom y=60（nav 底部 56 + 4px 微超出 .site-nav::before 底緣冷光線）
+   gradient 設計：peak 在中心 50%，下半段（75-92%）刻意保留可見 alpha，
+   讓過 nav hairline (~93%) 後仍有 0.27 → 0 漸隱尾段（不會在 hairline 處突然消失）
+   box-shadow：1px 線太薄，加 cyan 4px 圍繞光暈強化視覺存在感 */
 .nav__brand-divider {
     width: 1px;
     height: 60px;
@@ -105,9 +108,11 @@
         transparent 0%,
         rgba(var(--c-cyan-rgb), 0.30) 25%,
         rgba(var(--c-cyan-rgb), 0.85) 50%,
-        rgba(var(--c-cyan-rgb), 0.30) 75%,
+        rgba(var(--c-cyan-rgb), 0.55) 75%,
+        rgba(var(--c-cyan-rgb), 0.30) 92%,
         transparent 100%
     );
+    box-shadow: 0 0 4px rgba(var(--c-cyan-rgb), 0.30);
     transform: translateY(2px);
 }
 
