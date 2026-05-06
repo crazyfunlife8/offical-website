@@ -93,17 +93,27 @@
     color: var(--c-cyan);
 }
 
-/* 中英文之間的垂直冷光線：從中心向上下兩端 emit
-   高度 60px 大於 nav 56px，align-self: center 後再 translateY(2px) 形成下偏：
-   top y=0（nav 頂部）→ bottom y=60（nav 底部 56 + 4px 微超出 .site-nav::before 底緣冷光線）
-   gradient 設計：peak 在中心 50%，下半段（75-92%）刻意保留可見 alpha，
-   讓過 nav hairline (~93%) 後仍有 0.27 → 0 漸隱尾段（不會在 hairline 處突然消失）
-   box-shadow：1px 線太薄，加 cyan 4px 圍繞光暈強化視覺存在感 */
+/* 中英文之間的垂直冷光線
+   layout 解耦：外 span 在 flex flow 只佔 1em 高度（不撐高 parent，baseline 對齊不被破壞）
+   視覺線條由 ::before 絕對定位向上下兩端伸出（top -22px 上延、bottom -25px 下延）
+   y 範圍 ~ nav y=-2 to y=61：上方略出 nav 頂、下方 5px 微超出 nav 底緣 hairline
+   gradient peak 在 50%（線條中心 ≈ brand 文字高度），向兩端漸隱
+   下半段 75-92% 保留可見 alpha 讓過 hairline 後仍有 0.23 → 0 漸隱尾段 */
 .nav__brand-divider {
     width: 1px;
-    height: 60px;
+    height: 1em;
     align-self: center;
     flex-shrink: 0;
+    position: relative;
+}
+
+.nav__brand-divider::before {
+    content: '';
+    position: absolute;
+    top: -22px;
+    bottom: -25px;
+    left: 0;
+    width: 1px;
     background: linear-gradient(180deg,
         transparent 0%,
         rgba(var(--c-cyan-rgb), 0.30) 25%,
@@ -113,7 +123,6 @@
         transparent 100%
     );
     box-shadow: 0 0 4px rgba(var(--c-cyan-rgb), 0.30);
-    transform: translateY(2px);
 }
 
 /* ─── 連結區：絕對置中，CTA 靠右（margin-left: auto） ──── */
