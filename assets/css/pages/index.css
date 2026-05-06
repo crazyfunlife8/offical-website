@@ -698,7 +698,8 @@ body {
 }
 
 /* 副標題英文 echo（Italiana，更弱的 cyan 微光）
-   text-shadow 四層（與中文副標同設計）：右下偏移投影 + 360° 包圍 */
+   text-shadow 五層強化版：偏移維持 1/2px 不破壞字形、擴散範圍與 alpha 加強
+   ① 右下硬邊 ② 右下柔影加厚 ③ 360° 中暈加大 ④ 360° 大暈加深 ⑤ 360° 外圍擴散（新增） */
 .final-cta__subtitle-en {
     font-family: var(--f-display-en);
     font-size: clamp(0.875rem, 1.2vw, 1.125rem);
@@ -709,9 +710,10 @@ body {
     margin: 0.5em 0 0;
     text-shadow:
         1px 1px 0 rgba(0, 0, 0, 1),
-        2px 2px 3px rgba(0, 0, 0, 0.85),
-        0 0 12px rgba(0, 0, 0, 1),
-        0 0 24px rgba(0, 0, 0, 0.5);
+        2px 2px 4px rgba(0, 0, 0, 0.9),
+        0 0 16px rgba(0, 0, 0, 1),
+        0 0 32px rgba(0, 0, 0, 0.75),
+        0 0 56px rgba(0, 0, 0, 0.4);
 }
 
 /* CTA 按鈕外距（樣式本體由 components.css 的 .btn--yellow 接管） */
