@@ -708,9 +708,10 @@ body {
 
 /* 副標題英文 echo（Italiana，更弱的 cyan 微光）
    設計目的：跨背景 legibility shadow（字幕／雜誌字技法）
-   純擴散光暈（拿掉描邊以避免同層硬邊感）：
-   字在藍色光暈／亮背景區：「亮底 → 黑暈 → cyan 字」柔和對比保護
-   字在純黑底：黑暈與背景同色不可見（OK，字本身對比夠）*/
+   策略：「高 alpha 純黑區」階梯延伸 → 字邊向外 ~20px 都接近純黑保護層
+   ① 內三層 alpha 1.0 不同 blur 階梯（6/12/20px）→ 多層疊加把高 alpha 區向外推
+   ② 中層 alpha 0.75 過渡（36px）
+   ③ 外圍 alpha 0.40 漸退（64px）*/
 .final-cta__subtitle-en {
     font-family: var(--f-display-en);
     font-size: clamp(0.875rem, 1.2vw, 1.125rem);
@@ -720,9 +721,11 @@ body {
     color: rgba(var(--c-cyan-rgb), 0.95);
     margin: 0.5em 0 0;
     text-shadow:
-        0 0 24px rgba(0, 0, 0, 1),
-        0 0 48px rgba(0, 0, 0, 0.7),
-        0 0 80px rgba(0, 0, 0, 0.4);
+        0 0 6px rgba(0, 0, 0, 1),
+        0 0 12px rgba(0, 0, 0, 1),
+        0 0 20px rgba(0, 0, 0, 1),
+        0 0 36px rgba(0, 0, 0, 0.75),
+        0 0 64px rgba(0, 0, 0, 0.40);
 }
 
 /* CTA 按鈕外距（樣式本體由 components.css 的 .btn--yellow 接管） */
