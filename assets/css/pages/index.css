@@ -707,9 +707,9 @@ body {
 }
 
 /* 副標題英文 echo（Italiana，更弱的 cyan 微光）
-   text-shadow 兩段組合（拿掉偏移投影，對稱四週）：
-   ① 8 方向 1px 純黑描邊（字邊銳利黑邊）
-   ② 擴散光暈（字邊外圍 360° 漸層黑暈，與亮 cyan 字邊形成柔軟過渡）*/
+   只做偏移陰影：字下方右下方向性陰影、產生「字浮起、影在後」的 z 軸層次感
+   ① 硬邊偏移（2px 3px 無模糊純黑 → 立體輪廓位移）
+   ② 柔影過渡（3px 4px 5px 模糊 → 影子過渡漸層） */
 .final-cta__subtitle-en {
     font-family: var(--f-display-en);
     font-size: clamp(0.875rem, 1.2vw, 1.125rem);
@@ -719,17 +719,8 @@ body {
     color: rgba(var(--c-cyan-rgb), 0.95);
     margin: 0.5em 0 0;
     text-shadow:
-        -1px -1px 0 #000,
-        0 -1px 0 #000,
-        1px -1px 0 #000,
-        1px 0 0 #000,
-        1px 1px 0 #000,
-        0 1px 0 #000,
-        -1px 1px 0 #000,
-        -1px 0 0 #000,
-        0 0 16px rgba(0, 0, 0, 1),
-        0 0 32px rgba(0, 0, 0, 0.7),
-        0 0 56px rgba(0, 0, 0, 0.4);
+        2px 3px 0 rgba(0, 0, 0, 0.9),
+        3px 4px 5px rgba(0, 0, 0, 0.6);
 }
 
 /* CTA 按鈕外距（樣式本體由 components.css 的 .btn--yellow 接管） */
