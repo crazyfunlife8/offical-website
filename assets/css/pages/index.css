@@ -439,6 +439,13 @@ body {
     color: var(--c-muted);
     white-space: nowrap;  /* 不分行（單行右對齊） */
     margin: 0;            /* spacing 由 .manifesto__body-divider 接管 */
+
+    /* text-shadow 四層（與 Hero 副標 / final-cta 副標同設計：跨背景 legibility shadow + 偏移層次感）*/
+    text-shadow:
+        1px 1px 0 rgba(0, 0, 0, 1),
+        2px 2px 3px rgba(0, 0, 0, 0.85),
+        0 0 12px rgba(0, 0, 0, 1),
+        0 0 24px rgba(0, 0, 0, 0.5);
 }
 
 /* 中英文之間冷光分隔線（與 Hero 副標 .hero__readout-divider 同設計語言：c-blue 右側射出）
