@@ -641,14 +641,15 @@ body {
     margin: 0;
 }
 
-/* 英文 echo「Don't click yet.」（Italiana hairline serif）
+/* 英文 echo「Don't click yet.」（Fraunces editorial serif）
+   字型：var(--f-serif) Fraunces，筆畫穩定能撐住陰影（取代 Italiana hairline 因筆畫過細被陰影吃掉問題）
    text-shadow 四層（與中文副標 .final-cta__subtitle 同設計）：
    ① 1px 1px 0 純黑（偏移陰影硬邊）
    ② 2px 2px 3px 黑 0.85（偏移陰影柔影）
    ③ 0 0 12px 純黑（擴散中暈）
    ④ 0 0 24px 黑 0.5（擴散外暈）*/
 .final-cta__title-en {
-    font-family: var(--f-display-en);
+    font-family: var(--f-serif);
     font-size: clamp(1.125rem, 2vw, 1.5rem);
     font-weight: 400;
     letter-spacing: 0.12em;
@@ -700,14 +701,15 @@ body {
         0 0 24px rgba(0, 0, 0, 0.5);
 }
 
-/* 副標題英文 echo（Italiana，更弱的 cyan 微光）
+/* 副標題英文 echo（Fraunces editorial serif）
+   字型：var(--f-serif) Fraunces，與 .final-cta__title-en 同字型
    text-shadow 四層（與中文副標 .final-cta__subtitle 同設計）：
    ① 1px 1px 0 純黑（偏移陰影硬邊）
    ② 2px 2px 3px 黑 0.85（偏移陰影柔影）
    ③ 0 0 12px 純黑（擴散中暈）
    ④ 0 0 24px 黑 0.5（擴散外暈）*/
 .final-cta__subtitle-en {
-    font-family: var(--f-display-en);
+    font-family: var(--f-serif);
     font-size: clamp(0.875rem, 1.2vw, 1.125rem);
     font-weight: 400;
     letter-spacing: 0.08em;
