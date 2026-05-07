@@ -141,6 +141,76 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | 13 | 內容填充（作品截圖、角色圖等素材） | 🔲 待完成（等素材提供） |
 | 14 | SEO / sitemap / Schema 更新 | 🔲 待完成 |
 | 15 | 測試與部署上線 | 🔲 待完成 |
+| 16 | 太空人 ScrollTrigger 角色敘事（見下方設計構想 backlog） | 🔲 構想階段（未啟動實作） |
+
+---
+
+### 設計構想 backlog（2026-05-07 21:46 創辦人提出）
+
+#### 太空人 ScrollTrigger 角色敘事「沉思 → 破格」
+
+**創辦人原始劇本（2026-05-07）：**
+
+| 狀態 | 畫面 | 情緒 |
+|---|---|---|
+| 頁面初始（未滾動） | 太空人坐著托腮沉思，旁邊一句 hero 文案。極靜。 | 冷靜、高級、克制 |
+| 使用者開始滾動 | 太空人突然 — 跌倒 / 滾走 / 手一滑杯子打翻 / 跑出畫面框 | 驚喜、會心一笑、「欸這公司有趣」 |
+| 後續 section | 每段他以不同「不正經姿態」出現：倒栽蔥、飄過去、踩在標題上、偷看下一段 | 陪伴、頑皮、記憶點 |
+| Final CTA | 他重新坐回原位假裝沒事，但旁邊有個打翻的咖啡杯 | 收尾、幽默、留白 |
+
+**設計核心：** 反差敘事——「冷峻電影感深空 + 一個搞笑陪伴的太空人」是品牌調性的具象化（呼應 §一 設計判斷三條：俐落、線條、電影感的同時，主動製造衝突反差是美學本身，不是妥協）。太空人是品牌「非常規思維」訴求的人格化角色。
+
+**為什麼從「Hero 太空人 3D 模型」轉到「ScrollTrigger 全站角色敘事」：**
+
+- 2026-04-21 原規劃 Hero Three.js 3D 太空人已從 Hero section 移除（CLAUDE.md 偏差表既存紀錄），HTML 以 `<!-- 太空人暫時移除 2026-04-21 -->` 標記保留位置
+- 移除原因：3D 模型只在 Hero 露臉一次、無敘事延續性、視覺重量壓過 hero 文案
+- 本構想把太空人從「Hero 一次性視覺物件」升級為「全站陪伴角色」，從靜態裝飾變成敘事節奏一部分，這是更有意義的角色設計
+
+**技術選型評估：**
+
+| 方案 | 適合度 | 說明 |
+|---|---|---|
+| Three.js 3D 模型 + ScrollTrigger 驅動 | ❌ 過重 | 3D 真實感與「跌倒/打翻杯子」卡通敘事衝突；多姿態切換需 mixer / morph target，工程量大 |
+| Lottie + ScrollTrigger 控制進度 | ⚠️ 可行 | 動畫師做完整時間軸，ScrollTrigger 控 lottie.goToAndStop。但 Lottie 檔案大、需要動畫師產出；風格易偏 SaaS 卡通 |
+| **SVG 多姿勢圖 + GSAP/ScrollTrigger 切換**（建議） | ✅ 最適合 | 設計師畫 6-8 張姿勢 SVG（沉思 / 跌倒中 / 倒栽蔥 / 飄過 / 踩標題 / 偷看 / 坐回 + 咖啡），ScrollTrigger 控位置 / rotation / opacity 切換。檔案小、品質可縮放、跟整站線條極簡風一致 |
+| PNG 序列幀 + GSAP | ⚠️ 備選 | 簡單但縮放會糊、檔案多 |
+
+**ScrollTrigger 是技術骨幹（GSAP 全站已載入、core.js 已註冊 plugin），但主要工作量在角色設計／插畫產出，不在程式碼。**
+
+**初步架構草案（SVG 方案）：**
+
+```
+<!-- HTML：全頁固定容器 -->
+<div class="astronaut" data-pose="contemplating" aria-hidden="true">
+  <svg>...當前姿勢...</svg>
+</div>
+
+<!-- JS：各 section 觸發姿勢 + 位置動畫 -->
+ScrollTrigger.create({
+  trigger: '.manifesto',
+  start: 'top 90%',
+  onEnter: () => {
+    swapPose('falling');                    // 切 SVG
+    gsap.to('.astronaut', {
+      x: '+=200', rotation: 360, duration: 1
+    });
+  }
+});
+```
+
+**素材清單（待設計師產出）：**
+1. Hero idle — 坐姿托腮沉思
+2. Transition — 跌倒中（旋轉模糊）
+3. Manifesto — 倒栽蔥
+4. Bento services — 飄過畫面 / 踩在卡片上 / 偷看下一張卡
+5. Final CTA — 坐回原位 + 旁邊打翻的咖啡杯（含咖啡漬光暈）
+
+**待決事項：**
+- 太空人視覺風格（線條極簡 vs. 平塗色塊 vs. 半寫實插畫）—— 需配合整站冷峻電影感調性
+- 手機版策略——縮小 / 隱藏 / 簡化（ScrollTrigger 在小螢幕觸發節奏可能太密集）
+- 無障礙——`prefers-reduced-motion` 應停用所有姿勢切換動畫，至少保留靜態 idle 姿勢
+
+**啟動條件：** 設計師交付 6-8 張 SVG 姿勢圖 + 風格一致性確認後啟動實作。實作本身（ScrollTrigger 編排）約 0.5 天工作量。
 
 ---
 
