@@ -142,6 +142,31 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 
 ---
 
+### SEO 策略（2026-05-07 13:09 確立方向）
+
+**核心判斷：形象頁是轉換頁、不是獲客頁。** 未來主流量來自內容頁（吸 Google 長尾關鍵字）→ 內鏈導流至形象頁 → 詢問轉換。形象頁主要承接品牌詞搜尋（自家品牌不爭排名），長尾關鍵字需要文章頁承接。
+
+**階段 1（UI 設計定案後執行）形象頁基礎 SEO 埋設**：
+- 每頁獨立 `<title>` / `<meta description>`
+- Open Graph 標籤（`og:title` / `og:description` / `og:image`）
+- 結構化資料 Schema.org `LocalBusiness`（地址、營業時間、聯絡方式）
+- `sitemap.xml` + `robots.txt`
+- H1 / H2 語意層級確認
+
+埋在 HTML metadata、不影響視覺，設計收尾後一次補完。對應任務清單 #14。
+
+**階段 2（未來開內容頁時執行）內容 SEO 主戰場**：
+- 關鍵字研究 + 內容主題規劃（產業洞察／設計教學／案例拆解／FAQ）
+- 內部連結策略（文章自然連回形象頁服務區塊）
+- E-E-A-T 作者背景（Google 看重作者專業度）
+- 部署位置：主站 `/blog` 子目錄（權重集中），**不另開子網域**
+
+**紅線**：禁止為 SEO 把長尾關鍵字塞進形象頁文案破壞設計節奏；長尾流量靠內容頁，不靠形象頁。
+
+**待辦觸發**：UI 設計定案 → 啟動階段 1。階段 2 待創辦人決定內容生產時機。
+
+---
+
 ### 主視覺背景技術規格（已確認，禁止改動核心數值）
 
 **檔案**：`assets/js/pages/index.js` → `initStarfield()`、`assets/css/pages/index.css` → `#blackhole`
