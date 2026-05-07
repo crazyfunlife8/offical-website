@@ -309,8 +309,9 @@ body {
     /* 2026-05-06：text 右邊緣對齊 .manifesto__inner（max-w 1200 容器右邊）；spacing 仍由 divider 接管 */
     margin: 0 max(0px, calc((100vw - var(--max-w)) / 2)) 0 0;
 
-    /* 字型：回到原本的 Italiana（var(--f-display-en) hairline serif，文藝復興雜誌封面感）
-       2026-05-07 嘗試換 Fraunces 修復偏移陰影吃字問題後，使用者要求回到原 Italiana 看視覺效果 */
+    /* 字型：Italiana（var(--f-display-en) hairline serif，文藝復興雜誌封面感）
+       設計取捨：保留 Italiana hairline 視覺，拿掉 text-shadow 避免偏移陰影吃字
+       （與中文 .hero__readout 不對稱：中文有陰影、英文裸字。中文仿宋筆畫夠粗不吃字、英文 hairline 吃字） */
     font-family: var(--f-display-en);
     font-size: clamp(0.775rem, 1.16vw, 1.025rem);  /* 縮小 ~2px（原 clamp(0.9, 1.3vw, 1.15rem)）；峰值仍受 max-width 900px 限制不超過 ~789px 自然寬度 */
     font-style: normal;
@@ -318,13 +319,6 @@ body {
     letter-spacing: 0.06em;
     line-height: 1.5;
     color: rgba(var(--c-stellar-rgb), 0.85);
-
-    /* text-shadow 四層（與中文 .hero__readout 同設計） */
-    text-shadow:
-        1px 1px 0 rgba(0, 0, 0, 1),
-        2px 2px 3px rgba(0, 0, 0, 0.85),
-        0 0 12px rgba(0, 0, 0, 1),
-        0 0 24px rgba(0, 0, 0, 0.5);
 }
 
 /* 手機：維持可讀性，字級縮小，允許換行 */
