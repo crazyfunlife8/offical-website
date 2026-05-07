@@ -136,7 +136,8 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | 11a | 首頁主視覺背景（Three.js 黑洞漩渦星場） | ✅ 確認完成 |
 | 11b | 首頁視覺元素實裝與微調 | 🔄 進行中 |
 | 12 | 服務頁 IA 重構：services.html 退役、nav「服務」改錨點 | ✅ 完成（2026-05-07 21:18） |
-| 12a | 7 個個別服務頁 + about/news/contact teaser 模板 | 🔲 待執行 |
+| 12a | 9 個 teaser 頁（7 服務 + about + news）共用 coming-soon 模板 + contact.html 極簡聯絡頁 | ✅ 完成（2026-05-07 21:38） |
+| 12b | 7 個服務頁正式內容填充（取代 teaser） | 🔲 待執行（依素材與文案進度逐頁升級） |
 | 13 | 內容填充（作品截圖、角色圖等素材） | 🔲 待完成（等素材提供） |
 | 14 | SEO / sitemap / Schema 更新 | 🔲 待完成 |
 | 15 | 測試與部署上線 | 🔲 待完成 |
@@ -216,18 +217,19 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 
 ### 已存在的頁面檔案
 - `index.html` — 4 sections 完整實作（Hero / 宣言 / Bento 服務 / 終點 CTA「先別點」），site-footer 同步重設計。Section 4 品牌故事於 2026-05-07 移除。`<section class="services-section">` 加 `id="services-section"` 作為 nav 錨點目標（2026-05-07 21:18）。
+- `social.html` / `virtual.html` / `website.html` / `system.html` / `consultant.html` / `tiktok.html` / `growth.html` / `about.html` / `news.html` — 9 頁 teaser「敬請期待」共用 `pages/coming-soon.css`（2026-05-07 21:38）
+- `contact.html` — 極簡聯絡頁（LINE/電話 Liquid Glass 卡片連結 + 地址統編 mono），使用 `pages/coming-soon.css` 大架構 + `pages/contact.css` 補充（2026-05-07 21:38）
 - `maintenance.html` — 真維護備用頁（與 teaser「敬請期待」分開）
 
 ### 已退役的頁面檔案（2026-05-07 21:18）
 - `services.html` + `pages/services.css` + `pages/services.js` — 服務總覽中間頁，IA 重構後退役
 
-### 未實作的頁面（nav 已有連結 / bento 卡已有連結）
-about.html、contact.html、news.html、social.html、website.html、system.html、virtual.html、consultant.html、tiktok.html、growth.html
-
 ### 實作偏差備注
 | 項目 | 文件規劃 | 實際實作 |
 |------|---------|---------|
 | 服務頁 IA 結構（2026-05-07 21:18） | nav「服務」→ services.html 總覽中間頁 → 個別服務頁（雙層導覽） | 改為錨點滾動：nav「服務」→ `index.html#services-section` 直接捲到首頁 bento 服務星圖 → 個別服務頁（單層主線）。services.html / pages/services.css / pages/services.js 整批刪除。Hero CTA「探索服務」同步改 `#services-section`。`.services-section` 加 `scroll-margin-top: 80px` 補償 fixed nav。**紅線**：禁止再造服務總覽中間頁；首頁 bento 是唯一服務陳列點。完整推導（為什麼不選 hover 下拉 / 為什麼不選深度服務地圖）見 commit body。 |
+| 個別服務頁 / 子頁實作策略（2026-05-07 21:38） | bento 卡點進去的個別服務頁從零撰寫完整內容後上線 | 改為先做 teaser「敬請期待」共用模板（`pages/coming-soon.css`），再依素材進度逐頁升級為正式內容。9 個 teaser（7 服務 + about + news）共用 5 段結構：eyebrow（mono uppercase + 黃色冷光 border-top）/ Chiron Sung HK 中文 title（4-layer text-shadow §十七 紀律）/ 對稱 cyan 冷光 divider（呼應 final-cta__divider）/ Noto Sans TC lead（沿用 bento desc 文案）/ mono pill status「內容準備中 · Coming Soon」/ btn--primary「想先聊聊」CTA → contact.html / 「← 回服務星圖」隱性出口（about/news 改「← 回首頁」）。virtual.html / about.html 有 Italiana 英文 echo（呼應 bento C 雙語對位）。**為什麼選 teaser 不選「全部導 maintenance」**：訪客點 AI 虛擬網紅卻看到「全站維護」會懷疑點錯；teaser 顯示服務名稱可確認 + 個別 OG meta 為長尾 SEO 預備（呼應 SEO 階段 1 紀律）。**紅線**：teaser 升級為正式頁時保留同一 URL（不換 slug），維持已埋 OG / canonical 連續性；contact.html 永久留作正式聯絡頁、不被 teaser 化。 |
+| contact.html 極簡聯絡頁（2026-05-07 21:38） | 規劃為含表單的完整 contact 頁（依個資法第 8 條配隱私權政策連結） | 表單實作前先做極簡版：沿用 coming-soon 大架構（eyebrow / 中文 title / Italiana en echo「Get in Touch.」/ divider / lead）+ `.contact__channels` Liquid Glass 卡片連結（LINE 連 line.me / 電話 tel:）+ `.contact__studio` mono 小字（地址 + 統編）。資料來源全部沿用 site-footer 已有資訊不另蒐集。**紀律**：未實作表單前不放隱私權政策連結（無蒐集行為不觸法第 8 條）；正式表單上線時補回隱私權政策頁與 footer 連結（CLAUDE.md site-footer 偏差表已紀錄此承諾）。 |
 | 裝飾字型 | Exo 2（--f-disp） | Bebas Neue（--f-bebas）為主要裝飾字 |
 | 等寬字型 | IBM Plex Mono | 維持 IBM Plex Mono |
 | Hero 太空人 | Three.js 3D 模型 | 2026-04-21 已從 Hero section 移除（HTML 以 `<!-- 太空人暫時移除 2026-04-21 -->` 標記保留位置） |
