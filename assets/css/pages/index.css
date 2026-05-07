@@ -251,10 +251,17 @@ body {
     margin: 0 max(0px, calc((100vw - var(--max-w)) / 2)) 0 0;
     white-space: normal;
 
-    /* 淡冷藍 text-shadow：文字背面光源感 */
+    /* text-shadow 四層（與 final-cta 副標同設計：跨背景 legibility shadow + 偏移層次感）
+       ① 1px 1px 0 純黑（偏移陰影硬邊）
+       ② 2px 2px 3px 黑 0.85（偏移陰影柔影）
+       ③ 0 0 12px 純黑（擴散中暈）
+       ④ 0 0 24px 黑 0.5（擴散外暈）
+       原冷藍光暈（0 0 40px c-blue 0.18 / 0 2px 60px c-blue 0.08，文字背面光源感）已替換 */
     text-shadow:
-        0 0 40px rgba(var(--c-blue-rgb), 0.18),
-        0 2px 60px rgba(var(--c-blue-rgb), 0.08);
+        1px 1px 0 rgba(0, 0, 0, 1),
+        2px 2px 3px rgba(0, 0, 0, 0.85),
+        0 0 12px rgba(0, 0, 0, 1),
+        0 0 24px rgba(0, 0, 0, 0.5);
 }
 
 /* 兩段語意 dim / strong 視覺扁平化：HTML 語意標籤保留供無障礙；視覺無差異對比 */
@@ -302,13 +309,22 @@ body {
     /* 2026-05-06：text 右邊緣對齊 .manifesto__inner（max-w 1200 容器右邊）；spacing 仍由 divider 接管 */
     margin: 0 max(0px, calc((100vw - var(--max-w)) / 2)) 0 0;
 
-    font-family: var(--f-display-en);  /* Italiana（文藝復興雜誌封面感，hairline 高對比 Roman serif） */
+    /* 字型：var(--f-serif) Fraunces，筆畫穩定能撐住陰影
+       （取代 Italiana hairline 因筆畫過細被偏移陰影吃掉問題） */
+    font-family: var(--f-serif);
     font-size: clamp(0.775rem, 1.16vw, 1.025rem);  /* 縮小 ~2px（原 clamp(0.9, 1.3vw, 1.15rem)）；峰值仍受 max-width 900px 限制不超過 ~789px 自然寬度 */
     font-style: normal;
     font-weight: 400;
-    letter-spacing: 0.06em;                  /* 雜誌排版常用的開放字距，襯托 hairline 優雅感 */
+    letter-spacing: 0.06em;
     line-height: 1.5;
     color: rgba(var(--c-stellar-rgb), 0.85);
+
+    /* text-shadow 四層（與中文 .hero__readout 同設計） */
+    text-shadow:
+        1px 1px 0 rgba(0, 0, 0, 1),
+        2px 2px 3px rgba(0, 0, 0, 0.85),
+        0 0 12px rgba(0, 0, 0, 1),
+        0 0 24px rgba(0, 0, 0, 0.5);
 }
 
 /* 手機：維持可讀性，字級縮小，允許換行 */
