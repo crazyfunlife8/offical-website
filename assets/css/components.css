@@ -78,7 +78,7 @@
 
 .nav__brand-zh {
     font-family: var(--f-serif-cjk);   /* Chiron Sung HK，與 h1 主標同家族延續品牌個性 */
-    font-size: 16px;
+    font-size: 17px;  /* 16 → 17 中英比例平衡，中文主訴求視覺重量提升 */
     font-weight: 500;
     letter-spacing: 0.1em;
     color: var(--c-stellar);
@@ -139,9 +139,9 @@
     font-family: var(--f-serif-cjk);
     font-size: 15px;
     font-weight: 300;
-    letter-spacing: 0.35em;
-    color: color-mix(in srgb, var(--c-blue), white 70%); /* 2026-05-06 由 white 45% (#7a8ff8) 調亮到 white 70% (~#b6c3fa) */
-    text-shadow: 0 0 14px rgba(var(--c-blue-rgb), 0.5); /* idle：藍底暈光 */
+    letter-spacing: 0.1em;  /* 0.35em → 0.1em 字距收斂、字像詞不像散字 */
+    color: color-mix(in srgb, var(--c-blue), white 70%);
+    /* idle 拿掉 blue 暈光（保留 hover 時才有），降噪 + 拉開層次 */
     position: relative;
     padding: 18px 0;
     transition: color 0.18s ease, text-shadow 0.18s ease;
@@ -284,96 +284,159 @@
    2. 玻璃擬態卡片 (Glass Card)
    ════════════════════════════════════════════════════════════ */
 
+/* ──── Liquid Glass 水狀卡片（2026-05-07 借用 Apple Liquid Glass 三技法）────
+   ① 邊緣折射光：border-box gradient 模擬水鏡邊緣光環（取代 1px solid border）
+   ② 內部水面反光：多層 inset box-shadow 形成「光打在水面」的體積感
+   ③ Hover 整片折射：::after radial cyan 微光浮現
+   材質角色：.card 本體 = 冷藍水狀；.service-card__icon / __arrow = 黃色 CTA 訊號（分工）
+*/
 .card {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    /* 雙層背景：padding-box 玻璃底色 / border-box 折射光環 */
+    background:
+        linear-gradient(135deg,
+            rgba(var(--c-blue-rgb), 0.10) 0%,
+            rgba(var(--c-blue-rgb), 0.18) 100%) padding-box,
+        linear-gradient(135deg,
+            rgba(var(--c-cyan-rgb), 0.45) 0%,
+            rgba(var(--c-cyan-rgb), 0.08) 35%,
+            rgba(var(--c-blue-rgb), 0.10) 65%,
+            rgba(var(--c-cyan-rgb), 0.30) 100%) border-box;
+    border: 1px solid transparent;
     border-radius: var(--radius-lg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
     padding: var(--sp-md);
     position: relative;
     overflow: hidden;
+
+    /* 多層光影：inset 水面反光 + inset 體積陰影 + inset 上方光暈 + 外部浮起投影 */
+    box-shadow:
+        inset 0 1px 0 rgba(var(--c-cyan-rgb), 0.18),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+        inset 0 40px 60px -40px rgba(var(--c-cyan-rgb), 0.10),
+        0 8px 32px rgba(0, 0, 0, 0.20);
+
     transition:
         transform var(--t-base),
-        border-color var(--t-base),
-        box-shadow var(--t-base),
-        background var(--t-base);
+        box-shadow var(--t-base);
 }
 
 .card:hover {
     transform: translateY(-4px);
-    border-color: var(--c-accent);
-    box-shadow: var(--shadow-yellow);
-    background: var(--glass-bg-hover);
+    box-shadow:
+        inset 0 1px 0 rgba(var(--c-cyan-rgb), 0.32),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+        inset 0 40px 60px -40px rgba(var(--c-cyan-rgb), 0.20),
+        0 12px 40px rgba(var(--c-cyan-rgb), 0.18),
+        0 0 24px rgba(var(--c-yellow-rgb), 0.12);
 }
 
-/* 卡片右上角裝飾光點 */
+/* 上半部水面反光漸層（取代原右上角藍光點，現在是光打在水面） */
 .card::before {
     content: '';
     position: absolute;
-    top: -40px;
-    right: -40px;
-    width: 80px;
-    height: 80px;
-    background: radial-gradient(circle, rgba(var(--c-blue-rgb), 0.25) 0%, transparent 70%);
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg,
+        rgba(var(--c-stellar-rgb), 0.06) 0%,
+        transparent 100%);
     pointer-events: none;
-    transition: opacity var(--t-base);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
-.card:hover::before {
+/* Hover 整片折射光（cyan radial，預設居中；後續可由 JS 更新 --card-mx/my 改鼠標跟隨） */
+.card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        circle at var(--card-mx, 50%) var(--card-my, 50%),
+        rgba(var(--c-cyan-rgb), 0.20) 0%,
+        transparent 55%
+    );
     opacity: 0;
+    transition: opacity var(--t-base);
+    pointer-events: none;
+    border-radius: var(--radius-lg);
+}
+
+.card:hover::after {
+    opacity: 1;
 }
 
 
 /* ════════════════════════════════════════════════════════════
-   3. 按鈕 (Buttons)
+   3. 按鈕 (Buttons — 2026-05-07 Apple Liquid Glass 風重設計)
+   設計語言：呼應服務卡片 Liquid Glass 質感（雙 background gradient + inset 光影）
+   字型：var(--f-sans) Noto Sans TC 500 取代 Chiron Sung HK 仿宋（按鈕用 sans 不用宋）
+   互動：Apple ease-out-expo transition (cubic-bezier(0.16, 1, 0.3, 1))
+        + :active scale(0.97) 點擊回饋
+        + 黃色 CTA ::after 光暈擴散（visualEffect 風）
    ════════════════════════════════════════════════════════════ */
 
 .btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    border-radius: 6px;
-    font-family: var(--f-serif-cjk);
-    font-weight: 700;
+    gap: 0.6rem;
+    padding: 0.85rem 1.8rem;
+    border-radius: 10px;  /* 6px → 10px Apple visionOS 風 */
+    font-family: var(--f-sans);  /* 仿宋 → Noto Sans TC */
+    font-weight: 500;  /* 700 → 500 更精緻 */
     font-size: var(--fs-base);
+    letter-spacing: 0.04em;  /* 0.06em → 0.04em 收斂 */
     cursor: pointer;
-    border: none;
+    border: 1px solid transparent;
     text-decoration: none;
-    transition: all var(--t-base);
-    padding: 0.8rem 2rem;
-    letter-spacing: 0.06em;
     white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);  /* Apple ease-out-expo */
 }
 
-/* ── 訊號型（深空舞台）：精確邊框 + 幽藍底色，hover 時藍光暈放
-   電影感：暗房中那個發著光的按鈕，存在感清晰但不張揚 ── */
+.btn:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease-out;
+}
+
+/* ── 訊號型 (.btn--primary)：液態玻璃藍按鈕（呼應服務卡片）── */
 .btn--primary {
-    background: rgba(var(--c-blue-rgb), 0.10);
-    border: 1px solid rgba(var(--c-blue-rgb), 0.38);
-    border-radius: 2px;
-    color: var(--c-stellar);
-    padding: 0.75rem 1.6rem;
-    letter-spacing: 0.08em;
-    transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, color 0.22s ease;
+    background:
+        linear-gradient(135deg,
+            rgba(var(--c-blue-rgb), 0.12) 0%,
+            rgba(var(--c-blue-rgb), 0.22) 100%) padding-box,
+        linear-gradient(135deg,
+            rgba(var(--c-cyan-rgb), 0.42) 0%,
+            rgba(var(--c-cyan-rgb), 0.10) 50%,
+            rgba(var(--c-cyan-rgb), 0.32) 100%) border-box;
+    color: rgba(var(--c-stellar-rgb), 0.95);
+    backdrop-filter: blur(12px) saturate(1.3);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
+    box-shadow:
+        inset 0 1px 0 rgba(var(--c-cyan-rgb), 0.22),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.30),
+        0 4px 16px rgba(var(--c-blue-rgb), 0.18);
 }
 
 .btn--primary:hover {
-    background: rgba(var(--c-blue-rgb), 0.18);
-    border-color: rgba(var(--c-blue-rgb), 0.70);
-    box-shadow: 0 0 16px rgba(var(--c-blue-rgb), 0.30), 0 0 40px rgba(var(--c-blue-rgb), 0.12);
+    box-shadow:
+        inset 0 1px 0 rgba(var(--c-cyan-rgb), 0.40),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.30),
+        0 6px 24px rgba(var(--c-cyan-rgb), 0.30),
+        0 0 36px rgba(var(--c-blue-rgb), 0.25);
     color: var(--c-stellar);
 }
 
-/* ── 虛空型（深空舞台）：純文字在深黑中，對比 primary 的有形存在
-   不裝飾，不框架，靠 opacity 說話 ── */
+/* ── 虛空型 (.btn--ghost)：純文字（保留極簡，重設 .btn 預設規則） ── */
 .btn--ghost {
-    background: transparent;
+    background: none;
     border: none;
     border-radius: 0;
+    padding: 0.85rem 0;
     color: rgba(var(--c-stellar-rgb), 0.40);
-    padding: 0.75rem 0;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
+    overflow: visible;
     transition: color 0.25s ease;
 }
 
@@ -381,27 +444,72 @@
     color: rgba(var(--c-stellar-rgb), 0.82);
 }
 
+.btn--ghost:active {
+    transform: none;  /* 純文字不需 scale */
+}
+
+/* ── 黃金型 (.btn--yellow)：液態金按鈕（CTA 主轉換、實體金屬光感）── */
 .btn--yellow {
-    background: var(--c-yellow);
+    background:
+        linear-gradient(180deg,
+            rgba(var(--c-yellow-rgb), 1.0) 0%,
+            rgba(var(--c-amber-rgb), 0.92) 100%) padding-box,
+        linear-gradient(135deg,
+            rgba(255, 255, 255, 0.7) 0%,
+            rgba(var(--c-yellow-rgb), 0.4) 50%,
+            rgba(var(--c-amber-rgb), 0.7) 100%) border-box;
     color: var(--c-black);
-    font-weight: 900;
+    font-weight: 700;  /* 900 → 700 精緻 */
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.55),  /* 頂邊白高光：實體表面光 */
+        inset 0 -1px 2px rgba(0, 0, 0, 0.20),     /* 底邊黑陰影：實體深度 */
+        0 4px 18px rgba(var(--c-yellow-rgb), 0.35),
+        0 0 0 0 rgba(var(--c-yellow-rgb), 0);     /* 預備光暈擴散 */
 }
 
 .btn--yellow:hover {
-    background: #ffd340;
-    box-shadow: var(--shadow-yellow);
     transform: translateY(-2px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.65),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.25),
+        0 8px 32px rgba(var(--c-yellow-rgb), 0.45),
+        0 0 48px rgba(var(--c-yellow-rgb), 0.20);
 }
 
-/* 箭頭 icon 動畫 */
-/* 外連結圖示（arrow up right）於 btn 內縮小，不與文字等大 */
+.btn--yellow:active {
+    transform: translateY(-2px) scale(0.97);
+}
+
+/* 黃色 CTA 點擊瞬間光暈擴散（Apple visualEffect 風：::after radial 從中心炸開） */
+.btn--yellow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center,
+        rgba(255, 255, 255, 0.55) 0%,
+        rgba(255, 255, 255, 0.22) 30%,
+        transparent 60%);
+    opacity: 0;
+    transform: scale(0.4);
+    pointer-events: none;
+    border-radius: inherit;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+.btn--yellow:active::after {
+    opacity: 1;
+    transform: scale(2);
+    transition: opacity 0.05s ease-in, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 箭頭 icon 動畫（外連結縮小 / 內部箭頭 hover 右移） */
 .btn .fa-arrow-up-right-from-square {
     font-size: 0.75em;
 }
 
 .btn .btn-arrow {
     display: inline-block;
-    transition: transform var(--t-fast);
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn:hover .btn-arrow {
@@ -488,75 +596,100 @@
 
 
 /* ════════════════════════════════════════════════════════════
-   6. 服務卡片 (Service Card)
+   6. 服務卡片 (Service Card — 2026-05-07 極簡編輯陳列)
+   結構：[head: label] → [body: title + desc + tag] → [arrow]
+   設計判斷：移除編號 / icon 等視覺主錨，靠 Liquid Glass 質感 + 字型對位 +
+            留白建立品牌識別。服務區是「陳列、選擇」性質，不該爆破。
+   字型對位：
+     - label = JetBrains Mono 黃色 + 上方冷光分隔線（呼應全站冷光線語言）
+     - title = Chiron Sung HK 中文（呼應 Hero h1 主標）
+     - desc = Noto Sans TC（內文）
+     - arrow = Italiana italic「Read more」+ 線條延展
    ════════════════════════════════════════════════════════════ */
 
 .service-card {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: var(--sp-sm);
+    gap: var(--sp-md);
     cursor: pointer;
     text-decoration: none;
     color: var(--c-white);
 }
 
+/* 內容推到 .card ::before/::after 之上（Liquid Glass 折射層在底） */
+.service-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.service-card__head {
+    display: flex;
+}
+
+/* label：上方冷光分隔線 + mono uppercase 黃色（取代「左 border」用「上 border」） */
 .service-card__label {
     font-family: var(--f-mono);
     font-size: var(--fs-xs);
     color: var(--c-yellow);
-    letter-spacing: 0.12em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
+    padding-top: var(--sp-xs);
+    border-top: 1px solid rgba(var(--c-yellow-rgb), 0.45);
+    line-height: 1.4;
+    align-self: flex-start;  /* 限制寬度貼齊文字、避免上分隔線拉滿整列 */
+}
+
+/* 中段：title + desc 緊湊群組 */
+.service-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-xs);
 }
 
 .service-card__title {
+    font-family: var(--f-serif-cjk);
     font-size: var(--fs-xl);
-    font-weight: 900;
-    line-height: 1.2;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+    color: var(--c-stellar);
 }
 
 .service-card__desc {
     font-size: var(--fs-sm);
     color: var(--c-muted);
-    line-height: 1.65;
+    line-height: 1.7;
 }
 
+/* 底部 arrow：Italiana italic 「Read more」+ 線條延展（hover 時拉長變黃） */
 .service-card__arrow {
+    margin-top: auto;
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    font-size: var(--fs-sm);
-    font-weight: 700;
-    color: var(--c-white);
-    margin-top: auto;
-    transition: gap var(--t-fast), color var(--t-fast);
+    gap: 0.7rem;
+    font-family: var(--f-display-en);
+    font-style: italic;
+    font-size: var(--fs-md);
+    color: rgba(var(--c-stellar-rgb), 0.85);
+    letter-spacing: 0.02em;
+    transition: color var(--t-fast);
+}
+
+.service-card__arrow-line {
+    display: inline-block;
+    width: 28px;
+    height: 1px;
+    background: rgba(var(--c-stellar-rgb), 0.55);
+    transition: width var(--t-base), background var(--t-base);
 }
 
 .card:hover .service-card__arrow {
-    gap: 0.7rem;
     color: var(--c-yellow);
 }
 
-/* 卡片 icon 圓圈（從舊版 /創巢官網/ port） */
-.service-card__icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: rgba(var(--c-blue-rgb), 0.15);
-    border: 1px solid rgba(var(--c-blue-rgb), 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    color: var(--c-blue);
-    margin-bottom: var(--sp-sm);
-    transition: background var(--t-base), border-color var(--t-base), color var(--t-base);
-}
-
-.card:hover .service-card__icon {
-    background: rgba(var(--c-yellow-rgb), 0.12);
-    border-color: rgba(var(--c-yellow-rgb), 0.4);
-    color: var(--c-yellow);
+.card:hover .service-card__arrow-line {
+    width: 56px;
+    background: rgba(var(--c-yellow-rgb), 0.8);
 }
 
 /* D 顧問卡的 tag row（「詢價制」黃 tag 容器） */
@@ -565,23 +698,6 @@
     flex-wrap: wrap;
     gap: 0.4rem;
     margin: var(--sp-xs) 0;
-}
-
-/* E 跳動E投放卡片內部左右雙欄佈局
-   左：icon + label + title（緊湊上方）
-   右：長描述（左對齊承接） */
-.bento--e__layout {
-    display: grid;
-    grid-template-columns: minmax(180px, 1fr) 2fr;
-    gap: var(--sp-md);
-    align-items: start;
-}
-
-@media (max-width: 720px) {
-    .bento--e__layout {
-        grid-template-columns: 1fr;
-        gap: var(--sp-sm);
-    }
 }
 
 

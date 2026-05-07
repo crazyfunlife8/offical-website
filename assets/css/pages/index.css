@@ -183,14 +183,9 @@ body {
     margin-top: 2.25rem;
 }
 
-/* Hero 範圍內 CTA：字級收小
-   Primary 保留自己的 1.6rem 側邊距（有形存在感）
-   Ghost 文字對齊左欄（無側邊距，虛空型） */
+/* Hero 範圍內 CTA：字級收小（2026-05-07 ghost 按鈕「了解我們」已拿掉，僅剩 primary） */
 .hero__cta-group .btn {
     font-size: 0.9375rem;
-}
-.hero__cta-group .btn--ghost {
-    padding: 0.7rem 0;
 }
 
 /* 向下捲動提示 */
@@ -522,7 +517,6 @@ body {
     padding: 0 var(--sec-px);
 }
 
-/* 非對稱 Bento Grid */
 /* 非對稱 Bento Grid（2026-04-16 原始設計，從舊版 創巢官網/ 恢復） */
 .bento-grid {
     display: grid;
@@ -532,80 +526,77 @@ body {
     margin-top: var(--sp-lg);
 }
 
-/* A 社群服務 — 左上，一般大小 */
+/* A 社群服務 — 左上 */
 .bento--a {
     grid-column: 1 / 2;
     grid-row: 1 / 2;
-    min-height: 260px;
-}
-
-/* C AI 虛擬網紅 — 右上 Featured（不再跨欄） */
-.bento--c {
-    grid-column: 3 / 4;
-    grid-row: 1 / 2;
-    min-height: 260px;
-    border-color: rgba(var(--c-blue-rgb), 0.5);
-    background: linear-gradient(135deg, rgba(var(--c-blue-rgb), 0.15), rgba(var(--c-navy-rgb), 0.2));
-}
-
-.bento--c::after {
-    content: 'FEATURED';
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    font-family: var(--f-mono);
-    font-size: var(--fs-xs);
-    color: var(--c-yellow);
-    letter-spacing: 0.12em;
-    opacity: 0.7;
-}
-
-/* Featured C 內部視覺強化：title 加大 + icon 使用黃色強調 */
-.bento--c .service-card__title {
-    font-size: var(--fs-2xl);  /* 38px（標準卡片用 fs-xl 28px）*/
-}
-
-.bento--c .service-card__icon {
-    background: rgba(var(--c-yellow-rgb), 0.12);
-    border-color: rgba(var(--c-yellow-rgb), 0.4);
-    color: var(--c-yellow);
-}
-
-/* B 網站 — 左中，小塊 */
-.bento--b-web {
-    grid-column: 1 / 2;
-    grid-row: 2 / 3;
-    min-height: 200px;
-}
-
-/* B 系統 — 中，一般 */
-.bento--b-sys {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
-    min-height: 200px;
-}
-
-/* D 顧問 — 右，跨兩行 */
-.bento--d {
-    grid-column: 3 / 4;
-    grid-row: 2 / 4;
-    min-height: 300px;
-}
-
-/* E 跳動E投放 — 左下，跨兩欄 */
-.bento--e {
-    grid-column: 1 / 3;
-    grid-row: 3 / 4;
-    min-height: 180px;
-    background: linear-gradient(135deg, rgba(var(--c-yellow-rgb), 0.06), rgba(var(--c-blue-rgb), 0.08));
-    border-color: rgba(var(--c-yellow-rgb), 0.2);
+    min-height: 280px;
 }
 
 /* F 社群增長 — 第一列中間（A 與 C 之間） */
 .bento--f {
     grid-column: 2 / 3;
     grid-row: 1 / 2;
-    min-height: 200px;
+    min-height: 220px;
+}
+
+/* C AI 虛擬網紅 — 右上 Featured（中文 title 統一回 Chiron Sung HK，差異化靠 FEATURED 標籤 + 文案張力） */
+.bento--c {
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+    min-height: 280px;
+}
+
+/* FEATURED 標籤：z-index: 2 高於 Liquid Glass ::before/::after */
+.bento--c::after {
+    content: 'FEATURED';
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    font-family: var(--f-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-yellow);
+    letter-spacing: 0.18em;
+    opacity: 0.75;
+    z-index: 2;
+}
+
+/* C 卡專屬英文 echo 副標（FEATURED 卡差異化：呼應 hero / manifesto / final-cta 雙語對位） */
+.bento--c .service-card__title-en {
+    font-family: var(--f-display-en);
+    font-size: var(--fs-md);
+    font-weight: 400;
+    color: rgba(var(--c-stellar-rgb), 0.55);
+    letter-spacing: 0.03em;
+    line-height: 1.3;
+}
+
+/* B 網站 — 左中 */
+.bento--b-web {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+    min-height: 220px;
+}
+
+/* B 系統 — 中 */
+.bento--b-sys {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    min-height: 220px;
+}
+
+/* D 顧問 — 右，跨兩行 */
+.bento--d {
+    grid-column: 3 / 4;
+    grid-row: 2 / 4;
+    min-height: 320px;
+}
+
+/* E 跳動E投放 — 左下，跨兩欄 */
+.bento--e {
+    grid-column: 1 / 3;
+    grid-row: 3 / 4;
+    min-height: 220px;
 }
 
 /* ════════════════════════════════════════════════════════════

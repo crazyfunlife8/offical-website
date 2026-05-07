@@ -14,7 +14,7 @@
                讓 CSS 改動不被 GSAP inline style 蓋掉，純靜態驗收。
        false → 正常全部動畫啟用。
        ════════════════════════════════════════════════════════ */
-    const DESIGN_MODE = true;
+    const DESIGN_MODE = false;
 
     // matchMedia 取代靜態寬度快照，let 允許 resize 時更新
     const mobileQuery = window.matchMedia('(max-width: 900px)');
@@ -665,12 +665,17 @@
             }
         );
 
-        // ── Section 3：Bento 卡片錯開進場 ──
+        // ── Section 3：Bento 卡片錯開進場（純 opacity stagger，避免 transform inline 衝突）──
+        // 不用 y/scale 因為：
+        //  (1) initConstellation 用 getBoundingClientRect 計算卡片中心畫連線，
+        //      若進場用 transform 偏移，初始計算位置錯位、ScrollTrigger 觸發後連線跟卡片中心對不齊
+        //  (2) GSAP 動畫結束會保留 inline transform，CSS .card:hover { translateY(-4px) }
+        //      無 !important 會被 inline 覆蓋、hover 時卡片不會上移
         const cards = document.querySelectorAll('.bento-grid .card');
         gsap.fromTo(cards,
-            { opacity: 0, y: 36, scale: 0.96 },
+            { opacity: 0 },
             {
-                opacity: 1, y: 0, scale: 1,
+                opacity: 1,
                 duration: 0.65,
                 stagger: 0.12,
                 ease: 'power2.out',
@@ -690,97 +695,8 @@
     }
 
     /* ════════════════════════════════════════════════════════
-       6. 星座連線（Bento 卡片之間）
+       6. （已退役）星座連線 — 2026-05-07 創辦人決定不要連線視覺
        ════════════════════════════════════════════════════════ */
-
-    // 計算每張 Bento 卡中心位置，以 SVG line 串接成星座
-    // 連線定義：以「相鄰且視覺上能構成星座圖」的方式挑選，避免過度交叉
-    function initConstellation() {
-        const grid = document.querySelector('.bento-grid');
-        if (!grid) return;
-
-        const cards = grid.querySelectorAll('.card');
-        if (cards.length < 2) return;
-
-        // 連線對：依 DOM 順序為節點 0..6
-        // 0=A社群, 1=C虛擬網紅(featured), 2=B網站, 3=B系統, 4=D顧問, 5=E跳動, 6=F社群增長
-        // 星座邏輯：相鄰區塊連線，不做全連通，避免視覺雜亂
-        const CONNECTIONS = [
-            [0, 1], [1, 4],     // A → C → D
-            [0, 2], [2, 3],     // A → B網站 → B系統
-            [3, 1],             // B系統 → C
-            [2, 5], [3, 5],     // 網站、系統 → E
-            [4, 6], [5, 6],     // D → F, E → F
-        ];
-
-        // 建立 SVG overlay
-        const svgNS = 'http://www.w3.org/2000/svg';
-        const svg = document.createElementNS(svgNS, 'svg');
-        svg.setAttribute('class', 'bento-constellation');
-        svg.setAttribute('xmlns', svgNS);
-        svg.setAttribute('aria-hidden', 'true');
-        svg.setAttribute('preserveAspectRatio', 'none');
-        grid.appendChild(svg);
-
-        function draw() {
-            // 清空舊元素
-            while (svg.firstChild) svg.removeChild(svg.firstChild);
-
-            const gridRect = grid.getBoundingClientRect();
-            svg.setAttribute('viewBox', `0 0 ${gridRect.width} ${gridRect.height}`);
-            svg.style.width  = gridRect.width + 'px';
-            svg.style.height = gridRect.height + 'px';
-
-            // 計算每張卡中心（相對 grid）
-            const points = Array.from(cards).map((card) => {
-                const r = card.getBoundingClientRect();
-                return {
-                    x: r.left - gridRect.left + r.width / 2,
-                    y: r.top  - gridRect.top  + r.height / 2,
-                };
-            });
-
-            // 畫連線（排除超出節點範圍的 index）
-            CONNECTIONS.forEach(([a, b]) => {
-                if (a >= points.length || b >= points.length) return;
-                const line = document.createElementNS(svgNS, 'line');
-                line.setAttribute('x1', points[a].x);
-                line.setAttribute('y1', points[a].y);
-                line.setAttribute('x2', points[b].x);
-                line.setAttribute('y2', points[b].y);
-                svg.appendChild(line);
-            });
-
-            // 節點：每張卡中心畫小星點
-            points.forEach((p) => {
-                const c = document.createElementNS(svgNS, 'circle');
-                c.setAttribute('cx', p.x);
-                c.setAttribute('cy', p.y);
-                c.setAttribute('r',  '2.5');
-                svg.appendChild(c);
-            });
-        }
-
-        draw();
-
-        // resize 重繪（debounce）
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(draw, 150);
-        });
-
-        // ScrollTrigger 進場淡入
-        if (typeof ScrollTrigger !== 'undefined') {
-            ScrollTrigger.create({
-                trigger: grid,
-                start: 'top 75%',
-                onEnter: () => svg.classList.add('is-visible'),
-            });
-        } else {
-            svg.classList.add('is-visible');
-        }
-    }
 
 
 
@@ -873,7 +789,6 @@
         // ─── 額外裝飾元素（2026-04-18，原「觀測儀」框架已棄用）───
         // 軌道環：2026-04-18 使用者回饋「多餘」，停用；程式保留供未來評估
         // try { initOrbitRings(); }  catch(e) { console.warn('[index.js] orbits failed:', e); }
-        try { initConstellation(); }  catch(e) { console.warn('[index.js] constellation failed:', e); }
     }
 
     if (document.readyState === 'loading') {
