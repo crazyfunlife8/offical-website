@@ -18,7 +18,7 @@
 
     <ul class="nav__links" role="list">
         <li><a href="about.html">關於</a></li>
-        <li><a href="services.html">服務</a></li>
+        <li><a href="index.html#services-section">服務</a></li>
         <li><a href="news.html">消息</a></li>
     </ul>
 
@@ -33,7 +33,7 @@
         <i class="fas fa-home" aria-hidden="true"></i>
         <span>首頁</span>
     </a>
-    <a href="services.html" class="dock-nav__item" aria-label="服務項目">
+    <a href="index.html#services-section" class="dock-nav__item" aria-label="服務項目">
         <i class="fas fa-th-large" aria-hidden="true"></i>
         <span>服務</span>
     </a>

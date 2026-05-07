@@ -135,7 +135,8 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | 10 | 前端骨架（token / base / components / animations / core.js / nav.js） | ✅ 完成 |
 | 11a | 首頁主視覺背景（Three.js 黑洞漩渦星場） | ✅ 確認完成 |
 | 11b | 首頁視覺元素實裝與微調 | 🔄 進行中 |
-| 12 | services.html 骨架 | 🔄 進行中（其餘 9 頁待執行） |
+| 12 | 服務頁 IA 重構：services.html 退役、nav「服務」改錨點 | ✅ 完成（2026-05-07 21:18） |
+| 12a | 7 個個別服務頁 + about/news/contact teaser 模板 | 🔲 待執行 |
 | 13 | 內容填充（作品截圖、角色圖等素材） | 🔲 待完成（等素材提供） |
 | 14 | SEO / sitemap / Schema 更新 | 🔲 待完成 |
 | 15 | 測試與部署上線 | 🔲 待完成 |
@@ -214,16 +215,19 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 ---
 
 ### 已存在的頁面檔案
-- `index.html` — 4 sections 完整實作（Hero / 宣言 / Bento 服務 / 終點 CTA「先別點」），site-footer 同步重設計。Section 4 品牌故事於 2026-05-07 移除。
-- `services.html` + `assets/css/pages/services.css` + `assets/js/pages/services.js` — 骨架，site-footer 同步更新
-- `maintenance.html`
+- `index.html` — 4 sections 完整實作（Hero / 宣言 / Bento 服務 / 終點 CTA「先別點」），site-footer 同步重設計。Section 4 品牌故事於 2026-05-07 移除。`<section class="services-section">` 加 `id="services-section"` 作為 nav 錨點目標（2026-05-07 21:18）。
+- `maintenance.html` — 真維護備用頁（與 teaser「敬請期待」分開）
 
-### 未實作的頁面（nav 已有連結）
+### 已退役的頁面檔案（2026-05-07 21:18）
+- `services.html` + `pages/services.css` + `pages/services.js` — 服務總覽中間頁，IA 重構後退役
+
+### 未實作的頁面（nav 已有連結 / bento 卡已有連結）
 about.html、contact.html、news.html、social.html、website.html、system.html、virtual.html、consultant.html、tiktok.html、growth.html
 
 ### 實作偏差備注
 | 項目 | 文件規劃 | 實際實作 |
 |------|---------|---------|
+| 服務頁 IA 結構（2026-05-07 21:18） | nav「服務」→ services.html 總覽中間頁 → 個別服務頁（雙層導覽） | 改為錨點滾動：nav「服務」→ `index.html#services-section` 直接捲到首頁 bento 服務星圖 → 個別服務頁（單層主線）。services.html / pages/services.css / pages/services.js 整批刪除。Hero CTA「探索服務」同步改 `#services-section`。`.services-section` 加 `scroll-margin-top: 80px` 補償 fixed nav。**紅線**：禁止再造服務總覽中間頁；首頁 bento 是唯一服務陳列點。完整推導（為什麼不選 hover 下拉 / 為什麼不選深度服務地圖）見 commit body。 |
 | 裝飾字型 | Exo 2（--f-disp） | Bebas Neue（--f-bebas）為主要裝飾字 |
 | 等寬字型 | IBM Plex Mono | 維持 IBM Plex Mono |
 | Hero 太空人 | Three.js 3D 模型 | 2026-04-21 已從 Hero section 移除（HTML 以 `<!-- 太空人暫時移除 2026-04-21 -->` 標記保留位置） |

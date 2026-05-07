@@ -509,6 +509,7 @@ body {
 
 .services-section {
     padding: var(--sp-xl) 0;
+    scroll-margin-top: 80px;
 }
 
 .services-section__inner {
