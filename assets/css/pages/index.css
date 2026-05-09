@@ -607,10 +607,16 @@ body {
 .final-cta {
     position: relative;
     padding: var(--sp-w1) 0;
-    /* 水平 overflow 切（避免太空人漂移時超出畫面右側）
-       垂直 overflow 放（讓太空人 rotate + scale 時腳尖不被切）*/
-    overflow-x: hidden;
-    overflow-y: visible;
+    /* 上下 padding 給足太空人 scale 1.5 + rotation 12° 擴張 buffer：
+       上方 100px 防 scale 從中心向上擴張部分被 clip、
+       下方 180px 防腳尖被下方 site-footer 蓋掉 */
+    padding-top: calc(var(--sp-w1) + 100px);
+    padding-bottom: calc(var(--sp-w1) + 180px);
+    /* overflow: clip（兩軸一致，CSS3 規範不會 promote 成 auto）
+       — overflow-x: hidden + overflow-y: visible 是 CSS spec 違法組合，
+         會強制把 -y promote 成 auto，在 final-cta 內長出 vertical scrollbar（user 看到的第 2 卷軸）
+       clip 比 hidden 更嚴格：完全 paint clip、不創 scroll container、不出任何 scrollbar */
+    overflow: clip;
     text-align: center;
 }
 

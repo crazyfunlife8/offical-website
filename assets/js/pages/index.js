@@ -1001,19 +1001,31 @@
         const wrapper = document.querySelector('.footer-astronaut');
         if (!wrapper || typeof gsap === 'undefined') return;
 
-        // 影片內動作放慢：playbackRate 0.5 = 半速、原本 4 秒 loop 變 8 秒
+        // 影片播放速度：1.0 = user 後製影片本身的原速
         const video = wrapper.querySelector('video');
         if (video) {
-            video.playbackRate = 0.5;
-            // 載入後重新套（有些瀏覽器在 loadedmetadata 前 set 會被覆寫）
+            video.playbackRate = 1.0;
             video.addEventListener('loadedmetadata', () => {
-                video.playbackRate = 0.5;
+                video.playbackRate = 1.0;
             });
         }
 
-        // 慢速漂移時長範圍（秒）
-        const MIN_DURATION = 18;
-        const MAX_DURATION = 26;
+        // 漂移時長範圍（單個 cycle 從畫面外漂到另一側畫面外的秒數）
+        const MIN_DURATION = 15;
+        const MAX_DURATION = 22;
+
+        // 出現間隔範圍：cycle 之間的延遲（0 = 離場後立即從另一邊進場、無間隔）
+        const MIN_INTERVAL = 0;
+        const MAX_INTERVAL = 0;
+
+        // 固定推進倍率：太空人朝鏡頭推進的視覺角度固定，不依起始大小變化
+        const SCALE_MULTIPLIER = 2.2;
+
+        // y 軸偏移範圍：startY/endY 各自獨立隨機，差距產生「斜上或斜下」漂移軌跡
+        // 範圍 -300 ~ 0（只往上偏移，避免往下撞到 site-footer 邊界）
+        // startY/endY 都在這範圍內、差距最大 300px → 明顯斜線軌跡
+        const Y_OFFSET_MIN = -300;
+        const Y_OFFSET_MAX = 0;
 
         let cycleTween = null;
 
@@ -1029,13 +1041,18 @@
             // 隨機傾斜角度：-12° 到 +12°（每輪一個固定角度、不在漂移期間改變）
             const rotation = (Math.random() * 24) - 12;
 
-            // 隨機初始尺寸：原尺寸的 55%-85%（暗示在遠處）
-            const startScale = 0.55 + Math.random() * 0.30;
-            // 隨機終點尺寸：原尺寸的 100%-150%（朝鏡頭推進、放大）
-            const endScale = 1.0 + Math.random() * 0.50;
+            // 隨機初始尺寸：原尺寸的 25%-85%（拓寬下限、更可能出現很遠很小的太空人）
+            const startScale = 0.25 + Math.random() * 0.60;
+            // 終點尺寸：固定推進倍率 1.8 倍（無論起始多少、推進角度一致）
+            const endScale = startScale * SCALE_MULTIPLIER;
 
-            // 漂移範圍給足 buffer，最大 endScale 1.5 也不會在邊緣看到 pop
-            const buffer = containerW * 0.8;
+            // y 軸隨機偏移：startY 跟 endY 各自獨立隨機 -150~+50px
+            // 兩者差距產生「斜上或斜下」漂移軌跡（每 cycle 軌跡不同）
+            const startY = Y_OFFSET_MIN + Math.random() * (Y_OFFSET_MAX - Y_OFFSET_MIN);
+            const endY = Y_OFFSET_MIN + Math.random() * (Y_OFFSET_MAX - Y_OFFSET_MIN);
+
+            // 漂移範圍 buffer = containerW × 0.3
+            const buffer = containerW * 0.3;
             const startX = enterFromRight
                 ? viewportW + buffer       // 右側畫面外（足夠遠）
                 : -containerW - buffer;    // 左側畫面外（足夠遠）
@@ -1043,31 +1060,36 @@
                 ? -containerW - buffer     // 終點：左側畫面外
                 : viewportW + buffer;      // 終點：右側畫面外
 
-            // 設定起點（瞬間定位）：位置 + 傾斜 + 起始尺寸 + 翻轉
+            // 設定起點（瞬間定位）：位置 + y 偏移 + 傾斜 + 起始尺寸 + 翻轉
             gsap.set(wrapper, {
                 x: startX,
+                y: startY,
                 scaleX: flipDir * startScale,
                 scaleY: startScale,
                 rotation: rotation,
                 opacity: 0.9,
             });
 
-            // 漂移期間：x 跨畫面 + scale 從小變大（追頭盔朝鏡頭推進）
-            // rotation 不動（保持入場那個傾斜角度）
+            // 漂移期間：x 跨畫面 + y 緩慢偏移 + scale 線性放大（推進角度固定）
             const duration = MIN_DURATION + Math.random() * (MAX_DURATION - MIN_DURATION);
             cycleTween = gsap.to(wrapper, {
                 x: endX,
+                y: endY,
                 scaleX: flipDir * endScale,
                 scaleY: endScale,
                 duration: duration,
                 ease: 'none',
-                onComplete: runCycle,
+                onComplete: () => {
+                    // cycle 之間隨機間隔 2-5 秒：太空人在畫面外、製造「停留後才出現」感
+                    const interval = MIN_INTERVAL + Math.random() * (MAX_INTERVAL - MIN_INTERVAL);
+                    setTimeout(runCycle, interval * 1000);
+                },
             });
         }
 
+        // page load 立即開始：太空人一直在 final-cta 內漂浮（不依 ScrollTrigger）
+        // user 滾到 final-cta 時看到的是動畫某個隨機 phase（剛進場 / 中段 / 快離場）
         runCycle();
-
-        // 視窗 resize 時下一輪 cycle 自動使用新 viewportW（不打斷當前 tween）
     }
 
     if (document.readyState === 'loading') {

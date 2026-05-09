@@ -141,7 +141,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | 13 | 內容填充（作品截圖、角色圖等素材） | 🔲 待完成（等素材提供） |
 | 14 | SEO / sitemap / Schema 更新 | 🔲 待完成 |
 | 15 | 測試與部署上線 | 🔲 待完成 |
-| 16 | 太空人角色敘事實作（見下方 backlog） | 🔄 進行中（beat01-03 已上線、beat04 漂浮影片暫停於素材未定案 2026-05-09 01:17） |
+| 16 | 太空人角色敘事實作 | ✅ 完成（beat01-04 全上線 2026-05-10） |
 
 ---
 
@@ -182,19 +182,18 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | 01 Hero idle | `.hero` | 靜態 PNG（chibi 太空人坐彎月） | 單張（Higgsfield 生圖） | 無 | ✅ 完成（早期版） |
 | 02 跌落穿越 Hero→Manifesto | `.hero-astronaut` 9:16 canvas | WebP 偵序列 | 133 偵（Kling 3 + RIFE 72→144 + 手動去背 11 偵） | ScrollTrigger pin 區段 | ✅ 完成（2026-05-08 ~15:30） |
 | 03 倒栽蔥懸吊 body-divider | `.manifesto-astronaut` 9:16 canvas | WebP 偵序列 | 179 偵（Kling 3 + RIFE 97→194 + 手動去背 + JS 動態對齊 body-divider via `getBoundingClientRect`） | ScrollTrigger 70/30 非線性 ease（110 偵斷點） | ✅ 完成（2026-05-08 ~18:43） |
-| 04 無頭追頭盔（Final CTA 漂浮） | `.footer-astronaut` 16:9 video | 透明 WebM 影片 | HTML5 video 自動 loop | GSAP 隨機漂移：左右進入 / 旋轉 ±12° / scale 0.55→1.5 / `playbackRate 0.5` / 18-26s 週期 | 🔄 **暫停：影片素材未定案** |
+| 04 無頭追頭盔（Final CTA 漂浮） | `.footer-astronaut` 16:9 video | 透明 WebM 影片（VP9+alpha） | HTML5 video 自動 loop + GSAP 隨機漂移 | 詳見下方 Beat 04 紀錄 | ✅ 完成（2026-05-10） |
 
-**Beat 04 暫停點（2026-05-09 01:17）：**
+**Beat 04 上線紀錄（2026-05-10）：**
 
-- **目前掛在頁面**：`assets/images/astronaut/clips/beat04-loop-transparent.webm`（2026-05-08 20:12 產出、來源 Kling v2 早期手動去背片）
-- **未上線的最新候選**：
-  - `beat04-headless-chase-kling3pro-v7.mp4`（10s / 25 credits / 1924×1076 / 2026-05-08 22:55）— 首尾偵 lock 成功、頭盔 3D 旋轉首次出現（偵 4 露背）、身體一致性佳
-  - `beat04-headless-chase-veo3_1-v1.mp4`（8s / 22 credits / 1280×720 / 2026-05-09 01:11）— 頭盔 3D 旋轉更平順、後段身體變形、無首尾偵 lock、解析度較低、自帶 ambient 音軌（上線需 muted）
-- **核心矛盾：** Kling 有 first/last frame lock 但頭盔 3D 旋轉不易引導；Veo 3.1 頭盔 3D 旋轉強但無首尾偵 lock + 身體後段變形
-- **後製管線（已驗證可運作、等選定才繼續）：** 使用者手動去背 → `C:\Users\user-45664\AppData\Local\Temp\white_to_black_video.py`（luma-key LOW=200 / HIGH=250 白→黑 anti-alias）→ ffmpeg libvpx-vp9 轉 VP9+alpha 透明 WebM → 覆蓋 `beat04-loop-transparent.webm`
-- **待決事項：** 採用 Kling v7 / Veo v1 / 再迭代 / 兩者都棄用回 Kling 重生；解析度與 loop 接縫的取捨優先序；Beat 01 hero idle 是否同步改 Kling/Veo chibi 風格重生
-
-**2026-05-09 結論：** 多版生成嘗試（拆分／整張、首尾偵 lock 強弱）未達理想——首尾偵 lock 太強會抑制 motion、拆分後 reference 失去 spatial context。**改走 s2-v2 拆分版後製剪輯路線**：user 用剪輯軟體手動合成頭盔/身體兩支 + 去背，完成後主 session 替換 `assets/images/astronaut/clips/beat04-loop-transparent.webm`。完整失敗推導見 commit a993822 message body。
+- **影片來源**：user 後製合成 `追頭盔後製黑色背景.mp4`（蛙式追頭盔、黑底 1932×1080 15.67s）
+- **後製管線**：Python imageio + ffmpeg luma-as-alpha threshold（LOW=5 / HIGH=20、RGBA stdin pipe）→ libvpx-vp9 + `alpha_mode=1` metadata → 透明 WebM 8.74 MB CRF 35（覆蓋 `assets/images/astronaut/clips/beat04-loop-transparent.webm`）
+- **CSS overflow 紀律**（解 transform 元素水平捲軸 + final-cta 第 2 捲軸）：
+  - `html / body { overflow-x: clip }`（不是 hidden）—— GPU 加速 transform 元素在 hidden 創 scroll container 時可能逃出，clip 是 paint-time 硬切
+  - 同元素 `overflow-x` 跟 `overflow-y` 必須一致——違法組合 `-x: hidden + -y: visible` 會 promote 成 auto 出第 2 捲軸
+  - `.final-cta { overflow: clip }` + `padding-top: var(--sp-w1) + 100px` + `padding-bottom: var(--sp-w1) + 180px` 給太空人 scale + rotation 擴張 buffer
+- **GSAP 動畫**（`initFooterAstronautDrift`）：page load 立即 runCycle、cycle 之間無間隔、duration 15-22s 隨機、startScale 0.25-0.85 隨機、endScale = startScale × 2.2（**固定推進倍率**——太空中追頭盔角度固定）、rotation ±12° 隨機、y 偏移 -300~0px 隨機（startY/endY 各自獨立 → 斜線軌跡）、buffer = containerW × 0.3
+- **Higgsfield 完整生成路線（Kling/Veo）失敗推導**：見 commit a993822 message body
 
 **新增工具配置（2026-05-09）：**
 - `~/.claude/skills/higgsfield/`：OSideMedia/higgsfield-ai-prompt-skill（20 sub-skill dispatcher）

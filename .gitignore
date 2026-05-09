@@ -11,3 +11,11 @@ assets/images/astronaut/clips/beat03-frames-rife/
 # beat04: original raw frames + RIFE-interpolated frames
 assets/images/astronaut/clips/beat04-frames-raw/
 assets/images/astronaut/clips/beat04-frames-rife/
+
+# Beat 04 debug / 中介產物（5/9 試錯時產出、5/10 上線版用 luma-as-alpha 直接從黑底處理已不需要）
+assets/images/astronaut/clips/beat04-loop-black-v2.mp4
+assets/images/astronaut/clips/beat04-loop-transparent-TEST.webm
+assets/images/astronaut/clips/test-alpha.html
+
+# 棄用 source（5/9 白底後製版、5/10 改用黑底版後棄用）
+assets/images/astronaut/V2後製去背版.mp4
