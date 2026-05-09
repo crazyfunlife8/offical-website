@@ -194,33 +194,14 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 - **後製管線（已驗證可運作、等選定才繼續）：** 使用者手動去背 → `C:\Users\user-45664\AppData\Local\Temp\white_to_black_video.py`（luma-key LOW=200 / HIGH=250 白→黑 anti-alias）→ ffmpeg libvpx-vp9 轉 VP9+alpha 透明 WebM → 覆蓋 `beat04-loop-transparent.webm`
 - **待決事項：** 採用 Kling v7 / Veo v1 / 再迭代 / 兩者都棄用回 Kling 重生；解析度與 loop 接縫的取捨優先序；Beat 01 hero idle 是否同步改 Kling/Veo chibi 風格重生
 
-**2026-05-09 跨 session 嘗試紀錄（五版皆失敗、最終採 v2 後製路線）：**
-
-| 版本 | 設定 | 失敗模式 |
-|---|---|---|
-| s2-v1（拆分 + 4 階段時間軸） | 頭盔/身體拆兩張獨立 reference / 1:1 / 5s / 首尾偵同圖 lock / Kling 3.0 Pro | 身體幾乎靜止只動一下手 ❌ 頭盔本體不動 visor 反射星雲在轉 ❌ |
-| s2-v2（拆分 + 簡化 prompt） | 同 v1 設定 / prompt 修為 One Action 連續描述 / 移除靜態 lock 詞 | 仍然失敗——拆分本身抑制 motion budget（單主體無 spatial context、Kling 保守處理） |
-| s2-v3（整張圖 + 10s） | pose-04-headless-chase-raw.png / 16:9 / 10s / 首尾偵同圖 lock | 一樣失敗（前提錯誤——主 session 誤把 v7 文字描述當「驗證成功」） |
-| s2-v4（整張圖 + 15s） | 整張圖 / 16:9 / 15s / 首尾偵同圖 lock | 頭盔中間停留晃動再 snap 回起點 ❌ 身體完全沒蛙式 ❌ — 確認 first/last lock 太強抑制 motion |
-| s2-v5（整張圖 + 15s + 移除尾偵） | 整張圖 / 16:9 / 15s / **僅首偵 lock**（移除 `--end-image`）/ prompt 軟引導收尾 | 仍未達理想（user 判定放棄此線） |
-
-**根因彙整（s2-v1 至 v5 共學）：**
-- **拆分策略無效**：純頭盔/純身體 reference 無 spatial context、Kling 保守處理（v1/v2）
-- **首尾偵 lock 太強會抑制 motion**：兩端同圖 + lock 硬綁 → 模型保守不動、或中間猶豫後 snap 回起點（v3/v4）
-- **僅首偵 lock + narrative 軟引導收尾**也未充分解決 Kling 對「蛙式 + 頭盔 3D 旋轉」這個動作組合的本質困難（v5）
-- 上 session v7「首尾偵 lock 成功、頭盔 3D 旋轉首次出現」是相對於 Veo v1 的描述、**不是整體成功**——主 session 誤讀為驗證基準導致 v3-v5 推論基底錯誤
-
-**最終決定（2026-05-09 user 拍板）：**
-- **棄用 Kling/Veo 完整生成路線**，採用 **s2-v2 後製剪輯**（拆分版）
-- user 用剪輯軟體手動合成頭盔 + 身體兩支、並做去背
-- 完成後給主 session 替換 `assets/images/astronaut/clips/beat04-loop-transparent.webm`
+**2026-05-09 結論：** 多版生成嘗試（拆分／整張、首尾偵 lock 強弱）未達理想——首尾偵 lock 太強會抑制 motion、拆分後 reference 失去 spatial context。**改走 s2-v2 拆分版後製剪輯路線**：user 用剪輯軟體手動合成頭盔/身體兩支 + 去背，完成後主 session 替換 `assets/images/astronaut/clips/beat04-loop-transparent.webm`。完整失敗推導見 commit a993822 message body。
 
 **新增工具配置（2026-05-09）：**
-- 安裝 OSideMedia/higgsfield-ai-prompt-skill（20 sub-skill）至 `~/.claude/skills/higgsfield/`
-- 安裝官方 4-skill 包（`higgsfield-generate` / `soul-id` / `product-photoshoot` / `marketplace-cards`）至 `~/.agents/skills/`
-- 修復 Higgsfield CLI wrapper 在 `~/.local/bin/higgsfield`（指向上 session 已裝的 `hf.exe`）
-- 建立 `_工具參考/Higgsfield_協作快照.md`（含 15 天自動重驗紀律）
-- 建立兩條 memory feedback：`feedback_higgsfield_collaboration.md` + `feedback_state_origin_before_destructive.md`
+- `~/.claude/skills/higgsfield/`：OSideMedia/higgsfield-ai-prompt-skill（20 sub-skill dispatcher）
+- `~/.agents/skills/`：官方 4-skill 包（generate / soul-id / product-photoshoot / marketplace-cards）
+- `~/.local/bin/higgsfield`：CLI wrapper（指向上 session 已裝的 `hf.exe`）
+- `_工具參考/Higgsfield_協作快照.md`：協作技巧庫（含 15 天自動重驗紀律）
+- 兩條 memory feedback：`feedback_higgsfield_collaboration.md`、`feedback_state_origin_before_destructive.md`
 
 **手機版策略 / 無障礙（仍待規劃）：** 手機版 ScrollTrigger 觸發節奏可能過密、待 beat04 定案後一次性適配；`prefers-reduced-motion` 應停用所有偵序列動畫、至少保留靜態 idle 姿勢。
 
