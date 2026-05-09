@@ -768,13 +768,15 @@
 
         // L1 環境動畫（設計模式保留，屬於靜態視覺一部分）
         try { initStarfield(); } catch(e) { console.warn('[index.js] initStarfield failed:', e); }
-        try {
-            initAstronaut();
-        } catch(e) {
-            console.warn('[index.js] initAstronaut failed, showing fallback:', e);
-            const fallback = document.querySelector('.hero__astronaut-fallback');
-            if (fallback) fallback.style.opacity = '1';
-        }
+        // 舊 3D Three.js 太空人 initAstronaut() 於 2026-05-07 停用
+        // 已被 initAstronautScroll()（偵序列 + ScrollTrigger）取代；舊函式保留供參
+        // try {
+        //     initAstronaut();
+        // } catch(e) {
+        //     console.warn('[index.js] initAstronaut failed, showing fallback:', e);
+        //     const fallback = document.querySelector('.hero__astronaut-fallback');
+        //     if (fallback) fallback.style.opacity = '1';
+        // }
 
         // DESIGN_MODE：凍結 L2（進場）+ L3（捲動驅動），加 body class 讓 CSS 提供救援
         if (DESIGN_MODE) {
@@ -786,9 +788,286 @@
         initHeroEntrance();
         initScrollAnimations();
 
+        // 太空人 ScrollTrigger 偵序列（2026-05-07 PoC 掛載）
+        try { initAstronautScroll(); } catch(e) { console.warn('[index.js] astronaut scroll failed:', e); }
+
+        // Beat 03 太空人 ScrollTrigger 偵序列（2026-05-08）
+        try { initManifestoAstronautScroll(); } catch(e) { console.warn('[index.js] manifesto astronaut failed:', e); }
+
+        // Beat 04 太空人隨機漂移（2026-05-08）
+        try { initFooterAstronautDrift(); } catch(e) { console.warn('[index.js] footer astronaut drift failed:', e); }
+
         // ─── 額外裝飾元素（2026-04-18，原「觀測儀」框架已棄用）───
         // 軌道環：2026-04-18 使用者回饋「多餘」，停用；程式保留供未來評估
         // try { initOrbitRings(); }  catch(e) { console.warn('[index.js] orbits failed:', e); }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 太空人 ScrollTrigger 偵序列（2026-05-07 PoC）
+    // ─────────────────────────────────────────────────────────
+    // 預載 72 張 raw PNG 偵到 Image 物件 → 捲動 Hero → Manifesto
+    // 期間驅動 canvas drawImage 切偵 → Manifesto 結束後淡出。
+    // ═══════════════════════════════════════════════════════════
+    function initAstronautScroll() {
+        // 來源：72 Kling 真實偵 → RIFE v4.6 補偵 144 → 使用者手動逐張去背 → 截尾刪除 134-144（角色已離場無內容）→ 512px WebP
+        // 邊緣品質：手工精修勝過所有 AI 自動工具
+        const TOTAL_FRAMES = 133;
+        const FRAME_PATH = (i) =>
+            `assets/images/astronaut/clips/beat02-frames/frame_${String(i).padStart(3, '0')}.webp`;
+
+        const wrapper = document.querySelector('.hero-astronaut');
+        const canvas = document.getElementById('hero-astronaut-canvas');
+        if (!wrapper || !canvas) return;
+        if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+            console.warn('[index.js] GSAP/ScrollTrigger 未載入，太空人 scroll 動畫停用');
+            return;
+        }
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.warn('[index.js] 太空人 canvas 2d context 取得失敗');
+            return;
+        }
+
+        const images = [];
+        let loadedCount = 0;
+
+        function onAllLoaded() {
+            wrapper.classList.add('loaded');
+            render();
+            attachScrollTrigger();
+        }
+
+        for (let i = 1; i <= TOTAL_FRAMES; i++) {
+            const img = new Image();
+            img.src = FRAME_PATH(i);
+            img.onload = () => {
+                loadedCount++;
+                if (loadedCount === TOTAL_FRAMES) onAllLoaded();
+            };
+            img.onerror = () => {
+                loadedCount++;
+                if (loadedCount === TOTAL_FRAMES) onAllLoaded();
+            };
+            images[i - 1] = img;
+        }
+
+        const sequence = { frame: 0 };
+        function render() {
+            const idx = Math.max(0, Math.min(TOTAL_FRAMES - 1, Math.round(sequence.frame)));
+            const img = images[idx];
+            if (img && img.complete && img.naturalWidth > 0) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function attachScrollTrigger() {
+            // 動畫範圍 = Hero 上半段（'center top' = Hero 中心捲到 viewport 頂端時動畫完成）
+            // 比 'bottom top' 範圍縮一半 → 每偵的滑動距離 ×0.5、整體節奏更快。
+            // scrub 0.2 比 0.5 更即時、比 true 仍保留少量平滑緩衝。
+            gsap.to(sequence, {
+                frame: TOTAL_FRAMES - 1,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'center top',
+                    scrub: 0.2,
+                },
+                onUpdate: render
+            });
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // Beat 03 太空人 ScrollTrigger 偵序列（2026-05-08）
+    // ─────────────────────────────────────────────────────────
+    // 預載 179 張透明 WebP → 捲動 Manifesto 期間驅動 canvas 切偵
+    // 動畫：懸線揮手 → 掙扎 → 掉下消失
+    //
+    // 動態定位：canvas 的 image 內線條對齊 .manifesto__body-divider
+    // 不寫死 top %，而是 runtime 抓 body-divider 實際位置 + 視窗 resize
+    // 重算，保證所有螢幕尺寸／字型載入時序都精準對齊。
+    // ═══════════════════════════════════════════════════════════
+    function initManifestoAstronautScroll() {
+        const TOTAL_FRAMES = 179;
+        const FRAME_PATH = (i) =>
+            `assets/images/astronaut/clips/beat03-frames/frame_${String(i).padStart(3, '0')}.webp`;
+        // image 內冷光線在 canvas 由上往下的位置比例（目測 ~20%）
+        // 視覺微調這個值對齊 body-divider 即可
+        const IMAGE_LINE_Y_RATIO = 0.20;
+
+        const wrapper = document.querySelector('.manifesto-astronaut');
+        const canvas = document.getElementById('manifesto-astronaut-canvas');
+        const divider = document.querySelector('.manifesto__body-divider');
+        const manifesto = document.querySelector('.manifesto');
+        if (!wrapper || !canvas) return;
+        if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+        // 動態對齊：把 canvas 推到 image 內線跟 body-divider 重疊
+        function alignToBodyDivider() {
+            if (!divider || !manifesto) return;
+            const dRect = divider.getBoundingClientRect();
+            const mRect = manifesto.getBoundingClientRect();
+            const dividerYInManifesto = dRect.top - mRect.top;
+            // canvas 高度（width × 16/9）
+            const canvasH = wrapper.offsetHeight;
+            // 把 canvas 上推 (image-line-position) 高度，讓 image 內線剛好落在 dividerY
+            const canvasTopPx = dividerYInManifesto - canvasH * IMAGE_LINE_Y_RATIO;
+            wrapper.style.top = `${canvasTopPx}px`;
+        }
+        alignToBodyDivider();
+        window.addEventListener('resize', alignToBodyDivider);
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(alignToBodyDivider);
+        }
+        // ScrollTrigger 啟動後可能也會改 layout，refresh 時也對齊一次
+        ScrollTrigger.addEventListener('refresh', alignToBodyDivider);
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const images = [];
+        let loadedCount = 0;
+
+        function onAllLoaded() {
+            wrapper.classList.add('loaded');
+            render();
+            attachScrollTrigger();
+        }
+
+        for (let i = 1; i <= TOTAL_FRAMES; i++) {
+            const img = new Image();
+            img.src = FRAME_PATH(i);
+            img.onload = () => {
+                loadedCount++;
+                if (loadedCount === TOTAL_FRAMES) onAllLoaded();
+            };
+            img.onerror = () => {
+                loadedCount++;
+                if (loadedCount === TOTAL_FRAMES) onAllLoaded();
+            };
+            images[i - 1] = img;
+        }
+
+        const sequence = { frame: 0 };
+        function render() {
+            const idx = Math.max(0, Math.min(TOTAL_FRAMES - 1, Math.round(sequence.frame)));
+            const img = images[idx];
+            if (img && img.complete && img.naturalWidth > 0) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function attachScrollTrigger() {
+            // 非線性節奏：偵 1-110 佔 70% scroll、偵 110+ 壓縮在後 30% scroll
+            // 結果：後段（掉下消失）每偵間距較短、滾動快速完成
+            const BREAKPOINT_FRAME = 110;
+            const BEFORE_SCROLL_RATIO = 0.70;
+            const FRAME_THRESHOLD = BREAKPOINT_FRAME / (TOTAL_FRAMES - 1);
+
+            // 動畫範圍 = Manifesto scroll 期間
+            gsap.to(sequence, {
+                frame: TOTAL_FRAMES - 1,
+                ease: function(t) {
+                    if (t <= BEFORE_SCROLL_RATIO) {
+                        return (t / BEFORE_SCROLL_RATIO) * FRAME_THRESHOLD;
+                    } else {
+                        return FRAME_THRESHOLD +
+                            ((t - BEFORE_SCROLL_RATIO) / (1 - BEFORE_SCROLL_RATIO)) *
+                            (1 - FRAME_THRESHOLD);
+                    }
+                },
+                scrollTrigger: {
+                    trigger: '.manifesto',
+                    start: 'top center',
+                    end: 'bottom top',
+                    scrub: 0.2,
+                },
+                onUpdate: render
+            });
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // Beat 04 太空人隨機漂移（2026-05-08）
+    // ─────────────────────────────────────────────────────────
+    // 從畫面外左 / 右隨機進入、慢速漂移到對側、loop。從左進入時水平
+    // 翻轉影片，讓頭盔永遠處於前進方向的前方（領頭追逐感）。
+    // ═══════════════════════════════════════════════════════════
+    function initFooterAstronautDrift() {
+        const wrapper = document.querySelector('.footer-astronaut');
+        if (!wrapper || typeof gsap === 'undefined') return;
+
+        // 影片內動作放慢：playbackRate 0.5 = 半速、原本 4 秒 loop 變 8 秒
+        const video = wrapper.querySelector('video');
+        if (video) {
+            video.playbackRate = 0.5;
+            // 載入後重新套（有些瀏覽器在 loadedmetadata 前 set 會被覆寫）
+            video.addEventListener('loadedmetadata', () => {
+                video.playbackRate = 0.5;
+            });
+        }
+
+        // 慢速漂移時長範圍（秒）
+        const MIN_DURATION = 18;
+        const MAX_DURATION = 26;
+
+        let cycleTween = null;
+
+        function runCycle() {
+            const containerW = wrapper.offsetWidth || 400;
+            const viewportW = window.innerWidth;
+            // 影片原始視角：頭盔在 image 左側、身體在右側、身體往左追頭盔。
+            // → 從畫面右進入（往左移）→ 影片頭盔正好在前進方向前方，無需翻轉
+            // → 從畫面左進入（往右移）→ 需要 scaleX(-1) 翻轉、頭盔換到 image 右側 = 前進方向前方
+            const enterFromRight = Math.random() < 0.5;
+            const flipDir = enterFromRight ? 1 : -1;
+
+            // 隨機傾斜角度：-12° 到 +12°（每輪一個固定角度、不在漂移期間改變）
+            const rotation = (Math.random() * 24) - 12;
+
+            // 隨機初始尺寸：原尺寸的 55%-85%（暗示在遠處）
+            const startScale = 0.55 + Math.random() * 0.30;
+            // 隨機終點尺寸：原尺寸的 100%-150%（朝鏡頭推進、放大）
+            const endScale = 1.0 + Math.random() * 0.50;
+
+            // 漂移範圍給足 buffer，最大 endScale 1.5 也不會在邊緣看到 pop
+            const buffer = containerW * 0.8;
+            const startX = enterFromRight
+                ? viewportW + buffer       // 右側畫面外（足夠遠）
+                : -containerW - buffer;    // 左側畫面外（足夠遠）
+            const endX = enterFromRight
+                ? -containerW - buffer     // 終點：左側畫面外
+                : viewportW + buffer;      // 終點：右側畫面外
+
+            // 設定起點（瞬間定位）：位置 + 傾斜 + 起始尺寸 + 翻轉
+            gsap.set(wrapper, {
+                x: startX,
+                scaleX: flipDir * startScale,
+                scaleY: startScale,
+                rotation: rotation,
+                opacity: 0.9,
+            });
+
+            // 漂移期間：x 跨畫面 + scale 從小變大（追頭盔朝鏡頭推進）
+            // rotation 不動（保持入場那個傾斜角度）
+            const duration = MIN_DURATION + Math.random() * (MAX_DURATION - MIN_DURATION);
+            cycleTween = gsap.to(wrapper, {
+                x: endX,
+                scaleX: flipDir * endScale,
+                scaleY: endScale,
+                duration: duration,
+                ease: 'none',
+                onComplete: runCycle,
+            });
+        }
+
+        runCycle();
+
+        // 視窗 resize 時下一輪 cycle 自動使用新 viewportW（不打斷當前 tween）
     }
 
     if (document.readyState === 'loading') {

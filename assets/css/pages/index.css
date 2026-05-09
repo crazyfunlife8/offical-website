@@ -356,10 +356,8 @@ body {
     opacity: 1;
 }
 
-/* Three.js canvas（暫時隱藏，未來啟用時移除此規則） */
-#astronaut-canvas {
-    display: none;
-}
+/* 舊 3D 太空人 #astronaut-canvas { display: none } 規則於 2026-05-07 移除
+   ID 已被新的 ScrollTrigger 偵序列 canvas 接管，樣式由 .hero-astronaut 區段控制 */
 
 @media (max-width: 900px) {
     .hero__inner {
@@ -455,10 +453,10 @@ body {
     background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(var(--c-blue-rgb), 0.08) 40%,
-        rgba(var(--c-blue-rgb), 0.35) 70%,
-        rgba(var(--c-blue-rgb), 0.70) 90%,
-        rgba(var(--c-blue-rgb), 0.90) 100%
+        rgba(var(--c-blue-rgb), 0.15) 20%,    /* 左側提亮：原 0.08@40% → 0.15@20% */
+        rgba(var(--c-blue-rgb), 0.40) 50%,    /* 中段提亮：原 0.35@70% → 0.40@50% */
+        rgba(var(--c-blue-rgb), 0.70) 80%,    /* 同色更早：原 0.70@90% → 0.70@80% */
+        rgba(var(--c-blue-rgb), 0.90) 100%    /* 右側源頭不變 */
     );
     box-shadow: 12px 0 20px rgba(var(--c-blue-rgb), 0.30);
 }
@@ -609,8 +607,49 @@ body {
 .final-cta {
     position: relative;
     padding: var(--sp-w1) 0;
-    overflow: hidden;
+    /* 水平 overflow 切（避免太空人漂移時超出畫面右側）
+       垂直 overflow 放（讓太空人 rotate + scale 時腳尖不被切）*/
+    overflow-x: hidden;
+    overflow-y: visible;
     text-align: center;
+}
+
+/* ════════════════════════════════════════════════════════════
+   太空人 Beat 04（無頭追頭盔）2026-05-08
+   ─────────────────────────────────────────────────────────────
+   自動 loop 影片、Final CTA 底部、背景層、不影響文字可讀性
+   位於「我準備好了」按鈕下方、Footer NEST DIGITAL 上方的空白區
+   ═══════════════════════════════════════════════════════════ */
+.footer-astronaut {
+    position: absolute;
+    /* 初始放左下、由 JS 接管 transform 控制橫移 + 翻轉
+       不要在 CSS 預設 transform，避免跟 GSAP 控制衝突 */
+    left: 0;
+    bottom: 0;
+    width: clamp(280px, 35vw, 520px);
+    aspect-ratio: 16 / 9;
+    /* 等比例從中心擴張（四邊一起往外長、視覺中心不偏移）
+       搭配 .final-cta 的 overflow-y: visible 讓上下邊界都不會被切 */
+    transform-origin: 50% 50%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0; /* JS 接管後才顯示，避免 flash */
+}
+
+.footer-astronaut video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    /* WebM (VP9+alpha) 影片自帶 alpha 通道，瀏覽器原生合成
+       不需要 blend mode hack，角色顏色 / 陰影都精確保留 */
+}
+
+@media (max-width: 900px) {
+    .footer-astronaut {
+        width: clamp(220px, 60vw, 320px);
+        bottom: 0.5rem;
+    }
 }
 
 /* 背景中央微光暈：暗黑底上的「終點之光」，呼應「準備好了」這個承諾 */
@@ -717,4 +756,97 @@ body {
 /* CTA 按鈕外距（樣式本體由 components.css 的 .btn--yellow 接管） */
 .final-cta__btn {
     margin-top: var(--sp-lg);
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   太空人 ScrollTrigger 偵序列（2026-05-07 PoC 掛載）
+   ─────────────────────────────────────────────────────────────
+   固定於 viewport 右側，捲動 Hero → Manifesto 期間驅動 72 偵
+   動畫。Manifesto 結束後淡出（避免太空人停留干擾 Bento）。
+   未去背 raw PNG 暫時直接渲染（白底），驗證 scroll 流暢度後
+   再決定是否補偵 / 去背。
+   ═══════════════════════════════════════════════════════════ */
+.hero-astronaut {
+    position: absolute;       /* 黏在 Hero 內部右側、跟隨 Hero 捲動，非 viewport-fixed */
+    top: 50%;
+    right: clamp(2rem, 5vw, 5rem);
+    transform: translateY(-50%);
+    width: clamp(240px, 36vw, 560px);
+    height: clamp(240px, 36vw, 560px);
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.8s ease-out;
+}
+
+.hero-astronaut.loaded {
+    opacity: 1;
+}
+
+.hero-astronaut canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    /* 零重力漂浮：輪迴 6 秒微幅上下 + 旋轉，靜止時也有生命感
+       與 ScrollTrigger 偵切換獨立（canvas drawImage 跟 CSS transform 不衝突）*/
+    animation: float 6s ease-in-out infinite;
+}
+
+/* 無障礙：尊重「減少動態」偏好 */
+@media (prefers-reduced-motion: reduce) {
+    .hero-astronaut canvas {
+        animation: none;
+    }
+}
+
+/* 手機版：縮小 + 移到 Hero 下緣 */
+@media (max-width: 900px) {
+    .hero-astronaut {
+        top: auto;
+        bottom: 6rem;
+        right: 1.5rem;
+        transform: none;
+        width: clamp(160px, 36vw, 240px);
+        height: clamp(160px, 36vw, 240px);
+    }
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   Beat 03 太空人 ScrollTrigger（Manifesto 區塊內 9:16 直式）
+   ─────────────────────────────────────────────────────────────
+   懸線揮手 → 掙扎 → 掉下消失 動畫，捲動 Manifesto 期間驅動 179 偵
+   定位 Manifesto 右側、9:16 直式
+   ═══════════════════════════════════════════════════════════ */
+.manifesto-astronaut {
+    position: absolute;
+    /* top 由 JS initManifestoAstronautScroll() 動態計算對齊
+       .manifesto__body-divider，這裡不寫死，避免衝突 */
+    left: calc(var(--sec-px) + 4rem);   /* 從 +1rem 改 +4rem，往右推 3rem (約 48px) */
+    transform: none;
+    width: clamp(168px, 21.6vw, 312px);   /* 比原本放大 20%（140→168 / 18vw→21.6vw / 260→312） */
+    /* 9:16 比例（自動算高度，不要改 width 以外的尺寸控制）*/
+    aspect-ratio: 9 / 16;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.8s ease-out;
+}
+
+.manifesto-astronaut.loaded {
+    opacity: 1;
+}
+
+.manifesto-astronaut canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+@media (max-width: 900px) {
+    .manifesto-astronaut {
+        left: 1rem;
+        width: clamp(144px, 36vw, 240px);   /* 比原本放大 20% */
+    }
 }

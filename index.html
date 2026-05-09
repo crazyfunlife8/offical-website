@@ -111,7 +111,12 @@
 
                 </div>
 
-                <!-- 太空人暫時移除 2026-04-21 -->
+                <!-- 太空人 ScrollTrigger 偵序列（2026-05-07 PoC 掛載）
+                     固定於右側、捲動驅動 72 偵動畫，完整邏輯見 index.js initAstronautScroll()
+                     canvas 內部繪製尺寸 512px = WebP 偵原始尺寸，外觀大小由 CSS 控制 -->
+                <div class="hero-astronaut" aria-hidden="true">
+                    <canvas id="hero-astronaut-canvas" width="512" height="512"></canvas>
+                </div>
 
             </div>
 
@@ -135,6 +140,12 @@
         ════════════════════════════════════════════════ -->
         <section class="manifesto" aria-label="品牌宣言">
             <div class="manifesto__line" aria-hidden="true"></div>
+
+            <!-- 太空人 ScrollTrigger Beat 03（懸線揮手 → 掉下）2026-05-08 PoC 掛載
+                 9:16 直式、Manifesto 區塊右側、捲動驅動 179 偵動畫 -->
+            <div class="manifesto-astronaut" aria-hidden="true">
+                <canvas id="manifesto-astronaut-canvas" width="432" height="768"></canvas>
+            </div>
 
             <div class="manifesto__inner">
                 <h2 class="manifesto__big-text">
@@ -298,6 +309,16 @@
         <section class="final-cta" aria-labelledby="cta-title">
 
             <div class="final-cta__glow" aria-hidden="true"></div>
+
+            <!-- 太空人 Beat 04（無頭追頭盔）2026-05-08
+                 自動 loop 影片、Final CTA 底部、背景層、不影響文字可讀性
+                 WebM (VP9+alpha) 真透明、現代瀏覽器 95%+ 支援；MP4 黑底為 fallback -->
+            <div class="footer-astronaut" aria-hidden="true">
+                <video autoplay loop muted playsinline>
+                    <source src="assets/images/astronaut/clips/beat04-loop-transparent.webm" type="video/webm">
+                    <source src="assets/images/astronaut/clips/beat04-loop-black.mp4" type="video/mp4">
+                </video>
+            </div>
 
             <div class="final-cta__inner">
                 <h2 class="final-cta__title" id="cta-title">先別點。</h2>

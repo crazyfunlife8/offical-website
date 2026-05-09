@@ -1,0 +1,13 @@
+# Raw/intermediate frame sequences — not used in production
+# beat02: original raw frames + RIFE-interpolated frames + Luma draft
+assets/images/astronaut/clips/beat02-frames-raw/
+assets/images/astronaut/clips/beat02-frames-rife/
+assets/images/astronaut/clips/beat02-frames-luma/
+
+# beat03: original raw frames + RIFE-interpolated frames
+assets/images/astronaut/clips/beat03-frames-raw/
+assets/images/astronaut/clips/beat03-frames-rife/
+
+# beat04: original raw frames + RIFE-interpolated frames
+assets/images/astronaut/clips/beat04-frames-raw/
+assets/images/astronaut/clips/beat04-frames-rife/

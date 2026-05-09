@@ -141,76 +141,88 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | 13 | 內容填充（作品截圖、角色圖等素材） | 🔲 待完成（等素材提供） |
 | 14 | SEO / sitemap / Schema 更新 | 🔲 待完成 |
 | 15 | 測試與部署上線 | 🔲 待完成 |
-| 16 | 太空人 ScrollTrigger 角色敘事（見下方設計構想 backlog） | 🔲 構想階段（未啟動實作） |
+| 16 | 太空人角色敘事實作（見下方 backlog） | 🔄 進行中（beat01-03 已上線、beat04 漂浮影片暫停於素材未定案 2026-05-09 01:17） |
 
 ---
 
-### 設計構想 backlog（2026-05-07 21:46 創辦人提出）
+### 太空人角色敘事實作（2026-05-07 21:46 構想 → 2026-05-08 實作啟動）
 
-#### 太空人 ScrollTrigger 角色敘事「沉思 → 破格」
-
-**創辦人原始劇本（2026-05-07）：**
+**創辦人原始劇本（2026-05-07）：** 沉思 → 破格 4 階段。
 
 | 狀態 | 畫面 | 情緒 |
 |---|---|---|
 | 頁面初始（未滾動） | 太空人坐著托腮沉思，旁邊一句 hero 文案。極靜。 | 冷靜、高級、克制 |
-| 使用者開始滾動 | 太空人突然 — 跌倒 / 滾走 / 手一滑杯子打翻 / 跑出畫面框 | 驚喜、會心一笑、「欸這公司有趣」 |
+| 使用者開始滾動 | 太空人突然 — 跌倒 / 滾走 / 手一滑杯子打翻 / 跑出畫面框 | 驚喜、會心一笑 |
 | 後續 section | 每段他以不同「不正經姿態」出現：倒栽蔥、飄過去、踩在標題上、偷看下一段 | 陪伴、頑皮、記憶點 |
 | Final CTA | 他重新坐回原位假裝沒事，但旁邊有個打翻的咖啡杯 | 收尾、幽默、留白 |
 
-**設計核心：** 反差敘事——「冷峻電影感深空 + 一個搞笑陪伴的太空人」是品牌調性的具象化（呼應 §一 設計判斷三條：俐落、線條、電影感的同時，主動製造衝突反差是美學本身，不是妥協）。太空人是品牌「非常規思維」訴求的人格化角色。
+**設計核心：** 反差敘事——「冷峻電影感深空 + 搞笑陪伴太空人」具象化品牌調性，呼應 §一 設計判斷三條（俐落 / 線條 / 電影感同時主動製造衝突反差）。太空人是品牌「非常規思維」訴求的人格化角色。
 
-**為什麼從「Hero 太空人 3D 模型」轉到「ScrollTrigger 全站角色敘事」：**
+**為什麼從「Hero 3D 模型」轉「全站陪伴角色」：** 2026-04-21 原 Hero Three.js 3D 太空人已從 Hero 移除（HTML 留 `<!-- 太空人暫時移除 2026-04-21 -->` 標記）。3D 模型只在 Hero 露臉一次、無敘事延續、視覺重量壓過 hero 文案。本案把太空人升級為「全站陪伴角色」、從靜態裝飾變敘事節奏。
 
-- 2026-04-21 原規劃 Hero Three.js 3D 太空人已從 Hero section 移除（CLAUDE.md 偏差表既存紀錄），HTML 以 `<!-- 太空人暫時移除 2026-04-21 -->` 標記保留位置
-- 移除原因：3D 模型只在 Hero 露臉一次、無敘事延續性、視覺重量壓過 hero 文案
-- 本構想把太空人從「Hero 一次性視覺物件」升級為「全站陪伴角色」，從靜態裝飾變成敘事節奏一部分，這是更有意義的角色設計
+**技術選型實際走向（2026-05-08 啟動實作後修正）：**
 
-**技術選型評估：**
+原規劃 SVG 多姿勢圖 + GSAP/ScrollTrigger 切換（設計師畫 6-8 張 SVG），啟動實作後改為 **AI 生成 MP4 → RIFE 偵插值 → 手動去背 → 透明 WebP 偵序列（ScrollTrigger 驅動）／透明 WebM（GSAP 漂移驅動）** 雙軌。
 
-| 方案 | 適合度 | 說明 |
+**為什麼改：**
+- SVG 方案需設計師交付 6-8 張連續姿勢圖、產出周期長
+- AI 生成（Higgsfield CLI / Kling 3.0 pro / Veo 3.1）能在當天迭代、符合「線條俐落 + 反差幽默」chibi 風格
+- 偵序列解析度可達 9:16 ≥ 1024px、視覺品質高於 SVG 簡化線條
+- 透明 WebM（VP9 + alpha）保持深黑底「沒有方塊邊」的乾淨合成
+
+**紅線：**
+- AI 生成片必須去背成透明（透明 WebP / 透明 WebM），禁止白底或黑底實心方塊壓在深空背景
+- 偵序列方案禁止 60+ 偵未壓 WebP（檔案膨脹）
+- 完整推導（為什麼不選 SVG / Lottie / Three.js 多姿態 mixer）見 git log 2026-05-08 commit body
+
+**已實裝 Beat 進度（2026-05-09 01:17）：**
+
+| Beat | Section / 容器 | 形式 | 偵數 / 來源 | 觸發 | 狀態 |
+|---|---|---|---|---|---|
+| 01 Hero idle | `.hero` | 靜態 PNG（chibi 太空人坐彎月） | 單張（Higgsfield 生圖） | 無 | ✅ 完成（早期版） |
+| 02 跌落穿越 Hero→Manifesto | `.hero-astronaut` 9:16 canvas | WebP 偵序列 | 133 偵（Kling 3 + RIFE 72→144 + 手動去背 11 偵） | ScrollTrigger pin 區段 | ✅ 完成（2026-05-08 ~15:30） |
+| 03 倒栽蔥懸吊 body-divider | `.manifesto-astronaut` 9:16 canvas | WebP 偵序列 | 179 偵（Kling 3 + RIFE 97→194 + 手動去背 + JS 動態對齊 body-divider via `getBoundingClientRect`） | ScrollTrigger 70/30 非線性 ease（110 偵斷點） | ✅ 完成（2026-05-08 ~18:43） |
+| 04 無頭追頭盔（Final CTA 漂浮） | `.footer-astronaut` 16:9 video | 透明 WebM 影片 | HTML5 video 自動 loop | GSAP 隨機漂移：左右進入 / 旋轉 ±12° / scale 0.55→1.5 / `playbackRate 0.5` / 18-26s 週期 | 🔄 **暫停：影片素材未定案** |
+
+**Beat 04 暫停點（2026-05-09 01:17）：**
+
+- **目前掛在頁面**：`assets/images/astronaut/clips/beat04-loop-transparent.webm`（2026-05-08 20:12 產出、來源 Kling v2 早期手動去背片）
+- **未上線的最新候選**：
+  - `beat04-headless-chase-kling3pro-v7.mp4`（10s / 25 credits / 1924×1076 / 2026-05-08 22:55）— 首尾偵 lock 成功、頭盔 3D 旋轉首次出現（偵 4 露背）、身體一致性佳
+  - `beat04-headless-chase-veo3_1-v1.mp4`（8s / 22 credits / 1280×720 / 2026-05-09 01:11）— 頭盔 3D 旋轉更平順、後段身體變形、無首尾偵 lock、解析度較低、自帶 ambient 音軌（上線需 muted）
+- **核心矛盾：** Kling 有 first/last frame lock 但頭盔 3D 旋轉不易引導；Veo 3.1 頭盔 3D 旋轉強但無首尾偵 lock + 身體後段變形
+- **後製管線（已驗證可運作、等選定才繼續）：** 使用者手動去背 → `C:\Users\user-45664\AppData\Local\Temp\white_to_black_video.py`（luma-key LOW=200 / HIGH=250 白→黑 anti-alias）→ ffmpeg libvpx-vp9 轉 VP9+alpha 透明 WebM → 覆蓋 `beat04-loop-transparent.webm`
+- **待決事項：** 採用 Kling v7 / Veo v1 / 再迭代 / 兩者都棄用回 Kling 重生；解析度與 loop 接縫的取捨優先序；Beat 01 hero idle 是否同步改 Kling/Veo chibi 風格重生
+
+**2026-05-09 跨 session 嘗試紀錄（五版皆失敗、最終採 v2 後製路線）：**
+
+| 版本 | 設定 | 失敗模式 |
 |---|---|---|
-| Three.js 3D 模型 + ScrollTrigger 驅動 | ❌ 過重 | 3D 真實感與「跌倒/打翻杯子」卡通敘事衝突；多姿態切換需 mixer / morph target，工程量大 |
-| Lottie + ScrollTrigger 控制進度 | ⚠️ 可行 | 動畫師做完整時間軸，ScrollTrigger 控 lottie.goToAndStop。但 Lottie 檔案大、需要動畫師產出；風格易偏 SaaS 卡通 |
-| **SVG 多姿勢圖 + GSAP/ScrollTrigger 切換**（建議） | ✅ 最適合 | 設計師畫 6-8 張姿勢 SVG（沉思 / 跌倒中 / 倒栽蔥 / 飄過 / 踩標題 / 偷看 / 坐回 + 咖啡），ScrollTrigger 控位置 / rotation / opacity 切換。檔案小、品質可縮放、跟整站線條極簡風一致 |
-| PNG 序列幀 + GSAP | ⚠️ 備選 | 簡單但縮放會糊、檔案多 |
+| s2-v1（拆分 + 4 階段時間軸） | 頭盔/身體拆兩張獨立 reference / 1:1 / 5s / 首尾偵同圖 lock / Kling 3.0 Pro | 身體幾乎靜止只動一下手 ❌ 頭盔本體不動 visor 反射星雲在轉 ❌ |
+| s2-v2（拆分 + 簡化 prompt） | 同 v1 設定 / prompt 修為 One Action 連續描述 / 移除靜態 lock 詞 | 仍然失敗——拆分本身抑制 motion budget（單主體無 spatial context、Kling 保守處理） |
+| s2-v3（整張圖 + 10s） | pose-04-headless-chase-raw.png / 16:9 / 10s / 首尾偵同圖 lock | 一樣失敗（前提錯誤——主 session 誤把 v7 文字描述當「驗證成功」） |
+| s2-v4（整張圖 + 15s） | 整張圖 / 16:9 / 15s / 首尾偵同圖 lock | 頭盔中間停留晃動再 snap 回起點 ❌ 身體完全沒蛙式 ❌ — 確認 first/last lock 太強抑制 motion |
+| s2-v5（整張圖 + 15s + 移除尾偵） | 整張圖 / 16:9 / 15s / **僅首偵 lock**（移除 `--end-image`）/ prompt 軟引導收尾 | 仍未達理想（user 判定放棄此線） |
 
-**ScrollTrigger 是技術骨幹（GSAP 全站已載入、core.js 已註冊 plugin），但主要工作量在角色設計／插畫產出，不在程式碼。**
+**根因彙整（s2-v1 至 v5 共學）：**
+- **拆分策略無效**：純頭盔/純身體 reference 無 spatial context、Kling 保守處理（v1/v2）
+- **首尾偵 lock 太強會抑制 motion**：兩端同圖 + lock 硬綁 → 模型保守不動、或中間猶豫後 snap 回起點（v3/v4）
+- **僅首偵 lock + narrative 軟引導收尾**也未充分解決 Kling 對「蛙式 + 頭盔 3D 旋轉」這個動作組合的本質困難（v5）
+- 上 session v7「首尾偵 lock 成功、頭盔 3D 旋轉首次出現」是相對於 Veo v1 的描述、**不是整體成功**——主 session 誤讀為驗證基準導致 v3-v5 推論基底錯誤
 
-**初步架構草案（SVG 方案）：**
+**最終決定（2026-05-09 user 拍板）：**
+- **棄用 Kling/Veo 完整生成路線**，採用 **s2-v2 後製剪輯**（拆分版）
+- user 用剪輯軟體手動合成頭盔 + 身體兩支、並做去背
+- 完成後給主 session 替換 `assets/images/astronaut/clips/beat04-loop-transparent.webm`
 
-```
-<!-- HTML：全頁固定容器 -->
-<div class="astronaut" data-pose="contemplating" aria-hidden="true">
-  <svg>...當前姿勢...</svg>
-</div>
+**新增工具配置（2026-05-09）：**
+- 安裝 OSideMedia/higgsfield-ai-prompt-skill（20 sub-skill）至 `~/.claude/skills/higgsfield/`
+- 安裝官方 4-skill 包（`higgsfield-generate` / `soul-id` / `product-photoshoot` / `marketplace-cards`）至 `~/.agents/skills/`
+- 修復 Higgsfield CLI wrapper 在 `~/.local/bin/higgsfield`（指向上 session 已裝的 `hf.exe`）
+- 建立 `_工具參考/Higgsfield_協作快照.md`（含 15 天自動重驗紀律）
+- 建立兩條 memory feedback：`feedback_higgsfield_collaboration.md` + `feedback_state_origin_before_destructive.md`
 
-<!-- JS：各 section 觸發姿勢 + 位置動畫 -->
-ScrollTrigger.create({
-  trigger: '.manifesto',
-  start: 'top 90%',
-  onEnter: () => {
-    swapPose('falling');                    // 切 SVG
-    gsap.to('.astronaut', {
-      x: '+=200', rotation: 360, duration: 1
-    });
-  }
-});
-```
-
-**素材清單（待設計師產出）：**
-1. Hero idle — 坐姿托腮沉思
-2. Transition — 跌倒中（旋轉模糊）
-3. Manifesto — 倒栽蔥
-4. Bento services — 飄過畫面 / 踩在卡片上 / 偷看下一張卡
-5. Final CTA — 坐回原位 + 旁邊打翻的咖啡杯（含咖啡漬光暈）
-
-**待決事項：**
-- 太空人視覺風格（線條極簡 vs. 平塗色塊 vs. 半寫實插畫）—— 需配合整站冷峻電影感調性
-- 手機版策略——縮小 / 隱藏 / 簡化（ScrollTrigger 在小螢幕觸發節奏可能太密集）
-- 無障礙——`prefers-reduced-motion` 應停用所有姿勢切換動畫，至少保留靜態 idle 姿勢
-
-**啟動條件：** 設計師交付 6-8 張 SVG 姿勢圖 + 風格一致性確認後啟動實作。實作本身（ScrollTrigger 編排）約 0.5 天工作量。
+**手機版策略 / 無障礙（仍待規劃）：** 手機版 ScrollTrigger 觸發節奏可能過密、待 beat04 定案後一次性適配；`prefers-reduced-motion` 應停用所有偵序列動畫、至少保留靜態 idle 姿勢。
 
 ---
 
