@@ -23,7 +23,6 @@
     --c-yellow:  #FFC709;
     --c-white:   #FFFFFF;
     --c-muted:   rgba(255, 255, 255, 0.55);
-    --c-accent:  var(--c-yellow); /* 全站預設強調色；各頁可在 pages/[page].css 頂部 override */
 
     /* ─── 強調色票（star-white / cool-cyan / amber-gold，比例 88/8/3/1） ─── */
     --c-stellar: #e8f0ff;   /* 星白：主要文字與星點（8%） */
@@ -45,7 +44,6 @@
     --glass-bg:       rgba(23, 54, 245, 0.12);
     --glass-border:   rgba(23, 54, 245, 0.4);
     --glass-blur:     16px;
-    --glass-bg-hover: rgba(23, 54, 245, 0.22);
 
     /* ─── Typography（2026-04-19 Q2 決議：B 半替換） ─── */
     --f-sans:  'Noto Sans TC', sans-serif;                              /* 全站中文內文 */
@@ -69,10 +67,6 @@
     --fs-3xl:  3.125rem;    /* 50px — 16 × 1.333⁴ */
     --fs-4xl:  4.1875rem;   /* 67px — 16 × 1.333⁵ */
     --fs-5xl:  5.625rem;    /* 90px — 16 × 1.333⁶ */
-
-    /* ─── Baseline Grid（8pt 基線 + 4pt 半步，所有垂直距離必須為 4 的倍數） ─── */
-    --grid-base: 8px;
-    --grid-half: 4px;
 
     /* ─── Spacing（三節奏系統，視覺元素庫 v1.0） ───
        緊（t）：同一語意群之間　中（m）：區塊內分段　寬（w）：區塊之間
@@ -107,44 +101,9 @@
     --t-base:   0.3s ease;
     --t-slow:   0.5s ease;
 
-    /* ─── Shadows ─── */
-    --shadow-card:   0 4px 40px rgba(23, 54, 245, 0.28);
-    --shadow-glow:   0 0 60px rgba(23, 54, 245, 0.65);
-    --shadow-yellow: 0 0 40px rgba(255, 199, 9, 0.5);
-
-    /* ─── 光與影的雕刻（Text Sculpt Tokens，2026-04-18 新增） ───
-       目的：讓關鍵文字有「被光雕出來」而非「貼上去」的立體感
-       用法：套 .text-sculpted 類別或直接 text-shadow: var(--ts-sculpt)
-    */
-    /* 浮雕（凸起）：上方高光 + 下方陰影 */
-    --ts-emboss:
-        0 1px 0 rgba(255, 255, 255, 0.15),
-        0 -1px 0 rgba(0, 0, 0, 0.35);
-    /* 陰刻（凹入）：上方陰影 + 下方高光，與浮雕反向 */
-    --ts-deboss:
-        0 -1px 0 rgba(255, 255, 255, 0.12),
-        0 1px 1px rgba(0, 0, 0, 0.45);
-    /* 雕刻（主力）：浮雕層 + 極微暗 halo，讓字與深空背景咬合 */
-    --ts-sculpt:
-        0 1px 0 rgba(255, 255, 255, 0.10),
-        0 -1px 1px rgba(0, 0, 0, 0.40),
-        0 0 24px rgba(232, 240, 255, 0.06);
-
-    /* ─── 內凹陰影（Inset Shadow Tokens，按鈕與關鍵容器用） ─── */
-    --shadow-inset:
-        inset 0 1px 0 rgba(255, 255, 255, 0.08),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.35);
-    --shadow-inset-strong:
-        inset 0 1px 0 rgba(255, 255, 255, 0.12),
-        inset 0 -2px 4px rgba(0, 0, 0, 0.50);
-
     /* ─── Z-index ─── */
     --z-stars:   0;
     --z-content: 1;
     --z-nav:     100;
     --z-overlay: 999;
-
-    /* ─── Responsive Breakpoints (used in JS too) ─── */
-    --bp-md: 900px;
-    --bp-lg: 1200px;
 }

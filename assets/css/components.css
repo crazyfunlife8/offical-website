@@ -543,23 +543,10 @@
     color: var(--c-yellow);
 }
 
-.tag--blue {
-    border-color: rgba(var(--c-blue-rgb), 0.5);
-    background: rgba(var(--c-blue-rgb), 0.12);
-    color: #7a9dff;
-}
-
 /* Size modifier — 卡片內標籤縮小變體 */
 .tag--xs {
     font-size: 0.65rem;
     padding: 0.22rem 0.6rem;
-}
-
-.tag__dot {
-    width: 5px;
-    height: 5px;
-    background: currentColor;
-    border-radius: 50%;
 }
 
 
@@ -838,66 +825,3 @@
 }
 
 
-/* ════════════════════════════════════════════════════════════
-   9. 環境裝飾元件（2026-04-18，原「觀測儀」框架已棄用）
-   ════════════════════════════════════════════════════════════ */
-
-/* ─── 光與影的雕刻（通用文字雕刻類別） ─── */
-.text-sculpted {
-    text-shadow: var(--ts-sculpt);
-}
-
-.text-embossed {
-    text-shadow: var(--ts-emboss);
-}
-
-.text-debossed {
-    text-shadow: var(--ts-deboss);
-}
-
-
-/* ─── 磁性按鈕（JS 處理偏移，CSS 負責視覺） ─── */
-.btn--magnetic {
-    position: relative;
-    will-change: transform;
-    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
-    box-shadow:
-        0 4px 16px rgba(var(--c-blue-rgb), 0.35),
-        var(--shadow-inset);
-}
-
-/* 磁性按鈕上的琥珀金小光點（全站唯一琥珀金位置候選之一） */
-.btn--magnetic .btn-amber-dot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    background: var(--c-amber);
-    border-radius: 50%;
-    box-shadow: 0 0 8px rgba(var(--c-amber-rgb), 0.85);
-    margin-right: 0.5rem;
-    vertical-align: middle;
-    animation: pulse-dot 2.8s ease-in-out infinite;
-}
-
-
-/* ─── SVG 描邊框（服務卡 Hover 或進場時觸發） ─── */
-.frame-drawn {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    border-radius: inherit;
-    overflow: hidden;
-}
-
-.frame-drawn rect {
-    fill: none;
-    stroke: rgba(var(--c-cyan-rgb), 0.65);
-    stroke-width: 1;
-    stroke-dasharray: 1200;
-    stroke-dashoffset: 1200;
-}
-
-/* 進入視野時 GSAP 觸發 .is-drawn，或 JS 套 style */
-.frame-drawn.is-drawn rect {
-    animation: stroke-draw 1.2s ease-out forwards;
-}

@@ -33,14 +33,16 @@
 
 「跳躍思維」「非常規」這些字眼如果出現在程式碼或文件裡，正確的角色是**訴求文案的內容**（h1、文案稿、品牌訊息），不是「設計風格規則」。
 
-**Codebase 中過去框架隱喻的殘留（待二階段視覺評估時逐項拍板）：**
+**Codebase 中過去框架隱喻的殘留（2026-05-10 大清掃後）：**
 
-- Three.js 黑洞星場（`#blackhole` + `initStarfield()`）
-- CSS 星空 `#css-starfield`（`base.css`）
-- `.nav__brand-star` 暖白光點 + 圍繞光暈（命名來自「望遠鏡下的恆星」隱喻）
-- 各種「螺旋臂 / 軌道 / 星辰 / stellar」相關 token / 註解 / class 名稱
+- Three.js 黑洞星場（`#blackhole` + `initStarfield()`）— **保留**（深黑底有力量，2026-04-21 確認完成）
+- CSS 星空 `#css-starfield`（`base.css`）— **保留**（其他頁面沿用）
+- Three.js `initStarfield()` 內部變數命名（螺旋臂 / 軌道 / starData / SPIRAL_K 等）— 現役邏輯內部命名，重命名與刪除為不同性質決定，**保留**
+- `.nav__brand-star` — 已不存在於 codebase（nav 已重設計為純文字並行排版）
 
-第一階段（2026-05-06）已完成純註解清理，第二階段（視覺實作的去留）待逐項評估。**評估時不要用「是否觀測儀」「是否跳躍思維」當問題**，要用「**這個元素放在深黑背景上有力量嗎？是否能讓品牌看起來俐落、有反差、有電影感**」當問題。
+2026-05-10 大清掃移除：所有觀測儀框架時期殘留的死碼（`initAstronaut` Three.js 太空人、`initOrbitRings` 軌道環注入、`initMagneticButton` 磁性按鈕、`.frame-drawn` SVG 描邊、`.text-sculpted/embossed/debossed` 雕刻 + 對應 ts-* tokens、整批未使用 keyframes）。詳見 commit body。
+
+**未來評估視覺去留時：** 不要用「是否觀測儀」「是否跳躍思維」當問題，要用「**這個元素放在深黑背景上有力量嗎？是否能讓品牌看起來俐落、有反差、有電影感**」當問題。
 
 ### 路徑
 `C:\Users\user-45664\Desktop\Claude AI相關\數位印鈔機\NEW創巢官網`
@@ -52,11 +54,11 @@
 - **圖示**：Font Awesome 6.4.0（CDN）
 - **字型**：
   - `--f-serif-cjk`：**Chiron Sung HK WS**（港產明朝活字，jsDelivr GitHub CDN）→ 全站中文主視覺字
+  - `--f-fang-cjk`：**cwTeX Q Fangsong**（繁體仿宋，OFL 授權，jsDelivr CDN）→ 副標編輯感仿宋
   - `--f-serif`：**Fraunces Variable Font**（opsz / wght / SOFT 三軸，Google Fonts）→ 英文大標/副標/引言
+  - `--f-display-en`：**Italiana**（hairline serif，雜誌封面感）→ 英文 echo 副標
   - `--f-sans`：Noto Sans TC（Google Fonts，100–900）→ 內文/說明/次要中文
-  - `--f-mono`：IBM Plex Mono → 等寬資料讀出條、Nav 品牌名
-  - `--f-bebas`：Bebas Neue → 英文裝飾大字
-  - `--f-disp`：Exo 2（保留但幾乎未使用）
+  - `--f-mono`：JetBrains Mono → 等寬資料讀出條、Nav 品牌名、按鈕箭頭
 - **部署**：GitHub Pages（CNAME: nestxmedia.com）
 
 ### CSS 5 層架構（載入順序不得更改）
@@ -114,8 +116,8 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | js-hidden | 入場動畫前預隱藏 class（GSAP 負責顯示） |
 | data-reveal | 通用 ScrollTrigger 進場屬性（core.js 處理） |
 | data-stagger-group | 子元素 stagger 進場屬性（core.js 處理） |
-| f-bebas | Bebas Neue 字型，英文裝飾大字專用（`--f-bebas`） |
-| f-disp | Exo 2 字型，英文標題（`--f-disp`，實際使用較少）|
+| f-display-en | Italiana 英文 echo 副標字型（`--f-display-en`） |
+| f-fang-cjk | cwTeX Q Fangsong 仿宋字型，副標編輯感（`--f-fang-cjk`） |
 | A–F | 服務六大類（A社群、B開發、C虛擬網紅、D顧問、E跳動E投放、F社群增長）|
 | FEATURED | bento--c 卡片右上角裝飾標籤（CSS ::after 生成） |
 
@@ -292,7 +294,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | 服務頁 IA 結構（2026-05-07 21:18） | nav「服務」→ services.html 總覽中間頁 → 個別服務頁（雙層導覽） | 改為錨點滾動：nav「服務」→ `index.html#services-section` 直接捲到首頁 bento 服務星圖 → 個別服務頁（單層主線）。services.html / pages/services.css / pages/services.js 整批刪除。Hero CTA「探索服務」同步改 `#services-section`。`.services-section` 加 `scroll-margin-top: 80px` 補償 fixed nav。**紅線**：禁止再造服務總覽中間頁；首頁 bento 是唯一服務陳列點。完整推導（為什麼不選 hover 下拉 / 為什麼不選深度服務地圖）見 commit body。 |
 | 個別服務頁 / 子頁實作策略（2026-05-07 21:38） | bento 卡點進去的個別服務頁從零撰寫完整內容後上線 | 改為先做 teaser「敬請期待」共用模板（`pages/coming-soon.css`），再依素材進度逐頁升級為正式內容。9 個 teaser（7 服務 + about + news）共用 5 段結構：eyebrow（mono uppercase + 黃色冷光 border-top）/ Chiron Sung HK 中文 title（4-layer text-shadow §十七 紀律）/ 對稱 cyan 冷光 divider（呼應 final-cta__divider）/ Noto Sans TC lead（沿用 bento desc 文案）/ mono pill status「內容準備中 · Coming Soon」/ btn--primary「想先聊聊」CTA → contact.html / 「← 回服務星圖」隱性出口（about/news 改「← 回首頁」）。virtual.html / about.html 有 Italiana 英文 echo（呼應 bento C 雙語對位）。**為什麼選 teaser 不選「全部導 maintenance」**：訪客點 AI 虛擬網紅卻看到「全站維護」會懷疑點錯；teaser 顯示服務名稱可確認 + 個別 OG meta 為長尾 SEO 預備（呼應 SEO 階段 1 紀律）。**紅線**：teaser 升級為正式頁時保留同一 URL（不換 slug），維持已埋 OG / canonical 連續性；contact.html 永久留作正式聯絡頁、不被 teaser 化。 |
 | contact.html 極簡聯絡頁（2026-05-07 21:38） | 規劃為含表單的完整 contact 頁（依個資法第 8 條配隱私權政策連結） | 表單實作前先做極簡版：沿用 coming-soon 大架構（eyebrow / 中文 title / Italiana en echo「Get in Touch.」/ divider / lead）+ `.contact__channels` Liquid Glass 卡片連結（LINE 連 line.me / 電話 tel:）+ `.contact__studio` mono 小字（地址 + 統編）。資料來源全部沿用 site-footer 已有資訊不另蒐集。**紀律**：未實作表單前不放隱私權政策連結（無蒐集行為不觸法第 8 條）；正式表單上線時補回隱私權政策頁與 footer 連結（CLAUDE.md site-footer 偏差表已紀錄此承諾）。 |
-| 裝飾字型 | Exo 2（--f-disp） | Bebas Neue（--f-bebas）為主要裝飾字 |
+| 裝飾字型（2026-05-10 收斂） | 規格書原列 Exo 2（--f-disp）+ Bebas Neue（--f-bebas）兩套裝飾字 | 視覺迭代過程未採用任一套，2026-05-10 大清掃時兩個 token 已從 tokens.css 移除。實際裝飾字角色由 `--f-display-en` Italiana 承擔（hero/manifesto/final-cta 英文 echo + footer NEST DIGITAL 大字）。 |
 | 等寬字型 | IBM Plex Mono | 維持 IBM Plex Mono |
 | Hero 太空人 | Three.js 3D 模型 | 2026-04-21 已從 Hero section 移除（HTML 以 `<!-- 太空人暫時移除 2026-04-21 -->` 標記保留位置） |
 | 四角座標文字 | 規格書原列為裝飾 | 2026-04-18 移除（HTML `.coords` 與 CSS 規則均已刪） |
@@ -313,3 +315,4 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | Hero CTA 單按鈕聚焦（2026-05-07 19:02） | 原 Hero「探索服務」(.btn--primary) +「了解我們」(.btn--ghost) 雙按鈕並排 | 移除「了解我們」整段 HTML + `.hero__cta-group .btn--ghost` 死碼 CSS。**理由**：① about.html 未實作 = 死連結 ② nav 已有「關於」入口、Hero 重複放等於浪費 attention ③ 跟「先別點」反轉風的「單一行動」哲學一致 ④ ghost 按鈕用 `fa-arrow-up-right-from-square` 外連結 icon 暗示「會跳走」、但 about.html 是站內頁、icon 行為矛盾。**紀律**：未來 about.html 完成後若要恢復按鈕、需重評估視覺重量是否仍適合雙按鈕或維持單按鈕聚焦。 |
 | 按鈕系統 Apple Liquid Glass 重設計（2026-05-07 19:02） | 原一般 Glassmorphism + Material Design 殘留（`.btn` radius 6px + Chiron Sung HK 700；`.btn--primary` 1px solid blue border；`.btn--yellow` 純黃 + 黑字 900 SaaS Banner 風） | 升級為 Apple Liquid Glass 質感（呼應服務卡片同設計語言）：**① `.btn` 主規則** 字型 Noto Sans TC 500（按鈕用 sans 不用宋）+ radius 10px + letter-spacing 0.04em + Apple ease-out-expo `cubic-bezier(0.16, 1, 0.3, 1)` + `:active scale(0.97)` 點擊回饋 **② `.btn--primary`** 雙 background gradient（padding-box 玻璃底 + border-box cyan 折射光環）+ backdrop blur 12px + inset 多層光影 **③ `.btn--yellow`** 液態金按鈕（黃→琥珀漸層 + 邊緣 white→yellow→amber 折射 + 頂邊白 0.55 高光 + 底邊黑 0.20 陰影 + 外部黃光暈）+ `::after` 點擊光暈擴散（Apple visualEffect 風） **④ `.btn--ghost`** 保留純文字極簡風（加 `:active { transform: none }` 不繼承 scale）。**過程紀錄**：曾反思「過度 Apple 風」、一度 revert 回電影感版（radius 4px / Chiron Sung HK / 純黃實心）、隨即發現範圍越界（用戶擔憂範圍是 nav 不是按鈕、按鈕 Apple 化是用戶最初認可的）、再 revert 回此版。**紀律**：服務卡片 + 按鈕兩處 Apple Liquid Glass 化是「有意設計選擇」、非框架性全站套用；其他元件評估時仍回到「俐落、線條、電影感」三條判斷、不因「Apple 化某處」就全站套用。 |
 | nav 視覺優化（電影感方向、不走 Apple 毛玻璃）（2026-05-07 19:02） | ① `.nav__links a` letter-spacing 0.35em（字拉散像散字、不像詞）② `.nav__links a` idle `text-shadow: 0 0 14px blue 0.5`（永遠像 hover 狀態、層次消失）③ `.nav__brand-zh` 16px / `.nav__brand-en` 11.5px（中英比例失衡、中文主訴求視覺重量不足） | **① `.nav__brand-zh` 16→17px**（中英比例平衡）**② `.nav__links a` letter-spacing 0.35em→0.1em**（字距收斂、字像詞不像散字）**③ `.nav__links a` idle blue text-shadow 拿掉**（保留 hover 才有 cyan 暈光、idle/hover 對比層次回來）。**不做**：`.site-nav.scrolled` 維持純黑半透明 `rgba(black, 0.92)`（**不走 Apple 毛玻璃方向**）+ `.nav__cta` 維持純文字 + 箭頭極簡風（**不轉按鈕**）。**設計判斷**：nav 走「電影感冷峻」方向（純黑半透明 + cyan 底邊 + 排版紀律）、跟服務卡片 + 按鈕的 Apple Liquid Glass 質感「有意分流」——每個元件依其角色決定是否套 Apple 化、不全站同步。 |
+| 首頁全 stack 大清掃（2026-05-10） | 多輪迭代後累積觀測儀框架、磁性按鈕、軌道環、SVG 描邊、雕刻陰影 token、整批未用 keyframes 等死碼，自承「待二階段視覺評估時逐項拍板」遲未動 | 一次性徹查首頁完整 stack（`index.html` / `index.css` / `index.js` / `core.js` / `nav.js` / `tokens.css` / `base.css` / `components.css` / `animations.css`）並 grep 交叉比對，移除：**HTML** `.hero__god-rays` 空 div；**index.css** `.hero__brand-tag` / `.hero__astronaut*` 死規則；**index.js** `initAstronaut()`（158 行 Three.js 3D 太空人，已被偵序列取代）+ `initOrbitRings()`（軌道環注入）+ Hero 入場序列內 `.hero__astronaut` fromTo + 註解殘骸；**components.css** `.tag--blue` / `.tag__dot` / `.text-sculpted/embossed/debossed` / `.btn--magnetic` / `.btn-amber-dot` / `.frame-drawn`；**base.css** `.f-serif` / `.f-disp` / `.f-mono` 工具類（0 處 HTML class 使用）；**animations.css** 17 個 0 引用 keyframes（twinkle / radar-ring / scan-line / cursor-blink / glow-pulse / glow-yellow / fade-up/in / slide-in-left/right / scale-in / gear-spin(+reverse) / orbit-rotate(+reverse) / prismatic-sweep / god-rays-drift / stroke-draw / constellation-fade-in）+ `.anim-fade-*` + `.delay-1~6`；**tokens.css** `--c-accent` / `--glass-bg-hover` / `--grid-base/half` / `--bp-md/lg` / `--shadow-card/glow/yellow/inset(-strong)` / `--ts-sculpt/emboss/deboss`；**core.js** `initMagneticButton()`。**保留**：`--sp-t/m/w` 新間距系統（tokens.css 自註「新代碼以此為準」現役遷移目標）、`pulse-dot` keyframe（`maintenance.html` 仍用）、Three.js `initStarfield()` 內部變數命名（現役邏輯）、DESIGN_MODE 機制。**紅線**：本次清理依「該 class / token / 函式有無被現役程式碼引用」單一標準，不涉及視覺判斷；任何「未來可能用」的元件不在保留範圍——需要時從 git history 取回比較乾淨。 |

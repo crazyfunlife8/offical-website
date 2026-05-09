@@ -429,170 +429,7 @@
     }
 
     /* ════════════════════════════════════════════════════════
-       2. Three.js 太空人（Floating Astronaut，手機跳過）
-       ════════════════════════════════════════════════════════ */
-
-    function initAstronaut() {
-        if (typeof THREE === 'undefined') {
-            // Three.js 未載入 → 顯示 PNG fallback
-            const fallback = document.querySelector('.hero__astronaut-fallback');
-            if (fallback) fallback.style.opacity = '1';
-            return;
-        }
-        if (IS_MOBILE) {
-            const fallback = document.querySelector('.hero__astronaut-fallback');
-            if (fallback) fallback.style.opacity = '1';
-            return;
-        }
-
-        const canvas = document.getElementById('astronaut-canvas');
-        if (!canvas) return;
-
-        const container = canvas.parentElement;
-        const W = container.clientWidth;
-        const H = container.clientHeight;
-
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.setSize(W, H);
-
-        const scene  = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 1000);
-        camera.position.set(0, 0, 5);
-
-        // 光源
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-        scene.add(ambientLight);
-
-        const keyLight = new THREE.DirectionalLight(0x1736F5, 1.2);
-        keyLight.position.set(-3, 4, 5);
-        scene.add(keyLight);
-
-        const fillLight = new THREE.DirectionalLight(0xFFC709, 0.4);
-        fillLight.position.set(4, -2, 3);
-        scene.add(fillLight);
-
-        const rimLight = new THREE.DirectionalLight(0xffffff, 0.3);
-        rimLight.position.set(0, -4, -3);
-        scene.add(rimLight);
-
-        // 太空人幾何（簡化版：球形頭盔 + 圓柱體幹 + 四肢）
-        const astronautGroup = new THREE.Group();
-
-        // 頭盔球
-        const helmetGeo  = new THREE.SphereGeometry(0.52, 24, 24);
-        const helmetMat  = new THREE.MeshPhongMaterial({
-            color:     0x1c2a8c,
-            shininess: 80,
-            specular:  0x8899ff,
-        });
-        const helmet = new THREE.Mesh(helmetGeo, helmetMat);
-        helmet.position.set(0, 1.0, 0);
-        astronautGroup.add(helmet);
-
-        // 頭盔玻璃面罩
-        const visiorGeo = new THREE.SphereGeometry(0.34, 20, 20, 0, Math.PI * 2, 0, Math.PI * 0.55);
-        const visiorMat = new THREE.MeshPhongMaterial({
-            color:       0xaaccff,
-            shininess:   120,
-            transparent: true,
-            opacity:     0.5,
-            side:        THREE.DoubleSide,
-        });
-        const visor = new THREE.Mesh(visiorGeo, visiorMat);
-        visor.rotation.x = Math.PI * 0.1;
-        visor.position.set(0, 1.0, 0.32);
-        astronautGroup.add(visor);
-
-        // 身體
-        const bodyGeo = new THREE.CylinderGeometry(0.38, 0.32, 0.95, 16);
-        const bodyMat = new THREE.MeshPhongMaterial({
-            color:     0xe8eaf6,
-            shininess: 40,
-        });
-        const body = new THREE.Mesh(bodyGeo, bodyMat);
-        body.position.set(0, 0.2, 0);
-        astronautGroup.add(body);
-
-        // 背包
-        const packGeo = new THREE.BoxGeometry(0.4, 0.45, 0.18);
-        const packMat = new THREE.MeshPhongMaterial({ color: 0xccccdd, shininess: 20 });
-        const pack = new THREE.Mesh(packGeo, packMat);
-        pack.position.set(0, 0.2, -0.36);
-        astronautGroup.add(pack);
-
-        // 左右手臂
-        [-0.52, 0.52].forEach((x) => {
-            const armGeo = new THREE.CapsuleGeometry(0.13, 0.48, 6, 8);
-            const armMat = new THREE.MeshPhongMaterial({ color: 0xe0e4f8, shininess: 30 });
-            const arm    = new THREE.Mesh(armGeo, armMat);
-            arm.position.set(x, 0.22, 0);
-            arm.rotation.z = x > 0 ? -0.3 : 0.3;
-            astronautGroup.add(arm);
-        });
-
-        // 左右腿
-        [-0.22, 0.22].forEach((x) => {
-            const legGeo = new THREE.CapsuleGeometry(0.14, 0.52, 6, 8);
-            const legMat = new THREE.MeshPhongMaterial({ color: 0xdde1f5, shininess: 30 });
-            const leg    = new THREE.Mesh(legGeo, legMat);
-            leg.position.set(x, -0.53, 0);
-            astronautGroup.add(leg);
-        });
-
-        // 發光腰帶裝飾
-        const beltGeo = new THREE.TorusGeometry(0.38, 0.045, 8, 28);
-        const beltMat = new THREE.MeshPhongMaterial({
-            color:   0xFFC709,
-            emissive: 0xFFC709,
-            emissiveIntensity: 0.4,
-        });
-        const belt = new THREE.Mesh(beltGeo, beltMat);
-        belt.position.set(0, -0.06, 0);
-        belt.rotation.x = Math.PI / 2;
-        astronautGroup.add(belt);
-
-        astronautGroup.scale.set(0.75, 0.75, 0.75);
-        scene.add(astronautGroup);
-
-        // ── 滾動控制太空人漂移 ──
-        let scrollProgress = 0;
-        window.addEventListener('scroll', () => {
-            const heroH = window.innerHeight;
-            scrollProgress = Math.min(window.scrollY / heroH, 1);
-        }, { passive: true });
-
-        // ── 動畫循環 ──
-        const clock = new THREE.Clock();
-        let astAnim;
-        function animateAstronaut() {
-            // DESIGN_MODE：render 一幀後停住（太空人停在初始位置）
-            if (!DESIGN_MODE) astAnim = requestAnimationFrame(animateAstronaut);
-            const t = clock.getElapsedTime();
-
-            // 浮動 + 滾動向上漂移（合併 y 軸，避免互相覆蓋）
-            astronautGroup.position.y  = Math.sin(t * 0.6) * 0.12 + scrollProgress * 1.8;
-            astronautGroup.rotation.y  = Math.sin(t * 0.25) * 0.18;
-            astronautGroup.rotation.z  = Math.sin(t * 0.4) * 0.05;
-
-            // 滾動：向右漂移 + 向後退 + 縮小
-            astronautGroup.position.x  = scrollProgress * 3.5;
-            astronautGroup.position.z  = -scrollProgress * 0.5;  // 用 = 避免累積
-            const scale = 0.75 * (1 - scrollProgress * 0.6);
-            astronautGroup.scale.set(scale, scale, scale);
-
-            renderer.render(scene, camera);
-        }
-        animateAstronaut();
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) cancelAnimationFrame(astAnim);
-            else animateAstronaut();
-        });
-    }
-
-    /* ════════════════════════════════════════════════════════
-       3. Hero GSAP 入場序列
+       2. Hero GSAP 入場序列
        ════════════════════════════════════════════════════════ */
 
     function initHeroEntrance() {
@@ -617,16 +454,8 @@
             { opacity: 1, duration: 0.5 },
             1.0
         )
-        .fromTo('.hero__astronaut',
-            { opacity: 0, x: 40 },
-            { opacity: IS_MOBILE ? 0.18 : 1, x: 0, duration: 1.0 },
-            0.15
-        )
 
         // ── 副標題進場序列 ──
-        // 保留容器 fade-in 與文字推出（::after 暗橢圓背景靜態存在，無需動畫）
-
-        // 副標容器先 fade-in
         .fromTo('.hero__rift',
             { opacity: 0 },
             { opacity: 1, duration: 0.4, ease: 'power2.out' },
@@ -642,7 +471,7 @@
     }
 
     /* ════════════════════════════════════════════════════════
-       5. ScrollTrigger — 各 Section 動畫
+       3. ScrollTrigger — 各 Section 動畫
        ════════════════════════════════════════════════════════ */
 
     function initScrollAnimations() {
@@ -666,11 +495,7 @@
         );
 
         // ── Section 3：Bento 卡片錯開進場（純 opacity stagger，避免 transform inline 衝突）──
-        // 不用 y/scale 因為：
-        //  (1) initConstellation 用 getBoundingClientRect 計算卡片中心畫連線，
-        //      若進場用 transform 偏移，初始計算位置錯位、ScrollTrigger 觸發後連線跟卡片中心對不齊
-        //  (2) GSAP 動畫結束會保留 inline transform，CSS .card:hover { translateY(-4px) }
-        //      無 !important 會被 inline 覆蓋、hover 時卡片不會上移
+        // GSAP fromTo 的 transform inline 會被 .card:hover translateY 撞掉，hover 不上移；故只動 opacity
         const cards = document.querySelectorAll('.bento-grid .card');
         gsap.fromTo(cards,
             { opacity: 0 },
@@ -695,71 +520,9 @@
     }
 
     /* ════════════════════════════════════════════════════════
-       6. （已退役）星座連線 — 2026-05-07 創辦人決定不要連線視覺
+       4. 初始化
        ════════════════════════════════════════════════════════ */
 
-
-
-
-    /* ════════════════════════════════════════════════════════
-       8. 軌道環 DOM 注入（Hero 太空人外圍）
-       ════════════════════════════════════════════════════════ */
-
-    function initOrbitRings() {
-        if (IS_MOBILE) return;
-
-        const astronaut = document.querySelector('.hero__astronaut');
-        if (!astronaut) return;
-        if (astronaut.querySelector('.hero__orbits')) return;
-
-        const svgNS = 'http://www.w3.org/2000/svg';
-
-        // 建立容器
-        const orbits = document.createElement('div');
-        orbits.className = 'hero__orbits';
-        orbits.setAttribute('aria-hidden', 'true');
-
-        // 外環：傾斜 12°
-        const outer = document.createElement('div');
-        outer.className = 'hero__orbit hero__orbit--outer';
-        const outerSvg = document.createElementNS(svgNS, 'svg');
-        outerSvg.setAttribute('viewBox', '-100 -100 200 200');
-        outerSvg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-        const outerEllipse = document.createElementNS(svgNS, 'ellipse');
-        outerEllipse.setAttribute('cx', '0');
-        outerEllipse.setAttribute('cy', '0');
-        outerEllipse.setAttribute('rx', '95');
-        outerEllipse.setAttribute('ry', '38');
-        outerEllipse.setAttribute('transform', 'rotate(12)');
-        outerSvg.appendChild(outerEllipse);
-        outer.appendChild(outerSvg);
-
-        // 內環：反向 -18°，虛線
-        const inner = document.createElement('div');
-        inner.className = 'hero__orbit hero__orbit--inner';
-        const innerSvg = document.createElementNS(svgNS, 'svg');
-        innerSvg.setAttribute('viewBox', '-100 -100 200 200');
-        innerSvg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-        const innerEllipse = document.createElementNS(svgNS, 'ellipse');
-        innerEllipse.setAttribute('cx', '0');
-        innerEllipse.setAttribute('cy', '0');
-        innerEllipse.setAttribute('rx', '72');
-        innerEllipse.setAttribute('ry', '26');
-        innerEllipse.setAttribute('transform', 'rotate(-18)');
-        innerSvg.appendChild(innerEllipse);
-        inner.appendChild(innerSvg);
-
-        orbits.appendChild(outer);
-        orbits.appendChild(inner);
-        astronaut.insertBefore(orbits, astronaut.firstChild);
-    }
-
-
-    /* ════════════════════════════════════════════════════════
-       10. 初始化
-       ════════════════════════════════════════════════════════ */
-
-    // readyState 防禦：若 DOMContentLoaded 已在 script 執行前觸發，直接執行
     function init() {
         // Three.js 未載入時移除 has-threejs class，讓 CSS 星空 fallback 正常顯示
         if (typeof THREE === 'undefined') {
@@ -768,15 +531,6 @@
 
         // L1 環境動畫（設計模式保留，屬於靜態視覺一部分）
         try { initStarfield(); } catch(e) { console.warn('[index.js] initStarfield failed:', e); }
-        // 舊 3D Three.js 太空人 initAstronaut() 於 2026-05-07 停用
-        // 已被 initAstronautScroll()（偵序列 + ScrollTrigger）取代；舊函式保留供參
-        // try {
-        //     initAstronaut();
-        // } catch(e) {
-        //     console.warn('[index.js] initAstronaut failed, showing fallback:', e);
-        //     const fallback = document.querySelector('.hero__astronaut-fallback');
-        //     if (fallback) fallback.style.opacity = '1';
-        // }
 
         // DESIGN_MODE：凍結 L2（進場）+ L3（捲動驅動），加 body class 讓 CSS 提供救援
         if (DESIGN_MODE) {
@@ -788,18 +542,14 @@
         initHeroEntrance();
         initScrollAnimations();
 
-        // 太空人 ScrollTrigger 偵序列（2026-05-07 PoC 掛載）
+        // 太空人 ScrollTrigger 偵序列（Beat 02）
         try { initAstronautScroll(); } catch(e) { console.warn('[index.js] astronaut scroll failed:', e); }
 
-        // Beat 03 太空人 ScrollTrigger 偵序列（2026-05-08）
+        // 太空人 ScrollTrigger 偵序列（Beat 03）
         try { initManifestoAstronautScroll(); } catch(e) { console.warn('[index.js] manifesto astronaut failed:', e); }
 
-        // Beat 04 太空人隨機漂移（2026-05-08）
+        // 太空人隨機漂移（Beat 04）
         try { initFooterAstronautDrift(); } catch(e) { console.warn('[index.js] footer astronaut drift failed:', e); }
-
-        // ─── 額外裝飾元素（2026-04-18，原「觀測儀」框架已棄用）───
-        // 軌道環：2026-04-18 使用者回饋「多餘」，停用；程式保留供未來評估
-        // try { initOrbitRings(); }  catch(e) { console.warn('[index.js] orbits failed:', e); }
     }
 
     // ═══════════════════════════════════════════════════════════

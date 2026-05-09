@@ -153,18 +153,6 @@ ul, ol {
     list-style: none;
 }
 
-/* ─── 英文顯示字體套用輔助（Fraunces Variable，opsz 大字光學尺寸） ─── */
-.f-serif,
-.f-disp {  /* .f-disp 為舊別名，新代碼請用 .f-serif */
-    font-family: var(--f-serif);
-    font-variation-settings: "opsz" 144, "wght" 400, "SOFT" 20;
-    letter-spacing: -0.02em;
-}
-
-.f-mono {
-    font-family: var(--f-mono);
-}
-
 /* ─── 通用分區樣式 ─── */
 section {
     position: relative;

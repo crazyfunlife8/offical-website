@@ -114,14 +114,6 @@ body {
     padding-left: 1.5rem;
 }
 
-/* 品牌 tag */
-.hero__brand-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    width: fit-content;
-}
-
 /* 主標題（2026-04-21 深空舞台版：均一字級，收緊字距讓字型本身說話）
    letter-spacing 0.06em：Chiron Sung 明朝骨架在深黑背景上的俐落存在感 */
 .hero__title {
@@ -337,38 +329,10 @@ body {
     }
 }
 
-/* 太空人容器（grid 右欄，正常文件流） */
-.hero__astronaut {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 480px;
-}
-
-/* PNG 圖片（Three.js 暫停使用，直接顯示） */
-.hero__astronaut-fallback {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    animation: float 8s ease-in-out infinite;
-    filter: drop-shadow(0 0 60px rgba(var(--c-blue-rgb), 0.5));
-    opacity: 1;
-}
-
-/* 舊 3D 太空人 #astronaut-canvas { display: none } 規則於 2026-05-07 移除
-   ID 已被新的 ScrollTrigger 偵序列 canvas 接管，樣式由 .hero-astronaut 區段控制 */
-
 @media (max-width: 900px) {
     .hero__inner {
-        grid-template-columns: 1fr;
         padding-top: 6rem;
         padding-bottom: 4rem;
-    }
-
-    .hero__astronaut {
-        height: 280px;
-        order: -1;
     }
 }
 
