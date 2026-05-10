@@ -118,7 +118,10 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | data-stagger-group | 子元素 stagger 進場屬性（core.js 處理） |
 | f-display-en | Italiana 英文 echo 副標字型（`--f-display-en`） |
 | f-fang-cjk | cwTeX Q Fangsong 仿宋字型，副標編輯感（`--f-fang-cjk`） |
-| A–F | 服務六大類（A社群、B開發、C虛擬網紅、D顧問、E跳動E投放、F社群增長）|
+| A–F | 服務六大類（A社群經營、B開發、C虛擬網紅、D顧問、E跳動E投放、F粉絲與互動買賣）；G 類自動化採集（ADSPOWER+PY）為待新增類別，**不可併入 B 類**|
+| B 類本質 | 軟體開發本業（網站架設 + 客製系統開發），對應「不正常人類軟體開發有限公司」核心服務；描述客製系統禁止用「流程自動化」措辭、避免與 G 類自動化採集混淆 |
+| F 類首頁退役 | 2026-05-11 起 F 類「粉絲與互動買賣」服務從首頁 bento 拿掉（地下性質服務不適形象首頁主動曝光）；規格書 §F 類保留並明確化定義，未來若有獨立 landing page 再評估上線 |
+| G 類待新增 | 自動化採集服務（ADSPOWER + Python）為瀏覽器指紋分流 + 腳本驅動的資料採集與帳號模擬操作；規格書 v0.2 §四 已加備註但未展開、首頁 bento 不露 |
 | FEATURED | bento--c 卡片右上角裝飾標籤（CSS ::after 生成） |
 
 ---
@@ -280,7 +283,8 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 ---
 
 ### 已存在的頁面檔案
-- `index.html` — 4 sections 完整實作（Hero / 宣言 / Bento 服務 / 終點 CTA「先別點」），site-footer 同步重設計。Section 4 品牌故事於 2026-05-07 移除。`<section class="services-section">` 加 `id="services-section"` 作為 nav 錨點目標（2026-05-07 21:18）。
+- `index.html` — 4 sections 完整實作（Hero / 宣言 / Bento 服務 / 終點 CTA「先別點」），site-footer 同步重設計。Section 4 品牌故事於 2026-05-07 移除。`<section class="services-section">` 加 `id="services-section"` 作為 nav 錨點目標（2026-05-07 21:18）。Bento 2026-05-11 從 7 卡縮為 6 卡（F「粉絲與互動買賣」退役），同日重平衡視覺權重：**FEATURED C 卡升格為 row 1 hero**（grid-column `3/4` → `2/4` 跨 2 欄）、A 卡退回單欄 supporting（`1/3` → `1/2`），呼應 FEATURED 標籤的主角 narrative；下半 row 3 E 跨左 2 欄保留為自營平台 anchor、與 C 形成上下兩個 hero 的反 Z 節奏。
+- `growth.html` — F 類 teaser「敬請期待」頁；2026-05-11 F 卡從首頁退役後成為 orphan page（無入口）、檔案保留待 F 類未來上線方式決定再處理。
 - `social.html` / `virtual.html` / `website.html` / `system.html` / `consultant.html` / `tiktok.html` / `growth.html` / `about.html` / `news.html` — 9 頁 teaser「敬請期待」共用 `pages/coming-soon.css`（2026-05-07 21:38）
 - `contact.html` — 極簡聯絡頁（LINE/電話 Liquid Glass 卡片連結 + 地址統編 mono），使用 `pages/coming-soon.css` 大架構 + `pages/contact.css` 補充（2026-05-07 21:38）
 - `maintenance.html` — 真維護備用頁（與 teaser「敬請期待」分開）
