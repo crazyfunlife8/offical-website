@@ -345,9 +345,6 @@ body {
 .manifesto__inner {
     position: relative;
     z-index: 1;
-}
-
-.manifesto__inner {
     width: 100%;
     max-width: var(--max-w);
     margin: 0 auto;
@@ -501,23 +498,16 @@ body {
     margin-top: var(--sp-lg);
 }
 
-/* A 社群服務 — 左上 */
+/* A 社群經營 — 左上單欄（2026-05-11 與 C 對換寬度：FEATURED C 升格為 hero、A 退回 supporting 視覺重量） */
 .bento--a {
     grid-column: 1 / 2;
     grid-row: 1 / 2;
     min-height: 280px;
 }
 
-/* F 社群增長 — 第一列中間（A 與 C 之間） */
-.bento--f {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
-    min-height: 220px;
-}
-
-/* C AI 虛擬網紅 — 右上 Featured（中文 title 統一回 Chiron Sung HK，差異化靠 FEATURED 標籤 + 文案張力） */
+/* C AI 虛擬網紅 — 右上跨 col 2-3 FEATURED hero（2026-05-11 升格：用視覺重量強化「主角」訊號、對應 FEATURED 標籤的 narrative） */
 .bento--c {
-    grid-column: 3 / 4;
+    grid-column: 2 / 4;
     grid-row: 1 / 2;
     min-height: 280px;
 }
@@ -575,8 +565,8 @@ body {
 }
 
 /* 手機 ≤ 900px：單欄垂直堆疊，所有 grid-column / grid-row 重置 auto
-   排序依 HTML：A → C(FEATURED) → B-web → B-sys → D → E → F
-   FEATURED C 卡排第二位、進站前三張就看到最強文案 */
+   排序依 HTML：A → C(FEATURED) → B-web → B-sys → D → E
+   FEATURED C 卡排第二位、進站前兩張就看到最強文案 */
 @media (max-width: 900px) {
     .bento-grid {
         grid-template-columns: 1fr;
@@ -603,10 +593,9 @@ body {
        下方 180px 防腳尖被下方 site-footer 蓋掉 */
     padding-top: calc(var(--sp-w1) + 100px);
     padding-bottom: calc(var(--sp-w1) + 180px);
-    /* overflow: clip（兩軸一致，CSS3 規範不會 promote 成 auto）
-       — overflow-x: hidden + overflow-y: visible 是 CSS spec 違法組合，
-         會強制把 -y promote 成 auto，在 final-cta 內長出 vertical scrollbar（user 看到的第 2 卷軸）
-       clip 比 hidden 更嚴格：完全 paint clip、不創 scroll container、不出任何 scrollbar */
+    /* overflow: clip（兩軸一致）：完全 paint clip，不創 scroll container、不出 scrollbar；
+       hidden 在某軸對 GPU 加速 transform 元素可能逃出，clip 是 paint-time 硬切。
+       禁止改回 overflow-x: hidden + overflow-y: visible（spec 違法組合會 promote 成 auto） */
     overflow: clip;
     text-align: center;
 }
@@ -626,7 +615,7 @@ body {
     width: clamp(280px, 35vw, 520px);
     aspect-ratio: 16 / 9;
     /* 等比例從中心擴張（四邊一起往外長、視覺中心不偏移）
-       搭配 .final-cta 的 overflow-y: visible 讓上下邊界都不會被切 */
+       .final-cta 的 overflow: clip + 上下 padding buffer 避免 scale + rotation 撞邊界 */
     transform-origin: 50% 50%;
     z-index: 0;
     pointer-events: none;
