@@ -62,6 +62,11 @@ body {
     padding: 0 var(--sec-px);
     padding-top: 5rem;                  /* 上移：內容浮在視口上半部，下方黑空間深邃 */
     padding-bottom: 7rem;
+
+    /* container query 起點：title 字級 / 太空人尺寸用 cqw 跟著 hero__inner 自身寬度縮放，
+       不再跟著 viewport 縮放。viewport > 1200 時 hero__inner 被 max-width 卡住、cqw 也鎖住，
+       title + 太空人停止縮小、gap 不會爆開。修「視窗縮窄時主標題與太空人逐漸分離」問題的根因。 */
+    container-type: inline-size;
 }
 
 /* 左欄：語意三段式（敘事 / 行動 / 引導），不用統一 gap，改用各段明確 margin */
@@ -72,10 +77,13 @@ body {
 }
 
 /* 主標題（2026-04-21 深空舞台版：均一字級，收緊字距讓字型本身說話）
-   letter-spacing 0.06em：Chiron Sung 明朝骨架在深黑背景上的俐落存在感 */
+   letter-spacing 0.06em：Chiron Sung 明朝骨架在深黑背景上的俐落存在感
+   font-size 用 cqw（container query width）取代 vw：
+   - viewport > 1200：hero__inner 卡 max-width 1200，cqw 同步鎖住，字級不再隨視窗縮
+   - viewport ≤ 1200：cqw = vw，行為跟原本 vw 等價 */
 .hero__title {
     font-family: var(--f-serif-cjk);
-    font-size: clamp(2rem, 3.8vw, 3.8rem);
+    font-size: clamp(2rem, 5cqw, 3.6rem);
     font-weight: 900;
     line-height: 1.75;
     letter-spacing: 0.06em;
@@ -730,10 +738,13 @@ body {
 .hero-astronaut {
     position: absolute;       /* 黏在 Hero 內部右側、跟隨 Hero 捲動，非 viewport-fixed */
     top: 50%;
-    right: clamp(2rem, 5vw, 5rem);
+    /* right / width / height 用 cqw 跟 title font-size 同步：跟容器（hero__inner）寬度縮放，
+       而非跟視窗縮放。配合 hero__inner max-width 1200 上限，避免視窗 > 1200 時太空人繼續放大、
+       脫離容器邊界 → 跟 title 之間 gap 撐開的 bug。 */
+    right: clamp(2rem, 4cqw, 5rem);
     transform: translateY(-50%);
-    width: clamp(240px, 36vw, 560px);
-    height: clamp(240px, 36vw, 560px);
+    width: clamp(240px, 47cqw, 540px);
+    height: clamp(240px, 47cqw, 540px);
     z-index: 5;
     pointer-events: none;
     opacity: 0;
