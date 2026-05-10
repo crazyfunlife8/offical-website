@@ -228,54 +228,131 @@
     display: none !important;
 }
 
-/* 底部 Dock（手機版）：預設隱藏，900px 以下切換為 flex */
-.dock-nav {
+/* ─── Hamburger 按鈕（mobile 顯示，桌機隱藏）─── */
+.nav__hamburger {
     display: none;
-    position: fixed;
-    bottom: var(--sp-sm);
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: var(--z-nav);
-
-    /* flex 屬性預先宣告，media query 切 display:flex 時立即生效 */
-    align-items: center;
-    gap: 1.75rem;
-
-    background: rgba(var(--c-black-rgb), 0.9);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-pill);
-    padding: 0.65rem 1.5rem;
-}
-
-.dock-nav__item {
-    display: flex;
+    background: transparent;
+    border: 0;
+    padding: 8px;
+    cursor: pointer;
+    margin-left: auto;
+    width: 40px;
+    height: 40px;
     flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    font-size: var(--fs-xs);
-    color: var(--c-muted);
-    transition: color var(--t-fast);
+    justify-content: center;
+    align-items: stretch;
+    gap: 5px;
+    position: relative;
+    z-index: 1;
 }
 
-.dock-nav__item i {
-    font-size: 1.1rem;
+.nav__hamburger-line {
+    display: block;
+    width: 100%;
+    height: 1.5px;
+    background: var(--c-stellar);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.2s ease,
+                background 0.2s ease;
+    transform-origin: center;
 }
 
-.dock-nav__item.active,
-.dock-nav__item:hover {
-    color: var(--c-yellow);
+.nav__hamburger:hover .nav__hamburger-line {
+    background: var(--c-cyan);
+}
+
+/* 開啟狀態：上下兩條變 X、中間一條淡出 */
+.site-nav.is-open .nav__hamburger-line:nth-child(1) {
+    transform: translateY(6.5px) rotate(45deg);
+    background: var(--c-cyan);
+}
+
+.site-nav.is-open .nav__hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.site-nav.is-open .nav__hamburger-line:nth-child(3) {
+    transform: translateY(-6.5px) rotate(-45deg);
+    background: var(--c-cyan);
+}
+
+/* mobile 內 .nav__links 的「聯絡我們」項目（dropdown 收進選單時使用），桌機隱藏 */
+.nav__links-cta-mobile {
+    display: none;
 }
 
 @media (max-width: 900px) {
+    /* 桌機 nav__links / nav__cta 隱藏；mobile 改用 hamburger 抽屜 */
     .site-nav .nav__links,
     .site-nav .nav__cta {
         display: none;
     }
 
-    .dock-nav {
+    /* 顯示 hamburger 按鈕 */
+    .nav__hamburger {
         display: flex;
+    }
+
+    /* 開啟時 nav__links 從 nav 下方滑入：full-width、垂直堆疊、深黑半透 + cyan border */
+    .site-nav.is-open .nav__links {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+
+        /* 從 nav 底部開始的 dropdown panel */
+        position: fixed;
+        top: 56px;                      /* nav 高度 */
+        left: 0;
+        right: 0;
+        transform: none;                /* 覆寫桌機的 translateX(-50%) */
+
+        background: rgba(var(--c-black-rgb), 0.96);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(var(--c-cyan-rgb), 0.30);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+
+        padding: 0.5rem 0;
+        z-index: calc(var(--z-nav) - 1);
+    }
+
+    .site-nav.is-open .nav__links li {
+        border-bottom: 1px solid rgba(var(--c-stellar-rgb), 0.06);
+    }
+
+    .site-nav.is-open .nav__links li:last-child {
+        border-bottom: 0;
+    }
+
+    .site-nav.is-open .nav__links a {
+        display: block;
+        width: 100%;
+        padding: 1rem clamp(1.25rem, 5vw, 2rem);
+        font-size: 1rem;
+        letter-spacing: 0.16em;
+        color: var(--c-stellar);
+        text-shadow: none;  /* 抽屜內裝模式不需 hover 暈光殘影 */
+    }
+
+    .site-nav.is-open .nav__links a:hover,
+    .site-nav.is-open .nav__links a.active {
+        color: var(--c-cyan);
+        background: rgba(var(--c-cyan-rgb), 0.05);
+    }
+
+    /* 抽屜內 hover hairline 隱藏（從中心展開的設計只適合桌機橫向 nav） */
+    .site-nav.is-open .nav__links a::after {
+        display: none;
+    }
+
+    /* 抽屜內顯示「聯絡我們」項目（雖跟 .nav__cta 重複，但 dropdown 內「聯絡」是主訴求 CTA） */
+    .nav__links-cta-mobile {
+        display: list-item;
+    }
+
+    .site-nav.is-open .nav__links-cta-mobile a {
+        color: var(--c-yellow);
     }
 }
 

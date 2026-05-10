@@ -16,10 +16,9 @@
        ════════════════════════════════════════════════════════ */
     const DESIGN_MODE = false;
 
-    // matchMedia 取代靜態寬度快照，let 允許 resize 時更新
-    const mobileQuery = window.matchMedia('(max-width: 900px)');
-    let IS_MOBILE     = mobileQuery.matches;
-    mobileQuery.addEventListener('change', (e) => { IS_MOBILE = e.matches; });
+    // 真實手機裝置檢測（給 Three.js 效能保護用，page-load 一次性拍板）
+    // hover:none + pointer:coarse = 觸控主導裝置（手機 / 平板）；桌機縮窗不會誤觸發
+    const IS_TOUCH_DEVICE = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
     /* ════════════════════════════════════════════════════════
        1. Three.js 星空粒子場（全站 canvas，手機跳過）
@@ -27,7 +26,8 @@
 
     function initStarfield() {
         if (typeof THREE === 'undefined') return;
-        if (IS_MOBILE) return;
+        // 效能保護：真實手機跳過 Three.js（CSS 星空 fallback 接手）；桌機縮窗仍跑
+        if (IS_TOUCH_DEVICE) return;
         /* ── 黑洞漩渦星場 ──────────────────────────────────────────
            概念：主視覺中心是黑洞深淵，所有星辰以螺旋軌跡被吸入
            技術：極座標系 (r, θ) 每幀更新 → 轉為 XY 位置
@@ -70,7 +70,7 @@
             return new THREE.CanvasTexture(cv);
         }
 
-        // 黑洞虛空已改由 CSS #blackhole 處理（radial-gradient，無色階問題）
+        // 黑洞虛空斜帶由 #css-starfield::before 統一處理（base.css，全站共用）
 
         // ── 動態螺旋星場（ShaderMaterial → per-vertex 可變大小）──
 
@@ -524,12 +524,13 @@
        ════════════════════════════════════════════════════════ */
 
     function init() {
-        // Three.js 未載入時移除 has-threejs class，讓 CSS 星空 fallback 正常顯示
-        if (typeof THREE === 'undefined') {
+        // Three.js 不可用（未載入或真實手機跳過）→ 移除 has-threejs、讓 CSS 星空 fallback 顯示
+        // 用 IS_TOUCH_DEVICE 而非 IS_MOBILE：桌機縮窗不誤觸發、手機才真切 fallback
+        if (typeof THREE === 'undefined' || IS_TOUCH_DEVICE) {
             document.body.classList.remove('has-threejs');
         }
 
-        // L1 環境動畫（設計模式保留，屬於靜態視覺一部分）
+        // L1 環境動畫（手機 IS_TOUCH_DEVICE 在內部早返回）
         try { initStarfield(); } catch(e) { console.warn('[index.js] initStarfield failed:', e); }
 
         // DESIGN_MODE：凍結 L2（進場）+ L3（捲動驅動），加 body class 讓 CSS 提供救援

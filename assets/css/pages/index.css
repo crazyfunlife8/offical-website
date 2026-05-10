@@ -3,53 +3,10 @@
    創巢數位 Nest Digital | 版本 redesign-v1
    ============================================================ */
 
-/* ─── 深空斜帶（CSS radial-gradient，16-bit 精度，無色階問題）─── */
-/*
-   設計概念：一條深邃的暗帶以 -15° 斜切整個主視覺
-   ellipse 50% 20%：橫跨全寬，帶高約 40vw，形成壓迫性的空間縱深感
-   220vw 正方形確保任意比例螢幕旋轉後都不露邊
-*/
-#blackhole {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    width: 220vw;
-    height: 220vw;
-    transform: translate(-50%, -50%) rotate(-15deg);
-    background: radial-gradient(
-        ellipse 50% 20% at center,
-        #000000              0%,
-        #000507              20%,
-        #020f2e              38%,
-        #061840              54%,
-        rgba(8,24,58,0.72)   66%,
-        rgba(7,20,52,0.40)   77%,
-        rgba(5,15,42,0.15)   88%,
-        transparent          100%
-    );
-    pointer-events: none;
-    z-index: 0;
-}
-
-/* canvas 升到斜帶上層，星星粒子可見於帶上（透明區域仍穿透顯示帶）*/
+/* canvas 升到 #css-starfield 之上，Three.js 星星可見於斜帶上層
+   #css-starfield::before（黑洞斜帶）由 base.css 統一管理、本檔不再覆蓋 */
 #starfield-canvas {
     z-index: 1;
-}
-
-/* SVG fractalNoise 噪點層：打散漸層色階斷層，opacity 極低不可見 */
-#blackhole::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    mix-blend-mode: soft-light;
-    pointer-events: none;
-}
-
-/* 手機不顯示（Three.js 跳過，斜帶也跳過）*/
-@media (max-width: 900px) {
-    #blackhole { display: none; }
 }
 
 /* ─── 首頁基礎 ─── */
@@ -308,31 +265,49 @@ body {
     color: rgba(var(--c-stellar-rgb), 0.85);
 }
 
-/* 手機：維持可讀性，字級縮小，允許換行 */
+/* 手機：太空人居中上方 + title 自動推到太空人下方 + 副標避開 dock-nav */
 @media (max-width: 900px) {
+    /* 取消 hero flex 垂直置中（mobile 內容 < hero 高度時會產生 hero__inner 偏移、
+       讓 .hero-astronaut top: 5rem 變成「從 hero__inner 中心起算」而非從 hero 頂算）
+       top-align 後 absolute top 值才是預期意義 */
+    .hero {
+        align-items: flex-start;
+    }
+
+    /* dock-nav 已退役改 hamburger，副標不再需要避開底部浮層
+       padding-bottom 還原為 3rem、height 還原為 45%，把空間還給 hero */
     .hero__rift {
         padding-bottom: 3rem;
         height: 45%;
     }
 
     .hero__readout {
-        font-size: 0.67rem;  /* 同步縮小 ~2px */
+        font-size: 0.67rem;
         letter-spacing: 0.03em;
     }
 
     .hero__readout-divider {
-        margin: 0.05em 0 0.15em;  /* 手機行距更緊 */
+        margin: 0.05em 0 0.15em;
     }
 
     .hero__readout-en {
-        font-size: 0.875rem;  /* 同步縮小 ~2px */
+        font-size: 0.875rem;
     }
-}
 
-@media (max-width: 900px) {
+    /* hero__inner padding-top 用 clamp 跟太空人尺寸同步：
+       上界 = 5rem(nav 56 + buffer 24) + clamp(140, 36vw, 200)px + 1.5rem(下方 buffer)
+       讓 title 起點永遠在太空人下方 24px 處 */
     .hero__inner {
-        padding-top: 6rem;
+        padding-top: clamp(15.25rem, calc(6.5rem + 36vw), 19rem);
         padding-bottom: 4rem;
+    }
+
+    /* 「往下探索」hint mobile 隱藏：
+       - 「探索服務 →」按鈕已是明確 CTA、不需第二個 scroll 引導
+       - mobile 直立螢幕用戶天然知道要滑
+       - padding-top 加大後，hint 會被擠進副標區域、實機看到重疊 */
+    .hero__scroll-hint {
+        display: none;
     }
 }
 
@@ -562,6 +537,21 @@ body {
     min-height: 220px;
 }
 
+/* 手機 ≤ 900px：單欄垂直堆疊，所有 grid-column / grid-row 重置 auto
+   排序依 HTML：A → C(FEATURED) → B-web → B-sys → D → E → F
+   FEATURED C 卡排第二位、進站前三張就看到最強文案 */
+@media (max-width: 900px) {
+    .bento-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .bento-grid > .card {
+        grid-column: auto;
+        grid-row: auto;
+    }
+}
+
 /* ════════════════════════════════════════════════════════════
    Section 5｜終點 CTA（反轉 CTA：「先別點」）
    居中布局（與服務區塊 cetered grid 視覺重心一致）
@@ -770,15 +760,16 @@ body {
     }
 }
 
-/* 手機版：縮小 + 移到 Hero 下緣 */
+/* 手機版：移到 hero 上方居中（nav 下方），避開 title / CTA / 副標 / dock-nav
+   桌機是「左字右圖」、手機改「圖在上字在下」是 mobile 直立螢幕標準 hero pattern */
 @media (max-width: 900px) {
     .hero-astronaut {
-        top: auto;
-        bottom: 6rem;
-        right: 1.5rem;
-        transform: none;
-        width: clamp(160px, 36vw, 240px);
-        height: clamp(160px, 36vw, 240px);
+        top: 5rem;                 /* nav 56px + buffer 24px */
+        bottom: auto;
+        right: 50%;
+        transform: translateX(50%);
+        width: clamp(140px, 36vw, 200px);
+        height: clamp(140px, 36vw, 200px);
     }
 }
 

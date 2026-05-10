@@ -63,10 +63,8 @@
 <body class="has-threejs">
 
     <!-- 星空 canvas（全站固定後層，Three.js 渲染目標） -->
+    <!-- 黑洞虛空斜帶由 nav.js 注入的 #css-starfield::before 統一承擔（首頁 / 其他頁 / 手機 RWD 全適用） -->
     <canvas id="starfield-canvas" aria-hidden="true"></canvas>
-
-    <!-- 黑洞虛空（CSS radial-gradient，避免 Canvas 8-bit 色階問題） -->
-    <div id="blackhole" aria-hidden="true"></div>
 
     <!-- Nav 由 nav.js 動態注入 -->
 

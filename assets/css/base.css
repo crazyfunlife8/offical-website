@@ -65,23 +65,45 @@ body::after {
     overflow: hidden;
 }
 
-/* 核心暗域：中心疊與背景同色漸層，製造黑洞虛空吸入感
-   星點由輻射分布自然環繞此暗核，強化銀河核心透視 */
+/* 黑洞虛空斜帶（全站統一：220vw 大盒子 + 橫向 ellipse + -15° 傾斜，跨畫面對角斜帶）
+   首頁桌機：Three.js 動態星點疊加在斜帶上 / 首頁手機：CSS 星點疊加 / 其他頁：CSS 星點疊加
+   永遠顯示——不論 has-threejs / 視窗寬度 / 觸控裝置都看得到 */
 #css-starfield::before {
     content: '';
     position: absolute;
-    inset: 0;
-    pointer-events: none;
+    top: 50%;
+    left: 50%;
+    width: 220vw;
+    height: 220vw;
+    transform: translate(-50%, -50%) rotate(-15deg);
     background: radial-gradient(
-        ellipse 40% 40% at 50% 50%,
-        rgba(5, 13, 46, 0.85) 0%,
-        rgba(5, 13, 46, 0.42) 38%,
-        transparent 70%
+        ellipse 50% 20% at center,
+        #000000              0%,
+        #000507              20%,
+        #020f2e              38%,
+        #061840              54%,
+        rgba(8,24,58,0.72)   66%,
+        rgba(7,20,52,0.40)   77%,
+        rgba(5,15,42,0.15)   88%,
+        transparent          100%
     );
+    pointer-events: none;
 }
 
-/* 首頁已有 Three.js，隱藏 CSS 星空 */
-body.has-threejs #css-starfield {
+/* SVG fractalNoise 噪點層：打散漸層色階斷層、避免在大尺度漸層上看到色帶（banding） */
+#css-starfield::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+}
+
+/* 首頁有 Three.js（桌機）→ 隱藏 CSS 星點，避免跟 Three.js 星點重疊雙倍
+   ::before（黑洞漸層）跟 ::after（noise）保留，當 Three.js 星點的底色畫布 */
+body.has-threejs #css-starfield > .css-stars {
     display: none;
 }
 

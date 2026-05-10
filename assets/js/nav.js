@@ -20,31 +20,21 @@
         <li><a href="about.html">關於</a></li>
         <li><a href="index.html#services-section">服務</a></li>
         <li><a href="news.html">消息</a></li>
+        <li class="nav__links-cta-mobile">
+            <a href="contact.html">聯絡我們 <span aria-hidden="true">→</span></a>
+        </li>
     </ul>
 
     <a href="contact.html" class="nav__cta">
         <span class="nav__cta-label">聯絡我們</span>
         <span class="nav__cta-arrow" aria-hidden="true">→</span>
     </a>
-</nav>
 
-<nav class="dock-nav" role="navigation" aria-label="手機底部導覽列">
-    <a href="index.html" class="dock-nav__item" aria-label="首頁">
-        <i class="fas fa-home" aria-hidden="true"></i>
-        <span>首頁</span>
-    </a>
-    <a href="index.html#services-section" class="dock-nav__item" aria-label="服務項目">
-        <i class="fas fa-th-large" aria-hidden="true"></i>
-        <span>服務</span>
-    </a>
-    <a href="about.html" class="dock-nav__item" aria-label="關於我們">
-        <i class="fas fa-user-astronaut" aria-hidden="true"></i>
-        <span>關於</span>
-    </a>
-    <a href="contact.html" class="dock-nav__item" aria-label="聯絡我們">
-        <i class="fas fa-paper-plane" aria-hidden="true"></i>
-        <span>聯絡</span>
-    </a>
+    <button type="button" class="nav__hamburger" aria-label="選單" aria-expanded="false" aria-controls="nav-links">
+        <span class="nav__hamburger-line" aria-hidden="true"></span>
+        <span class="nav__hamburger-line" aria-hidden="true"></span>
+        <span class="nav__hamburger-line" aria-hidden="true"></span>
+    </button>
 </nav>
 `;
 
@@ -60,7 +50,8 @@
     // ─── 注入 body 最前端（星空在前，Nav 在後）─────────────────
     document.body.insertAdjacentHTML('afterbegin', STARFIELD_HTML + NAV_HTML);
 
-    // ─── CSS 星空：以視窗中心為核心的輻射分布，製造深邃宇宙吸入感 ──
+    // ─── CSS 星空：log 螺旋臂 + 橢圓投影 + -15° 傾斜（呼應桌機 Three.js 黑洞邏輯）──
+    // 設計：兩條螺旋臂、95% 星點貼臂、5% 漫散；中心暗域留空、外圈隨 r 衰減
     function initCSSStarfield() {
         const VW = window.innerWidth  || 1440;
         const VH = window.innerHeight || 900;
@@ -71,34 +62,59 @@
         const CY   = Math.round(VH * 0.65);
         const RMAX = Math.round(Math.sqrt(CX * CX + CY * CY) * 1.15);
 
+        // 漩渦參數（呼應 index.js initStarfield 的 SPIRAL_K / TILT）
+        const SPIRAL_K     = 0.42;                    // 螺旋臂捲曲係數
+        const TILT         = -Math.PI / 12;           // -15°，與 #css-starfield::before 斜帶同向
+        const COS_T        = Math.cos(TILT);
+        const SIN_T        = Math.sin(TILT);
+        const ELLIPSE_R    = 0.55;                    // 橢圓比 短/長
+        const ARM_SPREAD   = 0.18;                    // 臂寬（弧度，越小越緊）
+        const ARM_RATIO    = 0.92;                    // 92% 貼臂、8% 漫散
+        const R_MIN        = RMAX * 0.06;             // 中心黑洞半徑（留空）
+
         const layers = [
-            // 遠景微塵：密集在核心中環（製造銀河核心密度感，中心留空黑洞感）
+            // 遠景微塵：高密度貼臂、明顯漩渦結構
             { sel: '.css-stars--s', count: 360,
-              getR: () => 90 + Math.pow(Math.random(), 1.2) * (RMAX * 0.72),
+              rRange: [R_MIN, RMAX * 0.55],
               sizeMin: 0.4, sizeMax: 1.0, opMin: 0.08, opMax: 0.52, glowChance: 0.0 },
-            // 中景星：均勻中環分布，帶少量冷藍色調
+            // 中景星：中環、帶冷藍色調
             { sel: '.css-stars--m', count: 110,
-              getR: () => 160 + Math.pow(Math.random(), 0.85) * (RMAX * 0.85),
+              rRange: [R_MIN * 1.5, RMAX * 0.65],
               sizeMin: 1.0, sizeMax: 1.8, opMin: 0.30, opMax: 0.78, glowChance: 0.06 },
-            // 近景亮星：偏外圍，帶光暈，代表較近的前景恆星
+            // 近景亮星：散布偏外、少量錨點、帶光暈
             { sel: '.css-stars--l', count: 28,
-              getR: () => RMAX * 0.38 + Math.random() * (RMAX * 0.68),
+              rRange: [RMAX * 0.20, RMAX * 0.55],
               sizeMin: 1.5, sizeMax: 2.8, opMin: 0.60, opMax: 1.00, glowChance: 0.45 },
         ];
 
-        layers.forEach(({ sel, count, getR, sizeMin, sizeMax, opMin, opMax, glowChance }) => {
+        layers.forEach(({ sel, count, rRange, sizeMin, sizeMax, opMin, opMax, glowChance }) => {
             const el = document.querySelector(sel);
             if (!el) return;
 
             // 1×1px 圓形元素，box-shadow 繼承圓形輪廓（確保真圓星點）
             el.style.cssText += 'width:1px;height:1px;border-radius:50%;background:transparent;';
 
+            const [rMin, rMax] = rRange;
             const shadows = [];
             for (let i = 0; i < count; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const r     = getR();
-                const x     = Math.round(CX + Math.cos(angle) * r);
-                const y     = Math.round(CY + Math.sin(angle) * r);
+                // 平方根均勻面積取樣（避免中心過密）
+                const r = Math.sqrt(rMin * rMin + Math.random() * (rMax * rMax - rMin * rMin));
+
+                // 螺旋臂角度：92% 貼兩條臂、8% 漫散
+                let theta;
+                if (Math.random() < ARM_RATIO) {
+                    const arm    = Math.floor(Math.random() * 2) * Math.PI;
+                    const spread = (Math.random() - 0.5) * ARM_SPREAD;
+                    theta = arm - Math.log(r * 0.01 + 0.1) * SPIRAL_K * 3.5 + spread;
+                } else {
+                    theta = Math.random() * Math.PI * 2;
+                }
+
+                // 橢圓投影 + 傾斜
+                const px = r * Math.cos(theta);
+                const py = r * Math.sin(theta) * ELLIPSE_R;
+                const x  = Math.round(CX + px * COS_T - py * SIN_T);
+                const y  = Math.round(CY + px * SIN_T + py * COS_T);
 
                 const size  = +(sizeMin + Math.random() * (sizeMax - sizeMin)).toFixed(1);
                 const op    = +(opMin   + Math.random() * (opMax - opMin)).toFixed(2);
@@ -124,11 +140,43 @@
     // ─── Active 狀態：高亮目前頁面連結 ───────────────────────
     const currentPath = location.pathname.split('/').pop() || 'index.html';
 
-    document.querySelectorAll('.nav__links a, .dock-nav__item').forEach((a) => {
+    document.querySelectorAll('.nav__links a').forEach((a) => {
         const href = a.getAttribute('href');
         if (href && href === currentPath) {
             a.classList.add('active');
         }
     });
+
+    // ─── Hamburger 選單開合（mobile）──────────────────────────
+    // 只在 mobile（≤900px）顯示按鈕；桌機 CSS 隱藏 .nav__hamburger
+    function initHamburger() {
+        const hamburger = document.querySelector('.nav__hamburger');
+        const nav = document.querySelector('.site-nav');
+        if (!hamburger || !nav) return;
+
+        function setOpen(open) {
+            nav.classList.toggle('is-open', open);
+            hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+
+        hamburger.addEventListener('click', () => {
+            const open = nav.classList.contains('is-open');
+            setOpen(!open);
+        });
+
+        // 點擊選單連結後自動關閉（提升 mobile 操作流暢）
+        nav.querySelectorAll('.nav__links a').forEach((a) => {
+            a.addEventListener('click', () => setOpen(false));
+        });
+
+        // ESC 鍵關閉
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && nav.classList.contains('is-open')) {
+                setOpen(false);
+            }
+        });
+    }
+
+    initHamburger();
 
 })();
