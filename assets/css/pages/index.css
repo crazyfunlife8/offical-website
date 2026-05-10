@@ -83,7 +83,7 @@ body {
    - viewport ≤ 1200：cqw = vw，行為跟原本 vw 等價 */
 .hero__title {
     font-family: var(--f-serif-cjk);
-    font-size: clamp(2rem, 5cqw, 3.6rem);
+    font-size: clamp(1.75rem, 5cqw, 3.6rem);
     font-weight: 900;
     line-height: 1.75;
     letter-spacing: 0.06em;
@@ -273,24 +273,31 @@ body {
     color: rgba(var(--c-stellar-rgb), 0.85);
 }
 
-/* 手機：太空人居中上方 + title 自動推到太空人下方 + 副標避開 dock-nav */
+/* 手機版主視覺：title 上方 / CTA 縮小 / 太空人靠右下 / 副標底部
+   設計取捨：直立螢幕 hero pattern 是「字在上、圖在右下角輔助裝飾」、不是圖頂上
+   太空人保持輕量（120-160px）避免壓 CTA、副標能完整顯示 */
 @media (max-width: 900px) {
-    /* 取消 hero flex 垂直置中（mobile 內容 < hero 高度時會產生 hero__inner 偏移、
-       讓 .hero-astronaut top: 5rem 變成「從 hero__inner 中心起算」而非從 hero 頂算）
-       top-align 後 absolute top 值才是預期意義 */
+    /* hero flex stretch：hero__inner 撐滿 hero 高度（100vh）、
+       讓 .hero-astronaut absolute bottom 對齊 hero 底部、不是 hero__inner 內容底部
+       （否則 hero__inner 會收縮成內容高度 ~465px、太空人會跑到 hero 中段） */
     .hero {
-        align-items: flex-start;
+        align-items: stretch;
     }
 
-    /* dock-nav 已退役改 hamburger，副標不再需要避開底部浮層
-       padding-bottom 還原為 3rem、height 還原為 45%，把空間還給 hero */
+    /* hero__inner padding-top 還原為簡短：title 緊接 nav 下方、視覺重量在上半部 */
+    .hero__inner {
+        padding-top: 6rem;
+        padding-bottom: 4rem;
+    }
+
+    /* 副標位置：rift 占 hero 底部 45%、padding-bottom 3rem（dock-nav 已退役不需避開） */
     .hero__rift {
         padding-bottom: 3rem;
         height: 45%;
     }
 
     .hero__readout {
-        font-size: 0.67rem;
+        font-size: 0.875rem;
         letter-spacing: 0.03em;
     }
 
@@ -302,18 +309,14 @@ body {
         font-size: 0.875rem;
     }
 
-    /* hero__inner padding-top 用 clamp 跟太空人尺寸同步：
-       上界 = 5rem(nav 56 + buffer 24) + clamp(140, 36vw, 200)px + 1.5rem(下方 buffer)
-       讓 title 起點永遠在太空人下方 24px 處 */
-    .hero__inner {
-        padding-top: clamp(15.25rem, calc(6.5rem + 36vw), 19rem);
-        padding-bottom: 4rem;
+    /* CTA 按鈕 mobile 縮小（讓出空間 + 視覺密度配合 mobile）
+       桌機 0.9375rem 14×16=225px 寬，mobile 收 0.85 + padding 0.65/1.4 = ~165px 寬 */
+    .hero__cta-group .btn {
+        font-size: 0.85rem;
+        padding: 0.65rem 1.4rem;
     }
 
-    /* 「往下探索」hint mobile 隱藏：
-       - 「探索服務 →」按鈕已是明確 CTA、不需第二個 scroll 引導
-       - mobile 直立螢幕用戶天然知道要滑
-       - padding-top 加大後，hint 會被擠進副標區域、實機看到重疊 */
+    /* 「往下探索」hint mobile 隱藏（「探索服務 →」按鈕已是明確 scroll CTA、不需重複引導） */
     .hero__scroll-hint {
         display: none;
     }
@@ -771,16 +774,20 @@ body {
     }
 }
 
-/* 手機版：移到 hero 上方居中（nav 下方），避開 title / CTA / 副標 / dock-nav
-   桌機是「左字右圖」、手機改「圖在上字在下」是 mobile 直立螢幕標準 hero pattern */
+/* 手機版：太空人靠右下、視覺主導
+   尺寸 RWD 雙軸縮放：min(85vw, 可用垂直空間)，再 clamp 220-360px
+   - 短手機（780vh 以下）：calc(100vh - 530px) 主導、太空人縮小避免擠 CTA
+   - 高手機（932vh，user 14 Pro Max 測試基準）：85vw 主導、達 360px 上限
+   bottom 8rem：給副標 buffer */
 @media (max-width: 900px) {
     .hero-astronaut {
-        top: 5rem;                 /* nav 56px + buffer 24px */
-        bottom: auto;
-        right: 50%;
-        transform: translateX(50%);
-        width: clamp(140px, 36vw, 200px);
-        height: clamp(140px, 36vw, 200px);
+        --ast-size: clamp(220px, min(85vw, calc(100vh - 530px)), 360px);
+        top: auto;
+        bottom: 8rem;
+        right: 1.5rem;
+        transform: none;
+        width: var(--ast-size);
+        height: var(--ast-size);
     }
 }
 
