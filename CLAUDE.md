@@ -118,7 +118,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | data-stagger-group | 子元素 stagger 進場屬性（core.js 處理） |
 | f-display-en | Italiana 英文 echo 副標字型（`--f-display-en`） |
 | f-fang-cjk | cwTeX Q Fangsong 仿宋字型，副標編輯感（`--f-fang-cjk`） |
-| A–F | 服務六大類（A社群經營、B開發、C虛擬網紅、D顧問、E跳動E投放、F粉絲與互動買賣）；G 類自動化採集（ADSPOWER+PY）為待新增類別，**不可併入 B 類**|
+| A–F | 服務六大類（A社群經營、B開發、C虛擬網紅、D顧問、E跳動E投放、F粉絲與互動買賣 *首頁退役*）；G 類自動化採集（ADSPOWER+PY）為待新增類別，**不可併入 B 類**。命名規則：A/E 用首頁卡聚焦 sub 名（規格書類名分別為「社群服務 / 自營平台」），其他 4 類用規格書類名短化 |
 | B 類本質 | 軟體開發本業（網站架設 + 客製系統開發），對應「不正常人類軟體開發有限公司」核心服務；描述客製系統禁止用「流程自動化」措辭、避免與 G 類自動化採集混淆 |
 | F 類首頁退役 | 2026-05-11 起 F 類「粉絲與互動買賣」服務從首頁 bento 拿掉（地下性質服務不適形象首頁主動曝光）；規格書 §F 類保留並明確化定義，未來若有獨立 landing page 再評估上線 |
 | G 類待新增 | 自動化採集服務（ADSPOWER + Python）為瀏覽器指紋分流 + 腳本驅動的資料採集與帳號模擬操作；規格書 v0.2 §四 已加備註但未展開、首頁 bento 不露 |
