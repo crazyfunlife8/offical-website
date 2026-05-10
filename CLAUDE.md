@@ -35,8 +35,8 @@
 
 **Codebase 中過去框架隱喻的殘留（2026-05-10 大清掃後）：**
 
-- Three.js 黑洞星場（`#blackhole` + `initStarfield()`）— **保留**（深黑底有力量，2026-04-21 確認完成）
-- CSS 星空 `#css-starfield`（`base.css`）— **保留**（其他頁面沿用）
+- Three.js 黑洞動態星場（`initStarfield()`）— **保留**（深黑底有力量，2026-04-21 確認完成）；2026-05-10 統一架構後 `#blackhole` 元素已退役、漸層斜帶由 `#css-starfield::before` 全站承擔
+- CSS 星空 `#css-starfield`（`base.css`）— **保留**（含 `::before` 220vw 黑洞斜帶 + `::after` noise overlay + log 螺旋臂星點）
 - Three.js `initStarfield()` 內部變數命名（螺旋臂 / 軌道 / starData / SPIRAL_K 等）— 現役邏輯內部命名，重命名與刪除為不同性質決定，**保留**
 - `.nav__brand-star` — 已不存在於 codebase（nav 已重設計為純文字並行排版）
 
@@ -87,8 +87,8 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 
 ### 關鍵架構決策原因
 - **Nav 動態注入**：nav.js 統一維護導覽列，修改單一檔案即全站生效
-- **CSS 星空由 nav.js 注入**：避免 HTML 多頁重複；`body.has-threejs` 自動隱藏（首頁改用 Three.js）
-- **`body.has-threejs`**：只有 index.html 有此 class，控制 Three.js canvas 顯示
+- **CSS 星空由 nav.js 注入**：避免 HTML 多頁重複；`body.has-threejs` 隱藏 `.css-stars` 子元素（保留 ::before 黑洞漸層永遠顯示、避免雙重底色）
+- **`body.has-threejs`**：index.html 載入時帶此 class；JS init 時若偵測為觸控裝置（`IS_TOUCH_DEVICE` = `(hover: none) and (pointer: coarse)`）則移除、回退 CSS 星空 fallback
 
 ---
 
@@ -101,7 +101,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 5. **Three.js 3D 星空**：僅限 index.html（`body.has-threejs`）；其他頁面用 CSS 星空
 6. **不得將頁面專屬樣式寫入 components.css**（分層邊界保護）
 7. **Hero 入場動畫**：`.js-hidden` class 搭配 GSAP，確保無 JS 時內容仍可見（不可用 `display:none`）
-8. **效能邊界**：手機（≤900px）跳過 Three.js；`renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5))`
+8. **效能邊界**：真實觸控裝置（`hover:none + pointer:coarse`）跳過 Three.js（不再用 viewport 寬度判斷、避免桌機縮窗誤觸發）；`renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5))`
 
 ---
 
@@ -316,3 +316,4 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | 按鈕系統 Apple Liquid Glass 重設計（2026-05-07 19:02） | 原一般 Glassmorphism + Material Design 殘留（`.btn` radius 6px + Chiron Sung HK 700；`.btn--primary` 1px solid blue border；`.btn--yellow` 純黃 + 黑字 900 SaaS Banner 風） | 升級為 Apple Liquid Glass 質感（呼應服務卡片同設計語言）：**① `.btn` 主規則** 字型 Noto Sans TC 500（按鈕用 sans 不用宋）+ radius 10px + letter-spacing 0.04em + Apple ease-out-expo `cubic-bezier(0.16, 1, 0.3, 1)` + `:active scale(0.97)` 點擊回饋 **② `.btn--primary`** 雙 background gradient（padding-box 玻璃底 + border-box cyan 折射光環）+ backdrop blur 12px + inset 多層光影 **③ `.btn--yellow`** 液態金按鈕（黃→琥珀漸層 + 邊緣 white→yellow→amber 折射 + 頂邊白 0.55 高光 + 底邊黑 0.20 陰影 + 外部黃光暈）+ `::after` 點擊光暈擴散（Apple visualEffect 風） **④ `.btn--ghost`** 保留純文字極簡風（加 `:active { transform: none }` 不繼承 scale）。**過程紀錄**：曾反思「過度 Apple 風」、一度 revert 回電影感版（radius 4px / Chiron Sung HK / 純黃實心）、隨即發現範圍越界（用戶擔憂範圍是 nav 不是按鈕、按鈕 Apple 化是用戶最初認可的）、再 revert 回此版。**紀律**：服務卡片 + 按鈕兩處 Apple Liquid Glass 化是「有意設計選擇」、非框架性全站套用；其他元件評估時仍回到「俐落、線條、電影感」三條判斷、不因「Apple 化某處」就全站套用。 |
 | nav 視覺優化（電影感方向、不走 Apple 毛玻璃）（2026-05-07 19:02） | ① `.nav__links a` letter-spacing 0.35em（字拉散像散字、不像詞）② `.nav__links a` idle `text-shadow: 0 0 14px blue 0.5`（永遠像 hover 狀態、層次消失）③ `.nav__brand-zh` 16px / `.nav__brand-en` 11.5px（中英比例失衡、中文主訴求視覺重量不足） | **① `.nav__brand-zh` 16→17px**（中英比例平衡）**② `.nav__links a` letter-spacing 0.35em→0.1em**（字距收斂、字像詞不像散字）**③ `.nav__links a` idle blue text-shadow 拿掉**（保留 hover 才有 cyan 暈光、idle/hover 對比層次回來）。**不做**：`.site-nav.scrolled` 維持純黑半透明 `rgba(black, 0.92)`（**不走 Apple 毛玻璃方向**）+ `.nav__cta` 維持純文字 + 箭頭極簡風（**不轉按鈕**）。**設計判斷**：nav 走「電影感冷峻」方向（純黑半透明 + cyan 底邊 + 排版紀律）、跟服務卡片 + 按鈕的 Apple Liquid Glass 質感「有意分流」——每個元件依其角色決定是否套 Apple 化、不全站同步。 |
 | 首頁全 stack 大清掃（2026-05-10） | 多輪迭代後累積觀測儀框架、磁性按鈕、軌道環、SVG 描邊、雕刻陰影 token、整批未用 keyframes 等死碼，自承「待二階段視覺評估時逐項拍板」遲未動 | 一次性徹查首頁完整 stack（`index.html` / `index.css` / `index.js` / `core.js` / `nav.js` / `tokens.css` / `base.css` / `components.css` / `animations.css`）並 grep 交叉比對，移除：**HTML** `.hero__god-rays` 空 div；**index.css** `.hero__brand-tag` / `.hero__astronaut*` 死規則；**index.js** `initAstronaut()`（158 行 Three.js 3D 太空人，已被偵序列取代）+ `initOrbitRings()`（軌道環注入）+ Hero 入場序列內 `.hero__astronaut` fromTo + 註解殘骸；**components.css** `.tag--blue` / `.tag__dot` / `.text-sculpted/embossed/debossed` / `.btn--magnetic` / `.btn-amber-dot` / `.frame-drawn`；**base.css** `.f-serif` / `.f-disp` / `.f-mono` 工具類（0 處 HTML class 使用）；**animations.css** 17 個 0 引用 keyframes（twinkle / radar-ring / scan-line / cursor-blink / glow-pulse / glow-yellow / fade-up/in / slide-in-left/right / scale-in / gear-spin(+reverse) / orbit-rotate(+reverse) / prismatic-sweep / god-rays-drift / stroke-draw / constellation-fade-in）+ `.anim-fade-*` + `.delay-1~6`；**tokens.css** `--c-accent` / `--glass-bg-hover` / `--grid-base/half` / `--bp-md/lg` / `--shadow-card/glow/yellow/inset(-strong)` / `--ts-sculpt/emboss/deboss`；**core.js** `initMagneticButton()`。**保留**：`--sp-t/m/w` 新間距系統（tokens.css 自註「新代碼以此為準」現役遷移目標）、`pulse-dot` keyframe（`maintenance.html` 仍用）、Three.js `initStarfield()` 內部變數命名（現役邏輯）、DESIGN_MODE 機制。**紅線**：本次清理依「該 class / token / 函式有無被現役程式碼引用」單一標準，不涉及視覺判斷；任何「未來可能用」的元件不在保留範圍——需要時從 git history 取回比較乾淨。 |
+| 首頁 + Manifesto 全機型 RWD 收尾（2026-05-10） | 主視覺 / Manifesto / Footer 多處字級寫死 `var(--fs-*)` 或固定 rem、mobile 視窗縮放下尺寸不適、`#blackhole` 跟 `#css-starfield` 雙黑洞並存、dock-nav 浮層吃 mobile 垂直空間 | **架構統一 6 commit 收斂**：(1) `3ae4111` 死碼大清掃 −580 行；(2) `ca3f7f2` 黑洞統一到 `#css-starfield::before`（刪 `#blackhole` 元素 / 220vw + `-15deg` 斜帶 / has-threejs 改只藏 `.css-stars`）+ dock-nav 退役改右上 hamburger button + dropdown panel；(3) `1e721f9` 主視覺 cqw 修桌機 gap drift（hero__inner 加 `container-type: inline-size`、title font 跟 astronaut 尺寸/right margin 換 cqw、跨 1100-1720 viewport gap 鎖在 27-31px）；(4) `002aaef` mobile hero 重構（太空人靠右下、size 280-360 雙軸 RWD `clamp(220, min(85vw, calc(100vh - 530px)), 360)`、CTA 縮 127px、title 上移 padding-top 6rem、hero `align-items: stretch`、IS_TOUCH_DEVICE 取代 IS_MOBILE）；(5) `61be281` 副標 wrap 自適應（hero readout font `clamp(0.75rem, 2.9vw, 0.875rem)` + `letter-spacing: 0`、manifesto big-text accent stroke 改 `0.022em` 等比縮放、manifesto body 右對齊+span block 強制斷句）；(6) `3a3bbb5` manifesto RWD 全機型適配（big-text font `clamp(3.1rem, 13vw, 10.8rem)` 跨 360-1720 全部 6/3 split、body 字級 `clamp(0.875rem, 2vw, 1.375rem)`、span block 限 `≤640px` 真手機才強制 wrap、平板 641-900 inline 自然單行、GSAP 進場移除 x 偏移避免 ScrollTrigger 沒觸發時 transform 偏移）；(7) footer studio pair 加第二公司聯名 X（`grid-template-columns: 1fr 2.2fr` 擴 STUDIO 欄、entries flex 0 0 auto + `justify-content: center` 視覺貼文字之間、X 用 `::before/::after` 對角交叉冷光線手繪 + `--c-blue` 三層深藍 box-shadow 光暈、桌機水平/手機垂直自適應）。**全機型驗證通過**：360x780 / 375x812 / 390x844 / 414x896 / 430x932 / 440x956 + 768 tablet + 1400/1720 desktop。**紀律提煉**：寫死 px / rem / `<br>` 是反 RWD 紀律、優先 vw/vh/cqw/em/clamp 自適應；HTML hardcode 換行是最後手段；視窗 + 字級 + 容器三方關聯 calc 才能跨機型一致；任何 transform 初始狀態（GSAP fromTo）必須考慮 ScrollTrigger 不觸發時的視覺。完整推導見 6 個 commit body。 |

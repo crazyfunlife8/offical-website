@@ -848,14 +848,15 @@
     margin: 1.5em 0 0;
 }
 
-/* 兩欄資訊區（CONTACT / STUDIO） */
+/* 兩欄資訊區（CONTACT / STUDIO 雙公司）
+   STUDIO 欄擴寬（容納雙公司 + cyan X 聯名符號），用 1fr 2.2fr 比例 + max-w 提升 */
 .site-footer__info {
     margin-top: var(--sp-w1);
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 2.2fr;
     gap: var(--sp-w1);
     width: 100%;
-    max-width: 720px;
+    max-width: 960px;
     text-align: left;
 }
 
@@ -874,6 +875,55 @@
     color: rgba(var(--c-stellar-rgb), 0.78);
     line-height: 1.7;
     margin: 0;
+}
+
+/* STUDIO 雙公司聯名 pair：兩家公司資訊水平排列、中間冷光 X 連接（聯名符號）
+   entry flex 0 0 auto 收文字寬度、pair justify-content center 整組居中 → X 視覺貼在文字之間 */
+.site-footer__studio-pair {
+    display: flex;
+    align-items: center;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.site-footer__studio-entry {
+    flex: 0 0 auto;
+}
+
+/* 雙公司聯名 X：兩條交叉冷光線手繪、深藍 c-blue 配三層光暈
+   不用 × 字符（Italiana 字型視覺重心歪、且筆畫粗細跟「冷光線」氣質不符） */
+.site-footer__studio-x {
+    position: relative;
+    flex-shrink: 0;
+    width: clamp(32px, 3.2vw, 44px);
+    height: clamp(32px, 3.2vw, 44px);
+    user-select: none;
+}
+
+.site-footer__studio-x::before,
+.site-footer__studio-x::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background: var(--c-blue);
+    /* 三層深藍 box-shadow 模擬冷光霓虹散射 */
+    box-shadow:
+        0 0 4px rgba(var(--c-blue-rgb), 0.90),
+        0 0 10px rgba(var(--c-blue-rgb), 0.60),
+        0 0 22px rgba(var(--c-blue-rgb), 0.32);
+    transform-origin: center;
+}
+
+.site-footer__studio-x::before {
+    transform: translateY(-50%) rotate(45deg);
+}
+
+.site-footer__studio-x::after {
+    transform: translateY(-50%) rotate(-45deg);
 }
 
 /* 最底版權行 */
@@ -898,6 +948,21 @@
         gap: var(--sp-md);
         text-align: center;
         margin-top: var(--sp-lg);
+    }
+
+    /* mobile：雙公司改垂直堆疊、cyan X 仍在中間做視覺連接 */
+    .site-footer__studio-pair {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .site-footer__studio-entry {
+        flex: 0 1 auto;
+    }
+
+    .site-footer__studio-x {
+        font-size: 1.5rem;
     }
 }
 
