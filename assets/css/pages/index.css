@@ -83,7 +83,10 @@ body {
    - viewport ≤ 1200：cqw = vw，行為跟原本 vw 等價 */
 .hero__title {
     font-family: var(--f-serif-cjk);
-    font-size: clamp(1.75rem, 5cqw, 3.6rem);
+    /* RWD 字級自適應（cqw 隨 hero__inner 容器寬度縮放）：
+       下界 1.5rem(24px) + 7cqw 大係數 → 全 mobile 範圍隨視窗變化、不卡下界
+       360 mobile → 24px / 430 mobile → 27px / 768 → 51px / 1200+ → 56px upper */
+    font-size: clamp(1.5rem, 7cqw, 3.5rem);
     font-weight: 900;
     line-height: 1.75;
     letter-spacing: 0.06em;
@@ -357,17 +360,17 @@ body {
 
 .manifesto__big-text {
     font-family: var(--f-serif-cjk);
-    font-size: clamp(4.5rem, 13vw, 13rem);
+    /* clamp 雙界調整、確保所有 viewport 自然 wrap 一致 6/3 split:
+       下界 3.1rem(49.6px): 360 mobile content 320 容納 6 字 + 全形空格（49.6×6.38=316 < 320）
+       上界 10.8rem(172.8px): 1720+ desktop content 1120 容納 6 字 + 空格（172.8×6.38=1102 < 1120）
+       中段 13vw: 跟視窗縮放、字級隨容器自然調整 */
+    font-size: clamp(3.1rem, 13vw, 10.8rem);
     font-weight: 900;
     line-height: 0.95;
     letter-spacing: -0.02em;
     text-align: right;
 }
 
-/* .line span 改 block 級別、強制每行獨立、避免 mobile 自然 wrap 把第二行首字擠上第一行末 */
-.manifesto__big-text .line {
-    display: block;
-}
 
 .manifesto__big-text .accent {
     /* 空心描邊：用 em 單位、stroke 跟字級等比縮放
@@ -386,10 +389,11 @@ body {
 }
 
 .manifesto__body p {
-    font-size: var(--fs-md);
+    /* RWD 自適應：mobile 14px / 桌機隨 vw 縮放至 22px 上界 */
+    font-size: clamp(0.875rem, 2vw, 1.375rem);
     line-height: 1.8;
     color: var(--c-muted);
-    white-space: nowrap;  /* 不分行（單行右對齊） */
+    white-space: nowrap;  /* 不分行（單行右對齊，mobile MQ override 為 normal）*/
     margin: 0;            /* spacing 由 .manifesto__body-divider 接管 */
 
     /* text-shadow 四層（與 Hero 副標 / final-cta 副標同設計：跨背景 legibility shadow + 偏移層次感）*/
@@ -453,12 +457,23 @@ body {
         width: 100%;
     }
 
-    /* body 段落改左對齊（mobile 閱讀順暢） */
-    .manifesto__body {
-        text-align: left;
+
+    /* body 中英文副標 mobile 維持靠右對齊（呼應 big-text 右對齊、視覺一致）
+       但 mobile 必須允許 wrap（desktop 的 nowrap 在 mobile 會 overflow） */
+    .manifesto__body p {
+        white-space: normal;
     }
 
+
     /* mobile 描邊已由基礎 em 單位等比縮放、不需再 override */
+}
+
+/* 真手機寬度（≤640px）才強制 body p span 換行：
+   tablet（641-900）寬度足夠、保持 inline 自然 wrap、不強制斷成 2/3 行 */
+@media (max-width: 640px) {
+    .manifesto__body p span {
+        display: block;
+    }
 }
 
 
@@ -837,6 +852,6 @@ body {
 @media (max-width: 900px) {
     .manifesto-astronaut {
         left: 1rem;
-        width: clamp(144px, 36vw, 240px);   /* 比原本放大 20% */
+        width: clamp(173px, 43.2vw, 288px);     /* 原 144-240 × 1.2 倍 */
     }
 }

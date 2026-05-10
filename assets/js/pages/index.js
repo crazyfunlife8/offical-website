@@ -479,17 +479,17 @@
 
         // ── Section 2：宣言文字滑入 ──
         gsap.fromTo('.manifesto__big-text',
-            { opacity: 0, x: 80 },
+            { opacity: 0 },
             {
-                opacity: 1, x: 0, duration: 1.0, ease: 'power2.out',
+                opacity: 1, duration: 1.0, ease: 'power2.out',
                 scrollTrigger: { trigger: '.manifesto', start: 'top 75%', toggleActions: 'play none none none' }
             }
         );
 
         gsap.fromTo('.manifesto__body',
-            { opacity: 0, x: 60 },
+            { opacity: 0 },
             {
-                opacity: 1, x: 0, duration: 0.8, delay: 0.2, ease: 'power2.out',
+                opacity: 1, duration: 0.8, delay: 0.2, ease: 'power2.out',
                 scrollTrigger: { trigger: '.manifesto', start: 'top 70%', toggleActions: 'play none none none' }
             }
         );
