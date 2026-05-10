@@ -820,14 +820,15 @@
 }
 
 /* 兩欄資訊區（CONTACT / STUDIO 雙公司）
-   STUDIO 欄擴寬（容納雙公司 + cyan X 聯名符號），用 1fr 2.2fr 比例 + max-w 提升 */
+   2026-05-11 修：原 `1fr 2.2fr / max-width 960px` 固定容器框架造成「視覺內容中心 vs 容器幾何中心」偏差 145px
+   （CONTACT 內容貼欄左 + STUDIO pair 置中於 2.2fr 寬欄，視覺重心嚴重左偏）。
+   改 `auto auto` shrink-to-content + 移除固定寬度，讓父層 .site-footer__inner align-items: center
+   把整組「CONTACT cluster + gap + STUDIO cluster」當一個自然 fit 的單元置中於 viewport，視覺與幾何重合。 */
 .site-footer__info {
     margin-top: var(--sp-w1);
     display: grid;
-    grid-template-columns: 1fr 2.2fr;
+    grid-template-columns: auto auto;
     gap: var(--sp-w1);
-    width: 100%;
-    max-width: 960px;
     text-align: left;
 }
 
