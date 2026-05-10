@@ -48,33 +48,6 @@
         });
     }
 
-    // ─── Stagger Reveal（用 [data-stagger-group] 圈住子元素） ─
-    function initStaggerReveal() {
-        if (typeof gsap === 'undefined') return;
-
-        const groups = document.querySelectorAll('[data-stagger-group]');
-        groups.forEach((group) => {
-            const children = group.children;
-            const stagger  = parseFloat(group.dataset.staggerGroup || 0.12);
-
-            gsap.fromTo(children,
-                { opacity: 0, y: 24 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.6,
-                    stagger,
-                    ease: 'power2.out',
-                    scrollTrigger: {
-                        trigger: group,
-                        start: 'top 85%',
-                        toggleActions: 'play none none none',
-                    }
-                }
-            );
-        });
-    }
-
     // ─── Nav 滾動行為 ─────────────────────────────────────────
     // 超過 100px 加深背景（class: .scrolled）
     function initNavScroll() {
@@ -98,10 +71,7 @@
     // ─── 初始化（readyState 防禦，避免 DOMContentLoaded 已提前觸發）────
     function init() {
         initNavScroll();
-        requestAnimationFrame(function () {
-            initScrollReveal();
-            initStaggerReveal();
-        });
+        requestAnimationFrame(initScrollReveal);
     }
 
     if (document.readyState === 'loading') {

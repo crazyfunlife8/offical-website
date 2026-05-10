@@ -554,14 +554,12 @@
     }
 
     // ═══════════════════════════════════════════════════════════
-    // 太空人 ScrollTrigger 偵序列（2026-05-07 PoC）
+    // Beat 02 太空人 ScrollTrigger 偵序列（Hero → Manifesto 跌落）
     // ─────────────────────────────────────────────────────────
-    // 預載 72 張 raw PNG 偵到 Image 物件 → 捲動 Hero → Manifesto
-    // 期間驅動 canvas drawImage 切偵 → Manifesto 結束後淡出。
+    // 預載 133 張透明 WebP → 捲動 Hero 上半段驅動 canvas drawImage 切偵
+    // 來源：72 Kling 真實偵 → RIFE v4.6 補偵 144 → 手動逐張去背 → 截尾刪 134-144 → 512px WebP
     // ═══════════════════════════════════════════════════════════
     function initAstronautScroll() {
-        // 來源：72 Kling 真實偵 → RIFE v4.6 補偵 144 → 使用者手動逐張去背 → 截尾刪除 134-144（角色已離場無內容）→ 512px WebP
-        // 邊緣品質：手工精修勝過所有 AI 自動工具
         const TOTAL_FRAMES = 133;
         const FRAME_PATH = (i) =>
             `assets/images/astronaut/clips/beat02-frames/frame_${String(i).padStart(3, '0')}.webp`;
@@ -752,22 +750,9 @@
         const wrapper = document.querySelector('.footer-astronaut');
         if (!wrapper || typeof gsap === 'undefined') return;
 
-        // 影片播放速度：1.0 = user 後製影片本身的原速
-        const video = wrapper.querySelector('video');
-        if (video) {
-            video.playbackRate = 1.0;
-            video.addEventListener('loadedmetadata', () => {
-                video.playbackRate = 1.0;
-            });
-        }
-
         // 漂移時長範圍（單個 cycle 從畫面外漂到另一側畫面外的秒數）
         const MIN_DURATION = 15;
         const MAX_DURATION = 22;
-
-        // 出現間隔範圍：cycle 之間的延遲（0 = 離場後立即從另一邊進場、無間隔）
-        const MIN_INTERVAL = 0;
-        const MAX_INTERVAL = 0;
 
         // 固定推進倍率：太空人朝鏡頭推進的視覺角度固定，不依起始大小變化
         const SCALE_MULTIPLIER = 2.2;
@@ -830,11 +815,7 @@
                 scaleY: endScale,
                 duration: duration,
                 ease: 'none',
-                onComplete: () => {
-                    // cycle 之間隨機間隔 2-5 秒：太空人在畫面外、製造「停留後才出現」感
-                    const interval = MIN_INTERVAL + Math.random() * (MAX_INTERVAL - MIN_INTERVAL);
-                    setTimeout(runCycle, interval * 1000);
-                },
+                onComplete: runCycle,  // cycle 之間無間隔：離場後立即從另一邊進場
             });
         }
 

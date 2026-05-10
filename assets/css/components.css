@@ -505,26 +505,6 @@
     color: var(--c-stellar);
 }
 
-/* ── 虛空型 (.btn--ghost)：純文字（保留極簡，重設 .btn 預設規則） ── */
-.btn--ghost {
-    background: none;
-    border: none;
-    border-radius: 0;
-    padding: 0.85rem 0;
-    color: rgba(var(--c-stellar-rgb), 0.40);
-    letter-spacing: 0.06em;
-    overflow: visible;
-    transition: color 0.25s ease;
-}
-
-.btn--ghost:hover {
-    color: rgba(var(--c-stellar-rgb), 0.82);
-}
-
-.btn--ghost:active {
-    transform: none;  /* 純文字不需 scale */
-}
-
 /* ── 黃金型 (.btn--yellow)：液態金按鈕（CTA 主轉換、實體金屬光感）── */
 .btn--yellow {
     background:
@@ -579,11 +559,7 @@
     transition: opacity 0.05s ease-in, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* 箭頭 icon 動畫（外連結縮小 / 內部箭頭 hover 右移） */
-.btn .fa-arrow-up-right-from-square {
-    font-size: 0.75em;
-}
-
+/* 箭頭 icon 動畫（內部箭頭 hover 右移） */
 .btn .btn-arrow {
     display: inline-block;
     transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
@@ -651,11 +627,6 @@
 
 .section-header__title .accent {
     color: var(--c-yellow);
-}
-
-.section-header__body {
-    margin-top: var(--sp-sm);
-    max-width: 520px;
 }
 
 
@@ -959,10 +930,6 @@
 
     .site-footer__studio-entry {
         flex: 0 1 auto;
-    }
-
-    .site-footer__studio-x {
-        font-size: 1.5rem;
     }
 }
 

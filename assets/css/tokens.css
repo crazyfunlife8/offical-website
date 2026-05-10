@@ -35,7 +35,6 @@
     --c-blue-rgb:    23, 54, 245;    /* #1736F5 */
     --c-navy-rgb:    11, 26, 122;    /* #0b1a7a */
     --c-yellow-rgb:  255, 199, 9;    /* #FFC709 */
-    --c-white-rgb:   255, 255, 255;  /* #FFFFFF */
     --c-stellar-rgb: 232, 240, 255;  /* #e8f0ff */
     --c-cyan-rgb:    0, 200, 255;    /* #00c8ff */
     --c-amber-rgb:   245, 166, 35;   /* #f5a623 */
@@ -43,7 +42,6 @@
     /* ─── Glass / Overlay ─── */
     --glass-bg:       rgba(23, 54, 245, 0.12);
     --glass-border:   rgba(23, 54, 245, 0.4);
-    --glass-blur:     16px;
 
     /* ─── Typography（2026-04-19 Q2 決議：B 半替換） ─── */
     --f-sans:  'Noto Sans TC', sans-serif;                              /* 全站中文內文 */
@@ -92,7 +90,6 @@
     /* ─── Layout ─── */
     --max-w:       1200px;
     --sec-px:      2.5rem;
-    --radius:      8px;
     --radius-lg:   16px;
     --radius-pill: 50px;
 
