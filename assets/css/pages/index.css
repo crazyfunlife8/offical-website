@@ -297,8 +297,10 @@ body {
     }
 
     .hero__readout {
-        font-size: 0.875rem;
-        letter-spacing: 0.03em;
+        /* clamp 隨視窗 vw 縮放：430 viewport (14 Pro Max) 拿 12.47px 可單行
+           較小手機（360-414）自動縮小到 12px、仍會自然 wrap 2 行（文字長度物理限制） */
+        font-size: clamp(0.75rem, 2.9vw, 0.875rem);
+        letter-spacing: 0;
     }
 
     .hero__readout-divider {
@@ -362,10 +364,17 @@ body {
     text-align: right;
 }
 
+/* .line span 改 block 級別、強制每行獨立、避免 mobile 自然 wrap 把第二行首字擠上第一行末 */
+.manifesto__big-text .line {
+    display: block;
+}
+
 .manifesto__big-text .accent {
-    /* 桌機版：空心描邊，更有震撼感 */
+    /* 空心描邊：用 em 單位、stroke 跟字級等比縮放
+       桌機 156px 字 → 0.022em = 3.4px stroke（≈原 3px）
+       手機 72px 字 → 0.022em = 1.6px stroke（小字配細描邊、視覺比例一致） */
     color: transparent;
-    -webkit-text-stroke: 3px var(--c-yellow);
+    -webkit-text-stroke: 0.022em var(--c-yellow);
     display: inline-block;
     position: relative;
 }
@@ -438,16 +447,18 @@ body {
         align-items: flex-start;
     }
 
-    .manifesto__big-text,
+    /* big-text 維持靠右（與桌機一致），width:100% 讓右對齊有空間生效
+       align-items: flex-start 下 h2 預設只取 max-content 寬度、text-align 失效 */
+    .manifesto__big-text {
+        width: 100%;
+    }
+
+    /* body 段落改左對齊（mobile 閱讀順暢） */
     .manifesto__body {
         text-align: left;
     }
 
-    /* 小尺寸描邊太細，改回實心黃 */
-    .manifesto__big-text .accent {
-        color: var(--c-yellow);
-        -webkit-text-stroke: 0;
-    }
+    /* mobile 描邊已由基礎 em 單位等比縮放、不需再 override */
 }
 
 
