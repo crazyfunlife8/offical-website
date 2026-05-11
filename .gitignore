@@ -19,3 +19,9 @@ assets/images/astronaut/clips/test-alpha.html
 
 # 棄用 source（5/9 白底後製版、5/10 改用黑底版後棄用）
 assets/images/astronaut/V2後製去背版.mp4
+
+# 認證金鑰（Cloudflare API token / Account ID 等）——絕對不可進 git
+.claude/secrets.local.env
+
+# Wrangler local cache（pages deploy 產出，不該 commit）
+.wrangler/
