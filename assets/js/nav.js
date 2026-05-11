@@ -92,9 +92,16 @@
 </footer>
 `;
 
-    // ─── 注入：星空 + Nav 到 body 開頭、Footer 到 body 結尾 ─────
+    // ─── 注入：星空 + Nav 到 body 開頭、Footer 緊接 <main> 後 ─────
+    // footer 注入 main afterend（同 main sibling），語意正確且 layout 跟原 inline footer 一致
+    // 若無 main element 才 fallback 到 body beforeend
     document.body.insertAdjacentHTML('afterbegin', STARFIELD_HTML + NAV_HTML);
-    document.body.insertAdjacentHTML('beforeend', SITE_FOOTER_HTML);
+    const mainEl = document.querySelector('main');
+    if (mainEl) {
+        mainEl.insertAdjacentHTML('afterend', SITE_FOOTER_HTML);
+    } else {
+        document.body.insertAdjacentHTML('beforeend', SITE_FOOTER_HTML);
+    }
 
     // ─── CSS 星空：log 螺旋臂 + 橢圓投影 + -15° 傾斜（呼應桌機 Three.js 黑洞邏輯）──
     // 設計：兩條螺旋臂、95% 星點貼臂、5% 漫散；中心暗域留空、外圈隨 r 衰減
