@@ -300,10 +300,16 @@ body {
     }
 
     .hero__readout {
-        /* clamp 隨視窗 vw 縮放：430 viewport (14 Pro Max) 拿 12.47px 可單行
-           較小手機（360-414）自動縮小到 12px、仍會自然 wrap 2 行（文字長度物理限制） */
+        /* clamp 隨視窗 vw 縮放：430 viewport (14 Pro Max) 拿 12.47px、小手機 360-414 縮到 12px */
         font-size: clamp(0.75rem, 2.9vw, 0.875rem);
         letter-spacing: 0;
+    }
+
+    /* 手機強制斷行：<strong>「而是一個敢用不同方法的團隊」永遠在第二行
+       桌機保持 inline 自然 flow；display: block 只在 ≤900px 套用、CSS-only 不動 HTML
+       配合 base .hero__readout 的 text-align: right、兩行各自靠右對齊 */
+    .hero__readout strong {
+        display: block;
     }
 
     .hero__readout-divider {
