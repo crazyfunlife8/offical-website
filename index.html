@@ -293,12 +293,12 @@
             <div class="final-cta__glow" aria-hidden="true"></div>
 
             <!-- 太空人 Beat 04（無頭追頭盔）2026-05-08
-                 自動 loop 影片、Final CTA 底部、背景層、不影響文字可讀性
-                 WebM (VP9+alpha) 真透明、現代瀏覽器 95%+ 支援；MP4 黑底為 fallback -->
+                 雙格式真透明：HEVC+alpha (Safari/iOS 13+) + WebM VP9+alpha (Chrome/Firefox/Android)
+                 HEVC 必須放第一，Safari 才會優先選；codecs=hvc1 標記讓 Chrome 跳過 HEVC 改吃 WebM -->
             <div class="footer-astronaut" aria-hidden="true">
                 <video autoplay loop muted playsinline>
+                    <source src="assets/images/astronaut/clips/beat04-loop-transparent.mp4" type="video/mp4; codecs=hvc1">
                     <source src="assets/images/astronaut/clips/beat04-loop-transparent.webm" type="video/webm">
-                    <source src="assets/images/astronaut/clips/beat04-loop-black.mp4" type="video/mp4">
                 </video>
             </div>
 

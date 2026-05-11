@@ -137,6 +137,14 @@
 
     initCSSStarfield();
 
+    // resize 重算座標（debounce 200ms）：viewport 改變時星點分布跟著重生成
+    // 避免桌機刷新後切手機尺寸看到桌機座標星點 / 手機刷新看到緊縮分布
+    let starfieldResizeTimer = null;
+    window.addEventListener('resize', () => {
+        clearTimeout(starfieldResizeTimer);
+        starfieldResizeTimer = setTimeout(initCSSStarfield, 200);
+    });
+
     // ─── Active 狀態：高亮目前頁面連結 ───────────────────────
     const currentPath = location.pathname.split('/').pop() || 'index.html';
 

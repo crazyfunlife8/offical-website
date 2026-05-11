@@ -16,8 +16,10 @@
        ════════════════════════════════════════════════════════ */
     const DESIGN_MODE = false;
 
-    // 真實手機裝置檢測（給 Three.js 效能保護用，page-load 一次性拍板）
+    // 真實手機裝置檢測（page-load 一次性拍板）
     // hover:none + pointer:coarse = 觸控主導裝置（手機 / 平板）；桌機縮窗不會誤觸發
+    // 2026-05-11 起手機跑「降階版 Three.js」（粒子 6500→2000、pixelRatio 1.5→1.0）
+    // 而非 fallback 到 CSS 星空——手機與桌機共用同一套黑洞漩渦動態語言
     const IS_TOUCH_DEVICE = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
     /* ════════════════════════════════════════════════════════
@@ -26,8 +28,7 @@
 
     function initStarfield() {
         if (typeof THREE === 'undefined') return;
-        // 效能保護：真實手機跳過 Three.js（CSS 星空 fallback 接手）；桌機縮窗仍跑
-        if (IS_TOUCH_DEVICE) return;
+        // 手機降階：粒子數縮小、pixelRatio 鎖 1.0；不再 fallback 到 CSS 星空
         /* ── 黑洞漩渦星場 ──────────────────────────────────────────
            概念：主視覺中心是黑洞深淵，所有星辰以螺旋軌跡被吸入
            技術：極座標系 (r, θ) 每幀更新 → 轉為 XY 位置
@@ -46,7 +47,7 @@
             antialias: false,
             preserveDrawingBuffer: DESIGN_MODE,
         });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, IS_TOUCH_DEVICE ? 1.0 : 1.5));
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.sortObjects = false;
 
@@ -74,7 +75,7 @@
 
         // ── 動態螺旋星場（ShaderMaterial → per-vertex 可變大小）──
 
-        const COUNT    = 6500;
+        const COUNT    = IS_TOUCH_DEVICE ? 2000 : 6500;
         const R_MIN    = 0.42;         // 事件視界半徑
         const SPIRAL_K = 0.42;
         const TILT     = Math.PI / 12;  // +15°，與 CSS 斜帶同向
@@ -183,7 +184,7 @@
 
         // ── 靜態背景星塵（固定像素大小，提供全畫面深邃基底）──
 
-        const BG_N  = 1800;
+        const BG_N  = IS_TOUCH_DEVICE ? 600 : 1800;
         const bgGeo = new THREE.BufferGeometry();
         const bgPos = new Float32Array(BG_N * 3);
         const bgCol = new Float32Array(BG_N * 3);
@@ -215,7 +216,7 @@
         // 與主粒子相同螺旋臂結構，但 spread 更寬（霧感）、亮度極低（0.03–0.14）
         // 不做逐粒子軌道計算，用 group.rotation 慢轉，視覺上暈染臂的厚度
 
-        const DUST_N   = 2800;
+        const DUST_N   = IS_TOUCH_DEVICE ? 800 : 2800;
         const dustGeo  = new THREE.BufferGeometry();
         const dustPos  = new Float32Array(DUST_N * 3);
         const dustCol  = new Float32Array(DUST_N * 3);
@@ -300,9 +301,10 @@
         const ROT_BY_TYPE = [0.00060, 0.00032, 0.00017, 0.000075];
         const BASE_PULL   = 0.000010;
 
-        // 預熱模擬：快轉 6000 幀讓差速旋轉充分剪切成自然形態
+        // 預熱模擬：快轉讓差速旋轉充分剪切成自然形態（手機減半避免阻塞）
+        const WARMUP_FRAMES = IS_TOUCH_DEVICE ? 2000 : 6000;
         (function warmup() {
-            for (let w = 0; w < 6000; w++) {
+            for (let w = 0; w < WARMUP_FRAMES; w++) {
                 for (let i = 0; i < COUNT; i++) {
                     const i4 = i * 4;
                     let r = starData[i4], theta = starData[i4 + 1];
@@ -524,14 +526,19 @@
        ════════════════════════════════════════════════════════ */
 
     function init() {
-        // Three.js 不可用（未載入或真實手機跳過）→ 移除 has-threejs、讓 CSS 星空 fallback 顯示
-        // 用 IS_TOUCH_DEVICE 而非 IS_MOBILE：桌機縮窗不誤觸發、手機才真切 fallback
-        if (typeof THREE === 'undefined' || IS_TOUCH_DEVICE) {
+        // Three.js 不可用 → 移除 has-threejs、CSS 星空 fallback 顯示
+        // 手機跑降階版 Three.js（IS_TOUCH_DEVICE 在 initStarfield 內處理粒子數縮減）
+        if (typeof THREE === 'undefined') {
             document.body.classList.remove('has-threejs');
         }
 
-        // L1 環境動畫（手機 IS_TOUCH_DEVICE 在內部早返回）
-        try { initStarfield(); } catch(e) { console.warn('[index.js] initStarfield failed:', e); }
+        // L1 環境動畫；失敗時 fallback 回 CSS 星空
+        try {
+            initStarfield();
+        } catch(e) {
+            console.warn('[index.js] initStarfield failed:', e);
+            document.body.classList.remove('has-threejs');
+        }
 
         // DESIGN_MODE：凍結 L2（進場）+ L3（捲動驅動），加 body class 讓 CSS 提供救援
         if (DESIGN_MODE) {

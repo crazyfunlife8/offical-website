@@ -88,7 +88,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 ### 關鍵架構決策原因
 - **Nav 動態注入**：nav.js 統一維護導覽列，修改單一檔案即全站生效
 - **CSS 星空由 nav.js 注入**：避免 HTML 多頁重複；`body.has-threejs` 隱藏 `.css-stars` 子元素（保留 ::before 黑洞漸層永遠顯示、避免雙重底色）
-- **`body.has-threejs`**：index.html 載入時帶此 class；JS init 時若偵測為觸控裝置（`IS_TOUCH_DEVICE` = `(hover: none) and (pointer: coarse)`）則移除、回退 CSS 星空 fallback
+- **`body.has-threejs`**：index.html 載入時帶此 class；**僅在 Three.js 不可用 / init 失敗時移除、回退 CSS 星空 fallback**。觸控裝置（`IS_TOUCH_DEVICE` = `(hover: none) and (pointer: coarse)`）跑降階版 Three.js（粒子 6500→2000），不再 fallback CSS 星空（2026-05-11 起）
 
 ---
 
@@ -101,7 +101,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 5. **Three.js 3D 星空**：僅限 index.html（`body.has-threejs`）；其他頁面用 CSS 星空
 6. **不得將頁面專屬樣式寫入 components.css**（分層邊界保護）
 7. **Hero 入場動畫**：`.js-hidden` class 搭配 GSAP，確保無 JS 時內容仍可見（不可用 `display:none`）
-8. **效能邊界**：真實觸控裝置（`hover:none + pointer:coarse`）跳過 Three.js（不再用 viewport 寬度判斷、避免桌機縮窗誤觸發）；`renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5))`
+8. **效能邊界**：真實觸控裝置（`hover:none + pointer:coarse`）跑**降階版 Three.js**——COUNT 6500→2000 / DUST_N 2800→800 / BG_N 1800→600 / 暖機 6000→2000 幀 / `setPixelRatio(min(devicePixelRatio, 1.0))`；桌機保留完整參數 `setPixelRatio(min(devicePixelRatio, 1.5))`（2026-05-11 起，原「手機跳過 Three.js」紀律廢止——Why 見 commit body）
 
 ---
 
@@ -207,7 +207,12 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 - `_工具參考/Higgsfield_協作快照.md`：協作技巧庫（含 15 天自動重驗紀律）
 - 兩條 memory feedback：`feedback_higgsfield_collaboration.md`、`feedback_state_origin_before_destructive.md`
 
-**手機版策略 / 無障礙（仍待規劃）：** 手機版 ScrollTrigger 觸發節奏可能過密、待 beat04 定案後一次性適配；`prefers-reduced-motion` 應停用所有偵序列動畫、至少保留靜態 idle 姿勢。
+**手機版策略（2026-05-11 定案）：**
+- **背景動畫**：手機跑降階版 Three.js（同桌機黑洞漩渦語言，粒子數縮 1/3），不再 fallback CSS 星空。CSS 星空保留為「Three.js init 失敗」最終 fallback。
+- **Beat 04 影片**：HEVC+alpha .mp4（Safari/iOS 13+）+ WebM VP9+alpha（Chrome/Firefox/Android）雙 source；HEVC 放第一、`codecs=hvc1` 讓 Chrome 跳過。**HEVC mp4 檔案待補**——Windows ffmpeg 無法輸出真 alpha auxiliary stream（libx265 不支援 yuva、hevc_nvenc 輸出 RGBA 但實際存儲降回 yuv420p），須用 macOS `hevc_videotoolbox` / Apple Compressor / 線上工具（Rotato Converter / Frama / getframa.app）轉檔。HEVC mp4 上線前，iOS 看不到 Beat 04 太空人（比看到黑塊 fallback 更乾淨）。
+- **ScrollTrigger Beat 02/03**：手機觸發節奏暫保持桌機規格、實機驗證後再評估降頻；`prefers-reduced-motion` 應停用所有偵序列動畫、至少保留靜態 idle 姿勢（待補）。
+
+**完整推導**（為什麼從「手機跳過 Three.js」改成「降階版 Three.js」、為什麼不選 a 修 CSS 補漏 / c canvas 2D / WebP 偵序列、HEVC+WebM 雙 source 順序如何決定、Windows ffmpeg HEVC alpha 實測失敗紀錄）見 git log 2026-05-11 commit body。
 
 ---
 
