@@ -770,46 +770,32 @@
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // 預載：每偵載入後計數、全部到齊後啟動 loop（避免初期跳偵閃爍）
+        // 並行 preload 全 470 偵，但**不等全部到齊**——page load 立即啟動 tick；
+        // 個別偵未 ready 時 skip 不 draw、保留 canvas 上一偵 buffer（避免閃爍/空白）
         const images = [];
-        let loadedCount = 0;
-        let actualLoaded = 0;   // 排除 404 失敗的、實際可用偵數
-
         for (let i = 1; i <= TOTAL_FRAMES; i++) {
             const img = new Image();
             img.src = FRAME_PATH(i);
-            img.onload = () => {
-                loadedCount++;
-                actualLoaded++;
-                if (loadedCount === TOTAL_FRAMES) startLoop();
-            };
-            img.onerror = () => {
-                loadedCount++;   // 失敗仍計數、避免無限等待
-                if (loadedCount === TOTAL_FRAMES) startLoop();
-            };
             images[i - 1] = img;
         }
 
         let frameIdx = 0;
         let lastFrameTime = 0;
 
-        function startLoop() {
-            // 容器顯示由 initFooterAstronautDrift 的 GSAP set opacity 0.9 控制，
-            // 這裡只負責 canvas 繪製、wrapper transform/opacity 與本函式無關
-            function tick(now) {
-                if (now - lastFrameTime >= FRAME_INTERVAL) {
-                    const img = images[frameIdx];
-                    if (img && img.complete && img.naturalWidth > 0) {
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    }
-                    frameIdx = (frameIdx + 1) % TOTAL_FRAMES;
-                    lastFrameTime = now;
+        function tick(now) {
+            if (now - lastFrameTime >= FRAME_INTERVAL) {
+                const img = images[frameIdx];
+                if (img && img.complete && img.naturalWidth > 0) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 }
-                requestAnimationFrame(tick);
+                // 未 ready 偵跳過、保留上一偵在 buffer（不 clearRect、不 draw）
+                frameIdx = (frameIdx + 1) % TOTAL_FRAMES;
+                lastFrameTime = now;
             }
             requestAnimationFrame(tick);
         }
+        requestAnimationFrame(tick);
     }
 
     // ═══════════════════════════════════════════════════════════
