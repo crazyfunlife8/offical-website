@@ -556,7 +556,10 @@
         // 太空人 ScrollTrigger 偵序列（Beat 03）
         try { initManifestoAstronautScroll(); } catch(e) { console.warn('[index.js] manifesto astronaut failed:', e); }
 
-        // 太空人隨機漂移（Beat 04）
+        // 太空人 Beat 04 WebP 偵序列繪製（取代 video 標籤、全平台真透明）
+        try { initFooterAstronautFrameLoop(); } catch(e) { console.warn('[index.js] footer astronaut frame loop failed:', e); }
+
+        // 太空人隨機漂移（Beat 04）—— 漂移 transform 由 GSAP 控制 wrapper、與 frame loop 並行
         try { initFooterAstronautDrift(); } catch(e) { console.warn('[index.js] footer astronaut drift failed:', e); }
     }
 
@@ -748,10 +751,74 @@
     }
 
     // ═══════════════════════════════════════════════════════════
+    // Beat 04 太空人 WebP 偵序列繪製（2026-05-11 取代 video 標籤）
+    // ─────────────────────────────────────────────────────────
+    // 原 video 方案 iOS Safari 對 VP9+alpha 不渲染 alpha → 看到黑塊；
+    // Windows ffmpeg 又無法產 HEVC+alpha mp4。改用 WebP 偵序列（同
+    // beat02/03 管線、所有平台 PNG-style alpha 100% 真透明）。
+    // 預載 N 偵 WebP → RAF 30fps 切偵 → 自動 loop（不依賴 scroll）
+    // ═══════════════════════════════════════════════════════════
+    function initFooterAstronautFrameLoop() {
+        const TOTAL_FRAMES = 470;                // 15.67s × 30fps（由 beat04_to_webp_frames.py 產出）
+        const FPS = 30;
+        const FRAME_INTERVAL = 1000 / FPS;       // 33.33ms / 偵
+        const FRAME_PATH = (i) =>
+            `assets/images/astronaut/clips/beat04-frames/frame_${String(i).padStart(3, '0')}.webp`;
+
+        const canvas = document.getElementById('footer-astronaut-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // 預載：每偵載入後計數、全部到齊後啟動 loop（避免初期跳偵閃爍）
+        const images = [];
+        let loadedCount = 0;
+        let actualLoaded = 0;   // 排除 404 失敗的、實際可用偵數
+
+        for (let i = 1; i <= TOTAL_FRAMES; i++) {
+            const img = new Image();
+            img.src = FRAME_PATH(i);
+            img.onload = () => {
+                loadedCount++;
+                actualLoaded++;
+                if (loadedCount === TOTAL_FRAMES) startLoop();
+            };
+            img.onerror = () => {
+                loadedCount++;   // 失敗仍計數、避免無限等待
+                if (loadedCount === TOTAL_FRAMES) startLoop();
+            };
+            images[i - 1] = img;
+        }
+
+        let frameIdx = 0;
+        let lastFrameTime = 0;
+
+        function startLoop() {
+            // 容器顯示由 initFooterAstronautDrift 的 GSAP set opacity 0.9 控制，
+            // 這裡只負責 canvas 繪製、wrapper transform/opacity 與本函式無關
+            function tick(now) {
+                if (now - lastFrameTime >= FRAME_INTERVAL) {
+                    const img = images[frameIdx];
+                    if (img && img.complete && img.naturalWidth > 0) {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    }
+                    frameIdx = (frameIdx + 1) % TOTAL_FRAMES;
+                    lastFrameTime = now;
+                }
+                requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
     // Beat 04 太空人隨機漂移（2026-05-08）
     // ─────────────────────────────────────────────────────────
     // 從畫面外左 / 右隨機進入、慢速漂移到對側、loop。從左進入時水平
     // 翻轉影片，讓頭盔永遠處於前進方向的前方（領頭追逐感）。
+    // 漂移 transform 由 GSAP 控制 .footer-astronaut wrapper；canvas 內容由
+    // initFooterAstronautFrameLoop 獨立繪製、兩者並行不衝突。
     // ═══════════════════════════════════════════════════════════
     function initFooterAstronautDrift() {
         const wrapper = document.querySelector('.footer-astronaut');

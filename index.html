@@ -292,14 +292,11 @@
 
             <div class="final-cta__glow" aria-hidden="true"></div>
 
-            <!-- 太空人 Beat 04（無頭追頭盔）2026-05-08
-                 雙格式真透明：HEVC+alpha (Safari/iOS 13+) + WebM VP9+alpha (Chrome/Firefox/Android)
-                 HEVC 必須放第一，Safari 才會優先選；codecs=hvc1 標記讓 Chrome 跳過 HEVC 改吃 WebM -->
+            <!-- 太空人 Beat 04（無頭追頭盔）2026-05-11 改用 WebP 偵序列
+                 取代原 video 標籤：iOS Safari 對 VP9+alpha WebM 不渲染 alpha、Windows ffmpeg
+                 又無法產 HEVC+alpha mp4。改用偵序列方案（同 beat02/03 管線）→ 所有平台真透明 -->
             <div class="footer-astronaut" aria-hidden="true">
-                <video autoplay loop muted playsinline>
-                    <source src="assets/images/astronaut/clips/beat04-loop-transparent.mp4" type="video/mp4; codecs=hvc1">
-                    <source src="assets/images/astronaut/clips/beat04-loop-transparent.webm" type="video/webm">
-                </video>
+                <canvas id="footer-astronaut-canvas" width="480" height="270"></canvas>
             </div>
 
             <div class="final-cta__inner">

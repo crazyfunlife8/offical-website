@@ -25,3 +25,6 @@ assets/images/astronaut/V2後製去背版.mp4
 
 # Wrangler local cache（pages deploy 產出，不該 commit）
 .wrangler/
+
+# 本機工具腳本（資產處理用、不進 production）
+_工具參考_local/
