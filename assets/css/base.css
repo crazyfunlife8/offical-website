@@ -45,14 +45,15 @@ body::after {
     background-repeat: repeat;
 }
 
-/* ─── Three.js canvas（僅 index.html，body.has-threejs）─── */
+/* ─── Three.js canvas（2026-05-12 起全站套用、所有頁面 body.has-threejs）─── */
+/* z-index: 1 高於 #css-starfield（z-stars，黑洞斜帶層），確保 Three.js 星點顯示在斜帶之上 */
 #starfield-canvas {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: var(--z-stars);
+    z-index: 1;
     pointer-events: none;
 }
 

@@ -3,12 +3,6 @@
    創巢數位 Nest Digital | 版本 redesign-v1
    ============================================================ */
 
-/* canvas 升到 #css-starfield 之上，Three.js 星星可見於斜帶上層
-   #css-starfield::before（黑洞斜帶）由 base.css 統一管理、本檔不再覆蓋 */
-#starfield-canvas {
-    z-index: 1;
-}
-
 /* ─── 首頁基礎 ─── */
 body {
     padding-top: 0;
