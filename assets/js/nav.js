@@ -47,8 +47,54 @@
 </div>
 `;
 
-    // ─── 注入 body 最前端（星空在前，Nav 在後）─────────────────
+    // ─── 站尾 HTML（電影片尾收束 + 雙公司聯名 X；2026-05-12 由各頁 inline 抽出統一注入）
+    const SITE_FOOTER_HTML = `
+<footer class="site-footer" role="contentinfo">
+    <div class="site-footer__inner">
+
+        <!-- 上方對稱冷光線（呼應 final-cta） -->
+        <div class="site-footer__divider" aria-hidden="true"></div>
+
+        <!-- 品牌大字（電影片尾收束） -->
+        <div class="site-footer__brand-block">
+            <h2 class="site-footer__brand-mark" aria-label="Nest Digital">NEST DIGITAL</h2>
+            <p class="site-footer__location">桃園・中壢｜中央西路二段 268-1 號 5 樓</p>
+        </div>
+
+        <!-- 兩欄資訊區 -->
+        <div class="site-footer__info">
+            <div class="site-footer__col">
+                <h3 class="site-footer__col-label">CONTACT</h3>
+                <p>LINE @604vqsva</p>
+                <p>03-4912872</p>
+            </div>
+            <div class="site-footer__col site-footer__col--studio">
+                <h3 class="site-footer__col-label">STUDIO</h3>
+                <div class="site-footer__studio-pair">
+                    <div class="site-footer__studio-entry">
+                        <p>創巢數位資訊企業社</p>
+                        <p>統編 93019200</p>
+                    </div>
+                    <span class="site-footer__studio-x" aria-hidden="true"></span>
+                    <div class="site-footer__studio-entry">
+                        <p>不正常人類軟體開發有限公司</p>
+                        <p>統編 83302868</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最底版權行 -->
+        <p class="site-footer__copy">
+            © 2024–2026 Nest Digital. All rights reserved.
+        </p>
+    </div>
+</footer>
+`;
+
+    // ─── 注入：星空 + Nav 到 body 開頭、Footer 到 body 結尾 ─────
     document.body.insertAdjacentHTML('afterbegin', STARFIELD_HTML + NAV_HTML);
+    document.body.insertAdjacentHTML('beforeend', SITE_FOOTER_HTML);
 
     // ─── CSS 星空：log 螺旋臂 + 橢圓投影 + -15° 傾斜（呼應桌機 Three.js 黑洞邏輯）──
     // 設計：兩條螺旋臂、95% 星點貼臂、5% 漫散；中心暗域留空、外圈隨 r 衰減
