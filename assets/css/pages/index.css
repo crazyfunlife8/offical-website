@@ -512,26 +512,6 @@ body {
     min-height: 280px;
 }
 
-/* FEATURED 標籤：z-index: 2 高於 Liquid Glass ::before/::after
-   FEATURED 的 F 字 baseline 對齊 .service-card__label 的開頭字 baseline：
-   完全 mirror label 的 box model（border-top transparent 佔位 + padding-top + line-height）
-   兩個 line-box 起點 / 高度完全相同 → text baseline 必然對齊在同一條水平線 */
-.bento--c::after {
-    content: 'FEATURED';
-    position: absolute;
-    top: var(--sp-md);
-    right: var(--sp-md);
-    padding-top: var(--sp-xs);
-    border-top: 1px solid transparent;
-    font-family: var(--f-mono);
-    font-size: var(--fs-xs);
-    line-height: 1.4;
-    color: var(--c-yellow);
-    letter-spacing: 0.18em;
-    opacity: 0.75;
-    z-index: 2;
-}
-
 /* C 卡專屬英文 echo 副標（FEATURED 卡差異化：呼應 hero / manifesto / final-cta 雙語對位） */
 .bento--c .service-card__title-en {
     font-family: var(--f-display-en);
