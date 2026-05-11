@@ -513,15 +513,19 @@ body {
 }
 
 /* FEATURED 標籤：z-index: 2 高於 Liquid Glass ::before/::after
-   top 對齊 label text baseline（border-top 之下 + label 自己的 padding-top sp-xs）；
-   right 對齊 desc/title 容器右緣（.card padding 內邊）—— 形成左右雙 mono 標籤平行 */
+   FEATURED 的 F 字 baseline 對齊 .service-card__label 的開頭字 baseline：
+   完全 mirror label 的 box model（border-top transparent 佔位 + padding-top + line-height）
+   兩個 line-box 起點 / 高度完全相同 → text baseline 必然對齊在同一條水平線 */
 .bento--c::after {
     content: 'FEATURED';
     position: absolute;
-    top: calc(var(--sp-md) + var(--sp-xs));
+    top: var(--sp-md);
     right: var(--sp-md);
+    padding-top: var(--sp-xs);
+    border-top: 1px solid transparent;
     font-family: var(--f-mono);
     font-size: var(--fs-xs);
+    line-height: 1.4;
     color: var(--c-yellow);
     letter-spacing: 0.18em;
     opacity: 0.75;
