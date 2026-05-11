@@ -512,12 +512,13 @@ body {
     min-height: 280px;
 }
 
-/* FEATURED 標籤：z-index: 2 高於 Liquid Glass ::before/::after */
+/* FEATURED 標籤：z-index: 2 高於 Liquid Glass ::before/::after
+   top/right 對齊 .card padding (var(--sp-md) = 2rem)，視覺上對齊 label 上緣 + desc 右緣 */
 .bento--c::after {
     content: 'FEATURED';
     position: absolute;
-    top: 1rem;
-    right: 1.25rem;
+    top: var(--sp-md);
+    right: var(--sp-md);
     font-family: var(--f-mono);
     font-size: var(--fs-xs);
     color: var(--c-yellow);
