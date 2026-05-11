@@ -513,11 +513,12 @@ body {
 }
 
 /* FEATURED 標籤：z-index: 2 高於 Liquid Glass ::before/::after
-   top/right 對齊 .card padding (var(--sp-md) = 2rem)，視覺上對齊 label 上緣 + desc 右緣 */
+   top 對齊 label text baseline（border-top 之下 + label 自己的 padding-top sp-xs）；
+   right 對齊 desc/title 容器右緣（.card padding 內邊）—— 形成左右雙 mono 標籤平行 */
 .bento--c::after {
     content: 'FEATURED';
     position: absolute;
-    top: var(--sp-md);
+    top: calc(var(--sp-md) + var(--sp-xs));
     right: var(--sp-md);
     font-family: var(--f-mono);
     font-size: var(--fs-xs);
