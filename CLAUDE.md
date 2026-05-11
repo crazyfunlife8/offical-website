@@ -98,7 +98,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 2. **CSS 5 層架構載入順序不得更改**（各層有明確職責邊界）
 3. **品牌名稱**：一律使用「創巢數位 Nest Digital」；禁止使用「NestX」（已廢棄舊稿稱呼）
 4. **nav.js 是 Nav + site-footer 唯一來源**：禁止在各 HTML 頁面直接寫 `<nav>` 或 `<footer class="site-footer">` 標籤；nav.js 用 `insertAdjacentHTML('afterbegin', ...)` 注入 STARFIELD + NAV、`insertAdjacentHTML('beforeend', SITE_FOOTER_HTML)` 注入 footer
-5. **Three.js 3D 星空**：僅限 index.html（`body.has-threejs`）；其他頁面用 CSS 星空
+5. **Three.js 3D 星空**：**2026-05-12 起全站共用**（黑洞漩渦動畫所有 11 頁套用）；由 `nav.js` 動態 load `assets/js/starfield.js`、注入 `<canvas id="starfield-canvas">`、加 `body.has-threejs` class；CSS 星空僅作為 Three.js init 失敗 fallback（init 失敗時 nav.js 自動移除 has-threejs、CSS 星空顯示）
 6. **不得將頁面專屬樣式寫入 components.css**（分層邊界保護）
 7. **Hero 入場動畫**：`.js-hidden` class 搭配 GSAP，確保無 JS 時內容仍可見（不可用 `display:none`）
 8. **效能邊界**：真實觸控裝置（`hover:none + pointer:coarse`）跑**降階版 Three.js**——COUNT 6500→2000 / DUST_N 2800→800 / BG_N 1800→600 / 暖機 6000→2000 幀 / `setPixelRatio(min(devicePixelRatio, 1.0))`；桌機保留完整參數 `setPixelRatio(min(devicePixelRatio, 1.5))`（2026-05-11 起，原「手機跳過 Three.js」紀律廢止——Why 見 commit body）

@@ -103,6 +103,53 @@
         document.body.insertAdjacentHTML('beforeend', SITE_FOOTER_HTML);
     }
 
+    // ─── Three.js 黑洞漩渦星場全站化（2026-05-12）─────────────
+    // 之前只有 index.html 跑 Three.js，其他頁用 CSS 靜態 fallback；
+    // 現改為所有頁面共用 starfield.js Three.js 黑洞動畫
+    // 流程：① body 加 has-threejs class（隱藏 CSS 螺旋臂，避免雙重）
+    //       ② 注入 <canvas id="starfield-canvas"> 給 Three.js renderer 用
+    //       ③ 動態 load Three.js CDN（已 load 跳過）→ load starfield.js
+    if (!document.body.classList.contains('has-threejs')) {
+        document.body.classList.add('has-threejs');
+    }
+    if (!document.getElementById('starfield-canvas')) {
+        const sfCanvas = document.createElement('canvas');
+        sfCanvas.id = 'starfield-canvas';
+        sfCanvas.setAttribute('aria-hidden', 'true');
+        document.body.insertBefore(sfCanvas, document.body.firstChild);
+    }
+
+    function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            // 避免重複載入同一 script
+            if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+            const s = document.createElement('script');
+            s.src = src;
+            s.onload = resolve;
+            s.onerror = () => reject(new Error(`[nav.js] failed to load ${src}`));
+            document.body.appendChild(s);
+        });
+    }
+
+    function bootStarfield() {
+        loadScript('assets/js/starfield.js').catch((e) => {
+            console.warn(e);
+            // starfield.js 載入失敗 → 拔 has-threejs，CSS 星空 fallback 接手
+            document.body.classList.remove('has-threejs');
+        });
+    }
+
+    if (typeof THREE === 'undefined') {
+        loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js')
+            .then(bootStarfield)
+            .catch((e) => {
+                console.warn(e);
+                document.body.classList.remove('has-threejs');
+            });
+    } else {
+        bootStarfield();
+    }
+
     // ─── CSS 星空：log 螺旋臂 + 橢圓投影 + -15° 傾斜（呼應桌機 Three.js 黑洞邏輯）──
     // 設計：兩條螺旋臂、95% 星點貼臂、5% 漫散；中心暗域留空、外圈隨 r 衰減
     function initCSSStarfield() {
