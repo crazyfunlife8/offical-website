@@ -1,0 +1,26 @@
+name: Deploy to Cloudflare Pages
+
+# 觸發條件：push 到 main 自動部署；workflow_dispatch 允許在 GitHub UI 手動 retry
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # commit-message 必須 ASCII，避免 Cloudflare API 8000111 Invalid commit message
+          command: pages deploy . --project-name=nestdigitalai --branch=main --commit-dirty=true --commit-message="GHA auto-deploy ${{ github.sha }}"

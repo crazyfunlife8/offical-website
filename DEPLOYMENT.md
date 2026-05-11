@@ -15,7 +15,7 @@
 | 來源 Repo | https://github.com/crazyfunlife8/offical-website（main 分支） |
 | HTTPS 憑證 | Cloudflare Universal SSL（自動續約） |
 | CDN Proxy | 開啟（橙雲） |
-| 部署方式 | 手動（Wrangler Direct Upload，尚未啟用 GitHub CI/CD） |
+| 部署方式 | **GitHub Actions 自動部署**（push main 觸發、底層仍走 Wrangler Direct Upload）；本地手動 `wrangler pages deploy` 仍可並用 |
 
 ## 二、Cloudflare 帳戶資源
 
@@ -87,16 +87,32 @@ npx --yes wrangler@latest pages deploy . --project-name=nestdigitalai --branch=m
 - NEW創巢官網 本地 `.claude/secrets.local.env` **不存在也不該建**，避免 token 散落多處增加洩漏風險
 - 此規範同步寫進 `~/.claude/projects/.../memory/project_nestdigital.md`，未來 session 自動知道
 
-## 五、啟用自動部署（未來可選）
+## 五、自動部署（2026-05-12 啟用：GitHub Actions + wrangler）
 
-要做到「push 到 main 自動觸發部署」需要建立 GitHub App OAuth 連線。此步驟**必須本人用瀏覽器操作**（GitHub OAuth 流程不能 API 代做）。
+**為什麼不走 Cloudflare 原生 Git Integration**：`nestdigitalai` project 當初用 Direct Upload mode 建立、官方規定 Direct Upload 與 Git Integration mode **不可互轉**（[Cloudflare docs](https://developers.cloudflare.com/pages/get-started/direct-upload/)）。若要 Git Integration 必須砍掉重建 project + 移轉自訂網域 + 失去現有 8 個 deployment 快照（a25dbace 等永久 URL 全失效）—— 切換代價過大。
 
-**步驟：**
-1. Discipline0305 用瀏覽器登入 Cloudflare
-2. 進 Workers 和 Pages → 點 `nestdigitalai` 專案 → Settings → Builds & deployments → Connect to Git
-3. 跳到 GitHub 授權頁，用 `Crazypig0305` 帳號 Authorize「Cloudflare Workers and Pages」App
-4. 安裝範圍勾 `offical-website`
-5. 之後每次 push 到 main 自動觸發 build & deploy
+**替代方案**：用 GitHub Actions + `cloudflare/wrangler-action@v3` 自動跑 wrangler pages deploy。完全不動 Cloudflare project、保留所有歷史快照、效果跟原生 git integration 一樣（push main → 自動 deploy production）。
+
+**Workflow 檔案**：`.github/workflows/deploy.yml`（main branch push 或 workflow_dispatch 觸發）
+
+**所需 GitHub Repo Secrets**（一次性設定）：
+1. 開 https://github.com/crazyfunlife8/offical-website/settings/secrets/actions
+2. 點 **New repository secret**，加兩個：
+   - Name: `CLOUDFLARE_API_TOKEN` / Value: 從部落格 `.claude/secrets.local.env` 複製 `cfut_xxx` token
+   - Name: `CLOUDFLARE_ACCOUNT_ID` / Value: `ddec233d5df4739ab8d5ec9567756ffd`
+
+**驗證流程**：
+1. 加完 secrets 後、push 任何 commit 到 main → GitHub Actions tab 自動跑 deploy job
+2. job 完成後 nestdigitalai.com 即生效（通常 1-2 分鐘）
+3. 若 secrets 設定前已有 workflow run 失敗、可在 GitHub Actions UI 點該 run → Re-run（無需重新 push）
+
+**Preview branch 工作流**（C 方案限制）：
+- 推到非 main branch **不會** trigger GitHub Actions 部署
+- 若需要 preview URL（同事 review 用），仍由本人在本地跑：
+  ```bash
+  npx --yes wrangler@latest pages deploy . --project-name=nestdigitalai --branch=preview-xxx --commit-dirty=true --commit-message="preview xxx"
+  ```
+- 跑完會給獨立 deployment URL、不影響主網域
 
 ## 六、權限配置
 
