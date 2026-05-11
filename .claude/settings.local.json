@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmdkey /list)",
+      "Bash(findstr github *)",
+      "PowerShell(cmdkey /delete:git:https://github.com)"
+    ]
+  }
+}
