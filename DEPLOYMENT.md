@@ -65,8 +65,11 @@ cd "/c/Users/user-45664/Desktop/Claude AI相關/數位印鈔機/NEW創巢官網"
 npx --yes wrangler@latest pages deploy . \
   --project-name=nestdigitalai \
   --branch=main \
-  --commit-dirty=true
+  --commit-dirty=true \
+  --commit-message="ASCII-only summary here"
 ```
+
+**⚠️ 必加 `--commit-message="ASCII 純英文摘要"`**——wrangler 預設把 git HEAD commit message 連同中文 body 傳給 Cloudflare API；API 用 UTF-8 嚴格驗證、含中文一律回 `code: 8000111 Invalid commit message`。即使 git commit 首行純 ASCII、body 中文仍會觸發。解法：用 `--commit-message` 覆寫成純 ASCII 短句（git commit 本身仍可繁中、僅 deploy 訊息要 ASCII）。
 
 或若需從 GitHub main 最新版部署（確保跟 GitHub 同步）：
 ```bash
@@ -74,7 +77,7 @@ set -a; source "/c/Users/user-45664/Desktop/Claude AI相關/部落格/.claude/se
 cd /tmp && rm -rf cf-deploy && mkdir cf-deploy && cd cf-deploy
 gh repo clone crazyfunlife8/offical-website repo -- --depth=1 --branch=main
 cd repo
-npx --yes wrangler@latest pages deploy . --project-name=nestdigitalai --branch=main --commit-dirty=true
+npx --yes wrangler@latest pages deploy . --project-name=nestdigitalai --branch=main --commit-dirty=true --commit-message="ASCII summary"
 ```
 
 部署完成後，Wrangler 會輸出新的 deployment 子網址（如 `https://xxxxxxxx.nestdigitalai.pages.dev`），自訂網域 `nestdigitalai.com` 會自動指向最新一次部署。
