@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="no-js">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一鍵架站｜創巢數位 Nest Digital</title>
+    <meta name="description" content="填完就好，剩下交給我們。幾分鐘內完成 AI 品牌分析與網站初步架構規劃。">
+    <meta property="og:title"       content="一鍵架站｜創巢數位 Nest Digital">
+    <meta property="og:description" content="填完就好，剩下交給我們。">
+    <meta property="og:type"        content="website">
+    <meta property="og:url"         content="https://nestdigitalai.com/quick-site.html">
+    <link rel="canonical"           href="https://nestdigitalai.com/quick-site.html">
+    <link rel="icon"                href="assets/images/brand/icon.png">
+    <link rel="apple-touch-icon"    href="assets/images/brand/icon.png">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght,SOFT@9..144,100..900,0..100&family=Noto+Sans+TC:wght@100;300;400;700;900&family=Italiana&display=swap" rel="stylesheet">
+
+    <!-- Chiron Sung HK -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+
+    <!-- CSS（順序不得更改）-->
+    <link rel="stylesheet" href="assets/css/tokens.css">
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
+    <link rel="stylesheet" href="assets/css/pages/quick-site.css">
+</head>
+<body>
+    <!-- Nav 由 nav.js 動態注入 -->
+
+    <main class="qs-main">
+
+        <!-- ── Hero 區 ── -->
+        <section class="qs-hero">
+            <div class="qs-hero__inner">
+                <p class="qs-hero__eyebrow" data-reveal>QUICK SITE BUILDER</p>
+                <h1 class="qs-hero__title" data-reveal data-reveal-delay="0.08">
+                    一鍵架站
+                </h1>
+                <p class="qs-hero__title-en" data-reveal data-reveal-delay="0.14">
+                    Fill in. We handle the rest.
+                </p>
+                <div class="qs-hero__divider" aria-hidden="true" data-reveal data-reveal-delay="0.2"></div>
+                <p class="qs-hero__lead" data-reveal data-reveal-delay="0.25">
+                    填完就好，剩下交給我們。系統會自動分析你的需求，<br>
+                    <strong>幾分鐘內</strong>完成初步架構規劃，並將結果傳送給你。
+                </p>
+            </div>
+        </section>
+
+        <!-- ── 表單區 ── -->
+        <section class="qs-form-section">
+            <div class="qs-container">
+
+                <form id="siteForm" class="qs-form" novalidate>
+
+                    <!-- ── 基本資料 ── -->
+                    <div class="qs-block">
+                        <div class="qs-block__header">
+                            <span class="qs-block__label">01 · BASIC INFO</span>
+                            <h2 class="qs-block__title">基本資料</h2>
+                        </div>
+                        <div class="qs-block__body card">
+                            <div class="qs-field-row">
+                                <div class="qs-field">
+                                    <label class="qs-label" for="siteName">
+                                        網站名稱 <span class="qs-required">*</span>
+                                    </label>
+                                    <input class="qs-input" type="text" id="siteName" name="siteName"
+                                        placeholder="例：創巢數位、小明咖啡" required>
+                                    <span class="qs-error">請填寫網站名稱</span>
+                                </div>
+                                <div class="qs-field">
+                                    <label class="qs-label" for="industry">
+                                        行業類別 <span class="qs-required">*</span>
+                                    </label>
+                                    <input class="qs-input" type="text" id="industry" name="industry"
+                                        placeholder="例：餐飲業、室內設計、健身教練" required>
+                                    <span class="qs-error">請填寫行業類別</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── 商家介紹 ── -->
+                    <div class="qs-block">
+                        <div class="qs-block__header">
+                            <span class="qs-block__label">02 · ABOUT</span>
+                            <h2 class="qs-block__title">商家介紹</h2>
+                        </div>
+                        <div class="qs-block__body card">
+                            <div class="qs-field">
+                                <label class="qs-label" for="businessDesc">
+                                    商家描述 <span class="qs-required">*</span>
+                                </label>
+                                <textarea class="qs-textarea" id="businessDesc" name="businessDesc" rows="4"
+                                    placeholder="介紹你的商家，例如：我們是一間位於台北的手作甜點工作室，專注於客製化婚禮蛋糕與節慶甜點，堅持使用天然食材。" required></textarea>
+                                <span class="qs-error">請填寫商家描述</span>
+                            </div>
+                            <div class="qs-field">
+                                <label class="qs-label" for="services">
+                                    提供的服務 <span class="qs-required">*</span>
+                                </label>
+                                <textarea class="qs-textarea" id="services" name="services" rows="4"
+                                    placeholder="條列你的主要服務或產品，例如：客製蛋糕、甜點外燴、烘焙課程、禮盒訂購。" required></textarea>
+                                <span class="qs-error">請填寫提供的服務</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── 聯絡資訊 ── -->
+                    <div class="qs-block">
+                        <div class="qs-block__header">
+                            <span class="qs-block__label">03 · CONTACT</span>
+                            <h2 class="qs-block__title">聯絡資訊</h2>
+                        </div>
+                        <div class="qs-block__body card">
+                            <div class="qs-field-row">
+                                <div class="qs-field">
+                                    <label class="qs-label" for="email">
+                                        信箱 <span class="qs-hint">（請使用 Google 信箱）</span>
+                                        <span class="qs-required">*</span>
+                                    </label>
+                                    <input class="qs-input" type="email" id="email" name="email"
+                                        placeholder="example@gmail.com" required>
+                                    <span class="qs-error">請填寫有效的 Google 電子信箱</span>
+                                </div>
+                                <div class="qs-field">
+                                    <label class="qs-label" for="phone">
+                                        連絡電話 <span class="qs-required">*</span>
+                                    </label>
+                                    <input class="qs-input" type="tel" id="phone" name="phone"
+                                        placeholder="例：0912-345-678" required>
+                                    <span class="qs-error">請填寫連絡電話</span>
+                                </div>
+                            </div>
+                            <div class="qs-field">
+                                <label class="qs-label" for="address">
+                                    地址 <span class="qs-hint">（選填）</span>
+                                </label>
+                                <input class="qs-input" type="text" id="address" name="address"
+                                    placeholder="例：台北市大安區忠孝東路四段">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── 風格偏好 ── -->
+                    <div class="qs-block">
+                        <div class="qs-block__header">
+                            <span class="qs-block__label">04 · STYLE</span>
+                            <h2 class="qs-block__title">風格偏好</h2>
+                        </div>
+                        <div class="qs-block__body card">
+                            <div class="qs-field">
+                                <label class="qs-label" for="stylePrefs">
+                                    偏好風格 <span class="qs-required">*</span>
+                                </label>
+                                <select class="qs-select" id="stylePrefs" name="stylePrefs" required>
+                                    <option value="" disabled selected>請選擇偏好風格</option>
+                                    <option value="依行業特性判斷">依行業特性判斷</option>
+                                    <option value="現代簡約">現代簡約</option>
+                                    <option value="專業商務">專業商務</option>
+                                    <option value="活潑亮麗">活潑亮麗</option>
+                                    <option value="溫馨自然">溫馨自然</option>
+                                    <option value="科技未來">科技未來</option>
+                                    <option value="優雅奢華">優雅奢華</option>
+                                    <option value="可愛俏皮">可愛俏皮</option>
+                                    <option value="復古懷舊">復古懷舊</option>
+                                </select>
+                                <span class="qs-error">請選擇風格偏好</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── 送出 ── -->
+                    <div class="qs-submit-area" data-reveal>
+                        <button type="submit" class="btn btn--yellow" id="submitBtn">
+                            送出需求，開始生成
+                            <span class="btn-arrow" aria-hidden="true">→</span>
+                        </button>
+                        <p class="qs-submit-note">送出後請保持此頁面開啟，AI 處理完成後會自動顯示結果。</p>
+                    </div>
+
+                </form>
+
+                <a href="index.html#services-section" class="qs-back-link">← 回服務星圖</a>
+
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- ════════════════════════════════════════════════
+         等待 Overlay
+    ════════════════════════════════════════════════ -->
+    <div class="qs-overlay" id="loadingOverlay" role="dialog" aria-modal="true" aria-label="處理中">
+        <div class="qs-overlay__box">
+
+            <div class="qs-overlay__brand">
+                <span class="qs-overlay__dot"></span>
+                NEST DIGITAL
+            </div>
+
+            <!-- 第一階段：AI 處理中 -->
+            <div id="phaseProcess">
+                <p class="qs-overlay__title">正在處理你的需求</p>
+                <p class="qs-overlay__sub">請保持此頁面開啟，完成後會自動顯示結果</p>
+
+                <div class="qs-spinner">
+                    <div class="qs-spinner__ring"></div>
+                    <div class="qs-spinner__core">
+                        <i class="fas fa-bolt" aria-hidden="true"></i>
+                    </div>
+                </div>
+
+                <ul class="qs-steps" aria-label="處理進度">
+                    <li class="qs-step qs-step--done" id="step1">
+                        <span class="qs-step__icon"><i class="fas fa-check"></i></span>
+                        <span>接收需求資料</span>
+                    </li>
+                    <li class="qs-step qs-step--active" id="step2">
+                        <span class="qs-step__icon"><i class="fas fa-spinner fa-spin"></i></span>
+                        <span>AI 分析品牌定位</span>
+                    </li>
+                    <li class="qs-step qs-step--pending" id="step3">
+                        <span class="qs-step__icon"><i class="fas fa-circle"></i></span>
+                        <span>規劃網站架構</span>
+                    </li>
+                    <li class="qs-step qs-step--pending" id="step4">
+                        <span class="qs-step__icon"><i class="fas fa-circle"></i></span>
+                        <span>生成頁面內容</span>
+                    </li>
+                    <li class="qs-step qs-step--pending" id="step5">
+                        <span class="qs-step__icon"><i class="fas fa-circle"></i></span>
+                        <span>完成準備</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 第二階段：部署中 -->
+            <div id="phaseDeploy" style="display:none;">
+                <p class="qs-overlay__title">
+                    網站部署中
+                    <span class="qs-dots" aria-hidden="true">
+                        <span></span><span></span><span></span>
+                    </span>
+                </p>
+                <p class="qs-overlay__sub">網站正在上線，完成後將自動開啟結果</p>
+
+                <div class="qs-countdown">
+                    <svg class="qs-countdown__ring" viewBox="0 0 120 120" aria-hidden="true">
+                        <circle class="qs-countdown__bg" cx="60" cy="60" r="52"/>
+                        <circle class="qs-countdown__bar" id="countdownBar" cx="60" cy="60" r="52"/>
+                    </svg>
+                    <div class="qs-countdown__number" id="countdownNumber">0%</div>
+                </div>
+
+                <p class="qs-deploy-hint">
+                    <i class="fas fa-info-circle" aria-hidden="true"></i> 請保持此頁面開啟
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ════════════════════════════════════════════════
+         結果 Overlay
+    ════════════════════════════════════════════════ -->
+    <div class="qs-result" id="resultOverlay" role="dialog" aria-modal="true" aria-label="架設結果">
+        <div class="qs-result__inner">
+
+            <div class="qs-result__hero">
+                <p class="qs-result__eyebrow">COMPLETE</p>
+                <h2 class="qs-result__title">你的網站已建好了！</h2>
+                <p class="qs-result__title-en">Your site is live.</p>
+                <div class="qs-result__divider" aria-hidden="true"></div>
+            </div>
+
+            <!-- 成功：網址卡片 -->
+            <div class="qs-result__url-card card" id="resultUrlCard">
+                <span class="qs-result__url-label">
+                    <i class="fas fa-globe" aria-hidden="true"></i> 你的網站網址
+                </span>
+                <a id="resultSiteUrl" href="#" target="_blank" rel="noopener" class="qs-result__url-link">
+                    <span id="resultUrlText">—</span>
+                    <i class="fas fa-external-link-alt" aria-hidden="true"></i>
+                </a>
+            </div>
+
+            <!-- 失敗：錯誤提示 -->
+            <div class="qs-result__fail-card card" id="resultFailCard" style="display:none;">
+                <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+                <p id="resultFailMsg">架設過程發生問題，請聯絡我們處理。</p>
+            </div>
+
+            <div class="qs-result__cta card">
+                <p>想進一步討論或調整？</p>
+                <a href="https://line.me/R/ti/p/@604vqsva?ts=01261611&oat_content=url"
+                   target="_blank" rel="noopener" class="btn btn--primary">
+                    <i class="fab fa-line" aria-hidden="true"></i>
+                    聯絡我們繼續聊
+                    <span class="btn-arrow" aria-hidden="true">→</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ── 錯誤 Toast ── -->
+    <div class="qs-toast" id="errorToast" role="alert">
+        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+        <span id="toastMsg">送出失敗，請稍後再試。</span>
+    </div>
+
+
+    <!-- ════════════════════════════════════════════════
+         頁尾
+    ════════════════════════════════════════════════ -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="site-footer__inner">
+            <div class="site-footer__divider" aria-hidden="true"></div>
+            <div class="site-footer__brand-block">
+                <h2 class="site-footer__brand-mark" aria-label="Nest Digital">NEST DIGITAL</h2>
+                <p class="site-footer__location">桃園・中壢｜中央西路二段 268-1 號 5 樓</p>
+            </div>
+            <div class="site-footer__info">
+                <div class="site-footer__col">
+                    <h3 class="site-footer__col-label">CONTACT</h3>
+                    <p>LINE @604vqsva</p>
+                    <p>03-4912872</p>
+                </div>
+                <div class="site-footer__col">
+                    <h3 class="site-footer__col-label">STUDIO</h3>
+                    <p>創巢數位資訊企業社</p>
+                    <p>統編 93019200</p>
+                </div>
+            </div>
+            <p class="site-footer__copy">
+                © 2024–2026 Nest Digital. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+
+    <!-- Scripts（順序不得更改）-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script src="assets/js/pages/quick-site.js"></script>
+</body>
+</html>
