@@ -3,7 +3,8 @@
     "allow": [
       "Bash(cmdkey /list)",
       "Bash(findstr github *)",
-      "PowerShell(cmdkey /delete:git:https://github.com)"
+      "PowerShell(cmdkey /delete:git:https://github.com)",
+      "Bash(npx wrangler *)"
     ]
   }
 }
