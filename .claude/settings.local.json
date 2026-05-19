@@ -4,7 +4,8 @@
       "Bash(cmdkey /list)",
       "Bash(findstr github *)",
       "PowerShell(cmdkey /delete:git:https://github.com)",
-      "Bash(npx wrangler *)"
+      "Bash(npx wrangler *)",
+      "Bash(xcopy /E /I /Y \"C:\\\\Users\\\\USER\\\\Desktop\\\\game-platform\\\\*\" \"C:\\\\Users\\\\USER\\\\Desktop\\\\NEW創巢官網\\\\demo\\\\gaming\\\\\" && xcopy /E /I /Y \"C:\\\\Users\\\\USER\\\\Desktop\\\\travelschedule\\\\*\" \"C:\\\\Users\\\\USER\\\\Desktop\\\\NEW創巢官網\\\\demo\\\\travel\\\\\")"
     ]
   }
 }

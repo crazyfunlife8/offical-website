@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>探索台灣 — 旅遊行程規劃</title>
+        
+        <!-- font awesome icon -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <!-- Google Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+        
+        <!-- AOS Animate On Scroll -->
+        <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+    <!-- SortableJS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+        <a class="navbar-brand" href="#" onclick="scrollToTop()">
+            <i data-lucide="compass" style="width:22px;height:22px"></i>
+            <span>探索台灣</span>
+        </a>
+        <div class="navbar-links" id="navLinks">
+            <a href="#hero" class="nav-link active" onclick="scrollToSection('hero')">首頁</a>
+            <a href="#stepperWrap" class="nav-link" onclick="scrollToSection('stepperWrap')">行程規劃</a>
+            <a href="#contact" class="nav-link" onclick="scrollToSection('contact')">聯絡我們</a>
+        </div>
+        <div class="navbar-actions">
+            <button class="btn-nav-login" onclick="openAuthModal('login')">
+                <i data-lucide="log-in" style="width:16px;height:16px"></i> 登入
+            </button>
+            <button class="btn-nav-register" onclick="openAuthModal('register')">免費註冊</button>
+            <!-- Logged-in state (hidden by default) -->
+            <div class="nav-user-menu" id="navUserMenu" style="display:none;">
+                <button class="btn-nav-user" onclick="toggleUserDropdown()">
+                    <div class="nav-avatar" id="navAvatar">U</div>
+                    <span id="navUserName">會員</span>
+                    <i data-lucide="chevron-down" style="width:14px;height:14px"></i>
+                </button>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-avatar" id="dropdownAvatar">U</div>
+                        <div>
+                            <div class="dropdown-name" id="dropdownName">會員</div>
+                            <div class="dropdown-email" id="dropdownEmail">user@example.com</div>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" onclick="openMyAccount()">
+                        <i data-lucide="user" style="width:16px;height:16px"></i> 我的帳戶
+                    </a>
+                    <a class="dropdown-item" onclick="openMyBookings()">
+                        <i data-lucide="calendar" style="width:16px;height:16px"></i> 我的行程
+                    </a>
+                    <a class="dropdown-item" onclick="openWishlist()">
+                        <i data-lucide="heart" style="width:16px;height:16px"></i> 收藏清單
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item text-danger" onclick="handleLogout()">
+                        <i data-lucide="log-out" style="width:16px;height:16px"></i> 登出
+                    </a>
+                </div>
+            </div>
+        </div>
+        <button class="navbar-hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
+            <i data-lucide="menu" style="width:22px;height:22px"></i>
+        </button>
+    </div>
+    <!-- Mobile menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#hero" class="mobile-link" onclick="scrollToSection('hero'); closeMobileMenu()">首頁</a>
+        <a href="#stepperWrap" class="mobile-link" onclick="scrollToSection('stepperWrap'); closeMobileMenu()">行程規劃</a>
+        <a href="#contact" class="mobile-link" onclick="scrollToSection('contact'); closeMobileMenu()">聯絡我們</a>
+        <div class="mobile-menu-divider"></div>
+        <button class="btn-mobile-login" onclick="openAuthModal('login'); closeMobileMenu()">登入</button>
+        <button class="btn-mobile-register" onclick="openAuthModal('register'); closeMobileMenu()">免費註冊</button>
+    </div>
+</nav>
+
+<!-- ========== HERO ========== -->
+<header class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <div class="hero-badge">
+            <i data-lucide="compass" style="width:14px;height:14px"></i>
+            Taiwan Travel Planner
+        </div>
+        <h1>打造你的<span>夢想旅程</span></h1>
+        <p class="hero-sub">從經典路線到完全客製，探索台灣最美的角落</p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <strong>2,500+</strong>
+                <span>滿意旅客</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+                <strong>150+</strong>
+                <span>精選景點</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+                <strong>4.9</strong>
+                <span>平均評分</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ========== STEPPER ========== -->
+<div class="stepper-wrap" id="stepperWrap">
+    <nav class="stepper">
+        <button class="stepper-step active" onclick="goStep(1)">
+            <span class="stepper-num">1</span>
+            <span class="stepper-label">方案</span>
+        </button>
+        <div class="stepper-line"></div>
+        <button class="stepper-step" onclick="goStep(2)">
+            <span class="stepper-num">2</span>
+            <span class="stepper-label">景點</span>
+        </button>
+        <div class="stepper-line"></div>
+        <button class="stepper-step" onclick="goStep(3)">
+            <span class="stepper-num">3</span>
+            <span class="stepper-label">排序</span>
+        </button>
+        <div class="stepper-line"></div>
+        <button class="stepper-step" onclick="goStep(4)">
+            <span class="stepper-num">4</span>
+            <span class="stepper-label">加購</span>
+        </button>
+        <div class="stepper-line"></div>
+        <button class="stepper-step" onclick="goStep(5)">
+            <span class="stepper-num">5</span>
+            <span class="stepper-label">確認</span>
+        </button>
+    </nav>
+</div>
+
+<main class="container">
+
+    <!-- ===== STEP 1 ===== -->
+    <div id="step1" class="section active">
+        <div class="section-head fade-up">
+            <h2>選擇旅遊方案</h2>
+            <p>精選六大經典行程，或跳過直接自行規劃景點</p>
+        </div>
+        <div class="packages-grid" id="packagesGrid"></div>
+        <div class="or-divider"><span>或者自己來</span></div>
+        <div style="text-align:center">
+            <button class="btn-link" onclick="clearPackage(); goStep(2);">
+                <i data-lucide="plus" style="width:16px;height:16px;vertical-align:-3px;margin-right:4px"></i>
+                跳過方案，自行選擇景點
+            </button>
+        </div>
+        <div class="btn-row">
+            <div></div>
+            <button class="btn btn-primary" onclick="goStep(2)">
+                繼續下一步 <i data-lucide="arrow-right" style="width:16px;height:16px"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== STEP 2 ===== -->
+    <div id="step2" class="section">
+        <div class="section-head fade-up">
+            <h2>選擇你想去的景點</h2>
+            <p>已選擇 <strong id="spotCount">0</strong> 個景點，點選卡片加入或移除</p>
+        </div>
+        <div class="filter-bar" id="filterBar"></div>
+        <div class="spots-grid" id="spotsGrid"></div>
+        <div class="btn-row">
+            <button class="btn btn-ghost" onclick="goStep(1)">
+                <i data-lucide="arrow-left" style="width:16px;height:16px"></i> 上一步
+            </button>
+            <button class="btn btn-primary" onclick="goStep(3)">
+                繼續下一步 <i data-lucide="arrow-right" style="width:16px;height:16px"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== STEP 3 ===== -->
+    <div id="step3" class="section">
+        <div class="section-head fade-up">
+            <h2>安排遊覽順序</h2>
+            <p>拖曳景點卡片調整你的路線順序</p>
+        </div>
+        <div class="sort-container">
+            <div class="sort-list" id="sortList"></div>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-ghost" onclick="goStep(2)">
+                <i data-lucide="arrow-left" style="width:16px;height:16px"></i> 上一步
+            </button>
+            <button class="btn btn-primary" onclick="goStep(4)">
+                繼續下一步 <i data-lucide="arrow-right" style="width:16px;height:16px"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== STEP 4 ===== -->
+    <div id="step4" class="section">
+        <div class="section-head fade-up">
+            <h2>餐點與接送服務</h2>
+            <p>依需求加購餐飲安排與交通接送</p>
+        </div>
+        <div class="options-grid">
+            <!-- Meal -->
+            <div class="option-group">
+                <div class="option-group-title">
+                    <span class="icon-wrap icon-meal"><i data-lucide="utensils" style="width:18px;height:18px"></i></span>
+                    餐點供應
+                </div>
+                <div class="option-item" onclick="selectOption('meal','none',this)" data-group="meal">
+                    <div class="option-radio"></div>
+                    <div class="option-label"><strong>不需要餐點</strong><span>自行安排用餐</span></div>
+                    <div class="option-price">+$0</div>
+                </div>
+                <div class="option-item" onclick="selectOption('meal','lunch',this)" data-group="meal">
+                    <div class="option-radio"></div>
+                    <div class="option-label"><strong>午餐</strong><span>在地特色餐廳</span></div>
+                    <div class="option-price">+$300</div>
+                </div>
+                <div class="option-item" onclick="selectOption('meal','full',this)" data-group="meal">
+                    <div class="option-radio"></div>
+                    <div class="option-label"><strong>午餐 + 晚餐</strong><span>全天餐食含特色料理</span></div>
+                    <div class="option-price">+$700</div>
+                </div>
+                <div class="option-item" onclick="selectOption('meal','premium',this)" data-group="meal">
+                    <div class="option-radio"></div>
+                    <div class="option-label"><strong>豪華全餐</strong><span>三餐 + 下午茶點心</span></div>
+                    <div class="option-price">+$1,200</div>
+                </div>
+            </div>
+            <!-- Transport -->
+            <div class="option-group">
+                <div class="option-group-title">
+                    <span class="icon-wrap icon-transport"><i data-lucide="car" style="width:18px;height:18px"></i></span>
+                    接送方式
+                </div>
+                <div class="option-item" onclick="selectOption('transport','none',this)" data-group="transport">
+                    <div class="option-radio"></div>
+                    <div class="option-label"><strong>自行前往</strong><span>自駕或大眾運輸</span></div>
+                    <div class="option-price">+$0</div>
+                </div>
+                <div class="option-item" onclick="selectOption('transport','station',this)" data-group="transport">
+                    <div class="option-radio"></div>
+                    <div class="option-label"><strong>車站定點接送</strong><span>高鐵 / 火車站出發</span></div>
+                    <div class="option-price">+$400</div>
+                </div>
+                <div class="option-item" onclick="selectOption('transport','hotel',this)" data-group="transport">
+                    <div class="option-radio"></div>
+                    <div class="option-label"><strong>飯店接送</strong><span>指定飯店門口接送</span></div>
+                    <div class="option-price">+$800</div>
+                </div>
+                <div class="option-item" onclick="selectOption('transport','private',this)" data-group="transport">
+                    <div class="option-radio"></div>
+                    <div class="option-label"><strong>到府專車接送</strong><span>專人專車到府服務</span></div>
+                    <div class="option-price">+$1,500</div>
+                </div>
+            </div>
+        </div>
+        <!-- People -->
+        <div class="option-group" style="max-width:420px;">
+            <div class="option-group-title">
+                <span class="icon-wrap icon-people"><i data-lucide="users" style="width:18px;height:18px"></i></span>
+                參加人數
+            </div>
+            <div class="people-counter">
+                <button class="counter-btn" onclick="changePeople(-1)">
+                    <i data-lucide="minus" style="width:18px;height:18px"></i>
+                </button>
+                <span class="counter-num" id="peopleCount">2</span>
+                <button class="counter-btn" onclick="changePeople(1)">
+                    <i data-lucide="plus" style="width:18px;height:18px"></i>
+                </button>
+                <span class="counter-label">人</span>
+            </div>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-ghost" onclick="goStep(3)">
+                <i data-lucide="arrow-left" style="width:16px;height:16px"></i> 上一步
+            </button>
+            <button class="btn btn-primary" onclick="goStep(5)">
+                繼續下一步 <i data-lucide="arrow-right" style="width:16px;height:16px"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== STEP 5 ===== -->
+    <div id="step5" class="section">
+        <div class="section-head fade-up">
+            <h2>確認您的行程</h2>
+            <p>檢查以下資訊，確認無誤即可送出預訂</p>
+        </div>
+        <div class="summary-card">
+            <div class="summary-header">
+                <h3 id="summaryTitle">您的專屬旅程</h3>
+                <span class="sub" id="summarySubtitle"></span>
+            </div>
+            <div class="summary-body">
+                <div class="summary-row">
+                    <span class="label">方案</span>
+                    <span class="value" id="sumPackage">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">景點路線</span>
+                    <div class="value summary-route" id="sumRoute"></div>
+                </div>
+                <div class="summary-row">
+                    <span class="label">餐點</span>
+                    <span class="value" id="sumMeal">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">接送</span>
+                    <span class="value" id="sumTransport">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">人數</span>
+                    <span class="value" id="sumPeople">-</span>
+                </div>
+            </div>
+            <div class="summary-total">
+                <span class="total-label">預估總金額</span>
+                <span class="total-price" id="sumTotal">$0</span>
+            </div>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-ghost" onclick="goStep(4)">
+                <i data-lucide="arrow-left" style="width:16px;height:16px"></i> 上一步
+            </button>
+            <button class="btn btn-success" onclick="submitBooking()">
+                <i data-lucide="check-circle" style="width:18px;height:18px"></i> 確認預訂
+            </button>
+        </div>
+    </div>
+
+</main>
+
+<!-- ========== CONTACT SECTION ========== -->
+<section class="contact-section" id="contact">
+    <div class="contact-inner">
+        <div class="section-head fade-up" style="text-align:center; margin-bottom:48px;">
+            <h2>聯絡我們</h2>
+            <p>有任何問題或需要客製化行程？我們的旅遊顧問隨時為您服務</p>
+        </div>
+        <div class="contact-grid">
+            <!-- Contact Info -->
+            <div class="contact-info" data-aos="fade-right">
+                <div class="contact-info-card">
+                    <div class="contact-info-item">
+                        <div class="contact-icon icon-phone">
+                            <i data-lucide="phone" style="width:20px;height:20px"></i>
+                        </div>
+                        <div>
+                            <strong>客服電話</strong>
+                            <p>02-2888-6666</p>
+                            <span>週一至週五 09:00 - 18:00</span>
+                        </div>
+                    </div>
+                    <div class="contact-info-item">
+                        <div class="contact-icon icon-email">
+                            <i data-lucide="mail" style="width:20px;height:20px"></i>
+                        </div>
+                        <div>
+                            <strong>電子郵件</strong>
+                            <p>service@exploretaiwan.com.tw</p>
+                            <span>24 小時內回覆</span>
+                        </div>
+                    </div>
+                    <div class="contact-info-item">
+                        <div class="contact-icon icon-location">
+                            <i data-lucide="map-pin" style="width:20px;height:20px"></i>
+                        </div>
+                        <div>
+                            <strong>公司地址</strong>
+                            <p>台北市中山區南京東路三段 168 號 12 樓</p>
+                            <span>交通部觀光署核准旅行業</span>
+                        </div>
+                    </div>
+                    <div class="contact-info-item">
+                        <div class="contact-icon icon-clock">
+                            <i data-lucide="clock" style="width:20px;height:20px"></i>
+                        </div>
+                        <div>
+                            <strong>營業時間</strong>
+                            <p>週一至週五 09:00 - 18:00</p>
+                            <span>週六 10:00 - 16:00（週日公休）</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-social">
+                    <span>追蹤我們</span>
+                    <div class="social-links">
+                        <a class="social-btn"><i class="fa-brands fa-facebook" style="color: rgb(15, 86, 213);"></i></a>
+                        <a class="social-btn"><i class="fa-brands fa-instagram" style="color: rgb(253, 73, 0);"></i></a>
+                        <a class="social-btn"><i class="fa-brands fa-youtube" style="color: rgb(255, 0, 0);"></i></a>
+                        <a class="social-btn"><i class="fa-brands fa-line" style="color: rgb(35, 255, 6);"></i></a>
+                    </div>
+                </div>
+            </div>
+            <!-- Contact Form -->
+            <div class="contact-form-wrap" data-aos="fade-left">
+                <form class="contact-form" onsubmit="handleContactSubmit(event)">
+                    <h3>留言給我們</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contactName">姓名</label>
+                            <input type="text" id="contactName" placeholder="請輸入您的姓名" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactPhone">電話</label>
+                            <input type="tel" id="contactPhone" placeholder="09xx-xxx-xxx">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactEmail">電子郵件</label>
+                        <input type="email" id="contactEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactSubject">主旨</label>
+                        <select id="contactSubject">
+                            <option value="">請選擇諮詢類型</option>
+                            <option value="custom">客製化行程諮詢</option>
+                            <option value="booking">訂單查詢</option>
+                            <option value="group">團體旅遊</option>
+                            <option value="corporate">企業旅遊</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactMessage">訊息內容</label>
+                        <textarea id="contactMessage" rows="4" placeholder="請描述您的需求或問題..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+                        <i data-lucide="send" style="width:16px;height:16px"></i> 送出訊息
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <i data-lucide="compass" style="width:24px;height:24px"></i>
+                    <span>探索台灣</span>
+                </div>
+                <p>我們致力於為每一位旅客打造獨一無二的台灣旅行體驗，從北到南、從山到海，讓您深度感受這座美麗島嶼的魅力。</p>
+                <div class="footer-badges">
+                    <span class="footer-badge">交通部觀光署認證</span>
+                    <span class="footer-badge">品質保障協會會員</span>
+                </div>
+            </div>
+            <div class="footer-links-group">
+                <h4>熱門行程</h4>
+                <a href="#">經典北部精華一日遊</a>
+                <a href="#">中部山林療癒之旅</a>
+                <a href="#">南部文化美食探索</a>
+                <a href="#">東部壯闊秘境兩日遊</a>
+            </div>
+            <div class="footer-links-group">
+                <h4>旅客服務</h4>
+                <a href="#">常見問題 FAQ</a>
+                <a href="#">退改辦法</a>
+                <a href="#">旅遊保險</a>
+                <a href="#">行李須知</a>
+            </div>
+            <div class="footer-links-group">
+                <h4>關於我們</h4>
+                <a href="#">公司簡介</a>
+                <a href="#">合作夥伴</a>
+                <a href="#">隱私政策</a>
+                <a href="#">服務條款</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Explore Taiwan &copy; 2026 — All Rights Reserved. 交觀甲字第 8888 號 品保北 1234 號</p>
+        </div>
+    </div>
+</footer>
+
+<!-- ========== SUCCESS MODAL ========== -->
+<div class="modal-overlay" id="successModal">
+    <div class="modal">
+        <div class="modal-icon">
+            <i data-lucide="party-popper" style="width:32px;height:32px"></i>
+        </div>
+        <h2>預訂成功！</h2>
+        <p>您的行程已送出，旅遊顧問將於 24 小時內與您聯繫確認所有細節。</p>
+        <button class="btn btn-primary" onclick="closeModal()">返回首頁</button>
+    </div>
+</div>
+
+<!-- ========== AUTH MODAL ========== -->
+<div class="modal-overlay" id="authModal">
+    <div class="auth-modal">
+        <button class="auth-close" onclick="closeAuthModal()">
+            <i data-lucide="x" style="width:20px;height:20px"></i>
+        </button>
+        <!-- Login Tab -->
+        <div class="auth-tab-content" id="loginTab">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i data-lucide="compass" style="width:28px;height:28px"></i>
+                </div>
+                <h2>歡迎回來</h2>
+                <p>登入您的帳戶以管理行程與收藏</p>
+            </div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginEmail">電子郵件</label>
+                    <div class="input-icon-wrap">
+                        <i data-lucide="mail" style="width:16px;height:16px"></i>
+                        <input type="email" id="loginEmail" placeholder="your@email.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">密碼</label>
+                    <div class="input-icon-wrap">
+                        <i data-lucide="lock" style="width:16px;height:16px"></i>
+                        <input type="password" id="loginPassword" placeholder="請輸入密碼" required>
+                    </div>
+                </div>
+                <div class="form-check-row">
+                    <label class="checkbox-wrap">
+                        <input type="checkbox" checked> <span>記住我</span>
+                    </label>
+                    <a class="form-link">忘記密碼？</a>
+                </div>
+                <button type="submit" class="btn btn-primary auth-submit">登入</button>
+            </form>
+            <div class="auth-divider"><span>或使用以下方式登入</span></div>
+            <div class="auth-social-row">
+                <button class="auth-social-btn" onclick="handleSocialLogin('Google')">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                    Google
+                </button>
+                <button class="auth-social-btn" onclick="handleSocialLogin('Facebook')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    Facebook
+                </button>
+            </div>
+            <div class="auth-switch">
+                還沒有帳戶？ <a onclick="switchAuthTab('register')">立即註冊</a>
+            </div>
+        </div>
+        <!-- Register Tab -->
+        <div class="auth-tab-content" id="registerTab" style="display:none;">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i data-lucide="compass" style="width:28px;height:28px"></i>
+                </div>
+                <h2>建立帳戶</h2>
+                <p>加入探索台灣，開始規劃您的夢想旅程</p>
+            </div>
+            <form onsubmit="handleRegister(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="regLastName">姓氏</label>
+                        <input type="text" id="regLastName" placeholder="王" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regFirstName">名字</label>
+                        <input type="text" id="regFirstName" placeholder="小明" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">電子郵件</label>
+                    <div class="input-icon-wrap">
+                        <i data-lucide="mail" style="width:16px;height:16px"></i>
+                        <input type="email" id="regEmail" placeholder="your@email.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="regPhone">手機號碼</label>
+                    <div class="input-icon-wrap">
+                        <i data-lucide="smartphone" style="width:16px;height:16px"></i>
+                        <input type="tel" id="regPhone" placeholder="09xx-xxx-xxx" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">密碼</label>
+                    <div class="input-icon-wrap">
+                        <i data-lucide="lock" style="width:16px;height:16px"></i>
+                        <input type="password" id="regPassword" placeholder="至少 8 個字元" required minlength="8">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="regPasswordConfirm">確認密碼</label>
+                    <div class="input-icon-wrap">
+                        <i data-lucide="lock" style="width:16px;height:16px"></i>
+                        <input type="password" id="regPasswordConfirm" placeholder="再次輸入密碼" required minlength="8">
+                    </div>
+                </div>
+                <label class="checkbox-wrap" style="margin-bottom:16px;">
+                    <input type="checkbox" required> <span>我同意<a class="form-link">服務條款</a>與<a class="form-link">隱私政策</a></span>
+                </label>
+                <button type="submit" class="btn btn-primary auth-submit">建立帳戶</button>
+            </form>
+            <div class="auth-switch">
+                已經有帳戶？ <a onclick="switchAuthTab('login')">立即登入</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== CONTACT SUCCESS MODAL ========== -->
+<div class="modal-overlay" id="contactSuccessModal">
+    <div class="modal">
+        <div class="modal-icon" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#2563eb;">
+            <i data-lucide="mail-check" style="width:32px;height:32px"></i>
+        </div>
+        <h2>訊息已送出！</h2>
+        <p>感謝您的來信，我們的客服團隊將於 24 小時內回覆您的訊息。</p>
+        <button class="btn btn-primary" onclick="document.getElementById('contactSuccessModal').classList.remove('show')">好的</button>
+    </div>
+</div>
+
+<!-- ========== NEWS WIDGET (bottom-right) ========== -->
+<div class="news-widget" id="newsWidget">
+    <div class="news-widget-panel" id="newsPanel">
+        <div class="news-widget-header">
+            <div class="news-widget-title">
+                <i data-lucide="bell-ring" style="width:16px;height:16px"></i>
+                <span>最新消息</span>
+                <span class="news-badge-count">3</span>
+            </div>
+            <button class="news-widget-close" onclick="toggleNewsWidget()">
+                <i data-lucide="chevron-down" style="width:16px;height:16px"></i>
+            </button>
+        </div>
+        <div class="news-widget-body" id="newsWidgetBody">
+            <!-- Rendered by JS -->
+        </div>
+        <div class="news-widget-footer">
+            <a href="#" class="news-view-all">查看所有公告</a>
+        </div>
+    </div>
+    <button class="news-widget-fab" id="newsFab" onclick="toggleNewsWidget()" style="display:none;">
+        <i data-lucide="bell-ring" style="width:20px;height:20px"></i>
+        <span class="news-fab-dot"></span>
+    </button>
+</div>
+
+<!-- ========== SCRIPT ========== -->
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
