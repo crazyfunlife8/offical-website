@@ -151,6 +151,14 @@
     margin-top: var(--sp-md);
 }
 
+.coming-soon__cta-group--duo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-t3);
+}
+
 /* 回首頁服務星圖連結 — 隱性出口、小字、隱藏動線 */
 .coming-soon__back-link {
     display: inline-block;
