@@ -1,0 +1,9 @@
+{
+  "name": "nest-digital-website",
+  "version": "1.0.0",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "node-html-parser": "^6.1.13",
+    "resend": "^4.0.0"
+  }
+}

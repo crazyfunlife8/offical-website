@@ -36,6 +36,9 @@
 
     <main class="qs-main">
 
+        <!-- ── 表單一 view ── -->
+        <div id="viewForm">
+
         <!-- ── Hero 區 ── -->
         <section class="qs-hero">
             <div class="qs-hero__inner">
@@ -150,30 +153,27 @@
                         </div>
                     </div>
 
-                    <!-- ── 風格偏好 ── -->
+                    <!-- ── 圖片上傳 ── -->
                     <div class="qs-block">
                         <div class="qs-block__header">
-                            <span class="qs-block__label">04 · STYLE</span>
-                            <h2 class="qs-block__title">風格偏好</h2>
+                            <span class="qs-block__label">04 · IMAGES</span>
+                            <h2 class="qs-block__title">商家圖片</h2>
                         </div>
                         <div class="qs-block__body card">
                             <div class="qs-field">
-                                <label class="qs-label" for="stylePrefs">
-                                    偏好風格 <span class="qs-required">*</span>
+                                <label class="qs-label">
+                                    商家照片 <span class="qs-hint">（選填，每張限 5MB，最多 5 張）</span>
                                 </label>
-                                <select class="qs-select" id="stylePrefs" name="stylePrefs" required>
-                                    <option value="" disabled selected>請選擇偏好風格</option>
-                                    <option value="依行業特性判斷">依行業特性判斷</option>
-                                    <option value="現代簡約">現代簡約</option>
-                                    <option value="專業商務">專業商務</option>
-                                    <option value="活潑亮麗">活潑亮麗</option>
-                                    <option value="溫馨自然">溫馨自然</option>
-                                    <option value="科技未來">科技未來</option>
-                                    <option value="優雅奢華">優雅奢華</option>
-                                    <option value="可愛俏皮">可愛俏皮</option>
-                                    <option value="復古懷舊">復古懷舊</option>
-                                </select>
-                                <span class="qs-error">請選擇風格偏好</span>
+                                <div class="qs-file-area" id="imageUploadArea">
+                                    <input class="qs-file-input" type="file" id="imageUpload"
+                                        name="images" multiple accept="image/jpeg,image/png,image/webp">
+                                    <label class="qs-file-label" for="imageUpload">
+                                        <i class="fas fa-images" aria-hidden="true"></i>
+                                        <span class="qs-file-label__text">點擊上傳商家照片</span>
+                                        <span class="qs-file-label__sub">支援 JPG / PNG / WEBP，每張限 5MB</span>
+                                    </label>
+                                </div>
+                                <div class="qs-image-grid" id="imageGrid" hidden></div>
                             </div>
                         </div>
                     </div>
@@ -191,6 +191,219 @@
                 </form>
             </div>
         </section>
+
+        </div><!-- /viewForm -->
+
+        <!-- ── 樣板預覽 view ── -->
+        <section id="viewPreview" class="qs-preview-section" hidden>
+
+            <div class="qs-preview-header">
+                <p class="qs-preview-eyebrow">SELECT A DESIGN</p>
+                <h2 class="qs-preview-title">選擇你喜歡的樣板</h2>
+                <p class="qs-preview-lead">
+                    點擊「放大預覽」查看完整效果，選定後點「選擇這個」繼續。
+                </p>
+            </div>
+
+            <div class="qs-preview-grid" id="previewGrid">
+                <!-- 三張卡片由 JS 注入 -->
+            </div>
+
+            <div class="qs-preview-back">
+                <button type="button" class="qs-back-link" id="backToForm">← 重新填寫</button>
+            </div>
+
+        </section><!-- /viewPreview -->
+
+        <!-- ── 表單二 view ── -->
+        <section id="viewForm2" class="qs-preview-section" hidden>
+
+            <div class="qs-preview-header">
+                <p class="qs-preview-eyebrow">ADVANCED FEATURES · STEP 2</p>
+                <h2 class="qs-preview-title">進階功能設定</h2>
+                <p class="qs-preview-lead">
+                    所有欄位皆為<strong style="color:var(--c-stellar)">選填</strong>，填入需要的功能即可。<br>
+                    送出後我們會與你聯繫，確認細節後手動幫你完成架設。
+                </p>
+            </div>
+
+            <form id="enhanceForm" class="qs-form" style="max-width:800px;margin:0 auto;" novalidate>
+
+                <!-- ── 社群媒體 ── -->
+                <div class="qs-block">
+                    <div class="qs-block__header">
+                        <span class="qs-block__label">01 · SOCIAL MEDIA</span>
+                        <h2 class="qs-block__title">社群媒體</h2>
+                    </div>
+                    <div class="qs-block__body card">
+                        <div class="qs-field-row">
+                            <div class="qs-field">
+                                <label class="qs-label" for="lineUrl">
+                                    <i class="fab fa-line" aria-hidden="true"></i>
+                                    LINE <span class="qs-hint">（選填）</span>
+                                </label>
+                                <input class="qs-input" type="url" id="lineUrl" name="lineUrl"
+                                    placeholder="https://line.me/ti/p/...">
+                            </div>
+                            <div class="qs-field">
+                                <label class="qs-label" for="facebookUrl">
+                                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                                    Facebook <span class="qs-hint">（選填）</span>
+                                </label>
+                                <input class="qs-input" type="url" id="facebookUrl" name="facebookUrl"
+                                    placeholder="https://www.facebook.com/...">
+                            </div>
+                        </div>
+                        <div class="qs-field-row">
+                            <div class="qs-field">
+                                <label class="qs-label" for="instagramUrl">
+                                    <i class="fab fa-instagram" aria-hidden="true"></i>
+                                    Instagram <span class="qs-hint">（選填）</span>
+                                </label>
+                                <input class="qs-input" type="url" id="instagramUrl" name="instagramUrl"
+                                    placeholder="https://www.instagram.com/...">
+                            </div>
+                            <div class="qs-field">
+                                <label class="qs-label" for="youtubeUrl">
+                                    <i class="fab fa-youtube" aria-hidden="true"></i>
+                                    YouTube <span class="qs-hint">（選填）</span>
+                                </label>
+                                <input class="qs-input" type="url" id="youtubeUrl" name="youtubeUrl"
+                                    placeholder="https://www.youtube.com/@...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── 地圖 ── -->
+                <div class="qs-block">
+                    <div class="qs-block__header">
+                        <span class="qs-block__label">02 · LOCATION</span>
+                        <h2 class="qs-block__title">Google 地圖</h2>
+                    </div>
+                    <div class="qs-block__body card">
+                        <div class="qs-field">
+                            <p class="qs-map-note">
+                                <i class="fas fa-check-circle" aria-hidden="true"></i>
+                                系統將自動根據你在表單一填寫的地址嵌入 Google 地圖，不需要額外填寫。
+                            </p>
+                            <label class="qs-toggle-row" for="includeMap">
+                                <input class="qs-toggle" type="checkbox" id="includeMap" name="includeMap" value="1" checked>
+                                <span class="qs-toggle__track"></span>
+                                <span class="qs-toggle__label">在網站中顯示地圖區塊</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── 營業資訊 ── -->
+                <div class="qs-block">
+                    <div class="qs-block__header">
+                        <span class="qs-block__label">03 · BUSINESS INFO</span>
+                        <h2 class="qs-block__title">營業資訊</h2>
+                    </div>
+                    <div class="qs-block__body card">
+                        <div class="qs-field">
+                            <label class="qs-label" for="businessHours">
+                                營業時間 <span class="qs-hint">（選填）</span>
+                            </label>
+                            <textarea class="qs-textarea" id="businessHours" name="businessHours" rows="4"
+                                placeholder="例：週一至週五 10:00–20:00&#10;週六 11:00–18:00&#10;週日公休"></textarea>
+                        </div>
+                        <div class="qs-field">
+                            <label class="qs-label" for="announcement">
+                                公告 / 促銷 <span class="qs-hint">（選填）</span>
+                            </label>
+                            <textarea class="qs-textarea" id="announcement" name="announcement" rows="3"
+                                placeholder="例：夏日限定優惠，消費滿 500 送甜點一份！有效期至 8/31。"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── 媒體 ── -->
+                <div class="qs-block">
+                    <div class="qs-block__header">
+                        <span class="qs-block__label">04 · MEDIA</span>
+                        <h2 class="qs-block__title">媒體檔案</h2>
+                    </div>
+                    <div class="qs-block__body card">
+                        <div class="qs-field">
+                            <label class="qs-label" for="menuPdf">
+                                菜單 / 型錄 PDF <span class="qs-hint">（選填，限 10MB）</span>
+                            </label>
+                            <div class="qs-file-area">
+                                <input class="qs-file-input" type="file" id="menuPdf" name="menuPdf"
+                                    accept=".pdf">
+                                <label class="qs-file-label" for="menuPdf">
+                                    <i class="fas fa-file-pdf" aria-hidden="true"></i>
+                                    <span class="qs-file-label__text">點擊上傳 PDF 檔案</span>
+                                    <span class="qs-file-label__sub">支援 .pdf 格式，最大 10MB</span>
+                                </label>
+                                <p class="qs-file-name" id="menuFileName" style="display:none;"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── 預約 / 訂購 ── -->
+                <div class="qs-block">
+                    <div class="qs-block__header">
+                        <span class="qs-block__label">05 · BOOKING & ORDER</span>
+                        <h2 class="qs-block__title">預約 ／ 訂購</h2>
+                    </div>
+                    <div class="qs-block__body card">
+                        <div class="qs-field">
+                            <label class="qs-label" for="bookingUrl">
+                                線上預約連結 <span class="qs-hint">（選填）</span>
+                            </label>
+                            <input class="qs-input" type="url" id="bookingUrl" name="bookingUrl"
+                                placeholder="例：https://booking.example.com 或 LINE 預約連結">
+                        </div>
+                        <div class="qs-field">
+                            <label class="qs-label" for="orderUrl">
+                                線上訂購連結 <span class="qs-hint">（選填）</span>
+                            </label>
+                            <input class="qs-input" type="url" id="orderUrl" name="orderUrl"
+                                placeholder="例：https://shop.example.com 或蝦皮 / 外送平台連結">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── 送出 ── -->
+                <div class="qs-submit-area">
+                    <button type="submit" class="btn btn--yellow" id="submitBtn2">
+                        生成最終預覽
+                        <span class="btn-arrow" aria-hidden="true">→</span>
+                    </button>
+                    <p class="qs-submit-note">AI 將把你填入的功能加入網站，約 15–20 秒完成。</p>
+                    <button type="button" class="qs-back-link" id="backToPreview">← 回樣板選擇</button>
+                </div>
+
+            </form>
+
+        </section><!-- /viewForm2 -->
+
+        <!-- ── 最終預覽 view ── -->
+        <section id="viewPreviewFinal" hidden>
+
+            <div class="qs-final-bar">
+                <div class="qs-final-bar__left">
+                    <span class="qs-final-bar__label">FINAL PREVIEW</span>
+                    <span class="qs-final-bar__name" id="finalPreviewName"></span>
+                </div>
+                <div class="qs-final-bar__actions">
+                    <button type="button" class="qs-btn-expand" id="backToForm2">
+                        ← 返回修改
+                    </button>
+                    <button type="button" class="btn btn--yellow" id="confirmSubmit">
+                        確認送出 <span class="btn-arrow" aria-hidden="true">→</span>
+                    </button>
+                </div>
+            </div>
+
+            <iframe id="finalPreviewFrame" title="最終網站預覽" sandbox="allow-scripts"></iframe>
+
+        </section><!-- /viewPreviewFinal -->
 
     </main>
 
@@ -242,27 +455,30 @@
                 </ul>
             </div>
 
-            <!-- 第二階段：部署中 -->
-            <div id="phaseDeploy" style="display:none;">
-                <p class="qs-overlay__title">
-                    網站部署中
-                    <span class="qs-dots" aria-hidden="true">
-                        <span></span><span></span><span></span>
-                    </span>
-                </p>
-                <p class="qs-overlay__sub">網站正在上線，完成後將自動開啟結果</p>
+            <!-- 第二階段：加入選配功能中 -->
+            <div id="phaseEnhance" style="display:none;">
+                <p class="qs-overlay__title">正在加入選配功能</p>
+                <p class="qs-overlay__sub">AI 正在將社群連結、營業資訊等功能加入你的網站</p>
 
-                <div class="qs-countdown">
-                    <svg class="qs-countdown__ring" viewBox="0 0 120 120" aria-hidden="true">
-                        <circle class="qs-countdown__bg" cx="60" cy="60" r="52"/>
-                        <circle class="qs-countdown__bar" id="countdownBar" cx="60" cy="60" r="52"/>
-                    </svg>
-                    <div class="qs-countdown__number" id="countdownNumber">0%</div>
+                <div class="qs-spinner">
+                    <div class="qs-spinner__ring"></div>
+                    <div class="qs-spinner__core">
+                        <i class="fas fa-magic" aria-hidden="true"></i>
+                    </div>
                 </div>
+            </div>
 
-                <p class="qs-deploy-hint">
-                    <i class="fas fa-info-circle" aria-hidden="true"></i> 請保持此頁面開啟
-                </p>
+            <!-- 第三階段：送出中 -->
+            <div id="phaseSubmit" style="display:none;">
+                <p class="qs-overlay__title">送出需求中</p>
+                <p class="qs-overlay__sub">正在將你的需求傳送給我們的團隊</p>
+
+                <div class="qs-spinner">
+                    <div class="qs-spinner__ring"></div>
+                    <div class="qs-spinner__core">
+                        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -272,41 +488,47 @@
     <!-- ════════════════════════════════════════════════
          結果 Overlay
     ════════════════════════════════════════════════ -->
-    <div class="qs-result" id="resultOverlay" role="dialog" aria-modal="true" aria-label="架設結果">
+    <div class="qs-result" id="resultOverlay" role="dialog" aria-modal="true" aria-label="需求已送出">
         <div class="qs-result__inner">
 
-            <div class="qs-result__hero">
-                <p class="qs-result__eyebrow">COMPLETE</p>
-                <h2 class="qs-result__title">你的網站已建好了！</h2>
-                <p class="qs-result__title-en">Your site is live.</p>
-                <div class="qs-result__divider" aria-hidden="true"></div>
+            <!-- 成功 -->
+            <div id="resultSuccess" style="display:none;">
+                <div class="qs-result__hero">
+                    <p class="qs-result__eyebrow">RECEIVED</p>
+                    <h2 class="qs-result__title">需求已送出！</h2>
+                    <p class="qs-result__title-en">We'll be in touch soon.</p>
+                    <div class="qs-result__divider" aria-hidden="true"></div>
+                </div>
+                <div class="qs-result__cta card">
+                    <p>我們將在 1–2 個工作天內與你聯繫，<br>確認細節後開始架設你的網站。</p>
+                    <a href="https://line.me/R/ti/p/@604vqsva?ts=01261611&oat_content=url"
+                       target="_blank" rel="noopener" class="btn btn--primary">
+                        <i class="fab fa-line" aria-hidden="true"></i>
+                        也可以直接聯絡我們
+                        <span class="btn-arrow" aria-hidden="true">→</span>
+                    </a>
+                </div>
             </div>
 
-            <!-- 成功：網址卡片 -->
-            <div class="qs-result__url-card card" id="resultUrlCard">
-                <span class="qs-result__url-label">
-                    <i class="fas fa-globe" aria-hidden="true"></i> 你的網站網址
-                </span>
-                <a id="resultSiteUrl" href="#" target="_blank" rel="noopener" class="qs-result__url-link">
-                    <span id="resultUrlText">—</span>
-                    <i class="fas fa-external-link-alt" aria-hidden="true"></i>
-                </a>
-            </div>
-
-            <!-- 失敗：錯誤提示 -->
-            <div class="qs-result__fail-card card" id="resultFailCard" style="display:none;">
-                <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
-                <p id="resultFailMsg">架設過程發生問題，請聯絡我們處理。</p>
-            </div>
-
-            <div class="qs-result__cta card">
-                <p>想進一步討論或調整？</p>
-                <a href="https://line.me/R/ti/p/@604vqsva?ts=01261611&oat_content=url"
-                   target="_blank" rel="noopener" class="btn btn--primary">
-                    <i class="fab fa-line" aria-hidden="true"></i>
-                    聯絡我們繼續聊
-                    <span class="btn-arrow" aria-hidden="true">→</span>
-                </a>
+            <!-- 失敗 -->
+            <div id="resultFail" style="display:none;">
+                <div class="qs-result__hero">
+                    <p class="qs-result__eyebrow">ERROR</p>
+                    <h2 class="qs-result__title">送出失敗</h2>
+                    <div class="qs-result__divider" aria-hidden="true"></div>
+                </div>
+                <div class="qs-result__fail-card card">
+                    <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+                    <p id="resultFailMsg">送出時發生問題，請直接聯絡我們。</p>
+                </div>
+                <div class="qs-result__cta card">
+                    <a href="https://line.me/R/ti/p/@604vqsva?ts=01261611&oat_content=url"
+                       target="_blank" rel="noopener" class="btn btn--primary">
+                        <i class="fab fa-line" aria-hidden="true"></i>
+                        直接聯絡我們
+                        <span class="btn-arrow" aria-hidden="true">→</span>
+                    </a>
+                </div>
             </div>
 
         </div>
@@ -318,6 +540,22 @@
         <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
         <span id="toastMsg">送出失敗，請稍後再試。</span>
     </div>
+
+    <!-- ════════════════════════════════════════════════
+         全屏預覽 Overlay
+    ════════════════════════════════════════════════ -->
+    <div id="fullscreenOverlay" class="qs-fullscreen">
+        <div class="qs-fullscreen__bar">
+            <span class="qs-fullscreen__label">PREVIEW</span>
+            <span class="qs-fullscreen__title" id="fullscreenTitle"></span>
+            <button type="button" class="qs-fullscreen__close" id="fullscreenClose" aria-label="關閉預覽">
+                <i class="fas fa-times" aria-hidden="true"></i>
+                <span>關閉</span>
+            </button>
+        </div>
+        <iframe id="fullscreenFrame" title="完整網站預覽" sandbox="allow-scripts"></iframe>
+    </div>
+
 
     <!-- Scripts（順序不得更改）-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
