@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>水卡：流入成形 → cross-fade 真水卡｜創巢數位（探索）</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+<style>
+  :root{ --cyan:0,200,255; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ min-height:100vh; color:rgba(var(--stellar),.9); font-family:"Noto Sans TC",sans-serif;
+    background:
+      linear-gradient(118deg, transparent 40%, rgba(40,70,130,.16) 50%, transparent 60%),
+      radial-gradient(130% 90% at 80% 6%, rgba(24,46,92,.32), transparent 55%),
+      radial-gradient(1px 1px at 12% 24%, rgba(255,255,255,.7), transparent),
+      radial-gradient(1px 1px at 32% 64%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.4px 1.4px at 64% 18%, rgba(255,255,255,.8), transparent),
+      radial-gradient(1px 1px at 78% 72%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.2px 1.2px at 50% 40%, rgba(180,220,255,.7), transparent),
+      radial-gradient(1px 1px at 88% 44%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.3px 1.3px at 6% 56%, rgba(255,235,200,.7), transparent),
+      #04060a;
+    background-repeat:no-repeat; background-attachment:fixed; overflow-x:hidden; }
+  .stage{ min-height:100vh; display:flex; align-items:center; justify-content:center; }
+  canvas#cv{ width:min(760px,94vw); aspect-ratio:760/560; display:block; }
+  .tag{ position:fixed; top:18px; left:50%; transform:translateX(-50%); font-family:"JetBrains Mono",monospace;
+    font-size:11px; letter-spacing:.06em; color:rgba(var(--stellar),.55); }
+  .ctrl{ position:fixed; left:50%; bottom:22px; transform:translateX(-50%); display:flex; gap:10px; align-items:center;
+    font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.7); }
+  .ctrl button{ background:rgba(0,200,255,.14); border:1px solid rgba(0,200,255,.5); color:rgba(var(--stellar),.9);
+    padding:6px 12px; border-radius:6px; cursor:pointer; font:inherit; font-size:11px; }
+  .ctrl input[type=range]{ width:240px; accent-color:rgb(0,200,255); }
+  /* 嵌入模式：透明底、隱藏控制 */
+  body.embed{ background:transparent !important; }
+  body.embed .ctrl, body.embed .tag{ display:none !important; }
+</style>
+</head>
+<body>
+<span class="tag">// 原型 · 一攤水從右側流入成形 → cross-fade 真水卡（宇宙+文字浮現）· 不上 production</span>
+<div class="stage"><canvas id="cv"></canvas></div>
+<div class="ctrl">
+  <button id="play">▶ 播放</button>
+  <input type="range" id="scrub" min="0" max="1000" value="0"><span id="lab">右側待入</span>
+</div>
+
+<script type="importmap">
+{ "imports": { "three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+// 創辦人定稿值
+const SP = { bead:0.94, amp:0.02, flow:1.5, thick:2.0, disp:8.0, dark:0.58, calmW:2.84, calmH:2.02, edgeIrr:0.15 };
+const FORM_END=0.72, COLLAPSE_S=0.72, STATIC_ON=0.72, META_OFF=0.92, TEXT_S=0.82;  // 鋪到接近結尾、不留定格尾巴
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const mix=(a,b,t)=>a+(b-a)*t;
+const easeOutCubic=q=>1-Math.pow(1-q,3);
+const easeOutBack=u=>{ const c1=2.7,c3=c1+1; return 1+c3*Math.pow(u-1,3)+c1*Math.pow(u-1,2); };  // 衝擊 overshoot（彈更多）
+const sstep=(a,b,x)=>{ const t=clamp((x-a)/(b-a),0,1); return t*t*(3-2*t); };
+const rand=(a,b)=>a+Math.random()*(b-a);
+
+const canvas=document.getElementById('cv');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1;
+const scene=new THREE.Scene();
+const group=new THREE.Group(); scene.add(group); group.rotation.set(0.10,0.17,0);
+const cardGroup=new THREE.Group(); group.add(cardGroup);   // 靜態真水卡：snap 時做 impact scale-pop
+const camera=new THREE.PerspectiveCamera(40,1,0.1,100); camera.position.set(0,0,7.4);
+const env=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),0.04).texture; scene.environment=env;
+group.add(new THREE.DirectionalLight(0xffffff,0)); // placeholder
+const key=new THREE.DirectionalLight(0xffffff,2.1); key.position.set(4,6,6); scene.add(key);
+const rim=new THREE.DirectionalLight(0x2a6cff,1.25); rim.position.set(-6,-2,3); scene.add(rim);
+// 場景內深空背景 → 進場的水有東西可折射、變清水（不再灰塊）
+function makeBgTex(){
+  const W=1280,H=940,c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+  g.fillStyle='#0a1630'; g.fillRect(0,0,W,H);   // 提亮基底接近頁面藍星場、暗框融進去
+  const rg=g.createRadialGradient(W*0.72,H*0.2,0,W*0.5,H*0.55,W*0.98);
+  rg.addColorStop(0,'rgba(40,72,140,0.7)'); rg.addColorStop(0.5,'rgba(22,40,80,0.45)'); rg.addColorStop(1,'rgba(12,22,46,0.2)');
+  g.fillStyle=rg; g.fillRect(0,0,W,H);
+  g.globalCompositeOperation='lighter';
+  const neb=(x,y,r,col)=>{ const q=g.createRadialGradient(x,y,0,x,y,r); q.addColorStop(0,col); q.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=q; g.fillRect(0,0,W,H); };
+  neb(W*0.78,H*0.2,W*0.55,'rgba(50,100,180,0.28)'); neb(W*0.2,H*0.85,W*0.5,'rgba(80,52,140,0.18)');
+  for(let i=0;i<340;i++){ const x=Math.random()*W,y=Math.random()*H,s=Math.random();
+    g.globalAlpha=0.2+s*0.6; g.fillStyle=s>0.9?'#ffe9c4':(s>0.6?'#bfe0ff':'#fff'); g.beginPath(); g.arc(x,y,s*1.4+0.2,0,7); g.fill(); }
+  g.globalAlpha=1; g.globalCompositeOperation='source-over';
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
+}
+scene.background=makeBgTex();
+function resize(){ const r=canvas.getBoundingClientRect(); renderer.setSize(r.width,r.height,false); camera.aspect=r.width/r.height; camera.updateProjectionMatrix(); }
+resize(); addEventListener('resize',resize);
+
+/* ════════ A. 靜態真水卡（定稿）— 一開始 opacity 0、成形末段淡入 ════════ */
+const CW=1200,CH=912;
+function buildTextTexture(){
+  const c=document.createElement('canvas'); c.width=CW; c.height=CH; const g=c.getContext('2d');
+  g.textBaseline='alphabetic';
+  g.font='700 240px "JetBrains Mono",monospace'; g.textAlign='right'; g.fillStyle='rgba(255,255,255,0.20)'; g.fillText('01',CW-90,250);
+  g.textAlign='left'; g.font='500 30px "JetBrains Mono",monospace'; g.fillStyle='rgba(90,210,255,0.95)'; g.fillText('D E V E L O P',110,150);
+  g.font='600 150px "Chiron Sung HK","Noto Serif TC",serif'; g.fillStyle='rgba(255,255,255,0.97)'; g.fillText('開發',106,320);
+  g.font='400 40px "Noto Sans TC",sans-serif'; g.fillStyle='rgba(255,255,255,0.62)'; g.fillText('把想法變成會運作的東西。',112,402);
+  const items=[['網站架設','一頁式到企業電商'],['客製系統開發','說得出來就寫得出來']];
+  g.strokeStyle='rgba(255,255,255,0.18)'; g.lineWidth=2; let y=510;
+  for(const [sn,sd] of items){
+    g.beginPath(); g.moveTo(110,y-46); g.lineTo(CW-90,y-46); g.stroke();
+    g.textAlign='left'; g.font='600 52px "Noto Serif TC",serif'; g.fillStyle='rgba(255,255,255,0.95)'; g.fillText(sn,110,y);
+    g.textAlign='right'; g.font='400 32px "Noto Sans TC",sans-serif'; g.fillStyle='rgba(255,255,255,0.5)'; g.fillText(sd,CW-90,y-6);
+    y+=132;
+  }
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=4; return t;
+}
+function makeStarTex(){
+  const W=1024,H=772,c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+  g.beginPath(); g.roundRect(8,8,W-16,H-16,180); g.clip();
+  const bg=g.createRadialGradient(W*0.72,H*0.22,0,W*0.5,H*0.55,W*0.9);
+  bg.addColorStop(0,'#16243f'); bg.addColorStop(.5,'#0a1226'); bg.addColorStop(1,'#05070f'); g.fillStyle=bg; g.fillRect(0,0,W,H);
+  g.globalCompositeOperation='lighter';
+  const neb=(x,y,r,col)=>{ const rg=g.createRadialGradient(x,y,0,x,y,r); rg.addColorStop(0,col); rg.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=rg; g.fillRect(0,0,W,H); };
+  neb(W*0.76,H*0.24,W*0.55,'rgba(40,84,158,0.22)'); neb(W*0.18,H*0.86,W*0.5,'rgba(78,42,128,0.16)');
+  for(let i=0;i<220;i++){ const x=Math.random()*W,y=Math.random()*H,s=Math.random();
+    g.globalAlpha=0.25+s*0.65; g.fillStyle=s>0.9?'#ffe9c4':(s>0.6?'#bfe0ff':'#ffffff'); g.beginPath(); g.arc(x,y,s*1.6+0.3,0,7); g.fill(); }
+  g.globalAlpha=1; g.globalCompositeOperation='source-over';
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=4; return t;
+}
+function beadAlpha(){
+  const w=512,h=Math.round(512*4.9/6.5),c=document.createElement('canvas'); c.width=w; c.height=h; const g=c.getContext('2d');
+  g.fillStyle='#000'; g.fillRect(0,0,w,h); g.filter='blur(5px)'; g.fillStyle='#fff';
+  const r=w*0.17; g.beginPath(); g.roundRect(w*0.045,h*0.05,w*0.91,h*0.90,r); g.fill();
+  return new THREE.CanvasTexture(c);
+}
+// 星空 plane
+const starMesh=new THREE.Mesh(new THREE.PlaneGeometry(6.35,4.78), new THREE.MeshBasicMaterial({map:makeStarTex(),transparent:false,alphaTest:0.5})); starMesh.position.z=-0.5; starMesh.visible=false; cardGroup.add(starMesh);
+// 文字 plane（不透明 → 才會進折射緩衝、被水折射）
+const textMesh=new THREE.Mesh(new THREE.PlaneGeometry(5.4,4.05), new THREE.MeshBasicMaterial({map:buildTextTexture(),transparent:false,alphaTest:0.06})); textMesh.position.z=-0.16; textMesh.visible=false; cardGroup.add(textMesh);
+// 水面 plane
+const PW=6.5,PH=4.9,HW=PW/2,HH=PH/2,RR=1.15,SH=0.9;
+const wgeo=new THREE.PlaneGeometry(PW,PH,150,114); const wbase=wgeo.attributes.position.array.slice();
+function rrSDF(x,y){ const qx=Math.abs(x)-(HW-RR),qy=Math.abs(y)-(HH-RR); return Math.hypot(Math.max(qx,0),Math.max(qy,0))+Math.min(Math.max(qx,qy),0)-RR; }
+const WN=wbase.length/3, shoulder=new Float32Array(WN), interior=new Float32Array(WN), waveFac=new Float32Array(WN), edgeBand=new Float32Array(WN);
+function calmRR(x,y,hw,hh,r){ const qx=Math.abs(x)-(hw-r),qy=Math.abs(y)-(hh-r); return Math.hypot(Math.max(qx,0),Math.max(qy,0))+Math.min(Math.max(qx,qy),0)-r; }
+for(let i=0;i<WN;i++){ const x=wbase[i*3],y=wbase[i*3+1],s=rrSDF(x,y);
+  const tt=Math.min(Math.max(-s,0)/SH,1); shoulder[i]=Math.sqrt(Math.max(0,1-(1-tt)*(1-tt)));
+  interior[i]=Math.min(Math.max(-s/0.55,0),1);
+  const cs=calmRR(x,y,SP.calmW,SP.calmH,0.55); const inCalm=1-sstep(-0.5,0.5,cs);
+  waveFac[i]=0.10+0.90*(1-inCalm); edgeBand[i]=(1-inCalm)*interior[i]; }
+const wmat=new THREE.MeshPhysicalMaterial({ transmission:1, thickness:SP.thick, ior:1.33, roughness:0.04, dispersion:SP.disp,
+  clearcoat:1, clearcoatRoughness:0.0, envMapIntensity:0.95, attenuationColor:new THREE.Color(0x9fe8ff), attenuationDistance:12-SP.dark*9,
+  transparent:true, alphaMap:beadAlpha(), side:THREE.FrontSide });
+const water=new THREE.Mesh(wgeo,wmat); water.visible=false; cardGroup.add(water);
+function wwave(x,y,t){ return Math.sin(x*1.7+t)*0.5+Math.sin(y*2.2+t*1.25)*0.45+Math.sin((x+y)*1.15-t*0.8)*0.4+Math.sin((x-y)*2.6+t*0.6)*0.25; }
+function wfine(x,y,t){ return Math.sin(x*6.3+t*1.7)*0.5+Math.sin(y*7.1-t*1.3)*0.45+Math.sin((x*4.2+y*5.1)+t*2.1)*0.4+Math.sin((x*8.4-y*3.3)-t*1.1)*0.32; }
+function updateWater(t, impactP=1){
+  const p=wgeo.attributes.position.array;
+  for(let i=0;i<WN;i++){ const x=wbase[i*3],y=wbase[i*3+1];
+    let z=SP.bead*shoulder[i]+SP.bead*0.16*interior[i];
+    z+=wwave(x,y,t)*SP.amp*interior[i]*waveFac[i];
+    z+=wfine(x,y,t)*SP.edgeIrr*edgeBand[i];
+    if(impactP<1){   // snap 落定瞬間：從偏右中心擴出一圈衝擊 ripple
+      const k=sstep(0,1,impactP), d=Math.hypot((x-0.65)*0.82,y*1.18);
+      const band=d-mix(0.18,3.15,k);
+      z+=(Math.sin(band*18.0)*Math.exp(-band*band*12.0)*0.105+Math.exp(-d*d*2.4)*0.040*Math.pow(1-k,1.8))*Math.pow(1-k,1.35)*interior[i];
+    }
+    p[i*3+2]=z; }
+  wgeo.attributes.position.needsUpdate=true; wgeo.computeVertexNormals();
+}
+
+/* ════════ B. metaball 流入成形 — 一開始顯示、末段淡出 ════════ */
+const mmat=new THREE.MeshPhysicalMaterial({ transmission:1, thickness:0.38, ior:1.33, roughness:0.018, dispersion:1.2,
+  clearcoat:1, clearcoatRoughness:0.0, attenuationColor:new THREE.Color(0xc8f5ff), attenuationDistance:18, envMapIntensity:0.95, transparent:true, depthWrite:false });
+const mc=new MarchingCubes(80, mmat, false, false, 400000);
+const META_MAX_X=2.5, META_MAX_Y=2.3, META_MAX_Z=1.25;   // 一直保持一小團水、不漲到卡大小（卡片靠 snap 蹦出）
+mc.scale.set(META_MAX_X,META_MAX_Y,META_MAX_Z);
+mc.position.z=-0.12; mc.isolation=55; group.add(mc);   // form 原型證實不封口的值
+starMesh.renderOrder=10; textMesh.renderOrder=20; water.renderOrder=30; mc.renderOrder=40; wmat.depthWrite=false;
+const balls=[]; const COLS=7, ROWS=5;
+for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+  balls.push({ col:c,row:r,
+    tx:0.18+c/(COLS-1)*0.64, ty:0.34+r/(ROWS-1)*0.32, tz:0.5,   // 留足邊距 → 場碰不到牆
+    sx:1.20+rand(0,0.18), sy:0.47+rand(-0.08,0.08)+(r-(ROWS-1)/2)*0.018, sz:0.5+rand(-0.05,0.05),
+    delay:(COLS-1-c)*0.052+rand(0,0.024), dur:rand(0.55,0.70), ph:rand(0,6.28) });
+}
+function updateMeta(formP, collapseP, t){
+  const squeeze=sstep(0,1,collapseP);
+  const grow=sstep(0.04,0.42,formP);
+  const cluster=sstep(0.28,0.96,formP);   // 小水團持續往衝擊核心收、不提早站定
+  // 塌縮：整體收進中央、變薄 → 不再撐卡片外輪廓
+  mc.scale.set( mix(mix(1.2,META_MAX_X,grow),0.82,squeeze), mix(mix(1.1,META_MAX_Y,grow),0.34,squeeze), mix(mix(0.8,META_MAX_Z,grow),0.18,squeeze) );
+  mc.reset(); const sub=10;
+  for(const b of balls){
+    const q=clamp((formP-b.delay)/b.dur,0,1); const e=easeOutCubic(q);
+    const birth=sstep(0.02,0.24,q); if(birth<=0.001) continue;   // 未真正入場的球不加入、避免一開始就大片
+    const targetX=mix(0.62,0.50,cluster)+(b.col-(COLS-1)/2)*0.026;
+    const targetY=0.50+(b.row-(ROWS-1)/2)*0.024;
+    const settle=sstep(0.72,1.0,q); const active=sstep(0.05,0.28,q)*(1-settle);
+    const bounce=Math.sin(settle*Math.PI*2.2)*Math.pow(1-settle,2);
+    const wob=Math.sin(t*4.0+b.ph)*0.020*active; const sag=Math.sin(q*Math.PI)*0.05*(1-settle);
+    const fx=mix(b.sx,targetX,e)+bounce*0.03;
+    const fy=mix(b.sy,targetY,e)-sag+wob;
+    const fz=mix(b.sz+0.06*(1-q),b.tz,e)+wob*0.6;
+    const sinkX=0.5+(b.col-(COLS-1)/2)*0.012;   // 收進中央、不貼外緣
+    const sinkY=0.5+(b.row-(ROWS-1)/2)*0.010;
+    const x=mix(fx,sinkX,squeeze), y=mix(fy,sinkY,squeeze), z=mix(fz,0.42,squeeze);
+    const radius=mix( mix(0.070,mix(0.16,0.19,sstep(0.18,0.92,q)),birth), 0.05, squeeze );
+    mc.addBall(x,y,z,radius,sub);
+  }
+  mc.update();
+}
+
+/* ════════ 主迴圈：P 拆 form / fade / static ════════ */
+let P=0;
+function frame(t){
+  const formP=clamp(P/FORM_END,0,1);              // 流入成形
+  const collapseP=sstep(COLLAPSE_S,META_OFF,P);   // metaball 塌進中央
+  const staticP=sstep(STATIC_ON,META_OFF,P);      // 真水卡接管後的穩定過程
+
+  if(P<META_OFF){ updateMeta(formP, collapseP, t); mc.visible=true;
+    mmat.transmission=1;                                      // 保持清透
+    mmat.envMapIntensity=mix(0.90,0.12,sstep(0,0.22,collapseP));
+    mmat.opacity=0.88*(1-sstep(0.0,0.22,collapseP));          // 接手瞬間即消、不留鬼框
+  } else mc.visible=false;
+
+  // 真水卡：STATIC_ON 起獨佔卡片外輪廓（不拿輪廓做淡入 → 無灰暈）
+  const showStatic = P>=STATIC_ON;
+  water.visible=showStatic; starMesh.visible=showStatic; textMesh.visible=P>=TEXT_S;
+  if(showStatic){
+    const pop=clamp((P-STATIC_ON)/0.075,0,1);                    // 幾乎一出現即卡片大小、只落定瞬間彈一下
+    const popEase=easeOutCubic(pop), kick=Math.sin(pop*Math.PI)*0.045*Math.pow(1-pop,0.35);
+    cardGroup.scale.setScalar(mix(0.92,1.0,popEase)+kick);
+    cardGroup.position.x=mix(0.10,0,popEase);
+    const impactP=clamp((P-STATIC_ON)/0.22,0,1);
+    SP.amp=mix(0.07,0.02,staticP); SP.edgeIrr=mix(0.30,0.15,staticP);
+    updateWater(t,impactP);
+  }
+
+  renderer.render(scene,camera);
+}
+let t0=performance.now();
+(function loop(){ requestAnimationFrame(loop); frame((performance.now()-t0)/1000); })();
+
+/* 控制 */
+const scrub=document.getElementById('scrub'), lab=document.getElementById('lab');
+function setP(v){ P=clamp(v,0,1); if(scrub) scrub.value=Math.round(P*1000);
+  if(lab) lab.textContent = P<0.05?'右側待入' : P<FORM_END?'流入成形…' : P<META_OFF?'凝成真水…' : '真水卡'; }
+let anim=null;
+function playForm(){ if(anim)cancelAnimationFrame(anim);
+  const start=performance.now(), DUR=3200; setP(0);
+  (function a(){ const k=Math.min((performance.now()-start)/DUR,1); setP(k); if(k<1)anim=requestAnimationFrame(a); })(); }
+if(scrub) scrub.oninput=e=>setP((+e.target.value)/1000);
+const _play=document.getElementById('play'); if(_play) _play.onclick=playForm;
+
+// 嵌入模式 ?embed=1：透明底、隱藏控制；收到 parent「play-watercard」訊息就播放（捲到才觸發）
+if(new URLSearchParams(location.search).has('embed')){
+  document.body.classList.add('embed');
+  let played=false;
+  addEventListener('message', e=>{ if(e.data==='play-watercard' && !played){ played=true; playForm(); } });
+}
+</script>
+</body>
+</html>

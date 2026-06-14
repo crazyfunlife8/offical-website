@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>水卡凝聚成形 原型（metaball）｜創巢數位（探索）</title>
+<meta name="robots" content="noindex">
+<style>
+  :root{ --cyan:0,200,255; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ min-height:100vh; color:rgba(var(--stellar),.9); font-family:system-ui,sans-serif;
+    background:
+      linear-gradient(118deg, transparent 40%, rgba(40,70,130,.16) 50%, transparent 60%),
+      radial-gradient(130% 90% at 80% 6%, rgba(24,46,92,.32), transparent 55%),
+      radial-gradient(1px 1px at 12% 24%, rgba(255,255,255,.7), transparent),
+      radial-gradient(1px 1px at 32% 64%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.4px 1.4px at 64% 18%, rgba(255,255,255,.8), transparent),
+      radial-gradient(1px 1px at 78% 72%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.2px 1.2px at 50% 40%, rgba(180,220,255,.7), transparent),
+      radial-gradient(1px 1px at 88% 44%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.3px 1.3px at 6% 56%, rgba(255,235,200,.7), transparent),
+      #04060a;
+    background-repeat:no-repeat; background-attachment:fixed; overflow-x:hidden; }
+  .stage{ min-height:100vh; display:flex; align-items:center; justify-content:center; }
+  canvas#cv{ width:min(760px,94vw); aspect-ratio:760/560; display:block; }
+  .tag{ position:fixed; top:18px; left:50%; transform:translateX(-50%); font-family:"JetBrains Mono",monospace;
+    font-size:11px; letter-spacing:.06em; color:rgba(var(--stellar),.55); }
+  .ctrl{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%); display:flex; gap:10px; align-items:center;
+    font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.7); }
+  .ctrl button{ background:rgba(0,200,255,.14); border:1px solid rgba(0,200,255,.5); color:rgba(var(--stellar),.9);
+    padding:6px 12px; border-radius:6px; cursor:pointer; font-family:inherit; font-size:11px; }
+  .ctrl input[type=range]{ width:220px; accent-color:rgb(0,200,255); }
+</style>
+</head>
+<body>
+<span class="tag">// 原型 · 水珠凝聚成形（metaball · 重力拉向中央）· 拖滑桿或按播放 · 不上 production</span>
+<div class="stage"><canvas id="cv"></canvas></div>
+<div class="ctrl">
+  <button id="play">▶ 播放成形</button>
+  <span>手動：</span><input type="range" id="scrub" min="0" max="1000" value="0">
+  <span id="lab">散開</span>
+</div>
+
+<script type="importmap">
+{ "imports": { "three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const canvas=document.getElementById('cv');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1;
+const scene=new THREE.Scene();
+const group=new THREE.Group(); scene.add(group); group.rotation.set(0.10,0.17,0);
+const camera=new THREE.PerspectiveCamera(42,1,0.1,100); camera.position.set(0,0,7.6);
+const env=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),0.04).texture; scene.environment=env;
+const key=new THREE.DirectionalLight(0xffffff,2.2); key.position.set(4,6,6); scene.add(key);
+const rim=new THREE.DirectionalLight(0x2a6cff,1.3); rim.position.set(-6,-2,3); scene.add(rim);
+function resize(){ const r=canvas.getBoundingClientRect(); renderer.setSize(r.width,r.height,false); camera.aspect=r.width/r.height; camera.updateProjectionMatrix(); }
+resize(); addEventListener('resize',resize);
+
+// D1 水材質
+const mat=new THREE.MeshPhysicalMaterial({ transmission:1, thickness:0.9, ior:1.33, roughness:0.045, dispersion:3.0,
+  clearcoat:1, attenuationColor:new THREE.Color(0x9fe8ff), attenuationDistance:5, envMapIntensity:1.4, transparent:true });
+const mc=new MarchingCubes(80, mat, false, false, 400000); mc.scale.set(4.9,3.2,1.15); mc.isolation=55; group.add(mc);
+
+// 目標：排成矩形卡片的格點；散開：四散各處
+const rand=(a,b)=>a+Math.random()*(b-a);
+const balls=[];
+const COLS=7, ROWS=4;
+for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+  balls.push({
+    col:c, row:r,
+    tx:0.16+c/(COLS-1)*0.68, ty:0.36+r/(ROWS-1)*0.28, tz:0.5,
+    sx:1.20+rand(0,0.18),                                  // 起點移到畫面外右側 → 看得到流進來
+    sy:0.16+rand(0,0.68),
+    sz:0.5+rand(-0.05,0.05),
+    delay:(COLS-1-c)*0.045+rand(0,0.03),                   // 右側先到、左側後到（整攤往左灌）
+    dur:rand(0.58,0.74), ph:rand(0,6.28)
+  });
+}
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const mix=(a,b,t)=>a+(b-a)*t;
+const easeOutCubic=q=>1-Math.pow(1-q,3);
+const sstep=(a,b,x)=>{ const t=clamp((x-a)/(b-a),0,1); return t*t*(3-2*t); };
+
+let P=0;                                    // 0=右側外、未進場, 1=中央成形
+function render(t){
+  mc.reset(); const sub=10;
+  mc.scale.set(4.9, 3.2, mix(1.25,0.95, sstep(0.15,1.0,P)));   // 流入時厚 → 落定攤平
+  for(const b of balls){
+    const q=clamp((P-b.delay)/b.dur,0,1);
+    const e=easeOutCubic(q);
+    const settle=sstep(0.72,1.0,q);
+    const active=sstep(0.05,0.28,q)*(1-settle);
+    const bounce=Math.sin(settle*Math.PI*2.2)*Math.pow(1-settle,2);   // 落定 Q 彈
+    const wob=Math.sin(t*4.0+b.ph)*0.025*active;                      // 行進中邊緣抖、落定收掉
+    const sag=Math.sin(q*Math.PI)*0.055*(1-settle);                   // 重力下墜
+    const x=mix(b.sx, b.tx, e)+bounce*0.035;
+    const y=mix(b.sy, b.ty, e)-sag+wob;
+    const z=mix(b.sz+0.08*(1-q), b.tz, e)+wob*0.6;                    // 流入較鼓、落定壓扁
+    const radius=mix(0.17,0.20, sstep(0.18,0.92,q));                  // 始終連成一攤、不忽大忽小
+    mc.addBall(x, y, z, radius, sub);
+  }
+  mc.update();
+  renderer.render(scene,camera);
+}
+let t0=performance.now();
+(function loop(){ requestAnimationFrame(loop); render((performance.now()-t0)/1000); })();
+
+// 控制：播放（自動成形）+ 手動 scrub
+const scrub=document.getElementById('scrub'), lab=document.getElementById('lab');
+function setP(v){ P=Math.max(0,Math.min(1,v)); scrub.value=Math.round(P*1000);
+  lab.textContent = P<0.05?'散開' : P>0.95?'成形' : '凝聚中…'; }
+scrub.oninput=e=>setP((+e.target.value)/1000);
+let anim=null;
+document.getElementById('play').onclick=()=>{
+  if(anim) cancelAnimationFrame(anim);
+  const start=performance.now(), DUR=2600;
+  setP(0);
+  (function a(){ const k=Math.min((performance.now()-start)/DUR,1);
+    setP(k);                                  // 進度線性推進，逐球 delay 已做出分批進場
+    if(k<1) anim=requestAnimationFrame(a); })();
+};
+</script>
+</body>
+</html>

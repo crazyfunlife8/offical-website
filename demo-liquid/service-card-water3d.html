@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服務卡片 · 矩形真水（WebGL 沙盒）｜創巢數位（探索）</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+<style>
+  :root{ --cyan:0,200,255; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:"Noto Sans TC",sans-serif; color:rgba(var(--stellar),.92); min-height:100vh;
+    background:
+      linear-gradient(118deg, transparent 40%, rgba(40,70,130,.16) 50%, transparent 60%),
+      radial-gradient(130% 90% at 80% 6%, rgba(24,46,92,.32), transparent 55%),
+      radial-gradient(90% 80% at 14% 96%, rgba(46,22,78,.24), transparent 60%),
+      radial-gradient(1px 1px at 12% 24%, rgba(255,255,255,.7), transparent),
+      radial-gradient(1px 1px at 32% 64%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.4px 1.4px at 64% 18%, rgba(255,255,255,.8), transparent),
+      radial-gradient(1px 1px at 78% 72%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.2px 1.2px at 50% 40%, rgba(180,220,255,.7), transparent),
+      radial-gradient(1px 1px at 88% 44%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1px 1px at 24% 88%, rgba(255,255,255,.45), transparent),
+      radial-gradient(1.3px 1.3px at 6% 56%, rgba(255,235,200,.7), transparent),
+      #04060a;
+    background-repeat:no-repeat; background-attachment:fixed; }
+
+  .stage{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:70px 5vw; }
+  /* 水珠浮在星空：不裁切、邊緣由幾何的圓肩自己鼓出 */
+  .cardwrap{ position:relative; width:min(680px,92vw); aspect-ratio:680/516; }
+  .cardwrap canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+  /* 中央靜區可視化框（對齊用，正式拿掉）*/
+  .calmbox{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:6; pointer-events:none;
+    border:1.5px dashed rgba(0,200,255,.85); border-radius:18px; box-shadow:0 0 12px rgba(0,200,255,.3); }
+  .calmbox span{ position:absolute; top:-20px; left:0; font-family:"JetBrains Mono",monospace; font-size:10px;
+    letter-spacing:.12em; color:rgba(0,200,255,.85); }
+  /* 水珠底部焦散托光 */
+  .cardwrap::after{ content:''; position:absolute; left:18%; right:18%; bottom:8%; height:48px; z-index:-1; pointer-events:none;
+    background:radial-gradient(ellipse, rgba(var(--cyan),.18), transparent 70%); filter:blur(16px); }
+
+  .tagline{ position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:50;
+    font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.06em; color:rgba(var(--stellar),.55); }
+  .panel{ position:fixed; left:20px; bottom:20px; z-index:50; width:256px; padding:16px 18px;
+    background:rgba(8,12,22,.82); border:1px solid rgba(var(--stellar),.14); border-radius:12px;
+    backdrop-filter:blur(8px); font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.8); }
+  .panel h4{ font-size:10px; letter-spacing:.2em; color:rgba(var(--yellow),.9); margin-bottom:12px; }
+  .row{ margin:9px 0; }
+  .row label{ display:flex; justify-content:space-between; margin-bottom:5px; color:rgba(var(--stellar),.7); }
+  .row label b{ color:rgba(var(--cyan),.95); font-weight:500; }
+  .row input[type=range]{ width:100%; accent-color:rgb(var(--cyan)); }
+  .note{ margin-top:12px; font-size:9.5px; line-height:1.6; color:rgba(var(--stellar),.4); }
+  /* 嵌入模式 ?embed=1：背景透明、隱藏面板/虛線框/標籤 */
+  body.embed{ background:transparent !important; min-height:auto; }
+  body.embed .panel, body.embed .calmbox, body.embed .tagline{ display:none !important; }
+  body.embed .stage{ min-height:100vh; padding:0; }
+</style>
+</head>
+<body>
+<script>if(new URLSearchParams(location.search).has('embed'))document.body.classList.add('embed');</script>
+<span class="tagline">// 探索 · 矩形真水卡片（WebGL · 圓肩水珠邊）· 移動滑鼠攪動 · 不上 production</span>
+
+<div class="stage">
+  <div class="cardwrap"><canvas id="cv"></canvas><div class="calmbox" id="calmbox"><span>中央靜區</span></div></div>
+</div>
+
+<div class="panel">
+  <h4>水卡手感</h4>
+  <div class="row"><label>傾斜 左右 <b id="vTiltY">0.17</b></label><input type="range" id="sTiltY" min="-40" max="40" value="17"></div>
+  <div class="row"><label>傾斜 上下 <b id="vTiltX">0.10</b></label><input type="range" id="sTiltX" min="-40" max="40" value="10"></div>
+  <div class="row"><label>中央靜區 寬 <b id="vCalmW">2.84</b></label><input type="range" id="sCalmW" min="80" max="330" value="284"></div>
+  <div class="row"><label>中央靜區 高 <b id="vCalmH">2.02</b></label><input type="range" id="sCalmH" min="50" max="240" value="202"></div>
+  <div class="row"><label>邊緣隆起（水珠邊）<b id="vBead">0.94</b></label><input type="range" id="sBead" min="0" max="120" value="94"></div>
+  <div class="row"><label>水波幅度 <b id="vAmp">0.02</b></label><input type="range" id="sAmp" min="0" max="20" value="2"></div>
+  <div class="row"><label>邊緣不規則 <b id="vEdge">0.15</b></label><input type="range" id="sEdge" min="0" max="24" value="15"></div>
+  <div class="row"><label>流動速度 <b id="vFlow">1.5</b></label><input type="range" id="sFlow" min="0" max="30" value="15"></div>
+  <div class="row"><label>折射厚度 <b id="vThick">2.00</b></label><input type="range" id="sThick" min="0" max="200" value="200"></div>
+  <div class="row"><label>色散（彩虹邊）<b id="vDisp">8.0</b></label><input type="range" id="sDisp" min="0" max="80" value="80"></div>
+  <div class="row"><label>水珠染色（青）<b id="vDark">0.58</b></label><input type="range" id="sDark" min="0" max="100" value="58"></div>
+  <div class="note">圓肩 = 水珠的表面張力邊。移動滑鼠攪動水面。Chrome/Edge 最佳。</div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const P = { bead:0.94, amp:0.02, flow:1.5, thick:2.0, disp:8.0, dark:0.58, calmW:2.84, calmH:2.02, edgeIrr:0.15 };  // 創辦人定稿值 2026-06-14
+
+const canvas = document.getElementById('cv');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
+const scene = new THREE.Scene();
+const group = new THREE.Group(); scene.add(group);   // 水珠整組（可傾斜）
+group.rotation.set(0.10, 0.17, 0);                    // 右上微向前傾、強調立體
+const camera = new THREE.PerspectiveCamera(40,1,0.1,100); camera.position.set(0,0,7.4);
+const env = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),0.04).texture; scene.environment = env;
+const key = new THREE.DirectionalLight(0xffffff,2.1); key.position.set(4,6,6); scene.add(key);
+const rim = new THREE.DirectionalLight(0x2a6cff,1.25); rim.position.set(-6,-2,3); scene.add(rim);
+
+function resize(){ const r=canvas.getBoundingClientRect(); renderer.setSize(r.width,r.height,false);
+  camera.aspect=r.width/r.height; camera.updateProjectionMatrix(); }
+
+// ── 卡片內容（圓角裁切，當水體後方折射的字）──
+const CW=1200, CH=912, RAD=110;
+function buildTextTexture(){
+  const c=document.createElement('canvas'); c.width=CW; c.height=CH; const g=c.getContext('2d');
+  // 透明底：水珠取代卡片，只留內容浮在水裡折射
+  g.textBaseline='alphabetic';
+  g.font='700 240px "JetBrains Mono",monospace'; g.textAlign='right'; g.fillStyle='rgba(255,255,255,0.20)';
+  g.fillText('01', CW-90, 250);
+  g.textAlign='left'; g.font='500 30px "JetBrains Mono",monospace'; g.fillStyle='rgba(90,210,255,0.95)';
+  g.fillText('D E V E L O P', 110, 150);
+  g.font='600 150px "Chiron Sung HK","Noto Serif TC",serif'; g.fillStyle='rgba(255,255,255,0.97)';
+  g.fillText('開發', 106, 320);
+  g.font='400 40px "Noto Sans TC",sans-serif'; g.fillStyle='rgba(255,255,255,0.62)';
+  g.fillText('把想法變成會運作的東西。', 112, 402);
+  const items=[['網站架設','一頁式到企業電商'],['客製系統開發','說得出來就寫得出來']];
+  g.strokeStyle='rgba(255,255,255,0.18)'; g.lineWidth=2;
+  let y=510;
+  for(const [sn,sd] of items){
+    g.beginPath(); g.moveTo(110,y-46); g.lineTo(CW-90,y-46); g.stroke();
+    g.textAlign='left'; g.font='600 52px "Noto Serif TC",serif'; g.fillStyle='rgba(255,255,255,0.95)';
+    g.fillText(sn, 110, y);
+    g.textAlign='right'; g.font='400 32px "Noto Sans TC",sans-serif'; g.fillStyle='rgba(255,255,255,0.5)';
+    g.fillText(sd, CW-90, y-6);
+    y+=132;
+  }
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=4; return t;
+}
+let textMesh=null;
+function refreshText(){ const nt=buildTextTexture();
+  if(textMesh){ textMesh.material.map.dispose(); textMesh.material.map=nt; textMesh.material.needsUpdate=true; } }
+// 水珠後方的星空（場景內，會被水折射）
+function makeStarPlane(){
+  const W=1024,H=772,c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+  // 圓角裁切：宇宙填滿整顆水珠輪廓、不留矩形邊（否則內部會出現一塊卡片）
+  g.beginPath(); g.roundRect(8,8,W-16,H-16,180); g.clip();
+  const bg=g.createRadialGradient(W*0.72,H*0.22,0,W*0.5,H*0.55,W*0.9);
+  bg.addColorStop(0,'#16243f'); bg.addColorStop(.5,'#0a1226'); bg.addColorStop(1,'#05070f');
+  g.fillStyle=bg; g.fillRect(0,0,W,H);
+  g.globalCompositeOperation='lighter';
+  const neb=(x,y,r,col)=>{ const rg=g.createRadialGradient(x,y,0,x,y,r);
+    rg.addColorStop(0,col); rg.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=rg; g.fillRect(0,0,W,H); };
+  neb(W*0.76,H*0.24,W*0.55,'rgba(40,84,158,0.22)');
+  neb(W*0.18,H*0.86,W*0.5,'rgba(78,42,128,0.16)');
+  for(let i=0;i<220;i++){ const x=Math.random()*W,y=Math.random()*H,s=Math.random();
+    g.globalAlpha=0.25+s*0.65; g.fillStyle= s>0.9?'#ffe9c4':(s>0.6?'#bfe0ff':'#ffffff');
+    g.beginPath(); g.arc(x,y,s*1.6+0.3,0,7); g.fill(); }
+  g.globalAlpha=1; g.globalCompositeOperation='source-over';
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=4;
+  // 略大於文字、略小於水珠外緣；alphaTest 讓圓角外乾淨透明（進折射緩衝、無黑角）
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(6.35,4.78),
+    new THREE.MeshBasicMaterial({map:t, transparent:false, alphaTest:0.5}));
+  m.position.z=-0.5; group.add(m);
+}
+function makeTextPlane(){ textMesh=new THREE.Mesh(new THREE.PlaneGeometry(5.4,4.05),
+  new THREE.MeshBasicMaterial({map:buildTextTexture(), transparent:false, alphaTest:0.06}));
+  textMesh.position.z=-0.16; group.add(textMesh); }
+
+// ── 圓肩水珠輪廓的 alpha 遮罩 ──
+function beadAlpha(){
+  const w=512,h=Math.round(512*4.9/6.5),c=document.createElement('canvas'); c.width=w; c.height=h; const g=c.getContext('2d');
+  g.fillStyle='#000'; g.fillRect(0,0,w,h);
+  g.filter='blur(5px)'; g.fillStyle='#fff';
+  const r=w*0.17; g.beginPath(); g.roundRect(w*0.045,h*0.05,w*0.91,h*0.90,r); g.fill();
+  const t=new THREE.CanvasTexture(c); return t;
+}
+
+// ── 前方水面（圓肩水珠 + 起伏）──
+const PW=6.5, PH=4.9, HW=PW/2, HH=PH/2, R=1.15, SH=0.9;
+const geo=new THREE.PlaneGeometry(PW,PH,150,114);
+const base=geo.attributes.position.array.slice();
+function rrSDF(x,y){ const qx=Math.abs(x)-(HW-R), qy=Math.abs(y)-(HH-R);
+  const ax=Math.max(qx,0), ay=Math.max(qy,0);
+  return Math.hypot(ax,ay)+Math.min(Math.max(qx,qy),0)-R; }
+// 預存每點的 sdf / 圓肩高度 / 內部因子
+const smoothstep=(a,b,x)=>{ const t=Math.min(Math.max((x-a)/(b-a),0),1); return t*t*(3-2*t); };
+const N=base.length/3, sdf=new Float32Array(N), shoulder=new Float32Array(N), interior=new Float32Array(N), waveFac=new Float32Array(N), edgeBand=new Float32Array(N);
+for(let i=0;i<N;i++){ const x=base[i*3],y=base[i*3+1]; const s=rrSDF(x,y); sdf[i]=s;
+  const t=Math.min(Math.max(-s,0)/SH,1); shoulder[i]=Math.sqrt(Math.max(0,1-(1-t)*(1-t)));
+  interior[i]=Math.min(Math.max(-s/0.55,0),1); }
+// 中央靜區（可調框）：框內水波壓到 ~10%、框外到邊保留
+function calmRR(x,y,hw,hh,r){ const qx=Math.abs(x)-(hw-r), qy=Math.abs(y)-(hh-r);
+  return Math.hypot(Math.max(qx,0),Math.max(qy,0))+Math.min(Math.max(qx,qy),0)-r; }
+function computeWaveFac(){ const f=0.5;
+  for(let i=0;i<N;i++){ const x=base[i*3],y=base[i*3+1];
+    const cs=calmRR(x,y,P.calmW,P.calmH,0.55);
+    const inCalm=1-smoothstep(-f,f,cs);          // 1=框內, 0=框外
+    waveFac[i]=0.10+0.90*(1-inCalm);             // 框內水波弱
+    edgeBand[i]=(1-inCalm)*interior[i]; } }       // 邊緣不規則：只在中央框外、最外圈圓肩淡出
+computeWaveFac();
+function updateCalmBox(){ const cb=document.getElementById('calmbox'); if(!cb) return;
+  const vH=camera.position.z*Math.tan(40*Math.PI/360), vW=vH*camera.aspect;
+  cb.style.width=(P.calmW/vW*100)+'%'; cb.style.height=(P.calmH/vH*100)+'%'; }
+
+const mat=new THREE.MeshPhysicalMaterial({   // ← D1 原配方照抄
+  transmission:1, thickness:P.thick, ior:1.33, roughness:0.04, dispersion:P.disp,
+  clearcoat:1, clearcoatRoughness:0.0, envMapIntensity:0.95,
+  attenuationColor:new THREE.Color(0x9fe8ff), attenuationDistance:12-P.dark*9,
+  transparent:true, alphaMap:beadAlpha(), side:THREE.FrontSide });
+const water=new THREE.Mesh(geo,mat); group.add(water);
+
+const mouse={x:0,y:0,tx:99,ty:99};
+addEventListener('pointermove',e=>{ const r=canvas.getBoundingClientRect();
+  mouse.tx=((e.clientX-r.left)/r.width-0.5)*PW; mouse.ty=-((e.clientY-r.top)/r.height-0.5)*PH; });
+
+function wave(x,y,t){ return Math.sin(x*1.7+t)*0.5 + Math.sin(y*2.2+t*1.25)*0.45 + Math.sin((x+y)*1.15-t*0.8)*0.4 + Math.sin((x-y)*2.6+t*0.6)*0.25; }
+// 邊緣高頻亂波（不規則折射）
+function fineNoise(x,y,t){ return Math.sin(x*6.3+t*1.7)*0.5 + Math.sin(y*7.1-t*1.3)*0.45 + Math.sin((x*4.2+y*5.1)+t*2.1)*0.4 + Math.sin((x*8.4-y*3.3)-t*1.1)*0.32 + Math.sin((x*11.7+y*9.2)+t*0.9)*0.22; }
+
+let on=true; new IntersectionObserver(es=>es.forEach(e=>on=e.isIntersecting),{threshold:.02}).observe(canvas);
+let t=0;
+function loop(){ requestAnimationFrame(loop); if(!on) return;
+  t+=0.01*P.flow;
+  mouse.x+=(mouse.tx-mouse.x)*0.08; mouse.y+=(mouse.ty-mouse.y)*0.08;
+  const p=geo.attributes.position.array;
+  for(let i=0;i<N;i++){ const x=base[i*3],y=base[i*3+1];
+    let z=P.bead*shoulder[i] + P.bead*0.16*interior[i];   // 圓肩 + 微凸透鏡
+    z+=wave(x,y,t)*P.amp*interior[i]*waveFac[i];           // 水波：中央文字區弱、近邊保留
+    z+=fineNoise(x,y,t)*P.edgeIrr*edgeBand[i];             // 邊緣高頻不規則折射
+    const dx=x-mouse.x, dy=y-mouse.y;
+    z+=Math.exp(-(dx*dx+dy*dy)*1.6)*0.16*Math.sin(t*4)*interior[i];
+    p[i*3+2]=z; }
+  geo.attributes.position.needsUpdate=true; geo.computeVertexNormals();
+  renderer.render(scene,camera);
+}
+
+document.fonts.ready.then(()=>{ resize(); makeStarPlane(); makeTextPlane(); updateCalmBox(); loop(); });
+addEventListener('resize',()=>{ resize(); updateCalmBox(); });
+
+const $=id=>document.getElementById(id);
+$('sTiltY').oninput=e=>{ group.rotation.y=(+e.target.value)/100; $('vTiltY').textContent=group.rotation.y.toFixed(2); };
+$('sTiltX').oninput=e=>{ group.rotation.x=(+e.target.value)/100; $('vTiltX').textContent=group.rotation.x.toFixed(2); };
+$('sCalmW').oninput=e=>{ P.calmW=(+e.target.value)/100; computeWaveFac(); updateCalmBox(); $('vCalmW').textContent=P.calmW.toFixed(2); };
+$('sCalmH').oninput=e=>{ P.calmH=(+e.target.value)/100; computeWaveFac(); updateCalmBox(); $('vCalmH').textContent=P.calmH.toFixed(2); };
+$('sBead').oninput=e=>{ P.bead=(+e.target.value)/100; $('vBead').textContent=P.bead.toFixed(2); };
+$('sAmp').oninput=e=>{ P.amp=(+e.target.value)/100; $('vAmp').textContent=P.amp.toFixed(2); };
+$('sEdge').oninput=e=>{ P.edgeIrr=(+e.target.value)/100; $('vEdge').textContent=P.edgeIrr.toFixed(2); };
+$('sFlow').oninput=e=>{ P.flow=(+e.target.value)/10; $('vFlow').textContent=P.flow.toFixed(1); };
+$('sThick').oninput=e=>{ P.thick=(+e.target.value)/100; mat.thickness=P.thick; $('vThick').textContent=P.thick.toFixed(2); };
+$('sDisp').oninput=e=>{ P.disp=(+e.target.value)/10; mat.dispersion=P.disp; $('vDisp').textContent=P.disp.toFixed(1); };
+$('sDark').oninput=e=>{ P.dark=(+e.target.value)/100; mat.attenuationDistance=12-P.dark*9; $('vDark').textContent=P.dark.toFixed(2); };
+</script>
+</body>
+</html>

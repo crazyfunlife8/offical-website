@@ -150,13 +150,13 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 
 ---
 
-### 服務區塊視覺探索結論（探索期 2026-05-31 ~ 2026-06-14；記錄 2026-06-14 16:41）
+### 服務區塊視覺探索結論（探索期 2026-05-31 ~ 2026-06-15；記錄 2026-06-15 00:55）
 
 對應任務 11b。服務區卡片視覺做了完整探索週期，所有 POC 存檔於 `demo-liquid/`（探索集，**不上 production**；總索引 `demo-liquid/_index.html`、非液體總展示 `demo-liquid/showcase-all-cards.html`）。
 
-- **已否決方向**：液態水玻璃卡 / 3D 液體 D1–D8 / 液態金屬 fusion / 滴落變體 V / 液態卡 F / 早期 flow 批 / 星球 3D 畫廊。創辦人明確「放棄液態方向」。
-- **現役候選**：**開發類** = N4 捲動堆疊卡（開發→成長→顧問）× **真程式碼流星字雨撞擊**（墨黑不透明覆蓋主視覺星場、整行真 code 旋轉 90° 直立落下、打卡頂迸黃色火花，密度 24 條）；檔 `demo-liquid/service-n4rain-poc.html`。**社群類** = #23 手風琴圖條 `demo-liquid/service-accordion-embed.html`。整合預覽 `index-rain-preview.html`（noindex 副本、**未動正式 index.html**）。
-- **待決**：① N4 含三大類與「社群=手風琴」內容重疊如何分 ② 上下順序／字雨密度定案後才正式整合進 index.html + 5 層 CSS（樣式進 pages/index.css、JS 進 index.js）。
+- **已否決／退役方向**：液態水玻璃卡 / 3D 液體 D1–D8 / 液態金屬 fusion / 滴落變體 V / 液態卡 F / 早期 flow 批 / 星球 3D 畫廊（創辦人明確「放棄液態方向」）。**N4 捲動堆疊卡 × 程式碼流星字雨**（`service-n4rain-poc.html`）探索後退役。**水珠凝聚成形動畫**（metaball 小水流入 → snap 成卡，`service-card-water-final.html`，曾與 Codex 協作多輪）完整探索後創辦人改走簡單版，保留為探索紀錄、不上線。
+- **定案方向（2026-06-15 00:55）**：**開發區 = WebGL 真水卡「左右滑輪播」**——開發/成長/顧問三張水卡，箭頭＋圓點＋拖曳切換，**無進場動畫**（簡單版，刻意不用 metaball）。水卡定稿樣式（折射 / 色散邊 / 傾斜 / SP 定稿參數 bead0.94 amp0.02 disp8.0 等）見 `demo-liquid/service-card-water3d.html`（可調沙盒）；輪播實作 `demo-liquid/service-card-water-carousel.html`（`?embed=1` 乾淨嵌入）。水要清透必須**後方有星空可折射**（scene.background），否則變灰白黏土。**社群類維持 #23 手風琴**（`service-accordion-embed.html`）不動。整合於 `index-rain-preview.html`（noindex 副本、iframe 嵌入、星空底已提亮對齊頁面藍、**未動正式 index.html**）。
+- **整合待辦（正式進 index.html 前）**：① iframe 暗框治本——內嵌共用頁面 Three.js 星場 vs 維持提亮 iframe（治標）② iframe 捲動吃掉（游標在卡上滾頁面不動）：輪播需互動不能 `pointer-events:none`，靠 body `overflow:hidden` 緩解、需實機再驗 ③ 「成長」含社群經營與社群手風琴內容重疊如何分 ④ 進 5 層 CSS（樣式 pages/index.css、JS index.js）⑤ 效能（WebGL 水卡）。
 - **早期液態卡 morph 已清（2026-06-14 16:57）**：`index.html` + `assets/css/{animations,components,pages/index}.css` 曾有未 commit 的「液態卡 morph」實驗（`liquid-morph-a/b` 邊角晃動 + `?v=liquid2` 快取參數），已 `git restore` 全數還原、工作區乾淨；液態方向確定不上線。若日後要重看那批 keyframe，本條已記其內容、可重建。
 
 ---

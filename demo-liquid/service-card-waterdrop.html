@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服務卡片 · 矩形水珠（可調沙盒）｜創巢數位（探索）</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700&family=Italiana&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+<style>
+  :root{
+    --yellow:255,199,9; --cyan:0,200,255; --stellar:225,235,255;
+    --f-cjk:"Chiron Sung HK","Noto Serif TC",serif; --f-serif:"Noto Serif TC",serif;
+    --f-mono:"JetBrains Mono",monospace; --f-sans:"Noto Sans TC",sans-serif;
+    --rim:.55; --wob:1; --mag:1; --thick:.5; --water:.5;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{min-height:100%;color:rgba(var(--stellar),.92);font-family:var(--f-sans);}
+  /* 仿主視覺深空：黑洞斜帶 + 星點 + 星雲 */
+  body{
+    background:
+      linear-gradient(118deg, transparent 40%, rgba(40,70,130,.18) 50%, transparent 60%),
+      radial-gradient(130% 90% at 80% 6%, rgba(24,46,92,.34), transparent 55%),
+      radial-gradient(90% 80% at 14% 96%, rgba(46,22,78,.26), transparent 60%),
+      radial-gradient(1px 1px at 12% 24%, rgba(255,255,255,.7), transparent),
+      radial-gradient(1px 1px at 32% 64%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.4px 1.4px at 64% 18%, rgba(255,255,255,.8), transparent),
+      radial-gradient(1px 1px at 78% 72%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.2px 1.2px at 50% 40%, rgba(180,220,255,.7), transparent),
+      radial-gradient(1px 1px at 88% 44%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1px 1px at 24% 88%, rgba(255,255,255,.45), transparent),
+      radial-gradient(1.3px 1.3px at 6% 56%, rgba(255,235,200,.7), transparent),
+      #04060a;
+    background-repeat:no-repeat;background-attachment:fixed;
+  }
+
+  .stage{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 5vw;}
+
+  /* ───── 矩形水珠 ───── */
+  .drop{
+    position:relative;width:min(560px,86vw);min-height:430px;border-radius:42px;
+    /* 真折射：把身後星場用位移貼圖彎曲 */
+    -webkit-backdrop-filter:url(#water) brightness(1.06) saturate(1.25) contrast(1.02);
+    backdrop-filter:url(#water) brightness(1.06) saturate(1.25) contrast(1.02);
+    /* 體積 = 厚度驅動的內壁斜面 + 外投影；厚度越高、內凹越深、托高越明顯 */
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,calc(.9*var(--rim))),
+      inset 0 calc(12px + 30px*var(--thick)) calc(28px + 34px*var(--thick)) rgba(255,255,255,calc(.16*var(--rim))),
+      inset 0 calc(-22px - 34px*var(--thick)) calc(46px + 46px*var(--thick)) rgba(0,28,66,calc(.42 + .28*var(--thick))),
+      inset 0 0 0 1px rgba(200,235,255,calc(.5*var(--rim))),
+      0 40px 90px rgba(0,0,0,.55),
+      0 0 60px rgba(var(--cyan),calc(.10*var(--rim)));
+    animation:wob calc(9s / var(--wob,1)) ease-in-out infinite;
+    will-change:transform,border-radius;
+  }
+  /* 左上鏡面反光 */
+  .drop::before{
+    content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
+    background:
+      radial-gradient(120px 60px at 26% 16%, rgba(255,255,255,calc(.5*var(--rim))), transparent 70%),
+      linear-gradient(150deg, rgba(255,255,255,calc(.14*var(--rim))) 0%, transparent 30%);
+    mix-blend-mode:screen;filter:blur(1px);
+  }
+  /* 底部聚光焦散 */
+  .drop::after{
+    content:'';position:absolute;left:12%;right:12%;bottom:-26px;height:60px;border-radius:50%;
+    background:radial-gradient(ellipse, rgba(var(--cyan),calc(.22*var(--rim))), transparent 70%);
+    filter:blur(14px);pointer-events:none;z-index:-1;
+  }
+  @keyframes wob{
+    0%,100%{ transform:translateY(0) scale(1); border-radius:42px 46px 40px 44px; }
+    33%    { transform:translateY(-5px) scale(1.006); border-radius:48px 40px 46px 42px; }
+    66%    { transform:translateY(3px) scale(.996); border-radius:40px 48px 44px 46px; }
+  }
+
+  /* 厚度色散邊：青／暖橘微分光 + 厚壁立體斜面 */
+  .rim{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
+    box-shadow:
+      inset 2.5px 0 6px rgba(0,190,255,calc(.5*var(--thick))),
+      inset -2.5px 0 6px rgba(255,140,70,calc(.34*var(--thick))),
+      inset 0 4px 5px rgba(255,255,255,calc(.55*var(--thick)*var(--rim))),
+      inset 0 -6px 14px rgba(0,18,54,calc(.55*var(--thick)));}
+
+  /* 水感焦散：緩慢游移的水面亮斑 + 冷色染 */
+  .caustic{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
+    overflow:hidden;opacity:var(--water);mix-blend-mode:screen;}
+  .caustic::before{content:'';position:absolute;inset:-35%;
+    background:
+      radial-gradient(38% 28% at 28% 30%, rgba(120,220,255,.22), transparent 60%),
+      radial-gradient(34% 26% at 72% 58%, rgba(160,235,255,.18), transparent 60%),
+      radial-gradient(30% 22% at 52% 82%, rgba(90,205,255,.16), transparent 60%);
+    filter:blur(11px);animation:caustic 13s ease-in-out infinite;}
+  @keyframes caustic{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(7%,-6%) scale(1.1)}}
+
+  /* 字浮在水面上（不被 backdrop 模糊，清楚可讀） */
+  .content{position:relative;z-index:2;padding:50px 52px;transform:scale(var(--mag));transform-origin:center;}
+  .knum{position:absolute;right:18px;top:6px;font-family:var(--f-mono);font-size:96px;line-height:1;
+    color:rgba(255,255,255,.10);text-shadow:0 2px 20px rgba(0,0,0,.4);}
+  .klab{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.24em;color:rgba(var(--cyan),.95);
+    text-shadow:0 0 14px rgba(var(--cyan),.5);}
+  .content h3{font-family:var(--f-cjk);font-weight:600;font-size:2.7rem;margin:14px 0 6px;color:#fff;
+    text-shadow:0 1px 1px rgba(0,0,0,.5),0 0 24px rgba(0,0,0,.4);}
+  .sub{color:rgba(255,255,255,.72);font-size:.96rem;margin-bottom:30px;text-shadow:0 1px 2px rgba(0,0,0,.55);}
+  .content ul{list-style:none;}
+  .content li{display:flex;align-items:baseline;gap:16px;padding:15px 2px;
+    border-top:1px solid rgba(255,255,255,.18);}
+  .sn{font-family:var(--f-serif);font-size:1.16rem;color:rgba(255,255,255,.96);text-shadow:0 1px 2px rgba(0,0,0,.5);}
+  .sd{margin-left:auto;font-size:.82rem;color:rgba(255,255,255,.55);text-shadow:0 1px 2px rgba(0,0,0,.5);}
+
+  /* ───── 控制面板 ───── */
+  .panel{position:fixed;left:20px;bottom:20px;z-index:50;width:252px;padding:16px 18px;
+    background:rgba(8,12,22,.82);border:1px solid rgba(var(--stellar),.14);border-radius:12px;
+    backdrop-filter:blur(8px);font-family:var(--f-mono);font-size:11px;color:rgba(var(--stellar),.8);}
+  .panel h4{font-size:10px;letter-spacing:.2em;color:rgba(var(--yellow),.9);margin-bottom:12px;}
+  .row{margin:10px 0;}
+  .row label{display:flex;justify-content:space-between;margin-bottom:5px;color:rgba(var(--stellar),.7);}
+  .row label b{color:rgba(var(--cyan),.95);font-weight:500;}
+  .row input[type=range]{width:100%;accent-color:rgb(var(--cyan));}
+  .note{margin-top:12px;font-size:9.5px;line-height:1.6;color:rgba(var(--stellar),.4);}
+  .tagline{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:50;
+    font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:rgba(var(--stellar),.55);}
+</style>
+</head>
+<body>
+
+<span class="tagline">// 探索 · 矩形水珠卡片 · 拉軸調手感 · 不上 production</span>
+
+<div class="stage">
+  <div class="drop">
+    <div class="rim"></div>
+    <div class="caustic"></div>
+    <div class="content">
+      <span class="knum">01</span>
+      <span class="klab">DEVELOP</span>
+      <h3>開發</h3>
+      <p class="sub">把想法變成會運作的東西。</p>
+      <ul>
+        <li><span class="sn">網站架設</span><span class="sd">一頁式到企業電商</span></li>
+        <li><span class="sn">客製系統開發</span><span class="sd">說得出來就寫得出來</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- 真折射濾鏡：feTurbulence 造水面、feDisplacementMap 把身後星場彎曲 -->
+<svg width="0" height="0" style="position:absolute">
+  <filter id="water" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence id="turb" type="fractalNoise" baseFrequency="0.009 0.013" numOctaves="2" seed="7" result="n">
+      <animate attributeName="baseFrequency" dur="22s" values="0.009 0.013;0.012 0.010;0.009 0.013" repeatCount="indefinite"/>
+    </feTurbulence>
+    <feDisplacementMap id="disp" in="SourceGraphic" in2="n" scale="42" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<div class="panel">
+  <h4>水珠手感</h4>
+  <div class="row">
+    <label>厚度 <b id="vThick">0.50</b></label>
+    <input type="range" id="sThick" min="0" max="100" value="50">
+  </div>
+  <div class="row">
+    <label>水感（焦散流光）<b id="vWater">0.50</b></label>
+    <input type="range" id="sWater" min="0" max="100" value="50">
+  </div>
+  <div class="row">
+    <label>折射強度 <b id="vDisp">42</b></label>
+    <input type="range" id="sDisp" min="0" max="90" value="42">
+  </div>
+  <div class="row">
+    <label>晃動速度 <b id="vWob">1.0</b></label>
+    <input type="range" id="sWob" min="0" max="25" value="10">
+  </div>
+  <div class="row">
+    <label>邊緣／高光亮度 <b id="vRim">0.55</b></label>
+    <input type="range" id="sRim" min="0" max="100" value="55">
+  </div>
+  <div class="row">
+    <label>字放大（透鏡感）<b id="vMag">1.00</b></label>
+    <input type="range" id="sMag" min="100" max="116" value="100">
+  </div>
+  <div class="note">折射在 Chrome/Edge 才看得到（backdrop-filter url 濾鏡）。正式版會改用 WebGL 讓真星場即時折射。</div>
+</div>
+
+<script>
+  const $=id=>document.getElementById(id);
+  const root=document.documentElement.style;
+  const disp=$('disp');
+  $('sThick').oninput=e=>{ const v=(+e.target.value)/100; root.setProperty('--thick',v); $('vThick').textContent=v.toFixed(2); };
+  $('sWater').oninput=e=>{ const v=(+e.target.value)/100; root.setProperty('--water',v); $('vWater').textContent=v.toFixed(2); };
+  $('sDisp').oninput=e=>{ disp.setAttribute('scale',e.target.value); $('vDisp').textContent=e.target.value; };
+  $('sWob').oninput=e=>{ const v=(+e.target.value)/10; root.setProperty('--wob', v||0.0001); $('vWob').textContent=v.toFixed(1); };
+  $('sRim').oninput=e=>{ const v=(+e.target.value)/100; root.setProperty('--rim', v); $('vRim').textContent=v.toFixed(2); };
+  $('sMag').oninput=e=>{ const v=(+e.target.value)/100; root.setProperty('--mag', v); $('vMag').textContent=v.toFixed(2); };
+  root.setProperty('--thick',.5); root.setProperty('--water',.5);
+  root.setProperty('--wob',1); root.setProperty('--rim',.55); root.setProperty('--mag',1);
+</script>
+</body>
+</html>

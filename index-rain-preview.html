@@ -28,13 +28,15 @@
       /* 手風琴（社群）iframe 容器 */
       .accordion-wrap{ position:relative; z-index:2; width:100%; max-width:1280px; margin:0 auto; padding:0 4vw; }
       .accordion-wrap iframe{ width:100%; height:78vh; border:0; background:transparent; display:block; }
+
+      /* 開發水卡 iframe 容器 */
+      .watercard-wrap{ position:relative; z-index:2; width:100%; max-width:860px; margin:24px auto 0; padding:0 4vw; }
+      .watercard-wrap iframe{ width:100%; height:640px; border:0; background:transparent; display:block; }
       .accordion-wrap .alabel{ font-family:"JetBrains Mono",monospace; font-size:11.5px; letter-spacing:.22em;
         color:rgba(255,199,9,.85); padding:0 1vw 14px; }
 
       /* ── 星雨開發區（N4 堆疊卡 × 流星字雨撞擊） ── */
-      #dev{ position:relative; background:#04060a; box-shadow:0 -30px 70px rgba(0,0,0,.85); }
-      #dev .seam{ position:absolute; top:0; left:0; right:0; height:1px; z-index:6;
-        background:linear-gradient(90deg, transparent, rgba(225,235,255,.22), transparent); }
+      #dev{ position:relative; }
       #dev .dev-head{ position:absolute; left:7vw; top:9vh; z-index:2; }
       #dev .dev-head .en{ font-family:"JetBrains Mono",monospace; font-size:11.5px; letter-spacing:.26em; color:rgba(225,235,255,.45); }
       #dev .dev-head h2{ font-family:"Noto Serif TC",serif; font-weight:700; font-size:clamp(2.2rem,4.4vw,3.4rem); margin-top:10px; color:rgba(225,235,255,.95); }
@@ -134,26 +136,17 @@
             </div>
         </section>
 
-        <!-- ════ Section 3b｜服務 · 開發（N4 堆疊卡 × 流星字雨撞擊）════ -->
-        <section id="dev">
-            <div class="seam"></div>
-            <div class="dev-head">
-                <span class="en">DEVELOP</span>
-                <h2>開發</h2>
-                <div class="sub">捲動切換 · 真程式碼字雨打在卡片上</div>
+        <!-- ════ Section 3b｜服務 · 開發（矩形真水卡片 WebGL）════ -->
+        <section class="services-section">
+            <div class="services-section__inner">
+                <div class="section-header">
+                    <p class="section-header__eyebrow" data-reveal>DEVELOP ── 開發</p>
+                    <h2 class="section-header__title" data-reveal data-reveal-delay="0.1">把想法變成<span class="accent">會運作的東西</span></h2>
+                </div>
+                <div class="watercard-wrap">
+                    <iframe id="watercard-frame" src="demo-liquid/service-card-water-carousel.html?embed=1" title="開發水卡輪播（左右滑）" loading="lazy"></iframe>
+                </div>
             </div>
-            <div class="stackwrap" id="stack">
-                <div class="scard"><div class="inner"><span class="knum">01</span><span class="klab">DEVELOP</span><h3>開發</h3><p class="csub">把想法變成會運作的東西。</p>
-                    <ul><li><span class="sname">網站架設</span><span class="sdesc">一頁式到企業電商</span></li>
-                        <li><span class="sname">客製系統開發</span><span class="sdesc">說得出來就寫得出來</span></li></ul></div></div>
-                <div class="scard"><div class="inner"><span class="knum">02</span><span class="klab">GROWTH</span><h3>成長</h3><p class="csub">讓更多人看見你、記住你。</p>
-                    <ul><li><span class="sname">社群經營</span><span class="sdesc">素材、文案、定位</span></li>
-                        <li><span class="sname">AI 虛擬網紅</span><span class="sdesc">永遠不下班的代言人</span></li>
-                        <li><span class="sname">跳動E投放</span><span class="sdesc">個人戶也能投 TikTok</span></li></ul></div></div>
-                <div class="scard"><div class="inner"><span class="knum">03</span><span class="klab">CONSULT</span><h3>顧問</h3><p class="csub">先想清楚，再動手。</p>
-                    <ul><li><span class="sname">產業顧問導入</span><span class="sdesc">把方向想清楚再決定</span></li></ul></div></div>
-            </div>
-            <canvas id="rain"></canvas>
         </section>
 
         <!-- Section 5｜終點 CTA -->
@@ -182,88 +175,7 @@
     <script src="assets/js/nav.js"></script>
     <script src="assets/js/pages/index.js"></script>
 
-    <!-- ★ 星雨開發區腳本（正式整合時搬進 pages/index.js） -->
-    <script>
-    (function(){
-      if(!window.gsap) return;
-      gsap.registerPlugin(ScrollTrigger);
-      const scards=[...document.querySelectorAll('#dev .scard')];
-      scards.forEach((card,i)=>{ if(i===scards.length-1) return;
-        gsap.to(card.querySelector('.inner'),{ scale:.9, opacity:.45, ease:'none',
-          scrollTrigger:{ trigger:scards[i+1], start:'top bottom', end:'top top', scrub:true } });
-      });
-
-      const CODE=[
-        `const nest = createStudio()`, `export default function App() {`, `<section class="services">`,
-        `router.get('/api/orders', fn)`, `await db.clients.findMany()`, `npm run build && deploy`,
-        `return <Card {...props} />`, `background: #04060a;`, `useEffect(() => render(), [])`,
-        `if (user.ready) launch()`, `SELECT * FROM orders;`, `transform: translateY(-4px)`,
-        `addEventListener('scroll', fx)`, `git commit -m "ship it"`, `} else { retry() }`,
-      ];
-      const cv=document.getElementById('rain'), ctx=cv.getContext('2d');
-      let W,H,dpr;
-      function rs(){ dpr=Math.min(devicePixelRatio,2); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
-      rs(); addEventListener('resize',rs);
-      const hash=(a,b)=>{ const x=Math.sin(a*127.1+b*311.7)*43758.5453; return x-Math.floor(x); };
-      const ND=24, D=[];
-      for(let i=0;i<ND;i++) D.push({ spd:0.05+hash(i,1)*0.07, ph:hash(i,2)*1.8, sz:13+(hash(i,4)*3|0),
-        ye:hash(i,5)<0.12, cy:hash(i,6)<0.28 });
-      const rainOn={v:false};
-      new IntersectionObserver(es=>es.forEach(e=>{ rainOn.v=e.isIntersecting; cv.classList.toggle('on',e.isIntersecting); }),{threshold:0.02}).observe(document.getElementById('dev'));
-      function frontRects(){
-        const inners=document.querySelectorAll('#dev .inner'), out=[];
-        for(const el of inners){ if(parseFloat(getComputedStyle(el).opacity)<0.7) continue;
-          const r=el.getBoundingClientRect(); if(r.top>20&&r.top<H-20) out.push({l:r.left,r:r.right,t:r.top}); }
-        return out;
-      }
-      function drawRain(t){
-        ctx.clearRect(0,0,W,H);
-        const devTop=Math.max(0, document.getElementById('dev').getBoundingClientRect().top);
-        if(devTop>=H-4) return;
-        ctx.save(); ctx.beginPath(); ctx.rect(0,devTop,W,H-devTop); ctx.clip();
-        const rects=frontRects(); ctx.textBaseline='middle';
-        for(let i=0;i<ND;i++){
-          const d=D[i]; const raw=t*d.spd+d.ph, cyc=Math.floor(raw/1.8), prog=raw%1.8-0.25;
-          const code=CODE[(i*5+cyc)%CODE.length];
-          ctx.font=`${d.sz}px "JetBrains Mono",monospace`;
-          const w=ctx.measureText(code).width;
-          const x=16+Math.floor(hash(i,cyc*9+5)*(W-32));
-          const tipY=prog*H;
-          const base=d.ye?'255,199,9':(d.cy?'90,205,255':'150,180,220');
-          let hitY=Infinity;
-          for(const rc of rects) if(x>=rc.l&&x<=rc.r&&rc.t<hitY) hitY=rc.t;
-          const hitProg=hitY/H;
-          if(prog<=hitProg){
-            ctx.save(); ctx.translate(x,tipY); ctx.rotate(-Math.PI/2); ctx.textAlign='left';
-            const grd=ctx.createLinearGradient(0,0,w,0);
-            grd.addColorStop(0,`rgba(240,247,255,0.98)`); grd.addColorStop(0.10,`rgba(${base},0.92)`); grd.addColorStop(1,`rgba(${base},0)`);
-            ctx.fillStyle=grd; ctx.fillText(code,0,0); ctx.restore();
-          } else if(hitY<Infinity){
-            const tau=(prog-hitProg)/d.spd;
-            if(tau<0.6){
-              const fade=1-tau/0.6;
-              const lg=ctx.createRadialGradient(x,hitY,0,x,hitY,46);
-              lg.addColorStop(0,`rgba(255,214,98,${0.5*fade})`); lg.addColorStop(0.4,`rgba(255,199,9,${0.22*fade})`); lg.addColorStop(1,'rgba(255,199,9,0)');
-              ctx.fillStyle=lg; ctx.fillRect(x-46,hitY-48,92,50);
-              ctx.fillStyle=`rgba(255,236,170,${0.9*fade})`; ctx.fillRect(x-12,hitY-1.5,24,2);
-              ctx.textAlign='center';
-              for(let j=0;j<8;j++){
-                const vx=(hash(i,cyc*13+j)-0.5)*150, vy=-(45+hash(i,cyc*17+j)*120);
-                const px=x+vx*tau, py=hitY+vy*tau+175*tau*tau;
-                if(py>hitY+2) continue;
-                ctx.font=`${8+(hash(i,j+9)*4|0)}px "JetBrains Mono",monospace`;
-                ctx.fillStyle=j%2?`rgba(255,210,80,${fade*0.85})`:`rgba(235,242,255,${fade*0.85})`;
-                ctx.fillText(code[(j*5+cyc)%code.length],px,py);
-              }
-            }
-          }
-        }
-        ctx.restore();
-      }
-      const T0=performance.now();
-      (function loop(){ requestAnimationFrame(loop); if(rainOn.v) drawRain((performance.now()-T0)/1000); else ctx.clearRect(0,0,W,H); })();
-    })();
-    </script>
+    <!-- 開發區＝服務水卡輪播（iframe service-card-water-carousel.html?embed=1）；使用者左右滑/箭頭切換開發/成長/顧問 -->
 
 </body>
 </html>
