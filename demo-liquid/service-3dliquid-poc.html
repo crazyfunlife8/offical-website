@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D 液體 D1–D3｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --blue:23,54,245; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); overflow-x:hidden; }
+  body::before{ content:''; position:fixed; inset:0; z-index:-2; background:radial-gradient(circle at 50% 30%, #14213f 0%, #0a1226 50%, #05070f 100%); }
+  .sec{ position:relative; height:100vh; overflow:hidden; }
+  .sec canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:0; }
+  .sectag{ position:absolute; top:24px; left:50%; transform:translateX(-50%); z-index:9; font-family:"JetBrains Mono",monospace;
+    font-size:12px; letter-spacing:.14em; color:#06121e; background:rgba(var(--cyan),.85); padding:5px 14px; border-radius:5px; white-space:nowrap; }
+  .cap{ position:absolute; left:0; right:0; bottom:70px; text-align:center; z-index:5; pointer-events:none; }
+  .cap .t{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.5rem,3vw,2.2rem); color:rgba(var(--stellar),.97); }
+  .cap .s{ font-size:.85rem; color:rgba(var(--stellar),.5); margin-top:8px; }
+  .nav{ position:fixed; right:16px; bottom:14px; z-index:30; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.5); }
+</style>
+</head>
+<body>
+<section class="sec"><canvas id="cv1"></canvas><span class="sectag">D1 3D 水珠 metaball + 文字折射</span><div class="cap"><div class="t">社群經營</div><div class="s">水珠流動融合、文字在液體裡折射 · 移動滑鼠攪動</div></div></section>
+<section class="sec"><canvas id="cv2"></canvas><span class="sectag">D2 3D 色散玻璃 blob</span><div class="cap"><div class="t">網站架設</div><div class="s">透明玻璃液態球、彩虹色散、內容折射 · 移動滑鼠</div></div></section>
+<section class="sec"><canvas id="cv3"></canvas><span class="sectag">D3 液態金屬 / 鉻金 3D</span><div class="cap"><div class="t">客製系統</div><div class="s">流動的水銀鉻金、鏡面反射 · 移動滑鼠攪動</div></div></section>
+<div class="nav">3D 液體 D1–D3（第一波）· <b>WebGL · 偏重</b></div>
+
+<script type="importmap">
+{ "imports": { "three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+function setup(canvas){
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1;
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(42,1,0.1,100); camera.position.set(0,0,7.5);
+  const env=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),0.04).texture; scene.environment=env;
+  function resize(){ const r=canvas.getBoundingClientRect(); renderer.setSize(r.width,r.height,false); camera.aspect=r.width/r.height; camera.updateProjectionMatrix(); }
+  resize(); addEventListener('resize',resize);
+  let on=false; new IntersectionObserver(es=>es.forEach(e=>on=e.isIntersecting),{threshold:.05}).observe(canvas);
+  const mouse={x:0,y:0}; addEventListener('pointermove',e=>{ mouse.x=(e.clientX/innerWidth-0.5)*2; mouse.y=-(e.clientY/innerHeight-0.5)*2; });
+  return { renderer, scene, camera, isOn:()=>on, mouse, resize };
+}
+function textPlane(text){ const W=900,H=400,c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+  g.fillStyle='#0a1c36'; g.fillRect(0,0,W,H); g.fillStyle='#eaf4ff'; g.textAlign='center'; g.textBaseline='middle';
+  g.font='600 150px "Noto Serif TC",serif'; g.fillText(text,W/2,H/2);
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; const m=new THREE.Mesh(new THREE.PlaneGeometry(6,2.6), new THREE.MeshBasicMaterial({map:t}));
+  m.position.z=-1.6; return m; }
+const key=()=>{ const l=new THREE.DirectionalLight(0xffffff,2.2); l.position.set(4,6,6); return l; };
+const rim=()=>{ const l=new THREE.DirectionalLight(0x2a6cff,1.3); l.position.set(-6,-2,3); return l; };
+
+// ── D1 水珠 metaball + 文字折射 ──
+(function(){ const S=setup(document.getElementById('cv1')); S.scene.add(key(),rim());
+  S.scene.add(textPlane('社群經營'));
+  const mat=new THREE.MeshPhysicalMaterial({transmission:1,thickness:0.9,ior:1.33,roughness:0.04,dispersion:2.2,clearcoat:1,attenuationColor:new THREE.Color(0x9fe8ff),attenuationDistance:5,envMapIntensity:1.4,transparent:true});
+  const mc=new MarchingCubes(56,mat,false,false,120000); mc.scale.set(4.2,2.6,1.8); mc.isolation=80; S.scene.add(mc);
+  let t=0; (function loop(){ requestAnimationFrame(loop); if(!S.isOn()) return; t+=0.01;
+    mc.reset(); const sub=12;
+    for(let i=0;i<5;i++){ const u=i/4; mc.addBall(0.2+u*0.6, 0.5+Math.sin(t*0.8+i*1.6)*0.06, 0.5+Math.cos(t*0.6+i)*0.05, 1.05/Math.sqrt(5), sub); }
+    mc.addBall(0.5+S.mouse.x*0.28, 0.5+S.mouse.y*0.28, 0.5, 0.9, sub); mc.update();
+    S.renderer.render(S.scene,S.camera); })();
+})();
+
+// ── D2 色散玻璃 blob ──
+(function(){ const S=setup(document.getElementById('cv2')); S.scene.add(key(),rim());
+  S.scene.add(textPlane('網站架設'));
+  const geo=new THREE.IcosahedronGeometry(1.7,12); const base=geo.attributes.position.array.slice(); const nrm=(()=>{geo.computeVertexNormals();return geo.attributes.normal.array.slice();})();
+  const mat=new THREE.MeshPhysicalMaterial({transmission:1,thickness:1.4,ior:1.42,roughness:0.03,dispersion:6,clearcoat:1,clearcoatRoughness:0.05,attenuationColor:new THREE.Color(0xbfeeff),attenuationDistance:6,envMapIntensity:1.5,transparent:true});
+  const blob=new THREE.Mesh(geo,mat); S.scene.add(blob);
+  function n(x,y,z){ return (Math.sin(x*1.0+y*0.7)+Math.sin(y*1.3+z*0.9)+Math.sin(z*1.1+x*0.6))/3; }
+  let t=0; (function loop(){ requestAnimationFrame(loop); if(!S.isOn()) return; t+=0.008;
+    const p=geo.attributes.position.array;
+    for(let i=0;i<p.length;i+=3){ const d=n(base[i]*1.1+t,base[i+1]*1.1+t*0.7,base[i+2]*1.1)*0.18; p[i]=base[i]+nrm[i]*d; p[i+1]=base[i+1]+nrm[i+1]*d; p[i+2]=base[i+2]+nrm[i+2]*d; }
+    geo.attributes.position.needsUpdate=true; geo.computeVertexNormals();
+    blob.rotation.y+=0.004; blob.rotation.x=S.mouse.y*0.3; blob.rotation.z=S.mouse.x*0.2;
+    S.renderer.render(S.scene,S.camera); })();
+})();
+
+// ── D3 液態金屬 鉻金 ──
+(function(){ const S=setup(document.getElementById('cv3')); S.scene.add(key(),rim());
+  const mat=new THREE.MeshStandardMaterial({metalness:1,roughness:0.045,color:0xcfeaff,envMapIntensity:1.7});
+  const mc=new MarchingCubes(64,mat,false,false,120000); mc.scale.set(3.4,3.0,2.4); mc.isolation=80; S.scene.add(mc);
+  let t=0; (function loop(){ requestAnimationFrame(loop); if(!S.isOn()) return; t+=0.01;
+    mc.reset(); const sub=14;
+    for(let i=0;i<4;i++){ mc.addBall(0.5+Math.sin(t*0.7+i*1.7)*0.16, 0.5+Math.cos(t*0.9+i*1.3)*0.16, 0.5+Math.sin(t*0.5+i)*0.12, 1.1/Math.sqrt(4), sub); }
+    mc.addBall(0.5+S.mouse.x*0.3, 0.5+S.mouse.y*0.3, 0.5, 0.85, sub); mc.update();
+    S.renderer.render(S.scene,S.camera); })();
+})();
+</script>
+</body>
+</html>

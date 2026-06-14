@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>水珠 metaball POC｜創巢數位</title>
+<style>
+  :root { --bg:#05070f; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { height:100%; background:var(--bg); overflow:hidden; font-family:"Microsoft JhengHei","PingFang TC",sans-serif; }
+  #app { position:fixed; inset:0; }
+  canvas { display:block; }
+  .hud { position:fixed; left:24px; bottom:20px; z-index:10; color:rgba(200,225,255,.55);
+    font-size:12px; letter-spacing:.04em; line-height:1.7; pointer-events:none; text-shadow:0 1px 2px #000; }
+  .hud b { color:rgba(0,200,255,.9); }
+  .panel { position:fixed; right:18px; top:18px; z-index:10; background:rgba(10,16,30,.72);
+    border:1px solid rgba(0,200,255,.25); border-radius:12px; padding:14px 16px;
+    backdrop-filter:blur(8px); color:#cfe3ff; font-size:12px; width:240px; }
+  .panel h4 { font-size:11px; letter-spacing:.18em; color:rgba(0,200,255,.85); margin-bottom:10px; text-transform:uppercase; }
+  .row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:9px 0; }
+  .row label { flex:0 0 auto; opacity:.8; }
+  .row input[type=range] { flex:1; accent-color:#00c8ff; }
+  .row input[type=checkbox]{ accent-color:#00c8ff; width:auto; }
+  .row span { flex:0 0 36px; text-align:right; font-variant-numeric:tabular-nums; opacity:.7; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="hud">拖曳滑鼠：轉動視角看水珠立體折射　·　<b>POC</b> 水珠 metaball（不影響正式網站）</div>
+<div class="panel">
+  <h4>Water 參數</h4>
+  <div class="row"><label>水珠數量</label><input id="p-balls" type="range" min="2" max="7" step="1" value="5"><span id="v-balls">5</span></div>
+  <div class="row"><label>融合度</label><input id="p-merge" type="range" min="0.4" max="1.6" step="0.05" value="1.0"><span id="v-merge">1.0</span></div>
+  <div class="row"><label>色散 disp</label><input id="p-disp" type="range" min="0" max="8" step="0.1" value="3.5"><span id="v-disp">3.5</span></div>
+  <div class="row"><label>厚度</label><input id="p-thick" type="range" min="0.3" max="4" step="0.1" value="0.7"><span id="v-thick">0.7</span></div>
+  <div class="row"><label>青色</label><input id="p-tint" type="range" min="0" max="1" step="0.05" value="0.45"><span id="v-tint">0.45</span></div>
+  <div class="row"><label>霧度</label><input id="p-rough" type="range" min="0" max="0.3" step="0.01" value="0.03"><span id="v-rough">0.03</span></div>
+  <div class="row"><label>微動 animate</label><input id="p-anim" type="checkbox" checked><span></span></div>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+}}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const app = document.getElementById('app');
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.25;
+app.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, 0.1, 100);
+camera.position.set(0, 0, 8);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+// ---- background: deep space + stars ----
+function bgTexture(){
+  const c=document.createElement('canvas'); c.width=1024; c.height=1024; const g=c.getContext('2d');
+  const grd=g.createRadialGradient(512,430,60,512,512,760);
+  grd.addColorStop(0,'#13203f'); grd.addColorStop(0.45,'#0a1226'); grd.addColorStop(1,'#05070f');
+  g.fillStyle=grd; g.fillRect(0,0,1024,1024);
+  g.save(); g.translate(512,512); g.rotate(-0.32); g.globalAlpha=0.10;
+  const b=g.createLinearGradient(0,-120,0,120);
+  b.addColorStop(0,'rgba(0,200,255,0)'); b.addColorStop(0.5,'rgba(0,200,255,1)'); b.addColorStop(1,'rgba(0,200,255,0)');
+  g.fillStyle=b; g.fillRect(-700,-120,1400,240); g.restore();
+  for(let i=0;i<520;i++){ const x=Math.random()*1024,y=Math.random()*1024,r=Math.random()*1.4+0.2;
+    g.globalAlpha=Math.random()*0.7+0.15; g.fillStyle=Math.random()>0.85?'#bfe6ff':'#fff';
+    g.beginPath(); g.arc(x,y,r,0,6.28); g.fill(); }
+  g.globalAlpha=1; const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
+}
+scene.background = bgTexture();
+
+// ---- text floating behind the water ----
+function textTexture(){
+  const W=1024,H=1024,c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+  g.clearRect(0,0,W,H);
+  g.fillStyle='rgba(255,199,9,0.95)'; g.font='600 30px Consolas,monospace'; g.textBaseline='top';
+  g.fillRect(330,360,70,2); g.fillText('SOCIAL  SERVICE', 330, 382);
+  g.fillStyle='rgba(240,248,255,0.98)'; g.font='500 120px "Microsoft JhengHei",serif';
+  g.fillText('社群經營', 320, 470);
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=8; return t;
+}
+const textPlane = new THREE.Mesh(
+  new THREE.PlaneGeometry(7,7),
+  new THREE.MeshBasicMaterial({ map:textTexture(), transparent:true })
+);
+textPlane.position.z=-1.2; scene.add(textPlane);
+
+// ---- the WATER: metaball isosurface ----
+const waterMat = new THREE.MeshPhysicalMaterial({
+  transmission:1.0, thickness:0.7, ior:1.33, roughness:0.03, metalness:0.0,
+  dispersion:3.5, specularIntensity:1.0, clearcoat:1.0, clearcoatRoughness:0.06,
+  attenuationColor:new THREE.Color(0xbff1ff), attenuationDistance:9.0,
+  envMapIntensity:1.4, transparent:true
+});
+const RES = 64;
+const water = new MarchingCubes(RES, waterMat, false, false, 200000);
+water.scale.set(4.6, 2.6, 1.7);
+water.isolation = 80;
+scene.add(water);
+
+let nBalls=5, merge=1.0, tint=0.45, doAnim=true;
+
+function fieldUpdate(t){
+  water.reset();
+  const subtract = 12;
+  const strength = (1.15/Math.sqrt(nBalls)) * merge;
+  for(let i=0;i<nBalls;i++){
+    const u = nBalls>1 ? i/(nBalls-1) : 0.5;
+    const x = 0.22 + u*0.56;
+    const y = 0.5 + Math.sin(t*0.9 + i*1.7)*0.06 + (i%2?0.04:-0.04);
+    const z = 0.5 + Math.cos(t*0.7 + i*2.1)*0.05;
+    const s = strength * (0.85 + 0.3*Math.sin(t + i));
+    water.addBall(x, y, z, s, subtract);
+  }
+  water.update();
+}
+fieldUpdate(0);
+
+// tint affects attenuation color saturation
+function applyTint(v){
+  const cyan=new THREE.Color(0x6fe0ff), white=new THREE.Color(0xffffff);
+  waterMat.attenuationColor.copy(white).lerp(cyan, v);
+}
+applyTint(tint);
+
+const key=new THREE.DirectionalLight(0xdff2ff, 2.4); key.position.set(4,6,6); scene.add(key);
+const rim=new THREE.DirectionalLight(0x2a6cff, 1.6); rim.position.set(-6,-3,2); scene.add(rim);
+
+const target={x:0,y:0};
+addEventListener('pointermove', e=>{ target.x=(e.clientX/innerWidth-0.5)*0.5; target.y=(e.clientY/innerHeight-0.5)*0.35; });
+
+const $=(id)=>document.getElementById(id);
+const bindR=(id,vid,fn)=>{ const el=$(id),v=$(vid); el.addEventListener('input',()=>{ v.textContent=(+el.value).toFixed(el.step.includes('.')?2:0).replace(/\.00$/,''); fn(+el.value); refresh(); }); };
+let simT=0; const refresh=()=>{ if(!doAnim) fieldUpdate(simT); };
+bindR('p-balls','v-balls', x=>nBalls=x|0);
+bindR('p-merge','v-merge', x=>merge=x);
+bindR('p-disp','v-disp', x=>waterMat.dispersion=x);
+bindR('p-thick','v-thick', x=>waterMat.thickness=x);
+bindR('p-tint','v-tint', x=>{ tint=x; applyTint(x); });
+bindR('p-rough','v-rough', x=>waterMat.roughness=x);
+$('p-anim').addEventListener('change', e=>doAnim=e.target.checked);
+
+function tick(){
+  requestAnimationFrame(tick);
+  if(doAnim){ simT+=0.012; fieldUpdate(simT); }
+  water.rotation.y += (target.x - water.rotation.y)*0.06;
+  water.rotation.x += (target.y - water.rotation.x)*0.06;
+  renderer.render(scene,camera);
+}
+tick();
+addEventListener('resize', ()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+</script>
+</body>
+</html>

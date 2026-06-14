@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服務區塊 全新方向 N1–N5｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --blue:23,54,245; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); overflow-x:hidden; }
+  body::before{ content:''; position:fixed; inset:0; z-index:-2; background:radial-gradient(circle at 50% 30%, #131e3a 0%, #0a1226 52%, #05070f 100%); }
+  .sectag{ position:absolute; top:26px; left:50%; transform:translateX(-50%); z-index:9; font-family:"JetBrains Mono",monospace;
+    font-size:12px; letter-spacing:.13em; color:#06121e; background:rgba(var(--cyan),.85); padding:5px 14px; border-radius:5px; white-space:nowrap; }
+  .menu{ position:fixed; left:14px; top:50%; transform:translateY(-50%); z-index:40; display:flex; flex-direction:column; gap:7px; }
+  .menu a{ font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.55); text-decoration:none; background:rgba(10,18,38,.72);
+    border:1px solid rgba(var(--cyan),.25); padding:4px 9px; border-radius:5px; backdrop-filter:blur(4px); }
+  .menu a:hover{ color:#06121e; background:rgba(var(--cyan),.85); }
+
+  /* ── N1 編輯式大字索引 · hover 光線掃過 + 視覺浮現 ── */
+  #n1{ position:relative; min-height:100vh; padding:120px 8vw 90px; }
+  .idx{ max-width:1080px; margin:0 auto; position:relative; }
+  .idx .row{ position:relative; display:flex; align-items:baseline; gap:28px; padding:26px 8px;
+    border-top:1px solid rgba(var(--stellar),.13); cursor:pointer; transition:padding-left .45s cubic-bezier(.16,1,.3,1); }
+  .idx .row:last-of-type{ border-bottom:1px solid rgba(var(--stellar),.13); }
+  .idx .no{ font-family:"JetBrains Mono",monospace; font-size:12px; color:rgba(var(--stellar),.38); width:30px; }
+  .idx h3{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.9rem,3.6vw,3rem); color:rgba(var(--stellar),.62);
+    transition:color .35s; letter-spacing:.02em; }
+  .idx .en{ font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.2em; color:rgba(var(--stellar),.3); margin-left:auto; transition:color .35s; }
+  .idx .row::after{ content:''; position:absolute; left:0; bottom:-1px; height:1px; width:100%;
+    background:linear-gradient(90deg, rgba(var(--cyan),.95), rgba(var(--cyan),0)); transform:scaleX(0); transform-origin:left; transition:transform .55s cubic-bezier(.16,1,.3,1); }
+  .idx .row:hover{ padding-left:26px; }
+  .idx .row:hover h3{ color:rgba(var(--stellar),1); }
+  .idx .row:hover .en{ color:rgba(var(--cyan),.85); }
+  .idx .row:hover::after{ transform:scaleX(1); }
+  .peek{ position:absolute; right:-20px; top:50%; width:250px; height:165px; border-radius:10px; pointer-events:none;
+    opacity:0; transform:translateY(-50%) rotate(3deg) scale(.94); transition:opacity .35s, transform .45s cubic-bezier(.16,1,.3,1); z-index:3;
+    border:1px solid rgba(var(--stellar),.18); }
+  .idx.show .peek{ opacity:1; transform:translateY(-50%) rotate(0deg) scale(1); }
+
+  /* ── N2 輪廓字 · hover 灌滿 ── */
+  #n2{ position:relative; min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:110px 8vw; }
+  .strokes{ max-width:1100px; margin:0 auto; width:100%; }
+  .strokes .srow{ position:relative; padding:6px 0; cursor:pointer; display:flex; align-items:center; gap:30px; }
+  .strokes h3{ font-family:"Noto Serif TC",serif; font-weight:700; font-size:clamp(2.6rem,6vw,4.6rem); letter-spacing:.04em;
+    color:transparent; -webkit-text-stroke:1px rgba(var(--stellar),.34); transition:color .4s, -webkit-text-stroke-color .4s, transform .5s cubic-bezier(.16,1,.3,1); }
+  .strokes .tag{ font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.18em; color:rgba(var(--cyan),.9);
+    opacity:0; transform:translateX(-14px); transition:opacity .35s, transform .45s cubic-bezier(.16,1,.3,1); }
+  .strokes .srow:hover h3{ color:rgba(var(--stellar),.97); -webkit-text-stroke-color:rgba(var(--cyan),.0); transform:translateX(18px); }
+  .strokes .srow:hover .tag{ opacity:1; transform:translateX(0); }
+
+  /* ── N3 游標聚光網格 ── */
+  #n3{ position:relative; min-height:100vh; display:flex; align-items:center; padding:120px 8vw; }
+  .spot{ max-width:1080px; margin:0 auto; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; width:100%; }
+  .spot .card{ position:relative; min-height:230px; border-radius:14px; padding:26px 24px; overflow:hidden; cursor:pointer;
+    background:rgba(10,19,36,.72); border:1px solid rgba(var(--stellar),.08); }
+  .spot .card::before{ content:''; position:absolute; inset:0; opacity:0; transition:opacity .35s;
+    background:radial-gradient(340px circle at var(--mx,50%) var(--my,50%), rgba(var(--cyan),.13), transparent 62%); }
+  .spot .card:hover::before{ opacity:1; }
+  .spot .card>*{ position:relative; z-index:1; }
+  .spot .lab{ font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.18em; color:rgba(var(--cyan),.85); }
+  .spot h3{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.45rem; margin:14px 0 10px; }
+  .spot p{ font-size:.85rem; line-height:1.8; color:rgba(var(--stellar),.55); }
+  .spot .arrow{ position:absolute; right:22px; bottom:18px; font-family:"JetBrains Mono",monospace; font-size:13px; color:rgba(var(--stellar),.4); transition:color .3s, transform .3s; }
+  .spot .card:hover .arrow{ color:rgba(var(--cyan),.95); transform:translateX(4px); }
+
+  /* ── N4 三大類捲動堆疊 ── */
+  #n4{ position:relative; }
+  #n4 .stackwrap{ position:relative; }
+  #n4 .scard{ position:sticky; top:0; height:100vh; display:flex; align-items:center; justify-content:center; }
+  #n4 .inner{ width:min(880px,84vw); min-height:430px; border-radius:18px; padding:64px 70px; position:relative; overflow:hidden;
+    background:linear-gradient(160deg, rgba(14,24,46,.97), rgba(8,13,26,.97)); border:1px solid rgba(var(--stellar),.12);
+    box-shadow:0 30px 80px rgba(0,0,0,.55); }
+  #n4 .scard:nth-child(2) .inner{ background:linear-gradient(160deg, rgba(10,28,46,.97), rgba(7,14,28,.97)); }
+  #n4 .scard:nth-child(3) .inner{ background:linear-gradient(160deg, rgba(20,22,40,.97), rgba(10,11,24,.97)); }
+  #n4 .inner::before{ content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(var(--cyan),.8), transparent); }
+  #n4 .knum{ position:absolute; right:46px; top:34px; font-family:"JetBrains Mono",monospace; font-size:84px; font-weight:400; color:rgba(var(--stellar),.07); }
+  #n4 .klab{ font-family:"JetBrains Mono",monospace; font-size:11.5px; letter-spacing:.2em; color:rgba(var(--cyan),.85); }
+  #n4 h3{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(2rem,3.6vw,3rem); margin:18px 0 8px; }
+  #n4 .sub{ color:rgba(var(--stellar),.5); font-size:.95rem; margin-bottom:34px; }
+  #n4 ul{ list-style:none; display:flex; flex-direction:column; gap:0; }
+  #n4 li{ display:flex; align-items:baseline; gap:18px; padding:15px 4px; border-top:1px solid rgba(var(--stellar),.1); }
+  #n4 li .sname{ font-family:"Noto Serif TC",serif; font-size:1.15rem; color:rgba(var(--stellar),.92); }
+  #n4 li .sdesc{ margin-left:auto; font-size:.82rem; color:rgba(var(--stellar),.45); }
+
+  /* ── N5 水平推軌 ── */
+  #n5{ position:relative; overflow:hidden; }
+  #n5 .track{ display:flex; height:100vh; align-items:stretch; }
+  #n5 .panel{ flex:0 0 78vw; display:flex; flex-direction:column; justify-content:center; padding:0 7vw; position:relative;
+    border-left:1px solid rgba(var(--stellar),.1); }
+  #n5 .panel .pnum{ font-family:"JetBrains Mono",monospace; font-size:13px; color:rgba(var(--cyan),.85); letter-spacing:.2em; margin-bottom:22px; }
+  #n5 .panel h3{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(2.6rem,5.5vw,4.4rem); margin-bottom:18px; }
+  #n5 .panel p{ max-width:430px; font-size:.95rem; line-height:2; color:rgba(var(--stellar),.55); }
+  #n5 .panel .pl{ position:absolute; left:7vw; bottom:14vh; width:120px; height:1px;
+    background:linear-gradient(90deg, rgba(var(--cyan),.9), transparent); }
+
+  .nav{ position:fixed; right:16px; bottom:14px; z-index:30; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.5); }
+</style>
+</head>
+<body>
+<nav class="menu">
+  <a href="#n1">N1 大字索引</a>
+  <a href="#n2">N2 輪廓字</a>
+  <a href="#n3">N3 聚光網格</a>
+  <a href="#n4">N4 堆疊卡</a>
+  <a href="#n5">N5 水平推軌</a>
+</nav>
+
+<!-- N1 編輯式大字索引 -->
+<section id="n1">
+  <span class="sectag">N1 編輯式大字索引 · hover 光線掃過 + 視覺浮現</span>
+  <div class="idx" id="idx">
+    <div class="row" data-g="linear-gradient(135deg,#0a2a4a,#063a5e 55%,#0a86b8)"><span class="no">01</span><h3>網站架設</h3><span class="en">WEBSITE</span></div>
+    <div class="row" data-g="linear-gradient(135deg,#101b3e,#1736f5aa 70%,#3a6cff88)"><span class="no">02</span><h3>客製系統</h3><span class="en">SYSTEM</span></div>
+    <div class="row" data-g="linear-gradient(135deg,#0a2435,#0e5a6a 60%,#19d3a8aa)"><span class="no">03</span><h3>社群經營</h3><span class="en">SOCIAL</span></div>
+    <div class="row" data-g="linear-gradient(135deg,#1c1430,#3a1a6a 60%,#7a4bffaa)"><span class="no">04</span><h3>AI 虛擬網紅</h3><span class="en">AI TALENT</span></div>
+    <div class="row" data-g="linear-gradient(135deg,#2a1d08,#6a4a0e 60%,#ffc709aa)"><span class="no">05</span><h3>跳動E投放</h3><span class="en">PLATFORM</span></div>
+    <div class="row" data-g="linear-gradient(135deg,#102030,#1a4a5a 60%,#46d2ffaa)"><span class="no">06</span><h3>產業顧問</h3><span class="en">CONSULT</span></div>
+    <div class="peek" id="peek"></div>
+  </div>
+</section>
+
+<!-- N2 輪廓字 -->
+<section id="n2">
+  <span class="sectag">N2 輪廓字 · hover 灌滿 + 滑移</span>
+  <div class="strokes">
+    <div class="srow"><h3>網站架設</h3><span class="tag">WEBSITE → </span></div>
+    <div class="srow"><h3>客製系統</h3><span class="tag">SYSTEM → </span></div>
+    <div class="srow"><h3>社群經營</h3><span class="tag">SOCIAL → </span></div>
+    <div class="srow"><h3>AI 虛擬網紅</h3><span class="tag">AI TALENT → </span></div>
+    <div class="srow"><h3>跳動E投放</h3><span class="tag">PLATFORM → </span></div>
+    <div class="srow"><h3>產業顧問</h3><span class="tag">CONSULT → </span></div>
+  </div>
+</section>
+
+<!-- N3 游標聚光網格 -->
+<section id="n3">
+  <span class="sectag">N3 游標聚光網格 · 光斑跟著游標掃過卡片</span>
+  <div class="spot">
+    <div class="card"><span class="lab">WEBSITE</span><h3>網站架設</h3><p>3 秒內讓人記住你。從一頁式到企業電商。</p><span class="arrow">→</span></div>
+    <div class="card"><span class="lab">SYSTEM</span><h3>客製系統</h3><p>說得出來就寫得出來，沒說全的替你想到。</p><span class="arrow">→</span></div>
+    <div class="card"><span class="lab">SOCIAL</span><h3>社群經營</h3><p>替你想清楚要說什麼。素材、文案、定位。</p><span class="arrow">→</span></div>
+    <div class="card"><span class="lab">AI TALENT</span><h3>AI 虛擬網紅</h3><p>為品牌打造只屬於你的虛擬代言人。</p><span class="arrow">→</span></div>
+    <div class="card"><span class="lab">PLATFORM</span><h3>跳動E投放</h3><p>台灣個人戶也能投 TikTok，最快 24 小時開通。</p><span class="arrow">→</span></div>
+    <div class="card"><span class="lab">CONSULT</span><h3>產業顧問</h3><p>陪你把方向想清楚，再決定要不要做。</p><span class="arrow">→</span></div>
+  </div>
+</section>
+
+<!-- N4 三大類捲動堆疊 -->
+<section id="n4">
+  <div class="stackwrap">
+    <div class="scard"><span class="sectag">N4 三大類捲動堆疊 · 往下捲、卡片一張壓一張</span>
+      <div class="inner"><span class="knum">01</span><span class="klab">DEVELOP</span><h3>開發</h3><p class="sub">把想法變成會運作的東西。</p>
+        <ul><li><span class="sname">網站架設</span><span class="sdesc">一頁式到企業電商</span></li>
+            <li><span class="sname">客製系統開發</span><span class="sdesc">說得出來就寫得出來</span></li></ul></div></div>
+    <div class="scard">
+      <div class="inner"><span class="knum">02</span><span class="klab">GROWTH</span><h3>成長</h3><p class="sub">讓更多人看見你、記住你。</p>
+        <ul><li><span class="sname">社群經營</span><span class="sdesc">素材、文案、定位</span></li>
+            <li><span class="sname">AI 虛擬網紅</span><span class="sdesc">永遠不下班的代言人</span></li>
+            <li><span class="sname">跳動E投放</span><span class="sdesc">個人戶也能投 TikTok</span></li></ul></div></div>
+    <div class="scard">
+      <div class="inner"><span class="knum">03</span><span class="klab">CONSULT</span><h3>顧問</h3><p class="sub">先想清楚，再動手。</p>
+        <ul><li><span class="sname">產業顧問導入</span><span class="sdesc">把方向想清楚再決定</span></li></ul></div></div>
+  </div>
+</section>
+
+<!-- N5 水平推軌 -->
+<section id="n5">
+  <span class="sectag" style="position:fixed; opacity:0;" id="n5tag">N5</span>
+  <div class="track" id="track">
+    <div class="panel"><div class="pnum">DEVELOP ── 01</div><h3>開發</h3><p>網站架設、客製系統開發。把想法變成會運作的東西，從一頁式到企業級系統。</p><div class="pl"></div></div>
+    <div class="panel"><div class="pnum">GROWTH ── 02</div><h3>成長</h3><p>社群經營、AI 虛擬網紅、跳動E投放。讓更多人看見你、記住你。</p><div class="pl"></div></div>
+    <div class="panel"><div class="pnum">CONSULT ── 03</div><h3>顧問</h3><p>產業顧問導入。陪你把方向想清楚，再決定要不要做。</p><div class="pl"></div></div>
+  </div>
+</section>
+
+<div class="nav">全新方向 N1–N5 · <b>零 WebGL · GSAP + CSS</b></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// N1 hover 視覺浮現
+(function(){ const idx=document.getElementById('idx'), peek=document.getElementById('peek');
+  idx.querySelectorAll('.row').forEach(r=>{
+    r.addEventListener('pointerenter',()=>{ peek.style.background=r.dataset.g; idx.classList.add('show');
+      peek.style.top=(r.offsetTop+r.offsetHeight/2)+'px'; });
+  });
+  idx.addEventListener('pointerleave',()=>idx.classList.remove('show'));
+})();
+
+// N3 聚光座標
+document.querySelectorAll('#n3 .card').forEach(c=>{
+  c.addEventListener('pointermove',e=>{ const b=c.getBoundingClientRect();
+    c.style.setProperty('--mx',(e.clientX-b.left)+'px'); c.style.setProperty('--my',(e.clientY-b.top)+'px'); });
+});
+
+// N4 堆疊：上一張被壓時微縮變暗
+document.querySelectorAll('#n4 .scard').forEach((card,i,all)=>{
+  if(i===all.length-1) return;
+  gsap.to(card.querySelector('.inner'),{ scale:.93, opacity:.55, ease:'none',
+    scrollTrigger:{ trigger:all[i+1], start:'top bottom', end:'top top', scrub:true } });
+});
+
+// N5 水平推軌
+(function(){ const track=document.getElementById('track');
+  const dist=()=>track.scrollWidth-innerWidth;
+  gsap.to(track,{ x:()=>-dist(), ease:'none',
+    scrollTrigger:{ trigger:'#n5', start:'top top', end:()=>'+='+dist(), pin:true, scrub:1, invalidateOnRefresh:true } });
+})();
+</script>
+</body>
+</html>

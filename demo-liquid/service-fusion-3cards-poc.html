@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>液態金屬卡 · 三大類｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); overflow:hidden; height:100vh; }
+  body::before{ content:''; position:fixed; inset:0; z-index:-2; background:radial-gradient(circle at 50% 38%, #14213f 0%, #0a1226 52%, #05070f 100%); }
+  #cv{ position:fixed; inset:0; width:100%; height:100%; z-index:0; }
+  .sectag{ position:fixed; top:22px; left:50%; transform:translateX(-50%); z-index:9; font-family:"JetBrains Mono",monospace;
+    font-size:12px; letter-spacing:.12em; color:#06121e; background:rgba(var(--cyan),.85); padding:5px 14px; border-radius:5px; }
+  .cc{ position:fixed; z-index:5; width:210px; transform:translate(-50%,0); display:flex; flex-direction:column; pointer-events:none;
+    color:#06141f; text-shadow:0 1px 2px rgba(255,255,255,.35); }
+  .cc .lab{ font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.18em; color:#0a3050; border-top:1.5px solid rgba(10,48,80,.8); padding-top:8px; align-self:flex-start; }
+  .cc .ttl{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.5rem; margin:13px 0 11px; color:#08263f; }
+  .cc .desc{ font-size:.82rem; line-height:1.8; color:#0a2c47; }
+  .cc .more{ margin-top:16px; font-family:"JetBrains Mono",monospace; font-size:11.5px; color:#0a3a5a; }
+  .nav{ position:fixed; right:16px; bottom:14px; z-index:30; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.5); }
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<span class="sectag">三大類 · 液態金屬碎化反光卡（共用 1 個 WebGL 場景）</span>
+<div class="cc" id="cc0"><span class="lab">DEVELOP</span><div class="ttl">開發</div><p class="desc">網站架設、客製系統開發。<br>從一頁式到企業級系統。</p><span class="more">了解更多 →</span></div>
+<div class="cc" id="cc1"><span class="lab">GROWTH</span><div class="ttl">成長</div><p class="desc">社群經營、AI 虛擬網紅、<br>跳動E投放一條龍。</p><span class="more">了解更多 →</span></div>
+<div class="cc" id="cc2"><span class="lab">CONSULT</span><div class="ttl">顧問</div><p class="desc">產業顧問導入。<br>陪你把方向想清楚。</p><span class="more">了解更多 →</span></div>
+<div class="nav">三大類液態金屬卡 · <b>WebGL · 移動滑鼠</b></div>
+
+<script type="importmap">
+{ "imports": { "three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const canvas=document.getElementById('cv');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.15;
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(40,innerWidth/innerHeight,0.1,100); camera.position.set(0,0,9.4);
+scene.environment=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),0.04).texture;
+const kL=new THREE.DirectionalLight(0xffffff,2.4); kL.position.set(4,6,6); scene.add(kL);
+const rL=new THREE.DirectionalLight(0x2a6cff,1.4); rL.position.set(-6,-2,3); scene.add(rL);
+function resize(){ renderer.setSize(innerWidth,innerHeight); camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); }
+resize(); addEventListener('resize',resize);
+const mouse={x:0,y:0}; addEventListener('pointermove',e=>{ mouse.x=(e.clientX/innerWidth-0.5)*2; mouse.y=-(e.clientY/innerHeight-0.5)*2; });
+
+const metalMat=new THREE.MeshStandardMaterial({metalness:1,roughness:0.03,color:0xeaf2ff,envMapIntensity:2.1});
+const cols=[0.26,0.38,0.50,0.62,0.74], rows=[0.27,0.38,0.49,0.60,0.71];
+const dripX=[0.36,0.5,0.64];
+
+function makeCard(px, pofs){
+  const mc=new MarchingCubes(64,metalMat,false,false,160000); mc.scale.set(1.55,2.0,0.8); mc.isolation=80; mc.position.x=px; scene.add(mc);
+  const cells=[]; cols.forEach(cx=>rows.forEach(cy=>cells.push({x:cx,y:cy,ph:cx*7+cy*13+pofs})));
+  return (sec)=>{
+    mc.reset(); const sub=8;
+    cells.forEach(c=>{ const y=c.y+Math.cos(sec*1.8+c.ph)*0.009; const x=c.x+Math.sin(sec*2.2+c.ph)*0.007; mc.addBall(x,y,0.5,0.62,sub); });
+    for(let k=0;k<18;k++){                               // 內緣不規則碎化凸點
+      const ang=k/18*6.2832; const n=Math.sin(sec*2.4+k*1.7+pofs)*0.5+Math.sin(sec*4.1+k*2.7)*0.5;
+      mc.addBall(0.5+Math.cos(ang)*0.235, 0.49+Math.sin(ang)*0.205, 0.5, 0.05+0.06*(n*0.5+0.5), sub);
+    }
+    dripX.forEach((dx,i)=>{ const loc=((sec*0.32+i*0.27+pofs)%1); const yy=0.27-loc*0.34; const sd=0.5*(1-loc)*(1-loc); if(sd>0.03) mc.addBall(dx+Math.sin(sec+i)*0.008,yy,0.5,sd,sub); });
+    mc.addBall(0.5+mouse.x*0.1, 0.5+mouse.y*0.14, 0.5, 0.26, sub);
+    mc.update();
+    mc.rotation.y=mouse.x*0.12; mc.rotation.x=mouse.y*0.08;
+  };
+}
+const GAP=3.05;
+const updates=[ makeCard(-GAP,0), makeCard(0,2.1), makeCard(GAP,4.3) ];
+const anchors=[ new THREE.Vector3(-GAP,0.42,0), new THREE.Vector3(0,0.42,0), new THREE.Vector3(GAP,0.42,0) ];
+const ccs=[document.getElementById('cc0'),document.getElementById('cc1'),document.getElementById('cc2')];
+
+const T0=performance.now();
+(function loop(){ requestAnimationFrame(loop);
+  const sec=(performance.now()-T0)/1000;
+  updates.forEach(u=>u(sec));
+  // HTML 文字投影對齊各卡
+  anchors.forEach((a,i)=>{ const v=a.clone().project(camera);
+    ccs[i].style.left=((v.x*0.5+0.5)*innerWidth)+'px'; ccs[i].style.top=((-v.y*0.5+0.5)*innerHeight)+'px'; });
+  renderer.render(scene,camera);
+})();
+</script>
+</body>
+</html>

@@ -150,6 +150,17 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 
 ---
 
+### 服務區塊視覺探索結論（探索期 2026-05-31 ~ 2026-06-14；記錄 2026-06-14 16:41）
+
+對應任務 11b。服務區卡片視覺做了完整探索週期，所有 POC 存檔於 `demo-liquid/`（探索集，**不上 production**；總索引 `demo-liquid/_index.html`、非液體總展示 `demo-liquid/showcase-all-cards.html`）。
+
+- **已否決方向**：液態水玻璃卡 / 3D 液體 D1–D8 / 液態金屬 fusion / 滴落變體 V / 液態卡 F / 早期 flow 批 / 星球 3D 畫廊。創辦人明確「放棄液態方向」。
+- **現役候選**：**開發類** = N4 捲動堆疊卡（開發→成長→顧問）× **真程式碼流星字雨撞擊**（墨黑不透明覆蓋主視覺星場、整行真 code 旋轉 90° 直立落下、打卡頂迸黃色火花，密度 24 條）；檔 `demo-liquid/service-n4rain-poc.html`。**社群類** = #23 手風琴圖條 `demo-liquid/service-accordion-embed.html`。整合預覽 `index-rain-preview.html`（noindex 副本、**未動正式 index.html**）。
+- **待決**：① N4 含三大類與「社群=手風琴」內容重疊如何分 ② 上下順序／字雨密度定案後才正式整合進 index.html + 5 層 CSS（樣式進 pages/index.css、JS 進 index.js）。
+- **紅線**：`index.html` + `assets/css/{animations,components,pages/index}.css` 工作區目前有早期「液態卡 morph」**未 commit** 修改（`liquid-morph-a/b` 邊角晃動 + `?v=liquid2` 快取參數；液態已否決、不應上線）。下個 session 接手第一動作 `git diff` 確認後決定 `git restore` 丟棄或隔離，**禁止直接 stage+commit**。
+
+---
+
 ### 太空人角色敘事實作（2026-05-07 21:46 構想 → 2026-05-08 實作啟動）
 
 **創辦人原始劇本（2026-05-07）：** 沉思 → 破格 4 階段。
@@ -326,3 +337,15 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | nav 視覺優化（電影感方向、不走 Apple 毛玻璃）（2026-05-07 19:02） | ① `.nav__links a` letter-spacing 0.35em（字拉散像散字、不像詞）② `.nav__links a` idle `text-shadow: 0 0 14px blue 0.5`（永遠像 hover 狀態、層次消失）③ `.nav__brand-zh` 16px / `.nav__brand-en` 11.5px（中英比例失衡、中文主訴求視覺重量不足） | **① `.nav__brand-zh` 16→17px**（中英比例平衡）**② `.nav__links a` letter-spacing 0.35em→0.1em**（字距收斂、字像詞不像散字）**③ `.nav__links a` idle blue text-shadow 拿掉**（保留 hover 才有 cyan 暈光、idle/hover 對比層次回來）。**不做**：`.site-nav.scrolled` 維持純黑半透明 `rgba(black, 0.92)`（**不走 Apple 毛玻璃方向**）+ `.nav__cta` 維持純文字 + 箭頭極簡風（**不轉按鈕**）。**設計判斷**：nav 走「電影感冷峻」方向（純黑半透明 + cyan 底邊 + 排版紀律）、跟服務卡片 + 按鈕的 Apple Liquid Glass 質感「有意分流」——每個元件依其角色決定是否套 Apple 化、不全站同步。 |
 | 首頁全 stack 大清掃（2026-05-10） | 多輪迭代後累積觀測儀框架、磁性按鈕、軌道環、SVG 描邊、雕刻陰影 token、整批未用 keyframes 等死碼，自承「待二階段視覺評估時逐項拍板」遲未動 | 一次性徹查首頁完整 stack（`index.html` / `index.css` / `index.js` / `core.js` / `nav.js` / `tokens.css` / `base.css` / `components.css` / `animations.css`）並 grep 交叉比對，移除：**HTML** `.hero__god-rays` 空 div；**index.css** `.hero__brand-tag` / `.hero__astronaut*` 死規則；**index.js** `initAstronaut()`（158 行 Three.js 3D 太空人，已被偵序列取代）+ `initOrbitRings()`（軌道環注入）+ Hero 入場序列內 `.hero__astronaut` fromTo + 註解殘骸；**components.css** `.tag--blue` / `.tag__dot` / `.text-sculpted/embossed/debossed` / `.btn--magnetic` / `.btn-amber-dot` / `.frame-drawn`；**base.css** `.f-serif` / `.f-disp` / `.f-mono` 工具類（0 處 HTML class 使用）；**animations.css** 17 個 0 引用 keyframes（twinkle / radar-ring / scan-line / cursor-blink / glow-pulse / glow-yellow / fade-up/in / slide-in-left/right / scale-in / gear-spin(+reverse) / orbit-rotate(+reverse) / prismatic-sweep / god-rays-drift / stroke-draw / constellation-fade-in）+ `.anim-fade-*` + `.delay-1~6`；**tokens.css** `--c-accent` / `--glass-bg-hover` / `--grid-base/half` / `--bp-md/lg` / `--shadow-card/glow/yellow/inset(-strong)` / `--ts-sculpt/emboss/deboss`；**core.js** `initMagneticButton()`。**保留**：`--sp-t/m/w` 新間距系統（tokens.css 自註「新代碼以此為準」現役遷移目標）、`pulse-dot` keyframe（`maintenance.html` 仍用）、Three.js `initStarfield()` 內部變數命名（現役邏輯）、DESIGN_MODE 機制。**紅線**：本次清理依「該 class / token / 函式有無被現役程式碼引用」單一標準，不涉及視覺判斷；任何「未來可能用」的元件不在保留範圍——需要時從 git history 取回比較乾淨。 |
 | 首頁 + Manifesto 全機型 RWD 收尾（2026-05-10） | 主視覺 / Manifesto / Footer 多處字級寫死 `var(--fs-*)` 或固定 rem、mobile 視窗縮放下尺寸不適、`#blackhole` 跟 `#css-starfield` 雙黑洞並存、dock-nav 浮層吃 mobile 垂直空間 | **架構統一 6 commit 收斂**：(1) `3ae4111` 死碼大清掃 −580 行；(2) `ca3f7f2` 黑洞統一到 `#css-starfield::before`（刪 `#blackhole` 元素 / 220vw + `-15deg` 斜帶 / has-threejs 改只藏 `.css-stars`）+ dock-nav 退役改右上 hamburger button + dropdown panel；(3) `1e721f9` 主視覺 cqw 修桌機 gap drift（hero__inner 加 `container-type: inline-size`、title font 跟 astronaut 尺寸/right margin 換 cqw、跨 1100-1720 viewport gap 鎖在 27-31px）；(4) `002aaef` mobile hero 重構（太空人靠右下、size 280-360 雙軸 RWD `clamp(220, min(85vw, calc(100vh - 530px)), 360)`、CTA 縮 127px、title 上移 padding-top 6rem、hero `align-items: stretch`、IS_TOUCH_DEVICE 取代 IS_MOBILE）；(5) `61be281` 副標 wrap 自適應（hero readout font `clamp(0.75rem, 2.9vw, 0.875rem)` + `letter-spacing: 0`、manifesto big-text accent stroke 改 `0.022em` 等比縮放、manifesto body 右對齊+span block 強制斷句）；(6) `3a3bbb5` manifesto RWD 全機型適配（big-text font `clamp(3.1rem, 13vw, 10.8rem)` 跨 360-1720 全部 6/3 split、body 字級 `clamp(0.875rem, 2vw, 1.375rem)`、span block 限 `≤640px` 真手機才強制 wrap、平板 641-900 inline 自然單行、GSAP 進場移除 x 偏移避免 ScrollTrigger 沒觸發時 transform 偏移）；(7) footer studio pair 加第二公司聯名 X（`grid-template-columns: 1fr 2.2fr` 擴 STUDIO 欄、entries flex 0 0 auto + `justify-content: center` 視覺貼文字之間、X 用 `::before/::after` 對角交叉冷光線手繪 + `--c-blue` 三層深藍 box-shadow 光暈、桌機水平/手機垂直自適應）。**全機型驗證通過**：360x780 / 375x812 / 390x844 / 414x896 / 430x932 / 440x956 + 768 tablet + 1400/1720 desktop。**紀律提煉**：寫死 px / rem / `<br>` 是反 RWD 紀律、優先 vw/vh/cqw/em/clamp 自適應；HTML hardcode 換行是最後手段；視窗 + 字級 + 容器三方關聯 calc 才能跨機型一致；任何 transform 初始狀態（GSAP fromTo）必須考慮 ScrollTrigger 不觸發時的視覺。完整推導見 6 個 commit body。 |
+
+---
+
+## 五、協作方法紀律：視覺任務預設可調沙盒
+
+**規則：** 涉及「感覺/質感」的視覺任務（色彩、光感、動畫節奏、折射/虹彩強度、模糊、圓潤等**連續參數**），預設第一步先做「可即時拉軸調參數的 live demo 沙盒」讓 user 自己調手感，**不用文字對焦**；user 調到滿意、回報數值後，才寫死進正式碼並鋪開。
+
+**強制觸發：** 同一視覺目標用文字來回 ≥ 2 次仍未對齊 → 立即轉沙盒，禁止繼續用嘴繞。user 喊「給我一個可調沙盒」亦立即套用。
+
+**限制（須主動提醒、沙盒不會自己跑出來）：** 沙盒只對齊「長相」、不對齊 production 真實代價（效能、瀏覽器相容、可讀性、SEO/無障礙、WebGL 文字變貼圖等）。離散二選一決定直接問 user、不做沙盒。
+
+**生效時刻：2026-05-31 02:37（由「服務卡片液態水玻璃」對焦過程確立——文字對焦來回 6+ 輪未果，轉成 Three.js 可調沙盒後一次對齊）**

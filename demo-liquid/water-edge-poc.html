@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>卡片不規則水狀外框 POC｜創巢數位</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh; background:
+      radial-gradient(circle at 50% 38%, #13203f 0%, #0a1226 45%, #05070f 100%);
+    font-family:"Microsoft JhengHei","PingFang TC",sans-serif;
+    display:flex; align-items:center; justify-content:center; gap:50px; flex-wrap:wrap;
+    padding:60px; overflow-x:hidden;
+  }
+  /* 細微星點底，襯托卡片 */
+  body::before{ content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:radial-gradient(1px 1px at 20% 30%,#fff,transparent),
+      radial-gradient(1px 1px at 70% 60%,#bfe6ff,transparent),
+      radial-gradient(1px 1px at 40% 80%,#fff,transparent),
+      radial-gradient(1px 1px at 85% 25%,#fff,transparent),
+      radial-gradient(1px 1px at 55% 15%,#bfe6ff,transparent);
+    opacity:.5; background-size:cover; }
+
+  /* ───── 服務卡片（沿用正式卡片視覺語言）───── */
+  .wc { position:relative; width:340px; min-height:330px; z-index:1; }
+
+  /* 背景/邊框層：套水波濾鏡 → 外框變不規則水狀 */
+  .wc__bg {
+    position:absolute; inset:0;
+    background:
+      linear-gradient(135deg, rgba(10,28,56,.94), rgba(6,22,44,.94)) padding-box,
+      linear-gradient(135deg, rgba(0,200,255,.55), rgba(0,200,255,.08) 38%,
+        rgba(23,54,245,.22) 68%, rgba(0,200,255,.42)) border-box;
+    border:1.5px solid transparent;
+    border-radius:20px;
+    box-shadow:
+      inset 0 1px 0 rgba(0,200,255,.28),
+      inset 0 -1px 0 rgba(0,0,0,.4),
+      inset 0 40px 60px -40px rgba(0,200,255,.12),
+      0 12px 40px rgba(0,0,0,.45);
+    filter: url(#water);   /* ← 不規則水狀外框的關鍵 */
+  }
+
+  /* 內容層：不套濾鏡 → 文字保持清晰 */
+  .wc__content { position:relative; z-index:1; padding:30px 32px; color:#eaf4ff; }
+  .wc__line { width:64px; height:2px; background:rgba(255,199,9,.9); margin-bottom:12px; }
+  .wc__label { font:600 13px/1 Consolas,monospace; letter-spacing:.18em; color:rgba(255,199,9,.92); }
+  .wc__title { font:500 40px/1.2 "Microsoft JhengHei",serif; margin:22px 0 16px; color:#f2f8ff; }
+  .wc__desc { font:400 15px/1.9 "Microsoft JhengHei",sans-serif; color:rgba(210,228,250,.9); }
+  .wc__more { margin-top:30px; font:italic 18px/1 Georgia,serif; color:rgba(0,200,255,.92);
+    display:flex; align-items:center; gap:12px; }
+  .wc__more::after{ content:''; width:44px; height:1px; background:rgba(0,200,255,.7); }
+
+  /* 控制面板 */
+  .panel{ position:fixed; right:18px; top:18px; z-index:20; background:rgba(10,16,30,.78);
+    border:1px solid rgba(0,200,255,.25); border-radius:12px; padding:14px 16px; color:#cfe3ff;
+    font-size:12px; width:230px; }
+  .panel h4{ font-size:11px; letter-spacing:.16em; color:rgba(0,200,255,.85); margin-bottom:10px; }
+  .prow{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:10px 0; }
+  .prow input{ flex:1; accent-color:#00c8ff; }
+  .prow span{ flex:0 0 42px; text-align:right; opacity:.7; font-variant-numeric:tabular-nums; }
+  .hud{ position:fixed; left:20px; bottom:16px; z-index:20; color:rgba(200,225,255,.5); font-size:12px; }
+  .hud b{ color:rgba(0,200,255,.9); }
+</style>
+</head>
+<body>
+  <!-- 卡片 1 -->
+  <div class="wc">
+    <div class="wc__bg"></div>
+    <div class="wc__content">
+      <div class="wc__line"></div>
+      <div class="wc__label">SOCIAL&nbsp;&nbsp;SERVICE</div>
+      <div class="wc__title">社群經營</div>
+      <div class="wc__desc">你不是缺一個會發文的人，是缺有人替你想清楚要說什麼。素材設計、文案發想、帳號定位，從靈魂出發。</div>
+      <div class="wc__more">Read more</div>
+    </div>
+  </div>
+
+  <!-- 卡片 2（不同 seed、看每張水邊不同）-->
+  <div class="wc">
+    <div class="wc__bg" style="filter:url(#water2)"></div>
+    <div class="wc__content">
+      <div class="wc__line"></div>
+      <div class="wc__label">DEVELOPMENT</div>
+      <div class="wc__title">網站架設</div>
+      <div class="wc__desc">網站不是技術問題，是你能不能在 3 秒內讓人記住你。從一頁式到企業電商，先解決「你想說什麼」再寫一行 code。</div>
+      <div class="wc__more">Read more</div>
+    </div>
+  </div>
+
+  <!-- SVG 水波濾鏡：feTurbulence 產生有機雜訊 → feDisplacementMap 把邊推成不規則水狀 -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <filter id="water" x="-25%" y="-25%" width="150%" height="150%">
+        <feTurbulence id="turb" type="fractalNoise" baseFrequency="0.011" numOctaves="2" seed="4" result="n"/>
+        <feDisplacementMap id="disp" in="SourceGraphic" in2="n" scale="22" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="water2" x="-25%" y="-25%" width="150%" height="150%">
+        <feTurbulence id="turb2" type="fractalNoise" baseFrequency="0.011" numOctaves="2" seed="19" result="n"/>
+        <feDisplacementMap id="disp2" in="SourceGraphic" in2="n" scale="22" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="panel">
+    <h4>不規則水狀外框</h4>
+    <div class="prow"><label>水波幅度</label><input id="scale" type="range" min="0" max="50" step="1" value="22"><span id="vscale">22</span></div>
+    <div class="prow"><label>水波密度</label><input id="freq" type="range" min="0.004" max="0.05" step="0.001" value="0.011"><span id="vfreq">.011</span></div>
+  </div>
+  <div class="hud">調右上兩軸看水邊變化　·　<b>POC</b> 不規則水狀外框（純 SVG、零 WebGL、零效能負擔）</div>
+
+  <script>
+    const $=id=>document.getElementById(id);
+    function apply(){
+      const s=$('scale').value, f=$('freq').value;
+      $('disp').setAttribute('scale', s); $('disp2').setAttribute('scale', s);
+      $('turb').setAttribute('baseFrequency', f); $('turb2').setAttribute('baseFrequency', f);
+      $('vscale').textContent=s; $('vfreq').textContent=(+f).toFixed(3).replace(/^0/,'');
+    }
+    $('scale').addEventListener('input',apply);
+    $('freq').addEventListener('input',apply);
+    apply();
+  </script>
+</body>
+</html>

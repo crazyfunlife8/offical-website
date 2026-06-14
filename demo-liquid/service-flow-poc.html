@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服務流程：畫廊 + #10 + #11｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --blue:23,54,245; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); overflow-x:hidden; }
+  body::before{ content:''; position:fixed; inset:0; z-index:-2;
+    background:radial-gradient(circle at 50% 30%, #14213f 0%, #0a1226 50%, #05070f 100%); }
+  body::after{ content:''; position:fixed; inset:0; z-index:-1; opacity:.45; pointer-events:none;
+    background-image:radial-gradient(1.3px 1.3px at 18% 22%,#fff,transparent),
+      radial-gradient(1.1px 1.1px at 72% 35%,#bfe6ff,transparent),
+      radial-gradient(1px 1px at 42% 72%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 86% 60%,#fff,transparent); }
+  .sectag{ position:absolute; top:24px; left:50%; transform:translateX(-50%); z-index:8;
+    font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.14em; color:#06121e;
+    background:rgba(var(--cyan),.85); padding:5px 14px; border-radius:5px; white-space:nowrap; }
+
+  /* ════════ 1. 3D 畫廊（同款，改為區段）════════ */
+  .gallery-sec{ position:relative; height:100vh; overflow:hidden; }
+  .g-head{ position:absolute; top:64px; left:0; right:0; text-align:center; z-index:5; pointer-events:none; }
+  .g-head .ey{ font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.28em; color:rgba(var(--yellow),.9); }
+  .g-head h1{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.7rem,3.2vw,2.4rem); color:rgba(var(--stellar),.98); margin-top:10px; }
+  .glow{ position:absolute; left:50%; top:53%; width:900px; height:340px; transform:translate(-50%,-50%);
+    background:radial-gradient(ellipse at center, rgba(var(--cyan),.16), rgba(var(--blue),.06) 45%, transparent 70%); z-index:0; pointer-events:none; filter:blur(12px); }
+  .stage{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; perspective:1500px; cursor:grab; }
+  .stage:active{ cursor:grabbing; }
+  .ring{ position:relative; width:300px; height:380px; transform-style:preserve-3d; will-change:transform; }
+  .card{ position:absolute; inset:0; padding:34px 32px; display:flex; flex-direction:column; border-radius:14px;
+    backface-visibility:hidden;
+    background:linear-gradient(160deg, rgba(12,24,46,.92), rgba(7,16,32,.94)); border:1.5px solid rgba(var(--cyan),.4);
+    box-shadow:inset 0 1px 0 rgba(var(--cyan),.22), 0 24px 60px rgba(0,0,0,.5); }
+  .card .lab{ font-family:"JetBrains Mono",monospace; font-size:11.5px; letter-spacing:.16em; color:rgba(var(--yellow),.92);
+    border-top:1.5px solid rgba(var(--yellow),.6); padding-top:9px; align-self:flex-start; }
+  .card .ttl{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.7rem; margin:18px 0 14px; color:rgba(var(--stellar),.98); }
+  .card .desc{ font-size:.92rem; line-height:1.85; color:rgba(var(--stellar),.78); }
+  .card .more{ margin-top:auto; font-family:"JetBrains Mono",monospace; font-size:12.5px; color:rgba(var(--cyan),.9); }
+  .arrow{ position:absolute; top:50%; transform:translateY(-50%); z-index:6; width:54px; height:54px; border-radius:50%;
+    background:rgba(10,18,34,.55); border:1px solid rgba(var(--cyan),.35); color:rgba(var(--cyan),.9); font-size:24px;
+    cursor:pointer; backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; }
+  .arrow:hover{ background:rgba(var(--cyan),.18); }
+  .prev{ left:5%; } .next{ right:5%; }
+  .dots{ position:absolute; bottom:54px; left:0; right:0; display:flex; justify-content:center; gap:12px; z-index:6; }
+  .dot{ width:8px; height:8px; border-radius:50%; background:rgba(var(--stellar),.25); cursor:pointer; }
+  .dot.on{ background:rgba(var(--cyan),.95); transform:scale(1.4); }
+
+  /* ════════ 2. #10 Gooey 液態融合 ════════ */
+  .goo-sec{ position:relative; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; }
+  .goo-title{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.6rem,3vw,2.3rem); margin-bottom:8px; }
+  .goo-sub{ font-size:.9rem; color:rgba(var(--stellar),.55); margin-bottom:50px; }
+  .goo-wrap{ position:relative; width:min(900px,92vw); height:340px; }
+  .goo-field{ position:absolute; inset:0; filter:url(#goo); }
+  .blob{ position:absolute; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, rgba(120,230,255,.95), rgba(var(--cyan),.85) 55%, rgba(var(--blue),.7)); }
+  .nodes{ position:absolute; inset:0; }
+  .node{ position:absolute; transform:translate(-50%,-50%); text-align:center; pointer-events:auto; cursor:pointer; }
+  .node b{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.05rem; color:#04121f; display:block; }
+  .node span{ font-family:"JetBrains Mono",monospace; font-size:9px; letter-spacing:.1em; color:rgba(4,18,31,.7); }
+
+  /* ════════ 3. #11 影像扭曲位移 ════════ */
+  .dist-sec{ position:relative; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; }
+  .dist-title{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.6rem,3vw,2.3rem); margin-bottom:8px; }
+  .dist-sub{ font-size:.9rem; color:rgba(var(--stellar),.55); margin-bottom:50px; }
+  .dist-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; width:min(1040px,94vw); }
+  .dcard{ position:relative; aspect-ratio:3/4; border-radius:12px; overflow:hidden; cursor:pointer;
+    border:1px solid rgba(var(--cyan),.3); }
+  .dcard img{ width:100%; height:100%; object-fit:cover; filter:url(#distort) grayscale(1) brightness(.55) contrast(1.1);
+    transition:filter .4s; }
+  .dcard:hover img{ filter:url(#distortStrong) grayscale(1) brightness(.7) contrast(1.15); }
+  .dcard::after{ content:''; position:absolute; inset:0;
+    background:linear-gradient(180deg, transparent 35%, rgba(5,12,26,.85)), linear-gradient(120deg, rgba(var(--blue),.25), transparent 60%); }
+  .dcard .meta{ position:absolute; left:24px; bottom:22px; right:24px; z-index:2; }
+  .dcard .meta .lab{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.14em; color:rgba(var(--yellow),.9); }
+  .dcard .meta .t{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.5rem; color:#fff; margin-top:8px; }
+
+  /* ════ #7 物理掉落 ════ */
+  .phys-sec{ position:relative; min-height:100vh; padding:80px 20px 0; display:flex; flex-direction:column; align-items:center; overflow:hidden; }
+  .phys-stage{ position:relative; width:min(1000px,94vw); flex:1; min-height:480px; }
+  .chip{ position:absolute; top:0; left:0; padding:14px 26px; border-radius:40px; font-family:"Noto Serif TC",serif; font-weight:600;
+    font-size:1.1rem; white-space:nowrap; will-change:transform; color:rgba(var(--stellar),.97);
+    background:linear-gradient(135deg, rgba(var(--cyan),.22), rgba(var(--blue),.32)); border:1.5px solid rgba(var(--cyan),.5);
+    box-shadow:0 8px 24px rgba(0,0,0,.4); }
+  /* ════ #8 Scroll 拼貼 ════ */
+  .coll-sec{ position:relative; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; }
+  .coll-grid{ display:grid; grid-template-columns:repeat(3,200px); grid-auto-rows:150px; gap:18px; }
+  .piece{ border-radius:12px; display:flex; align-items:center; justify-content:center; font-family:"Noto Serif TC",serif; font-weight:600;
+    font-size:1.3rem; color:rgba(var(--stellar),.96); border:1.5px solid rgba(var(--cyan),.4);
+    background:linear-gradient(135deg, rgba(12,28,52,.9), rgba(7,18,36,.95)); opacity:0;
+    transition:transform 1s cubic-bezier(.16,1,.3,1), opacity 1s; }
+  .coll-sec.go .piece{ opacity:1; transform:none !important; }
+  /* ════ #9 游標殘影 ════ */
+  .trail-sec{ position:relative; height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:crosshair; user-select:none; }
+  .trail-hint{ font-family:"Noto Serif TC",serif; font-size:clamp(1.6rem,3.2vw,2.6rem); color:rgba(var(--stellar),.85); pointer-events:none; text-align:center; line-height:1.5; }
+  .trail-img{ position:absolute; width:150px; height:190px; border-radius:10px; object-fit:cover; pointer-events:none;
+    transform:translate(-50%,-50%); border:1px solid rgba(var(--cyan),.5); filter:grayscale(1) brightness(.7); animation:trailfade .9s forwards; }
+  @keyframes trailfade{ from{ opacity:.9; } to{ opacity:0; transform:translate(-50%,-50%) scale(.7) rotate(8deg); } }
+  /* ════ #12 半色調封面 ════ */
+  .half-sec{ position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:80px 20px; }
+  .half-cover{ position:relative; width:min(700px,92vw); aspect-ratio:4/5; border-radius:14px; overflow:hidden; border:1px solid rgba(var(--cyan),.3); }
+  .half-cover img{ width:100%; height:100%; object-fit:cover; filter:grayscale(1) contrast(1.3) brightness(.78); }
+  .half-cover::after{ content:''; position:absolute; inset:0; mix-blend-mode:screen; opacity:.55;
+    background-image:radial-gradient(circle, rgba(var(--cyan),.95) 28%, transparent 30%); background-size:7px 7px; }
+  .half-cover .lab{ position:absolute; top:6%; left:6%; z-index:2; font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.2em; color:rgba(var(--yellow),.95); }
+  .half-cover .big{ position:absolute; left:-1%; bottom:7%; z-index:2; font-family:"Noto Serif TC",serif; font-weight:600;
+    font-size:clamp(3rem,9vw,6rem); line-height:.92; color:#fff; mix-blend-mode:difference; }
+
+  .nav{ position:fixed; right:16px; bottom:16px; z-index:30; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.5); }
+  .nav b{ color:rgba(var(--cyan),.85); }
+</style>
+</head>
+<body>
+
+<!-- 1. 畫廊 -->
+<section class="gallery-sec">
+  <span class="sectag">畫廊（同你核准版）· 拖曳旋轉</span>
+  <div class="g-head"><div class="ey">OUR SERVICES</div><h1>我們能做的，比你想的更多</h1></div>
+  <div class="glow"></div>
+  <div class="stage" id="stage"><div class="ring" id="ring"></div></div>
+  <div class="arrow prev" onclick="step(1)">‹</div>
+  <div class="arrow next" onclick="step(-1)">›</div>
+  <div class="dots" id="dots"></div>
+</section>
+
+<!-- 2. #10 Gooey -->
+<section class="goo-sec">
+  <span class="sectag">#10 Gooey 液態融合 · 節點像水銀黏合分裂</span>
+  <h2 class="goo-title">服務不是分開的，是流動相連的</h2>
+  <p class="goo-sub">cyan 液態節點緩慢漂浮、靠近時融合成一體 — metaball 效果（純 SVG goo filter）</p>
+  <div class="goo-wrap">
+    <div class="goo-field" id="gooField"></div>
+    <div class="nodes" id="nodes"></div>
+  </div>
+</section>
+
+<!-- 3. #11 Distortion -->
+<section class="dist-sec">
+  <span class="sectag">#11 影像扭曲位移 · 隔著水波/玻璃的畫面</span>
+  <h2 class="dist-title">每個服務，都是一塊流動的畫面</h2>
+  <p class="dist-sub">畫面持續水波扭曲，hover 加強位移 — SVG turbulence + displacement（中等效能）</p>
+  <div class="dist-row">
+    <div class="dcard"><img src="https://picsum.photos/seed/socialnest/600/800" alt=""><div class="meta"><div class="lab">SOCIAL</div><div class="t">社群經營</div></div></div>
+    <div class="dcard"><img src="https://picsum.photos/seed/webnest/600/800" alt=""><div class="meta"><div class="lab">WEBSITE</div><div class="t">網站架設</div></div></div>
+    <div class="dcard"><img src="https://picsum.photos/seed/aitalent/600/800" alt=""><div class="meta"><div class="lab">AI TALENT</div><div class="t">AI 虛擬網紅</div></div></div>
+  </div>
+</section>
+
+<!-- 4. #7 物理掉落 -->
+<section class="phys-sec">
+  <span class="sectag">#7 物理掉落 · 滑鼠移過去會把它們撥開</span>
+  <h2 class="dist-title" style="margin-bottom:6px">服務像實體一樣掉下來</h2>
+  <p class="dist-sub">重力下墜、地面彈跳，滑鼠擾動（手寫物理、零外部庫）</p>
+  <div class="phys-stage" id="physStage"></div>
+</section>
+
+<!-- 5. #8 Scroll 拼貼 -->
+<section class="coll-sec" id="collSec">
+  <span class="sectag">#8 Scroll 拼貼成形 · 捲到此處自動拼合</span>
+  <h2 class="dist-title">散落的碎片，捲動時拼成全貌</h2>
+  <p class="dist-sub" style="margin-bottom:44px">進入視野時，零散的服務碎片飛回定位</p>
+  <div class="coll-grid" id="collGrid"></div>
+</section>
+
+<!-- 6. #9 游標殘影 -->
+<section class="trail-sec" id="trailSec">
+  <span class="sectag">#9 游標殘影圖卡 · 移動滑鼠</span>
+  <div class="trail-hint">把滑鼠移過這裡<br>服務畫面跟著你拖出殘影</div>
+</section>
+
+<!-- 7. #12 半色調封面 -->
+<section class="half-sec">
+  <span class="sectag">#12 半色調編輯封面 · 雜誌感</span>
+  <div class="half-cover">
+    <span class="lab">SOCIAL / NEST DIGITAL</span>
+    <img src="https://picsum.photos/seed/halfnest2/720/900" alt="">
+    <div class="big">社群<br>經營</div>
+  </div>
+</section>
+
+<!-- SVG filters -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="goo"><feGaussianBlur in="SourceGraphic" stdDeviation="13" result="b"/>
+      <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10" result="g"/>
+      <feBlend in="SourceGraphic" in2="g"/></filter>
+    <filter id="distort" x="-15%" y="-15%" width="130%" height="130%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.008 0.014" numOctaves="2" seed="3" result="n">
+        <animate attributeName="baseFrequency" dur="14s" values="0.008 0.014;0.011 0.018;0.008 0.014" repeatCount="indefinite"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <filter id="distortStrong" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="3" result="n">
+        <animate attributeName="baseFrequency" dur="6s" values="0.012 0.02;0.018 0.028;0.012 0.02" repeatCount="indefinite"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="34" xChannelSelector="R" yChannelSelector="G"/></filter>
+  </defs>
+</svg>
+
+<div class="nav">捲動：畫廊 ↓ #10 ↓ #11 · <b>純 CSS/SVG · 零 WebGL</b></div>
+
+<script>
+// ── 1. 畫廊 ──
+const SERVICES=[
+  {lab:'SOCIAL',ttl:'社群經營',desc:'你不是缺一個會發文的人，是缺有人替你想清楚要說什麼。',more:'了解更多 →'},
+  {lab:'AI TALENT',ttl:'AI 虛擬網紅',desc:'為品牌打造一個只屬於你的虛擬代言人。',more:'了解更多 →'},
+  {lab:'WEBSITE',ttl:'網站架設',desc:'網站不是技術問題，是你能不能在 3 秒內讓人記住你。',more:'了解更多 →'},
+  {lab:'SYSTEM',ttl:'客製系統開發',desc:'說得出來的就寫得出來，沒說全的我們替你想到。',more:'了解更多 →'},
+  {lab:'PLATFORM',ttl:'跳動E投放',desc:'台灣個人戶也能投 TikTok。最快 24 小時開通。',more:'前往平台 →'},
+  {lab:'CONSULTANCY',ttl:'產業顧問',desc:'問題不在執行力，在診斷。帶你找到卡關在哪。',more:'了解更多 →'},
+];
+const N=SERVICES.length, STEP=360/N, RADIUS=430;
+const ring=document.getElementById('ring'), dotsWrap=document.getElementById('dots');
+const cards=SERVICES.map((s,i)=>{ const el=document.createElement('div'); el.className='card';
+  el.innerHTML=`<span class="lab">${s.lab}</span><h3 class="ttl">${s.ttl}</h3><p class="desc">${s.desc}</p><span class="more">${s.more}</span>`;
+  ring.appendChild(el); const d=document.createElement('div'); d.className='dot'; d.onclick=()=>goto(i); dotsWrap.appendChild(d); return el; });
+const dots=[...dotsWrap.children];
+let rotation=0,target=0,dragging=false,startX=0,startRot=0,autoOn=true,idle;
+function frontIndex(){ return ((Math.round(-target/STEP)%N)+N)%N; }
+function goto(i){ target=-i*STEP; pause(); } function step(d){ target+=d*STEP; pause(); }
+function pause(){ autoOn=false; clearTimeout(idle); idle=setTimeout(()=>autoOn=true,3500); }
+const stage=document.getElementById('stage');
+stage.addEventListener('pointerdown',e=>{dragging=true;startX=e.clientX;startRot=target;pause();stage.setPointerCapture(e.pointerId);});
+stage.addEventListener('pointermove',e=>{ if(dragging) target=startRot+(e.clientX-startX)*0.35; });
+stage.addEventListener('pointerup',()=>{ dragging=false; target=Math.round(target/STEP)*STEP; });
+function tick(){ requestAnimationFrame(tick);
+  if(autoOn&&!dragging) target-=0.12; rotation+=(target-rotation)*0.1;
+  ring.style.transform=`translateZ(-${RADIUS}px) rotateY(${rotation}deg)`;
+  cards.forEach((c,i)=>{ const ang=(rotation+i*STEP)*Math.PI/180, f=Math.cos(ang), t=f*0.5+0.5, s=0.8+0.26*t;
+    c.style.transform=`rotateY(${i*STEP}deg) translateZ(${RADIUS}px) scale(${s.toFixed(3)})`;
+    c.style.opacity=(0.14+0.86*t).toFixed(3); c.style.filter=`brightness(${(0.5+0.5*t).toFixed(3)})`;
+    c.style.pointerEvents=f>0.3?'auto':'none'; c.style.zIndex=Math.round(t*100); });
+  const fi=frontIndex(); dots.forEach((d,i)=>d.classList.toggle('on',i===fi)); }
+tick();
+
+// ── 2. Gooey 節點 ──
+const gooField=document.getElementById('gooField'), nodesWrap=document.getElementById('nodes');
+const W=Math.min(900,innerWidth*0.92), H=340;
+const NODES=[
+  {x:0.16,y:0.5,r:78,t:'社群',s:'SOCIAL'},{x:0.34,y:0.34,r:66,t:'網站',s:'WEB'},
+  {x:0.5,y:0.6,r:84,t:'系統',s:'SYSTEM'},{x:0.67,y:0.36,r:64,t:'虛擬',s:'AI'},
+  {x:0.84,y:0.55,r:74,t:'投放',s:'PLATFORM'},
+];
+const blobs=NODES.map((n,i)=>{ const b=document.createElement('div'); b.className='blob';
+  b.style.width=b.style.height=n.r*2+'px'; gooField.appendChild(b);
+  const nd=document.createElement('div'); nd.className='node'; nd.innerHTML=`<b>${n.t}</b><span>${n.s}</span>`;
+  nodesWrap.appendChild(nd); return {b,nd,n,ph:i*1.3}; });
+function gooTick(t){ requestAnimationFrame(gooTick);
+  blobs.forEach(o=>{ const dx=Math.sin(t*0.0006+o.ph)*26, dy=Math.cos(t*0.0008+o.ph*1.4)*22;
+    const x=o.n.x*W+dx, y=o.n.y*H+dy;
+    o.b.style.left=(x-o.n.r)+'px'; o.b.style.top=(y-o.n.r)+'px';
+    o.nd.style.left=x+'px'; o.nd.style.top=y+'px'; }); }
+requestAnimationFrame(gooTick);
+
+// ── #7 物理掉落 ──
+(function(){
+  const stage=document.getElementById('physStage');
+  const labels=['社群經營','AI 虛擬網紅','網站架設','客製系統','跳動E投放','產業顧問'];
+  const chips=labels.map(l=>{ const c=document.createElement('div'); c.className='chip'; c.textContent=l; stage.appendChild(c);
+    return {el:c,x:0,y:0,vx:0,vy:0,w:0,h:0}; });
+  let mx=-999,my=-999,started=false;
+  stage.addEventListener('pointermove',e=>{ const r=stage.getBoundingClientRect(); mx=e.clientX-r.left; my=e.clientY-r.top; });
+  stage.addEventListener('pointerleave',()=>{ mx=-9999; my=-9999; });
+  new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting&&!started){ started=true;
+    const W=stage.clientWidth; chips.forEach((c,i)=>{ c.w=c.el.offsetWidth; c.h=c.el.offsetHeight;
+      c.x=W*(0.12+0.14*i); c.y=-90-i*70; c.vx=(Math.random()-.5)*2; }); } }),{threshold:.3}).observe(stage);
+  function loop(){ requestAnimationFrame(loop); if(!started) return;
+    const W=stage.clientWidth, H=stage.clientHeight;
+    chips.forEach(c=>{ c.vy+=0.6; c.x+=c.vx; c.y+=c.vy;
+      const dx=c.x-mx, dy=c.y-my, d=Math.hypot(dx,dy)||1; if(d<130){ const f=(130-d)/130*5; c.vx+=dx/d*f; c.vy+=dy/d*f; }
+      if(c.x<c.w/2){ c.x=c.w/2; c.vx*=-.5; } if(c.x>W-c.w/2){ c.x=W-c.w/2; c.vx*=-.5; }
+      if(c.y>H-c.h/2){ c.y=H-c.h/2; c.vy*=-.45; c.vx*=.86; }
+      c.el.style.transform=`translate(${(c.x-c.w/2).toFixed(1)}px,${(c.y-c.h/2).toFixed(1)}px)`; });
+  } loop();
+})();
+
+// ── #8 Scroll 拼貼 ──
+(function(){
+  const grid=document.getElementById('collGrid'), sec=document.getElementById('collSec');
+  ['社群','虛擬','網站','系統','投放','顧問'].forEach((t,i)=>{ const p=document.createElement('div'); p.className='piece'; p.textContent=t;
+    const ang=(Math.random()-.5)*44, tx=(Math.random()-.5)*900, ty=(Math.random()-.5)*520;
+    p.style.transform=`translate(${tx.toFixed(0)}px,${ty.toFixed(0)}px) rotate(${ang.toFixed(0)}deg)`;
+    p.style.transitionDelay=(i*0.08)+'s'; grid.appendChild(p); });
+  new IntersectionObserver(es=>es.forEach(e=>sec.classList.toggle('go', e.isIntersecting)),{threshold:.35}).observe(sec);
+})();
+
+// ── #9 游標殘影 ──
+(function(){
+  const sec=document.getElementById('trailSec');
+  const seeds=['socialT','webT','aiT','sysT','platT','consT']; let last=0, idx=0;
+  sec.addEventListener('pointermove',e=>{ const now=performance.now(); if(now-last<70) return; last=now;
+    const r=sec.getBoundingClientRect(); const im=document.createElement('img'); im.className='trail-img';
+    im.src=`https://picsum.photos/seed/${seeds[idx%seeds.length]}/200/260`; idx++;
+    im.style.left=(e.clientX-r.left)+'px'; im.style.top=(e.clientY-r.top)+'px'; sec.appendChild(im);
+    setTimeout(()=>im.remove(),900); });
+})();
+</script>
+</body>
+</html>

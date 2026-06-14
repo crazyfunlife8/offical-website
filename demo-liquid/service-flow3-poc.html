@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服務效果第三批 19–24｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --blue:23,54,245; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); overflow-x:hidden; }
+  body::before{ content:''; position:fixed; inset:0; z-index:-2; background:radial-gradient(circle at 50% 30%, #14213f 0%, #0a1226 50%, #05070f 100%); }
+  body::after{ content:''; position:fixed; inset:0; z-index:-1; opacity:.4; pointer-events:none;
+    background-image:radial-gradient(1.3px 1.3px at 18% 22%,#fff,transparent),radial-gradient(1.1px 1.1px at 72% 35%,#bfe6ff,transparent),
+      radial-gradient(1px 1px at 42% 72%,#fff,transparent),radial-gradient(1.2px 1.2px at 86% 60%,#fff,transparent); }
+  section{ position:relative; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:90px 20px; overflow:hidden; }
+  .sectag{ position:absolute; top:24px; left:50%; transform:translateX(-50%); z-index:9; font-family:"JetBrains Mono",monospace;
+    font-size:12px; letter-spacing:.14em; color:#06121e; background:rgba(var(--cyan),.85); padding:5px 14px; border-radius:5px; white-space:nowrap; }
+  .stitle{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.5rem,3vw,2.2rem); text-align:center; margin-bottom:6px; }
+  .ssub{ font-size:.9rem; color:rgba(var(--stellar),.55); text-align:center; margin-bottom:36px; }
+
+  /* 19 */
+  #pcv{ width:min(820px,94vw); height:260px; }
+  /* 20 */
+  .constel{ position:relative; width:min(820px,94vw); height:420px; }
+  .constel svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .constel .cnode{ position:absolute; transform:translate(-50%,-50%); text-align:center; }
+  .constel .cnode .dot{ width:12px; height:12px; border-radius:50%; margin:0 auto 8px; background:rgba(var(--cyan),.95);
+    box-shadow:0 0 14px rgba(var(--cyan),.9); }
+  .constel .cnode b{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.05rem; color:rgba(var(--stellar),.96); display:block; }
+  .constel .cnode span{ font-family:"JetBrains Mono",monospace; font-size:9px; letter-spacing:.12em; color:rgba(var(--cyan),.6); }
+  /* 21 */
+  #xcv{ width:min(360px,84vw); aspect-ratio:3/4; border-radius:12px; border:1px solid rgba(var(--cyan),.35); cursor:pointer; box-shadow:0 20px 50px rgba(0,0,0,.5); }
+  /* 22 */
+  .mag-row{ display:flex; gap:40px; flex-wrap:wrap; justify-content:center; }
+  .mag{ width:170px; height:170px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-align:center; cursor:pointer;
+    background:radial-gradient(circle at 38% 32%, rgba(var(--cyan),.28), rgba(var(--blue),.32)); border:1.5px solid rgba(var(--cyan),.5);
+    font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.2rem; color:rgba(var(--stellar),.97); will-change:transform;
+    box-shadow:0 12px 34px rgba(0,0,0,.4); transition:transform .25s cubic-bezier(.16,1,.3,1); }
+  /* 23 */
+  .accord{ display:flex; gap:10px; width:min(1040px,96vw); height:420px; }
+  .strip{ position:relative; flex:1; border-radius:14px; overflow:hidden; cursor:pointer; transition:flex .55s cubic-bezier(.16,1,.3,1);
+    border:1px solid rgba(var(--cyan),.3); }
+  .strip:hover{ flex:4; }
+  .strip img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:grayscale(1) brightness(.5) contrast(1.1); transition:filter .5s; }
+  .strip:hover img{ filter:grayscale(.3) brightness(.7); }
+  .strip::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg,transparent 40%, rgba(5,12,26,.9)), linear-gradient(120deg, rgba(var(--blue),.3), transparent 60%); }
+  .strip .cap{ position:absolute; left:18px; bottom:20px; z-index:2; writing-mode:vertical-rl; font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.2rem; color:#fff; transition:.4s; }
+  .strip:hover .cap{ writing-mode:horizontal-tb; }
+  .strip .lab{ position:absolute; left:18px; top:18px; z-index:2; font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.14em; color:rgba(var(--yellow),.9); opacity:0; transition:.4s; }
+  .strip:hover .lab{ opacity:1; }
+  /* 24 */
+  .glitch-wrap{ display:flex; flex-direction:column; gap:30px; align-items:center; }
+  .glitch{ position:relative; font-family:"Noto Serif TC",serif; font-weight:700; font-size:clamp(2.2rem,5vw,3.6rem); color:rgba(var(--stellar),.97); cursor:pointer; letter-spacing:.02em; }
+  .glitch::before,.glitch::after{ content:attr(data-t); position:absolute; left:0; top:0; width:100%; opacity:0; }
+  .glitch:hover::before{ color:#ff2e63; opacity:.85; animation:gl1 .26s steps(2,end) infinite; }
+  .glitch:hover::after{ color:rgba(var(--cyan),1); opacity:.85; animation:gl2 .3s steps(2,end) infinite; }
+  @keyframes gl1{ 0%{ transform:translate(-3px,1px); clip-path:inset(0 0 62% 0);} 50%{ transform:translate(3px,-1px); clip-path:inset(40% 0 20% 0);} 100%{ transform:translate(-2px,0); clip-path:inset(74% 0 4% 0);} }
+  @keyframes gl2{ 0%{ transform:translate(3px,-1px); clip-path:inset(20% 0 50% 0);} 50%{ transform:translate(-3px,1px); clip-path:inset(60% 0 8% 0);} 100%{ transform:translate(2px,0); clip-path:inset(8% 0 70% 0);} }
+
+  .nav{ position:fixed; right:16px; bottom:14px; z-index:30; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.5); }
+</style>
+</head>
+<body>
+
+<section><span class="sectag">#19 粒子匯聚成形 · 星塵聚成字</span>
+  <h2 class="stitle">服務，從宇宙塵埃聚成形</h2>
+  <p class="ssub">粒子飛入聚成服務名、再散開重組（canvas）</p>
+  <canvas id="pcv"></canvas>
+</section>
+
+<section><span class="sectag">#20 星座連線 · 服務星圖</span>
+  <h2 class="stitle">每個服務，是星圖上的一顆星</h2>
+  <p class="ssub">節點用線條連成星座、進視野逐條描繪</p>
+  <div class="constel" id="constel"><svg id="lines"></svg></div>
+</section>
+
+<section><span class="sectag">#21 像素溶解揭示 · 從馬賽克現形</span>
+  <h2 class="stitle">服務畫面從馬賽克溶解出來</h2>
+  <p class="ssub">點一下重播 · 從粗像素 resolve 成清晰</p>
+  <canvas id="xcv"></canvas>
+</section>
+
+<section><span class="sectag">#22 磁吸元素 · 游標吸過去</span>
+  <h2 class="stitle">服務會被你吸過來</h2>
+  <p class="ssub">靠近游標時被吸引、離開彈性回位</p>
+  <div class="mag-row" id="magRow"></div>
+</section>
+
+<section><span class="sectag">#23 手風琴圖條 · hover 展開</span>
+  <h2 class="stitle">並排的服務，滑到哪展到哪</h2>
+  <p class="ssub">窄圖條 hover 展開吃滿、其他收窄</p>
+  <div class="accord" id="accord"></div>
+</section>
+
+<section><span class="sectag">#24 Glitch / RGB 分離 · hover 故障</span>
+  <h2 class="stitle">服務名，數位故障的瞬間</h2>
+  <p class="ssub">hover 時紅藍綠錯位抖動（純 CSS）</p>
+  <div class="glitch-wrap" id="glitchWrap"></div>
+</section>
+
+<div class="nav">第三批 19–24 · <b>19/21 canvas、其餘輕量</b></div>
+
+<script>
+const SERVICES=[
+  {t:'社群經營',e:'SOCIAL'},{t:'網站架設',e:'WEBSITE'},{t:'AI 虛擬網紅',e:'AI TALENT'},
+  {t:'客製系統',e:'SYSTEM'},{t:'跳動E投放',e:'PLATFORM'},{t:'產業顧問',e:'CONSULT'},
+];
+const visible=(el,cb)=>new IntersectionObserver(es=>es.forEach(e=>cb(e.isIntersecting)),{threshold:.2}).observe(el);
+
+// ── #19 粒子匯聚 ──
+(function(){
+  const cv=document.getElementById('pcv'); const W=cv.clientWidth, H=cv.clientHeight; const dpr=Math.min(devicePixelRatio,2);
+  cv.width=W*dpr; cv.height=H*dpr; const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  const off=document.createElement('canvas'); off.width=W; off.height=H; const octx=off.getContext('2d');
+  function targets(text){ octx.clearRect(0,0,W,H); octx.fillStyle='#fff';
+    octx.font=`600 ${Math.min(150,W/ (text.length*0.62))}px "Noto Serif TC",serif`; octx.textAlign='center'; octx.textBaseline='middle';
+    octx.fillText(text,W/2,H/2); const d=octx.getImageData(0,0,W,H).data; const pts=[]; const gap=6;
+    for(let y=0;y<H;y+=gap)for(let x=0;x<W;x+=gap){ if(d[(y*W+x)*4+3]>128) pts.push([x,y]); } return pts; }
+  const POOL=2400; const parts=Array.from({length:POOL},()=>({x:Math.random()*W,y:Math.random()*H,tx:W/2,ty:H/2,on:false}));
+  function setText(t){ const pts=targets(t); parts.forEach((p,i)=>{ if(i<pts.length){ p.tx=pts[i][0]; p.ty=pts[i][1]; p.on=true; }
+    else { p.on=false; p.tx=Math.random()*W; p.ty=Math.random()*H; } }); }
+  let idx=0,on=true; visible(cv,v=>on=v);
+  (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{
+    setText(SERVICES[0].t);
+    setInterval(()=>{ idx=(idx+1)%SERVICES.length; setText(SERVICES[idx].t); }, 3600);
+  });
+  (function loop(){ requestAnimationFrame(loop); if(!on) return; ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='rgba(0,200,255,.9)';
+    parts.forEach(p=>{ const sp=p.on?0.09:0.04; p.x+=(p.tx-p.x)*sp; p.y+=(p.ty-p.y)*sp;
+      ctx.globalAlpha=p.on?0.95:0.18; ctx.fillRect(p.x,p.y,1.7,1.7); }); ctx.globalAlpha=1; })();
+})();
+
+// ── #20 星座連線 ──
+(function(){
+  const wrap=document.getElementById('constel'), svg=document.getElementById('lines');
+  const pos=[[14,30],[40,16],[68,34],[86,62],[58,72],[26,66]]; // % coords
+  const links=[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[1,4],[2,5]];
+  const W=wrap.clientWidth, H=wrap.clientHeight;
+  links.forEach((l,i)=>{ const a=pos[l[0]],b=pos[l[1]]; const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+    ln.setAttribute('x1',a[0]/100*W); ln.setAttribute('y1',a[1]/100*H); ln.setAttribute('x2',b[0]/100*W); ln.setAttribute('y2',b[1]/100*H);
+    ln.setAttribute('stroke','rgba(0,200,255,.5)'); ln.setAttribute('stroke-width','1');
+    const len=Math.hypot((b[0]-a[0])/100*W,(b[1]-a[1])/100*H); ln.style.strokeDasharray=len; ln.style.strokeDashoffset=len;
+    ln.style.transition=`stroke-dashoffset .7s ease ${i*0.12}s`; svg.appendChild(ln); });
+  pos.forEach((p,i)=>{ const s=SERVICES[i]; const n=document.createElement('div'); n.className='cnode';
+    n.style.left=p[0]+'%'; n.style.top=p[1]+'%'; n.innerHTML=`<div class="dot"></div><b>${s.t}</b><span>${s.e}</span>`; wrap.appendChild(n); });
+  visible(wrap,v=>{ if(v) [...svg.children].forEach(ln=>ln.style.strokeDashoffset='0'); });
+})();
+
+// ── #21 像素溶解 ──
+(function(){
+  const cv=document.getElementById('xcv'); const W=300,H=400; cv.width=W; cv.height=H; const ctx=cv.getContext('2d');
+  const tmp=document.createElement('canvas'); tmp.width=W; tmp.height=H; const tctx=tmp.getContext('2d');
+  let ready=false; const img=new Image(); img.crossOrigin='anonymous'; img.src='https://picsum.photos/seed/pixelNest/300/400';
+  let blk=46, animating=false;
+  img.onload=()=>{ ready=true; play(); };
+  function play(){ blk=46; animating=true; }
+  cv.addEventListener('click',play);
+  visible(cv,v=>{ if(v&&ready) play(); });
+  (function loop(){ requestAnimationFrame(loop); if(!ready) return;
+    if(animating){ blk-=0.7; if(blk<=1){ blk=1; animating=false; } }
+    const sw=Math.max(1,Math.round(W/blk)), sh=Math.max(1,Math.round(H/blk));
+    tctx.clearRect(0,0,W,H); tctx.drawImage(img,0,0,sw,sh);
+    ctx.imageSmoothingEnabled=false; ctx.clearRect(0,0,W,H); ctx.drawImage(tmp,0,0,sw,sh,0,0,W,H);
+    ctx.fillStyle='rgba(8,18,34,.35)'; ctx.fillRect(0,0,W,H);
+  })();
+})();
+
+// ── #22 磁吸 ──
+(function(){
+  const row=document.getElementById('magRow');
+  SERVICES.slice(0,4).forEach(s=>{ const m=document.createElement('div'); m.className='mag'; m.textContent=s.t; row.appendChild(m);
+    let rx=0,ry=0;
+    m.addEventListener('pointermove',e=>{ const r=m.getBoundingClientRect(); rx=(e.clientX-(r.left+r.width/2))*0.4; ry=(e.clientY-(r.top+r.height/2))*0.4;
+      m.style.transform=`translate(${rx}px,${ry}px)`; });
+    m.addEventListener('pointerleave',()=>{ m.style.transform='translate(0,0)'; }); });
+})();
+
+// ── #23 手風琴 ──
+(function(){
+  const ac=document.getElementById('accord');
+  SERVICES.slice(0,5).forEach((s,i)=>{ const d=document.createElement('div'); d.className='strip';
+    d.innerHTML=`<img src="https://picsum.photos/seed/acc${i}/500/700" alt=""><div class="lab">${s.e}</div><div class="cap">${s.t}</div>`; ac.appendChild(d); });
+})();
+
+// ── #24 Glitch ──
+(function(){
+  const wrap=document.getElementById('glitchWrap');
+  ['社群經營','網站架設','AI 虛擬網紅'].forEach(t=>{ const d=document.createElement('div'); d.className='glitch'; d.dataset.t=t; d.textContent=t; wrap.appendChild(d); });
+})();
+</script>
+</body>
+</html>

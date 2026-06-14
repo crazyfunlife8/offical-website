@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>開發區塊 · 藝術迴廊 × 流星字雨撞擊｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --blue:23,54,245; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); overflow-x:hidden; }
+
+  /* 主視覺示意（證明覆蓋關係） */
+  #hero{ position:relative; height:100vh; display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(circle at 50% 35%, #162242 0%, #0a1226 55%, #05070f 100%); }
+  #hero .ht{ text-align:center; }
+  #hero .ht h1{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:2.4rem; color:rgba(var(--stellar),.9); }
+  #hero .ht p{ margin-top:12px; font-size:.9rem; color:rgba(var(--stellar),.5); }
+
+  /* ── 開發區塊：墨黑覆蓋 + 字雨 + 3D 藝術迴廊 ── */
+  #dev{ position:relative; height:118vh; background:#04060a; overflow:hidden;
+    box-shadow:0 -30px 70px rgba(0,0,0,.85); }
+  #dev .seam{ position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(225,235,255,.22), transparent); }
+  #rain{ position:absolute; inset:0; width:100%; height:100%; z-index:4; pointer-events:none; }
+  .sectag{ position:absolute; top:24px; left:50%; transform:translateX(-50%); z-index:9; font-family:"JetBrains Mono",monospace;
+    font-size:12px; letter-spacing:.13em; color:#06121e; background:rgba(var(--cyan),.85); padding:5px 14px; border-radius:5px; white-space:nowrap; }
+  #dev .head{ position:absolute; left:7vw; top:11vh; z-index:2; }
+  #dev .head .en{ font-family:"JetBrains Mono",monospace; font-size:11.5px; letter-spacing:.26em; color:rgba(var(--stellar),.45); }
+  #dev .head h2{ font-family:"Noto Serif TC",serif; font-weight:700; font-size:clamp(2.4rem,4.6vw,3.6rem); margin-top:10px; color:rgba(var(--stellar),.95); }
+  #dev .head .sub{ margin-top:8px; font-size:.9rem; color:rgba(var(--stellar),.45); }
+
+  /* 3D 迴廊（沿用之前的藝術迴廊） */
+  .stage{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    perspective:1500px; cursor:grab; z-index:2; }
+  .stage:active{ cursor:grabbing; }
+  .ring{ position:relative; width:290px; height:370px; transform-style:preserve-3d; will-change:transform; margin-top:6vh; }
+  .card{ position:absolute; inset:0; padding:32px 30px; display:flex; flex-direction:column; backface-visibility:hidden;
+    transition:opacity .15s, filter .15s; }
+  .card .lab{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.16em;
+    color:rgba(var(--yellow),.92); border-top:1.5px solid rgba(var(--yellow),.6); padding-top:9px; align-self:flex-start; }
+  .card .ttl{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.55rem; margin:17px 0 13px; color:rgba(var(--stellar),.98); }
+  .card .desc{ font-size:.9rem; line-height:1.85; color:rgba(var(--stellar),.78); }
+  .card .more{ margin-top:auto; font-family:"JetBrains Mono",monospace; font-size:12px; color:rgba(var(--cyan),.9); letter-spacing:.06em; }
+
+  /* 卡片質感三選一 */
+  #dev.csg .card{ border-radius:14px; background:linear-gradient(160deg, rgba(12,24,46,.92), rgba(7,16,32,.94));
+    border:1.5px solid rgba(var(--cyan),.4); box-shadow:inset 0 1px 0 rgba(var(--cyan),.22), 0 24px 60px rgba(0,0,0,.5); }   /* 原版玻璃 */
+  #dev.cso .card{ border-radius:2px; background:linear-gradient(178deg, #0b0e14, #07090e);
+    border:1px solid rgba(225,235,255,.10); border-top:1px solid rgba(225,235,255,.55); box-shadow:0 30px 64px rgba(0,0,0,.7); } /* 黑曜石 */
+  #dev.csx .card{ border-radius:2px; background:linear-gradient(178deg, #0b0e14, #07090e);
+    border:1px solid rgba(225,235,255,.12); border-top:1px solid rgba(225,235,255,.5);
+    clip-path:polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%); }                                            /* 斜切角 */
+
+  .arrow{ position:absolute; top:55%; transform:translateY(-50%); z-index:6; width:52px; height:52px;
+    border-radius:50%; background:rgba(10,14,22,.6); border:1px solid rgba(var(--cyan),.35);
+    color:rgba(var(--cyan),.9); font-size:22px; cursor:pointer; backdrop-filter:blur(8px);
+    display:flex; align-items:center; justify-content:center; transition:.3s; }
+  .arrow:hover{ background:rgba(var(--cyan),.18); }
+  .prev{ left:5%; } .next{ right:5%; }
+  .dots{ position:absolute; bottom:7vh; left:0; right:0; display:flex; justify-content:center; gap:12px; z-index:6; }
+  .dot{ width:8px; height:8px; border-radius:50%; background:rgba(var(--stellar),.25); cursor:pointer; transition:.3s; }
+  .dot.on{ background:rgba(var(--yellow),.95); transform:scale(1.4); }
+
+  .toggle{ position:fixed; left:16px; bottom:14px; z-index:30; display:flex; gap:8px; }
+  .toggle button{ font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.8); background:rgba(10,14,22,.8);
+    border:1px solid rgba(225,235,255,.25); padding:5px 11px; border-radius:4px; cursor:pointer; }
+  .toggle button.on{ background:rgba(var(--yellow),.9); color:#1c1402; border-color:transparent; }
+  .nav{ position:fixed; right:16px; bottom:14px; z-index:30; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.5); }
+</style>
+</head>
+<body>
+
+<section id="hero">
+  <div class="ht"><h1>主視覺區（示意）</h1><p>原本的星河背景在這 · 往下捲、開發區塊會整層蓋過去</p></div>
+</section>
+
+<section id="dev" class="csg">
+  <div class="seam"></div>
+  <span class="sectag">開發區塊 · 藝術迴廊 × 流星字雨撞擊（不透明覆蓋）</span>
+  <div class="head">
+    <span class="en">DEVELOP</span>
+    <h2>開發</h2>
+    <div class="sub">網站架設 × 客製系統開發 · 拖曳迴廊</div>
+  </div>
+
+  <div class="stage" id="stage"><div class="ring" id="ring"></div></div>
+  <div class="arrow prev" onclick="step(1)">‹</div>
+  <div class="arrow next" onclick="step(-1)">›</div>
+  <div class="dots" id="dots"></div>
+
+  <canvas id="rain"></canvas>
+</section>
+
+<div class="toggle">
+  <button data-cs="csg" class="on">原版玻璃</button>
+  <button data-cs="cso">黑曜石</button>
+  <button data-cs="csx">斜切角</button>
+</div>
+<div class="nav">迴廊×字雨撞擊 · <b>CSS 3D + Canvas 2D · 零 WebGL</b></div>
+
+<script>
+/* ── 3D 藝術迴廊（沿用先前版本、內容換成開發類細分） ── */
+const SERVICES=[
+  { lab:'LANDING',  ttl:'一頁式形象站',   desc:'一頁把你說清楚。活動頁、名片站，最快一週上線。' },
+  { lab:'WEBSITE',  ttl:'企業官網與電商', desc:'從品牌門面到購物車。3 秒內讓人記住你。' },
+  { lab:'SYSTEM',   ttl:'客製系統開發',   desc:'說得出來就寫得出來，沒說全的替你想到。' },
+  { lab:'API',      ttl:'系統串接整合',   desc:'金流、物流、LINE、ERP，串起來才算數。' },
+  { lab:'ADMIN',    ttl:'後台管理系統',   desc:'你看得懂、員工會用，不用再求工程師。' },
+  { lab:'CARE',     ttl:'維運與迭代',     desc:'上線不是結束。我們陪你長期調整。' },
+];
+const NC=SERVICES.length, STEP_DEG=360/NC, RADIUS=420;
+const ring=document.getElementById('ring'), dotsWrap=document.getElementById('dots');
+const cards=SERVICES.map((s,i)=>{
+  const el=document.createElement('div'); el.className='card';
+  el.style.transform=`rotateY(${i*STEP_DEG}deg) translateZ(${RADIUS}px)`;
+  el.dataset.facing=Math.cos(i*STEP_DEG*Math.PI/180).toFixed(3);
+  el.innerHTML=`<span class="lab">${s.lab}</span><h3 class="ttl">${s.ttl}</h3><p class="desc">${s.desc}</p><span class="more">了解更多 →</span>`;
+  ring.appendChild(el);
+  const d=document.createElement('div'); d.className='dot'; d.onclick=()=>goto(i); dotsWrap.appendChild(d);
+  return el;
+});
+const dots=[...dotsWrap.children];
+let rotation=0, target=0, dragging=false, startX=0, startRot=0, autoOn=true, idleTimer;
+function frontIndex(){ return ((Math.round(-target/STEP_DEG)%NC)+NC)%NC; }
+function goto(i){ target=-i*STEP_DEG; pauseAuto(); }
+function step(dir){ target+=dir*STEP_DEG; pauseAuto(); }
+function pauseAuto(){ autoOn=false; clearTimeout(idleTimer); idleTimer=setTimeout(()=>autoOn=true,3500); }
+const stage=document.getElementById('stage');
+stage.addEventListener('pointerdown',e=>{ dragging=true; startX=e.clientX; startRot=target; pauseAuto(); stage.setPointerCapture(e.pointerId); });
+stage.addEventListener('pointermove',e=>{ if(dragging) target=startRot+(e.clientX-startX)*0.35; });
+stage.addEventListener('pointerup',()=>{ dragging=false; target=Math.round(target/STEP_DEG)*STEP_DEG; });
+function galleryTick(){
+  if(autoOn&&!dragging) target-=0.045;
+  rotation+=(target-rotation)*0.1;
+  ring.style.transform=`translateZ(-${RADIUS}px) rotateY(${rotation}deg)`;
+  cards.forEach((c,i)=>{
+    const ang=(rotation+i*STEP_DEG)*Math.PI/180, facing=Math.cos(ang), t=facing*0.5+0.5;
+    const s=0.8+0.26*t;
+    c.style.transform=`rotateY(${i*STEP_DEG}deg) translateZ(${RADIUS}px) scale(${s.toFixed(3)})`;
+    c.style.opacity=(0.13+0.87*t).toFixed(3);
+    c.style.filter=`brightness(${(0.5+0.5*t).toFixed(3)})`;
+    c.style.pointerEvents=facing>0.3?'auto':'none';
+    c.style.zIndex=Math.round(t*100);
+    c.dataset.facing=facing.toFixed(3);
+  });
+  dots.forEach((d,i)=>d.classList.toggle('on',i===frontIndex()));
+}
+
+/* 質感切換 */
+const dev=document.getElementById('dev');
+document.querySelectorAll('.toggle button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.toggle button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  dev.classList.remove('csg','cso','csx'); dev.classList.add(b.dataset.cs);
+});
+
+/* ── 流星字雨 + 撞擊正面卡片 ── */
+const GLY='{}[]<>/=+*#%&;:01'.split('');
+const cv=document.getElementById('rain'), ctx=cv.getContext('2d');
+let W,H,dpr;
+function rs(){ dpr=Math.min(devicePixelRatio,2); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+rs(); addEventListener('resize',rs);
+const hash=(a,b)=>{ const x=Math.sin(a*127.1+b*311.7)*43758.5453; return x-Math.floor(x); };
+const NR=52, S=[];
+for(let i=0;i<NR;i++) S.push({ spd:0.07+hash(i,1)*0.07, ph:hash(i,2)*1.4, len:6+(hash(i,3)*8|0), sz:9+hash(i,4)*4,
+  ye:hash(i,5)<0.06, cy:hash(i,6)<0.16 });
+
+function activeRects(){                                   // 只跟「面向前方」的迴廊卡碰撞
+  const cr=cv.getBoundingClientRect(), out=[];
+  for(const c of cards){ if(+c.dataset.facing>0.45){ const r=c.getBoundingClientRect();
+    out.push({ l:r.left-cr.left, r:r.right-cr.left, t:r.top-cr.top }); } }
+  return out;
+}
+
+function drawRain(t){
+  ctx.clearRect(0,0,W,H);
+  const rects=activeRects();
+  ctx.textAlign='center';
+  for(let i=0;i<NR;i++){
+    const s=S[i];
+    const raw=t*s.spd+s.ph, cyc=Math.floor(raw/1.4), prog=raw%1.4-0.2;
+    const x=(hash(i,cyc*7+11)*0.96+0.02)*W;
+    const headY=prog*H;
+    let hitY=Infinity;
+    for(const rc of rects) if(x>=rc.l&&x<=rc.r&&rc.t<hitY) hitY=rc.t;
+    const hitProg=hitY/H;
+    if(prog<=hitProg){
+      for(let k=0;k<s.len;k++){
+        const yy=headY-k*s.sz*1.6; if(yy<-20||yy>H+20) continue;
+        const a=k===0?0.75:(0.34*(1-k/s.len));
+        ctx.font=`${s.sz}px "JetBrains Mono",monospace`;
+        ctx.fillStyle=k===0?`rgba(238,245,255,${a})`:(s.ye?`rgba(255,199,9,${a})`:(s.cy?`rgba(0,200,255,${a*0.9})`:`rgba(150,175,210,${a})`));
+        ctx.fillText(GLY[(k+cyc+i)%GLY.length],x,yy);
+      }
+    } else if(hitY<Infinity){
+      const tau=(prog-hitProg)/s.spd;
+      if(tau<0.62){
+        const fade=1-tau/0.62;
+        const g=ctx.createRadialGradient(x,hitY,0,x,hitY,34);
+        g.addColorStop(0,`rgba(255,225,120,${0.5*fade})`); g.addColorStop(0.4,`rgba(255,199,9,${0.22*fade})`); g.addColorStop(1,'rgba(255,199,9,0)');
+        ctx.fillStyle=g; ctx.fillRect(x-36,hitY-36,72,38);
+        ctx.fillStyle=`rgba(255,236,170,${0.85*fade})`; ctx.fillRect(x-9,hitY-1.2,18,1.6);
+        for(let j=0;j<5;j++){
+          const vx=(hash(i,cyc*13+j)-0.5)*150, vy=-(40+hash(i,cyc*17+j)*110);
+          const px=x+vx*tau, py=hitY+vy*tau+170*tau*tau;
+          if(py>hitY+2) continue;
+          const a2=fade*(0.5+hash(i,j)*0.4);
+          ctx.font=`${7+hash(i,j+40)*4}px "JetBrains Mono",monospace`;
+          ctx.fillStyle=j%2?`rgba(255,210,80,${a2})`:`rgba(235,242,255,${a2})`;
+          ctx.fillText(GLY[(j+cyc)%GLY.length],px,py);
+        }
+      }
+    }
+  }
+}
+const T0=performance.now();
+(function loop(){ requestAnimationFrame(loop); galleryTick(); drawRain((performance.now()-T0)/1000); })();
+window.__rain=drawRain; window.__galleryTick=galleryTick;   // 驗證用
+</script>
+</body>
+</html>

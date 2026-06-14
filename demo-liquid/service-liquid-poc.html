@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>液體特效 L1–L6｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --blue:23,54,245; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); overflow-x:hidden; }
+  body::before{ content:''; position:fixed; inset:0; z-index:-2; background:radial-gradient(circle at 50% 30%, #14213f 0%, #0a1226 50%, #05070f 100%); }
+  .sec{ position:relative; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:90px 20px; overflow:hidden; }
+  .sectag{ position:absolute; top:24px; left:50%; transform:translateX(-50%); z-index:9; font-family:"JetBrains Mono",monospace;
+    font-size:12px; letter-spacing:.14em; color:#06121e; background:rgba(var(--cyan),.85); padding:5px 14px; border-radius:5px; white-space:nowrap; }
+  .stitle{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.5rem,3vw,2.2rem); text-align:center; margin-bottom:6px; position:relative; z-index:3; }
+  .ssub{ font-size:.9rem; color:rgba(var(--stellar),.55); text-align:center; margin-bottom:34px; position:relative; z-index:3; }
+  canvas{ display:block; }
+
+  /* L1 fluid */
+  #fluidcv{ position:absolute; inset:0; width:100%; height:100%; z-index:0; }
+  /* L2 ink */
+  #inkcv{ width:min(680px,92vw); height:420px; border-radius:14px; border:1px solid rgba(var(--cyan),.3); cursor:crosshair; background:#070d1a; }
+  /* L3 image distortion */
+  .ld{ width:min(420px,86vw); aspect-ratio:4/5; border-radius:14px; overflow:hidden; border:1px solid rgba(var(--cyan),.3); cursor:pointer; position:relative; }
+  .ld img{ width:100%; height:100%; object-fit:cover; filter:url(#warp) brightness(.7) grayscale(.3); transition:filter .4s, transform .5s; }
+  .ld:hover img{ filter:url(#warpStrong) brightness(.85); transform:scale(1.06); }
+  /* L4 liquid drag */
+  .slime-stage{ position:relative; width:min(700px,92vw); height:420px; }
+  .slime-layer{ position:absolute; inset:0; filter:url(#goo3); }
+  .slime{ position:absolute; border-radius:50%; background:radial-gradient(circle at 38% 32%, #aef0ff, rgba(var(--cyan),.95) 55%, rgba(var(--blue),.85)); }
+  .slime-hint{ position:absolute; left:50%; top:18px; transform:translateX(-50%); font-family:"JetBrains Mono",monospace; font-size:12px; color:rgba(var(--stellar),.45); }
+  /* L5 caustics */
+  .caustic-sec{ background:#04101c; }
+  .caustic{ position:absolute; inset:-10%; z-index:0; mix-blend-mode:screen; opacity:.5; filter:url(#caustic); background:#000; }
+  /* L6 blob cursor */
+  .blob-stage{ position:relative; width:100%; height:100vh; }
+  .blob-layer{ position:absolute; inset:0; filter:url(#goo3); pointer-events:none; }
+  .bc{ position:absolute; border-radius:50%; background:radial-gradient(circle at 40% 35%, #cdf6ff, rgba(var(--cyan),.9) 60%, rgba(var(--blue),.8)); }
+
+  .nav{ position:fixed; right:16px; bottom:14px; z-index:30; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.5); }
+</style>
+</head>
+<body>
+
+<section class="sec"><canvas id="fluidcv"></canvas><span class="sectag">L1 WebGL 真流體模擬 · 攪動畫面</span>
+  <h2 class="stitle">游標攪動，顏料在水裡漩渦擴散</h2>
+  <p class="ssub">真 Navier-Stokes 流體（webgl-fluid 函式庫）</p>
+</section>
+
+<section class="sec"><span class="sectag">L2 墨水擴散 ink bloom · 點/滑過</span>
+  <h2 class="stitle">墨在水中綻開</h2>
+  <p class="ssub">點擊或滑過畫面，墨點暈染流動擴散</p>
+  <canvas id="inkcv"></canvas>
+</section>
+
+<section class="sec"><span class="sectag">L3 影像液態扭曲 · hover</span>
+  <h2 class="stitle">畫面像液面被攪動</h2>
+  <p class="ssub">hover 圖片，表面液態扭曲流動</p>
+  <div class="ld"><img src="https://picsum.photos/seed/liquidimg/500/620" alt=""></div>
+</section>
+
+<section class="sec"><span class="sectag">L4 黏稠拉絲 liquid drag · 拖曳水滴</span>
+  <h2 class="stitle">像蜂蜜一樣被拉絲</h2>
+  <p class="ssub">按住拖動，水滴拉出黏絲、放手回彈</p>
+  <div class="slime-stage" id="slimeStage"><div class="slime-hint">按住中央水滴拖曳 →</div><div class="slime-layer" id="slimeLayer"></div></div>
+</section>
+
+<section class="sec caustic-sec"><div class="caustic"></div><span class="sectag">L5 水底焦散 caustics · 流動光網</span>
+  <h2 class="stitle">一層緩緩流動的水底光</h2>
+  <p class="ssub">整區覆蓋流動的焦散光網（純 SVG）</p>
+</section>
+
+<section class="sec"><div class="blob-stage" id="blobStage"><div class="blob-layer" id="blobLayer"></div></div>
+  <span class="sectag">L6 液態游標 blob cursor · 移動滑鼠</span>
+  <h2 class="stitle" style="pointer-events:none">游標是會變形的水滴</h2>
+  <p class="ssub" style="pointer-events:none">移動滑鼠，軟水滴跟隨並依速度拉伸</p>
+</section>
+
+<!-- SVG filters -->
+<svg width="0" height="0" style="position:absolute"><defs>
+  <filter id="goo3"><feGaussianBlur in="SourceGraphic" stdDeviation="11" result="b"/>
+    <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9"/></filter>
+  <filter id="warp" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.01 0.016" numOctaves="2" seed="7" result="n">
+      <animate attributeName="baseFrequency" dur="16s" values="0.01 0.016;0.014 0.02;0.01 0.016" repeatCount="indefinite"/></feTurbulence>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="16"/></filter>
+  <filter id="warpStrong" x="-25%" y="-25%" width="150%" height="150%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.014 0.022" numOctaves="2" seed="7" result="n">
+      <animate attributeName="baseFrequency" dur="7s" values="0.014 0.022;0.02 0.03;0.014 0.022" repeatCount="indefinite"/></feTurbulence>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="38"/></filter>
+  <filter id="caustic" x="-15%" y="-15%" width="130%" height="130%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.02 0.035" numOctaves="2" seed="3" result="n">
+      <animate attributeName="baseFrequency" dur="18s" values="0.02 0.035;0.028 0.05;0.02 0.035" repeatCount="indefinite"/></feTurbulence>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0   0 0 0 0 0.78   0 0 0 0 1   0 0 0 7 -3.2"/></filter>
+</defs></svg>
+
+<div class="nav">L1–L6 液體特效 · <b>L1 重(WebGL)、其餘輕</b></div>
+
+<script type="module">
+// ── L1 WebGL fluid ──
+try{
+  const { default: WebGLFluid } = await import('https://esm.sh/webgl-fluid@0.3.5');
+  WebGLFluid(document.getElementById('fluidcv'), {
+    TRANSPARENT:false, BACK_COLOR:{r:8,g:14,b:26}, SPLAT_RADIUS:0.3, DENSITY_DISSIPATION:1.4,
+    VELOCITY_DISSIPATION:1.6, CURL:28, COLOR_UPDATE_SPEED:8,
+  });
+}catch(e){ console.warn('fluid lib failed', e); document.querySelector('#fluidcv').style.background='#0a1426'; }
+</script>
+<script>
+// ── L2 ink ──
+(function(){ const cv=document.getElementById('inkcv'); const ctx=cv.getContext('2d');
+  function size(){ cv.width=cv.clientWidth; cv.height=cv.clientHeight; ctx.fillStyle='#070d1a'; ctx.fillRect(0,0,cv.width,cv.height); }
+  size();
+  let blobs=[];
+  function drop(x,y){ const hue=180+Math.random()*60; for(let i=0;i<6;i++) blobs.push({x,y,r:2,vr:0.6+Math.random()*1.2,a:0.5,vx:(Math.random()-.5)*0.6,vy:(Math.random()-.5)*0.6,h:hue}); }
+  cv.addEventListener('pointermove',e=>{ const r=cv.getBoundingClientRect(); if(Math.random()<0.5) drop(e.clientX-r.left,e.clientY-r.top); });
+  cv.addEventListener('pointerdown',e=>{ const r=cv.getBoundingClientRect(); for(let k=0;k<5;k++) drop(e.clientX-r.left,e.clientY-r.top); });
+  (function loop(){ requestAnimationFrame(loop);
+    ctx.fillStyle='rgba(7,13,26,0.04)'; ctx.fillRect(0,0,cv.width,cv.height);
+    blobs.forEach(b=>{ b.r+=b.vr; b.a*=0.985; b.x+=b.vx; b.y+=b.vy;
+      ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,6.28); ctx.fillStyle=`hsla(${b.h},90%,60%,${b.a*0.18})`; ctx.fill(); });
+    blobs=blobs.filter(b=>b.a>0.02); })();
+})();
+
+// ── L4 liquid drag (slime) ──
+(function(){ const stage=document.getElementById('slimeStage'), layer=document.getElementById('slimeLayer');
+  const body=document.createElement('div'), head=document.createElement('div'); body.className=head.className='slime';
+  layer.appendChild(body); layer.appendChild(head);
+  let W=stage.clientWidth,H=stage.clientHeight; let bx=W/2,by=H/2,hx=W/2,hy=H/2,dragging=false;
+  function setSize(el,s){ el.style.width=el.style.height=s+'px'; }
+  function place(el,x,y,s){ el.style.left=(x-s/2)+'px'; el.style.top=(y-s/2)+'px'; }
+  stage.addEventListener('pointerdown',e=>{ dragging=true; stage.setPointerCapture(e.pointerId); move(e); });
+  stage.addEventListener('pointermove',e=>{ if(dragging) move(e); });
+  stage.addEventListener('pointerup',()=>dragging=false);
+  function move(e){ const r=stage.getBoundingClientRect(); hx=e.clientX-r.left; hy=e.clientY-r.top; }
+  (function loop(){ requestAnimationFrame(loop);
+    if(!dragging){ hx+=(W/2-hx)*0.12; hy+=(H/2-hy)*0.12; } // 放手回中
+    bx+=(hx-bx)*0.18; by+=(hy-by)*0.18;
+    const d=Math.hypot(hx-bx,hy-by); const bs=Math.max(40,90-d*0.18); // 拉長時 body 縮
+    setSize(body,90); setSize(head,bs); place(body,bx,by,90); place(head,hx,hy,bs); })();
+})();
+
+// ── L6 blob cursor ──
+(function(){ const stage=document.getElementById('blobStage'), layer=document.getElementById('blobLayer');
+  const chain=Array.from({length:5},()=>({x:innerWidth/2,y:400})); const els=chain.map((c,i)=>{ const d=document.createElement('div'); d.className='bc';
+    const s=64-i*9; d.style.width=d.style.height=s+'px'; layer.appendChild(d); return d; });
+  let mx=innerWidth/2,my=400; stage.addEventListener('pointermove',e=>{ const r=stage.getBoundingClientRect(); mx=e.clientX-r.left; my=e.clientY-r.top; });
+  (function loop(){ requestAnimationFrame(loop); chain.forEach((c,i)=>{ const tx=i===0?mx:chain[i-1].x, ty=i===0?my:chain[i-1].y;
+    c.x+=(tx-c.x)*0.3; c.y+=(ty-c.y)*0.3; const s=64-i*9; els[i].style.left=(c.x-s/2)+'px'; els[i].style.top=(c.y-s/2)+'px'; }); })();
+})();
+</script>
+</body>
+</html>

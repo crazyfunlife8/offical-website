@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服務區塊 · N4 堆疊卡 × 流星字雨撞擊｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); }
+
+  /* 主視覺示意（證明覆蓋） */
+  #hero{ position:relative; height:100vh; display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(circle at 50% 35%, #162242 0%, #0a1226 55%, #05070f 100%); }
+  #hero .ht{ text-align:center; }
+  #hero .ht h1{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:2.4rem; color:rgba(var(--stellar),.9); }
+  #hero .ht p{ margin-top:12px; font-size:.9rem; color:rgba(var(--stellar),.5); }
+
+  /* ── 開發/服務區塊：墨黑不透明覆蓋 ── */
+  #dev{ position:relative; background:#04060a; box-shadow:0 -30px 70px rgba(0,0,0,.85); }
+  #dev .seam{ position:absolute; top:0; left:0; right:0; height:1px; z-index:6;
+    background:linear-gradient(90deg, transparent, rgba(225,235,255,.22), transparent); }
+  .sectag{ position:absolute; top:24px; left:50%; transform:translateX(-50%); z-index:9; font-family:"JetBrains Mono",monospace;
+    font-size:12px; letter-spacing:.13em; color:#06121e; background:rgba(var(--cyan),.85); padding:5px 14px; border-radius:5px; white-space:nowrap; }
+
+  /* N4 sticky 堆疊 */
+  .stackwrap{ position:relative; }
+  .scard{ position:sticky; top:0; height:100vh; display:flex; align-items:center; justify-content:center; }
+  .inner{ position:relative; width:min(860px,86vw); min-height:440px; border-radius:18px; padding:60px 66px; overflow:hidden;
+    background:linear-gradient(160deg, rgba(14,24,46,.98), rgba(8,13,26,.98)); border:1px solid rgba(225,235,255,.12);
+    box-shadow:0 34px 90px rgba(0,0,0,.6); z-index:2; }
+  .scard:nth-child(2) .inner{ background:linear-gradient(160deg, rgba(10,28,46,.98), rgba(7,14,28,.98)); }
+  .scard:nth-child(3) .inner{ background:linear-gradient(160deg, rgba(20,22,40,.98), rgba(10,11,24,.98)); }
+  .inner::before{ content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(var(--cyan),.85), transparent); }
+  .knum{ position:absolute; right:48px; top:30px; font-family:"JetBrains Mono",monospace; font-size:92px; color:rgba(225,235,255,.07); }
+  .klab{ font-family:"JetBrains Mono",monospace; font-size:11.5px; letter-spacing:.22em; color:rgba(var(--cyan),.85); }
+  .inner h3{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(2.1rem,3.8vw,3.1rem); margin:18px 0 8px; }
+  .inner .sub{ color:rgba(225,235,255,.5); font-size:.96rem; margin-bottom:34px; }
+  .inner ul{ list-style:none; }
+  .inner li{ display:flex; align-items:baseline; gap:18px; padding:16px 4px; border-top:1px solid rgba(225,235,255,.1); }
+  .inner li .sname{ font-family:"Noto Serif TC",serif; font-size:1.18rem; color:rgba(225,235,255,.93); }
+  .inner li .sdesc{ margin-left:auto; font-size:.84rem; color:rgba(225,235,255,.45); }
+
+  /* 字雨層：fixed 覆蓋視窗、區塊進入才顯示、在卡片之上（火花看得見） */
+  #rain{ position:fixed; inset:0; width:100%; height:100%; z-index:50; pointer-events:none; opacity:0; transition:opacity .4s; }
+  #rain.on{ opacity:1; }
+
+  .nav{ position:fixed; right:16px; bottom:14px; z-index:60; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.5); }
+</style>
+</head>
+<body>
+
+<section id="hero"><div class="ht"><h1>主視覺區（示意）</h1><p>原本的星河背景在這 · 往下捲、服務區塊整層蓋過去</p></div></section>
+
+<section id="dev">
+  <div class="seam"></div>
+  <span class="sectag">服務區塊 · N4 捲動堆疊卡 × 流星字雨撞擊（不透明覆蓋）</span>
+  <div class="stackwrap" id="stack">
+    <div class="scard"><div class="inner"><span class="knum">01</span><span class="klab">DEVELOP</span><h3>開發</h3><p class="sub">把想法變成會運作的東西。</p>
+      <ul><li><span class="sname">網站架設</span><span class="sdesc">一頁式到企業電商</span></li>
+          <li><span class="sname">客製系統開發</span><span class="sdesc">說得出來就寫得出來</span></li></ul></div></div>
+    <div class="scard"><div class="inner"><span class="knum">02</span><span class="klab">GROWTH</span><h3>成長</h3><p class="sub">讓更多人看見你、記住你。</p>
+      <ul><li><span class="sname">社群經營</span><span class="sdesc">素材、文案、定位</span></li>
+          <li><span class="sname">AI 虛擬網紅</span><span class="sdesc">永遠不下班的代言人</span></li>
+          <li><span class="sname">跳動E投放</span><span class="sdesc">個人戶也能投 TikTok</span></li></ul></div></div>
+    <div class="scard"><div class="inner"><span class="knum">03</span><span class="klab">CONSULT</span><h3>顧問</h3><p class="sub">先想清楚，再動手。</p>
+      <ul><li><span class="sname">產業顧問導入</span><span class="sdesc">把方向想清楚再決定</span></li></ul></div></div>
+  </div>
+</section>
+
+<section style="height:60vh; display:flex; align-items:center; justify-content:center; color:rgba(225,235,255,.3); font-family:'JetBrains Mono',monospace; font-size:12px;">（區塊結束 · 字雨層離開視窗）</section>
+
+<canvas id="rain"></canvas>
+<div class="nav">N4 堆疊 × 字雨撞擊 · <b>GSAP + Canvas 2D · 零 WebGL</b></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+/* N4 sticky 堆疊：下一張上來時，上一張縮小變暗（變暗 → 不再被字雨打） */
+const scards=[...document.querySelectorAll('.scard')];
+scards.forEach((card,i)=>{
+  if(i===scards.length-1) return;
+  gsap.to(card.querySelector('.inner'),{ scale:.9, opacity:.45, ease:'none',
+    scrollTrigger:{ trigger:scards[i+1], start:'top bottom', end:'top top', scrub:true } });
+});
+
+/* 字雨層：區塊進入視窗才開 */
+const rainOn={v:false};
+new IntersectionObserver(es=>es.forEach(e=>{ rainOn.v=e.isIntersecting; document.getElementById('rain').classList.toggle('on',e.isIntersecting); }),{threshold:0.02}).observe(document.getElementById('dev'));
+
+/* ── 流星字雨（真實程式碼）+ 撞擊前景堆疊卡 ── */
+const CODE=[
+  `const nest = createStudio()`,
+  `export default function App() {`,
+  `<section class="services">`,
+  `router.get('/api/orders', fn)`,
+  `await db.clients.findMany()`,
+  `npm run build && deploy`,
+  `return <Card {...props} />`,
+  `background: #04060a;`,
+  `useEffect(() => render(), [])`,
+  `if (user.ready) launch()`,
+  `SELECT * FROM orders;`,
+  `transform: translateY(-4px)`,
+  `addEventListener('scroll', fx)`,
+  `git commit -m "ship it"`,
+  `} else { retry() }`,
+];
+const cv=document.getElementById('rain'), ctx=cv.getContext('2d');
+let W,H,dpr;
+function rs(){ dpr=Math.min(devicePixelRatio,2); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+rs(); addEventListener('resize',rs);
+const hash=(a,b)=>{ const x=Math.sin(a*127.1+b*311.7)*43758.5453; return x-Math.floor(x); };
+const ND=24, D=[];                                       // 每滴 = 一整行真程式碼、旋轉 90° 直立落下
+for(let i=0;i<ND;i++) D.push({ spd:0.05+hash(i,1)*0.07, ph:hash(i,2)*1.8, sz:13+(hash(i,4)*3|0),
+  ye:hash(i,5)<0.12, cy:hash(i,6)<0.28 });
+
+function frontRects(){                                    // 只取「不透明的前景卡」頂緣當撞擊面
+  const inners=document.querySelectorAll('#dev .inner'), out=[];
+  for(const el of inners){
+    if(parseFloat(getComputedStyle(el).opacity) < 0.7) continue;
+    const r=el.getBoundingClientRect();
+    if(r.top>20 && r.top<H-20) out.push({ l:r.left, r:r.right, t:r.top });
+  }
+  return out;
+}
+
+function drawRain(t){
+  ctx.clearRect(0,0,W,H);
+  const devTop=Math.max(0, document.getElementById('dev').getBoundingClientRect().top);   // 字雨只在區塊內、不蓋到上方 hero
+  if(devTop>=H-4) return;
+  ctx.save(); ctx.beginPath(); ctx.rect(0,devTop,W,H-devTop); ctx.clip();
+  const rects=frontRects();
+  ctx.textBaseline='middle';
+  for(let i=0;i<ND;i++){
+    const d=D[i];
+    const raw=t*d.spd+d.ph, cyc=Math.floor(raw/1.8), prog=raw%1.8-0.25;
+    const code=CODE[(i*5+cyc)%CODE.length];
+    ctx.font=`${d.sz}px "JetBrains Mono",monospace`;
+    const w=ctx.measureText(code).width;                           // = 旋轉後碼條的長度
+    const x=16+Math.floor(hash(i,cyc*9+5)*(W-32));
+    const tipY=prog*H;                                             // 直立碼條的「下緣領先點」
+    const base=d.ye?'255,199,9':(d.cy?'90,205,255':'150,180,220');
+    let hitY=Infinity;
+    for(const rc of rects) if(x>=rc.l && x<=rc.r && rc.t<hitY) hitY=rc.t;
+    const hitProg=hitY/H;
+    if(prog<=hitProg){
+      ctx.save(); ctx.translate(x,tipY); ctx.rotate(-Math.PI/2); ctx.textAlign='left';
+      const grd=ctx.createLinearGradient(0,0,w,0);                 // 領先字亮、整行往上漸隱（彗尾）
+      grd.addColorStop(0,`rgba(240,247,255,0.98)`);
+      grd.addColorStop(0.10,`rgba(${base},0.92)`);
+      grd.addColorStop(1,`rgba(${base},0)`);
+      ctx.fillStyle=grd; ctx.fillText(code,0,0);
+      ctx.restore();
+    } else if(hitY<Infinity){
+      const tau=(prog-hitProg)/d.spd;
+      if(tau<0.6){
+        const fade=1-tau/0.6;
+        const lg=ctx.createRadialGradient(x,hitY,0,x,hitY,46);     // 撞擊暖光
+        lg.addColorStop(0,`rgba(255,214,98,${0.5*fade})`); lg.addColorStop(0.4,`rgba(255,199,9,${0.22*fade})`); lg.addColorStop(1,'rgba(255,199,9,0)');
+        ctx.fillStyle=lg; ctx.fillRect(x-46,hitY-48,92,50);
+        ctx.fillStyle=`rgba(255,236,170,${0.9*fade})`; ctx.fillRect(x-12,hitY-1.5,24,2);
+        ctx.textAlign='center';
+        for(let j=0;j<8;j++){                                      // 字符火花向上濺
+          const vx=(hash(i,cyc*13+j)-0.5)*150, vy=-(45+hash(i,cyc*17+j)*120);
+          const px=x+vx*tau, py=hitY+vy*tau+175*tau*tau;
+          if(py>hitY+2) continue;
+          ctx.font=`${8+(hash(i,j+9)*4|0)}px "JetBrains Mono",monospace`;
+          ctx.fillStyle=j%2?`rgba(255,210,80,${fade*0.85})`:`rgba(235,242,255,${fade*0.85})`;
+          ctx.fillText(code[(j*5+cyc)%code.length],px,py);
+        }
+      }
+    }
+  }
+  ctx.restore();
+}
+const T0=performance.now();
+(function loop(){ requestAnimationFrame(loop); if(rainOn.v) drawRain((performance.now()-T0)/1000); else ctx.clearRect(0,0,W,H); })();
+window.__rain=drawRain; window.__rectN=()=>frontRects().length;   // 驗證用
+</script>
+</body>
+</html>

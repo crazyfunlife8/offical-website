@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="no-js">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>創巢數位 Nest Digital｜用非常規思維解決真正的問題</title>
+    <meta name="description" content="創巢數位 Nest Digital — 軟體開發 × 品牌行銷 × AI應用 × 自動化，一條龍數位成長團隊。用驗證過的工具和流程，幫品牌在正確的地方成長。">
+    <meta property="og:title"       content="創巢數位 Nest Digital｜非常規，才是真解法">
+    <meta property="og:description" content="從軟體開發到行銷一條龍，我們用自己驗證過的工具和流程，在別人覺得不可能的地方找到真正的出口。">
+    <meta property="og:image"       content="https://nestxmedia.com/assets/images/og/index.jpg">
+    <meta property="og:type"        content="website">
+    <meta property="og:url"         content="https://nestxmedia.com/">
+    <link rel="canonical"           href="https://nestxmedia.com/">
+    <link rel="icon"                href="assets/images/brand/icon.png">
+    <link rel="apple-touch-icon"    href="assets/images/brand/icon.png">
+
+    <!-- Schema 結構化資料 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Nest Digital",
+        "alternateName": "創巢數位",
+        "url": "https://nestxmedia.com",
+        "logo": "https://nestxmedia.com/assets/images/brand/icon.png",
+        "description": "軟體開發 × 品牌行銷 × AI應用 × 自動化，用非常規的跳躍思維解決習以為常卻永遠解決不了的問題。",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+886-3-491-2872",
+            "contactType": "customer service",
+            "areaServed": "TW",
+            "availableLanguage": "zh-TW"
+        },
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "中央西路二段268號5樓",
+            "addressLocality": "中壢區",
+            "addressRegion": "桃園市",
+            "addressCountry": "TW"
+        },
+        "sameAs": ["https://line.me/R/ti/p/@604vqsva"]
+    }
+    </script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght,SOFT@9..144,100..900,0..100&family=Noto+Sans+TC:wght@100;300;400;700;900&family=Noto+Serif+TC:wght@400;500;700;900&family=Italiana&display=swap" rel="stylesheet">
+
+    <!-- Chiron Sung HK（港產明朝活字；中文主宋體，替代 Noto Serif 的通用感） -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+
+    <!-- CSS（順序不得更改）-->
+    <link rel="stylesheet" href="assets/css/tokens.css">
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/components.css?v=liquid2">
+    <link rel="stylesheet" href="assets/css/animations.css?v=liquid2">
+    <link rel="stylesheet" href="assets/css/pages/index.css?v=liquid2">
+</head>
+<body class="has-threejs">
+
+    <!-- 星空 canvas（全站固定後層，Three.js 渲染目標） -->
+    <!-- 黑洞虛空斜帶由 nav.js 注入的 #css-starfield::before 統一承擔（首頁 / 其他頁 / 手機 RWD 全適用） -->
+    <canvas id="starfield-canvas" aria-hidden="true"></canvas>
+
+    <!-- Nav 由 nav.js 動態注入 -->
+
+    <main>
+
+        <!-- ════════════════════════════════════════════════
+             Section 1｜Hero
+        ════════════════════════════════════════════════ -->
+        <section class="hero" aria-labelledby="hero-title">
+
+            <div class="hero__glow" aria-hidden="true"></div>
+
+            <div class="hero__inner">
+
+                <!-- 左側文字區 -->
+                <div class="hero__content">
+
+                    <!-- 主標題（品牌宣言） -->
+                    <h1 class="hero__title js-hidden" id="hero-title">
+                        <span class="line">用非常規的<span class="highlight">跳躍思維</span></span>
+                        <span class="line">解決習以為常</span>
+                        <span class="line">卻永遠</span>
+                        <span class="line">解決不了的問題</span>
+                    </h1>
+
+                    <!-- CTA 按鈕（單一聚焦：探索服務） -->
+                    <div class="hero__cta-group js-hidden">
+                        <a href="#services-section" class="btn btn--primary">
+                            探索服務
+                            <span class="btn-arrow" aria-hidden="true">→</span>
+                        </a>
+                    </div>
+
+                    <!-- 向下捲動 -->
+                    <div class="hero__scroll-hint js-hidden" aria-hidden="true">
+                        <span class="hero__scroll-hint__line"></span>
+                        <span>往下探索</span>
+                    </div>
+
+                </div>
+
+                <!-- 太空人 ScrollTrigger 偵序列（2026-05-07 PoC 掛載）
+                     固定於右側、捲動驅動 72 偵動畫，完整邏輯見 index.js initAstronautScroll()
+                     canvas 內部繪製尺寸 512px = WebP 偵原始尺寸，外觀大小由 CSS 控制 -->
+                <div class="hero-astronaut" aria-hidden="true">
+                    <canvas id="hero-astronaut-canvas" width="512" height="512"></canvas>
+                </div>
+
+            </div>
+
+            <!-- Hero 副標題：.hero__rift 定位容器（absolute, Hero 下半部右靠）
+                 .hero__readout (中文仿宋) / .hero__readout-divider (冷光分隔線) / .hero__readout-en (英文 Italianno) -->
+            <div class="hero__rift js-hidden" aria-hidden="false">
+                <p class="hero__readout">
+                    傳統做法不夠用時，你需要的<span class="hero__readout-dim">不是更努力</span>　<strong>而是一個敢用不同方法的團隊。</strong>
+                </p>
+                <div class="hero__readout-divider" aria-hidden="true"></div>
+                <p class="hero__readout-en" lang="en">
+                    Working harder isn't the answer when the rules don't work. A team that breaks them is.
+                </p>
+            </div>
+
+        </section>
+
+
+        <!-- ════════════════════════════════════════════════
+             Section 2｜宣言
+        ════════════════════════════════════════════════ -->
+        <section class="manifesto" aria-label="品牌宣言">
+            <div class="manifesto__line" aria-hidden="true"></div>
+
+            <!-- 太空人 ScrollTrigger Beat 03（懸線揮手 → 掉下）2026-05-08 PoC 掛載
+                 9:16 直式、Manifesto 區塊右側、捲動驅動 179 偵動畫 -->
+            <div class="manifesto-astronaut" aria-hidden="true">
+                <canvas id="manifesto-astronaut-canvas" width="432" height="768"></canvas>
+            </div>
+
+            <div class="manifesto__inner">
+                <h2 class="manifesto__big-text">
+                    <span class="line"><span class="accent">非常規，</span></span>
+                    <span class="line" data-text="才是真解法">才是真解法</span>
+                </h2>
+
+                <div class="manifesto__body">
+                    <p>
+                        <span>整世界都在發神經，你還在用正常思維面對？</span><span>要就跟著一起發瘋！</span>
+                    </p>
+                    <div class="manifesto__body-divider" aria-hidden="true"></div>
+                    <p class="manifesto__body-en" lang="en">
+                        <span>The world's gone mad.</span><span>Still trying to think straight?</span><span>Lose your mind with us.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ════════════════════════════════════════════════
+             Section 3｜服務星圖（非對稱 Bento）
+        ════════════════════════════════════════════════ -->
+        
+        <section class="services-section" aria-label="服務一覽手風琴">
+            <iframe title="服務手風琴" src="demo-liquid/service-accordion-embed.html" style="width:100%;height:540px;border:0;display:block;background:transparent" loading="lazy"></iframe>
+        </section>
+
+
+        <!-- Section 4 品牌故事預告 2026-05-07 整段移除 -->
+
+
+        <!-- ════════════════════════════════════════════════
+             Section 5｜終點 CTA（反轉 CTA：「先別點」）
+        ════════════════════════════════════════════════ -->
+        <section class="final-cta" aria-labelledby="cta-title">
+
+            <div class="final-cta__glow" aria-hidden="true"></div>
+
+            <!-- 太空人 Beat 04（無頭追頭盔）2026-05-11 改用 WebP 偵序列
+                 取代原 video 標籤：iOS Safari 對 VP9+alpha WebM 不渲染 alpha、Windows ffmpeg
+                 又無法產 HEVC+alpha mp4。改用偵序列方案（同 beat02/03 管線）→ 所有平台真透明 -->
+            <div class="footer-astronaut" aria-hidden="true">
+                <canvas id="footer-astronaut-canvas" width="480" height="270"></canvas>
+            </div>
+
+            <div class="final-cta__inner">
+                <h2 class="final-cta__title" id="cta-title">先別點。</h2>
+                <p class="final-cta__title-en" lang="en">Don't click yet.</p>
+
+                <div class="final-cta__divider" aria-hidden="true"></div>
+
+                <p class="final-cta__subtitle">除非你準備好不正常一次。</p>
+                <p class="final-cta__subtitle-en" lang="en">Unless you're ready to break something.</p>
+
+                <a href="contact.html" class="btn btn--yellow final-cta__btn">
+                    我準備好了
+                    <span class="btn-arrow" aria-hidden="true">→</span>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- Scripts（順序不得更改）-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script src="assets/js/pages/index.js"></script>
+
+</body>
+</html>

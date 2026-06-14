@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>滴落液體卡 變體｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --blue:23,54,245; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); overflow-x:hidden; }
+  body::before{ content:''; position:fixed; inset:0; z-index:-2; background:radial-gradient(circle at 50% 30%, #14213f 0%, #0a1226 50%, #05070f 100%); }
+  .sec{ position:relative; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:90px 20px; overflow:hidden; }
+  .sectag{ position:absolute; top:24px; left:50%; transform:translateX(-50%); z-index:9; font-family:"JetBrains Mono",monospace;
+    font-size:12px; letter-spacing:.14em; color:#06121e; background:rgba(var(--cyan),.85); padding:5px 14px; border-radius:5px; white-space:nowrap; }
+  .stitle{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.4rem,2.6vw,2rem); text-align:center; margin-bottom:6px; }
+  .ssub{ font-size:.88rem; color:rgba(var(--stellar),.5); text-align:center; margin-bottom:44px; }
+  .holder{ position:relative; width:320px; }
+  .content{ position:absolute; inset:0; z-index:3; padding:34px 32px; display:flex; flex-direction:column; color:#fff; pointer-events:none; }
+  .lab{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.16em; color:rgba(255,255,255,.92); border-top:1.5px solid rgba(255,255,255,.5); padding-top:8px; align-self:flex-start; }
+  .ttl{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.7rem; margin:18px 0 14px; }
+  .desc{ font-size:.92rem; line-height:1.85; opacity:.9; }
+  .more{ margin-top:auto; font-family:"JetBrains Mono",monospace; font-size:12.5px; }
+  .body{ width:320px; min-height:400px; border-radius:22px 22px 10px 10px; }
+  .drip{ position:absolute; border-radius:50%; }
+
+  .v1-wrap{ filter:url(#goo); position:relative; }
+  .v1 .body{ background:linear-gradient(160deg,#13b6c8,#0a6cff); }
+  .v1 .drip{ background:#0a6cff; }
+
+  .v2-wrap{ filter:url(#goo); position:relative; animation:jiggle 3.6s ease-in-out infinite; }
+  @keyframes jiggle{ 0%,100%{transform:scale(1,1);} 25%{transform:scale(1.04,0.97);} 50%{transform:scale(0.97,1.04);} 75%{transform:scale(1.03,0.98);} }
+  .v2 .body{ background:linear-gradient(160deg,#19d3a8,#0a86ff); border-radius:42% 58% 50% 50%/55% 50% 50% 45%; }
+  .v2 .blob{ position:absolute; border-radius:50%; background:#0a86ff; }
+
+  .v3-wrap{ filter:url(#goo); position:relative; }
+  .v3 .body{ background:linear-gradient(120deg,#3a4252,#cdd8e4 30%,#7d8aa0 48%,#f3f7fb 56%,#8590a3 72%,#39414f); background-size:280% 100%; animation:metal 7s linear infinite; }
+  .v3 .drip{ background:#9aa6b6; }
+  @keyframes metal{ to{ background-position:280% 0; } }
+  .v3 .content{ color:#0a1018; } .v3 .lab{ color:#5a4a00; border-top-color:rgba(90,74,0,.5);} .v3 .more{ color:#0a4a6a; }
+
+  .v4-wrap{ filter:url(#goo) drop-shadow(0 0 18px rgba(255,120,0,.75)); position:relative; }
+  .v4 .body{ background:linear-gradient(160deg,#ffd24a,#ff5a1f 60%,#c41a2b); }
+  .v4 .drip{ background:#ff7a1f; }
+
+  .v5-wrap{ filter:url(#goo); position:relative; cursor:pointer; }
+  .v5 .body{ background:linear-gradient(160deg,#7a4bff,#3a1aff); }
+  .v5 .drip{ background:#4a2aff; transition:height .5s cubic-bezier(.2,.8,.2,1), bottom .5s; }
+  .v5-wrap:hover .drip{ } /* JS handles stretch */
+
+  .nav{ position:fixed; right:16px; bottom:14px; z-index:30; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.5); }
+</style>
+</head>
+<body>
+
+<section class="sec"><span class="sectag">V1 長拖絲滴落 · 黏稠垂墜</span>
+  <h2 class="stitle">更長、更黏的拖絲</h2><p class="ssub">不同長度的黏絲緩緩垂墜、水滴墜落</p>
+  <div class="holder v1"><div class="v1-wrap" id="v1wrap"><div class="body"></div></div>
+    <div class="content"><span class="lab">SOCIAL</span><h3 class="ttl">社群經營</h3><p class="desc">替你想清楚要說什麼。素材、文案、定位，從靈魂出發。</p><span class="more">了解更多 →</span></div></div>
+</section>
+
+<section class="sec"><span class="sectag">V2 整塊史萊姆 · 全身抖動</span>
+  <h2 class="stitle">整張卡是一坨會抖的史萊姆</h2><p class="ssub">不只下緣，整個外框都是流動的果凍</p>
+  <div class="holder v2"><div class="v2-wrap" id="v2wrap"><div class="body"></div></div>
+    <div class="content"><span class="lab">WEBSITE</span><h3 class="ttl">網站架設</h3><p class="desc">3 秒內讓人記住你。從一頁式到企業電商。</p><span class="more">了解更多 →</span></div></div>
+</section>
+
+<section class="sec"><span class="sectag">V3 液態金屬滴 · 熔融水銀</span>
+  <h2 class="stitle">流動的金屬在滴落</h2><p class="ssub">鉻金水銀質感、底部熔融垂墜</p>
+  <div class="holder v3"><div class="v3-wrap" id="v3wrap"><div class="body"></div></div>
+    <div class="content"><span class="lab">SYSTEM</span><h3 class="ttl">客製系統</h3><p class="desc">說得出來就寫得出來，沒說全的替你想到。</p><span class="more">了解更多 →</span></div></div>
+</section>
+
+<section class="sec"><span class="sectag">V4 熔岩發光滴 · 滾燙岩漿</span>
+  <h2 class="stitle">滾燙的岩漿在滴</h2><p class="ssub">發光的熔岩、橘紅熱度往下淌</p>
+  <div class="holder v4"><div class="v4-wrap" id="v4wrap"><div class="body"></div></div>
+    <div class="content"><span class="lab">PLATFORM</span><h3 class="ttl">跳動E投放</h3><p class="desc">台灣個人戶也能投 TikTok，最快 24 小時開通。</p><span class="more">前往平台 →</span></div></div>
+</section>
+
+<section class="sec"><span class="sectag">V5 hover 拉絲 · 滑上去拉長</span>
+  <h2 class="stitle">滑鼠移上去，液體被拉長</h2><p class="ssub">hover 時黏絲戲劇性拉伸垂墜</p>
+  <div class="holder v5"><div class="v5-wrap" id="v5wrap"><div class="body"></div></div>
+    <div class="content"><span class="lab">AI TALENT</span><h3 class="ttl">AI 虛擬網紅</h3><p class="desc">為品牌打造一個只屬於你的虛擬代言人。</p><span class="more">了解更多 →</span></div></div>
+</section>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+  <filter id="goo"><feGaussianBlur in="SourceGraphic" stdDeviation="9" result="b"/><feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -11"/></filter>
+</defs></svg>
+<div class="nav">滴落變體 V1–V5 · <b>全 CSS/SVG · 零 WebGL</b></div>
+
+<script>
+function makeDrips(wrapId, xs, rs, color, lenMul){ const wrap=document.getElementById(wrapId);
+  const drips=xs.map((x,i)=>{ const d=document.createElement('div'); d.className='drip'; d.style.left=(x-rs[i])+'px';
+    d.style.width=d.style.height=rs[i]*2+'px'; if(color) d.style.background=color; wrap.appendChild(d); return {d,x,r:rs[i],ph:i}; });
+  return drips;
+}
+// V1 長拖絲
+(function(){ const drips=makeDrips('v1wrap',[36,90,150,210,270,300],[18,12,22,14,20,12]);
+  (function loop(t){ requestAnimationFrame(loop); drips.forEach((o,i)=>{ const base=18+o.r; const sway=Math.sin((t||0)*0.0009+o.ph)*0.5+0.5;
+    const drop=base + sway*(40+i*8); o.d.style.bottom=(-drop)+'px'; }); })();
+})();
+// V2 slime：四周加 blob
+(function(){ const wrap=document.getElementById('v2wrap');
+  const pts=[[160,-6,46],[40,40,40],[280,60,38],[-6,180,42],[326,200,40],[60,360,44],[250,380,40],[160,406,48]];
+  pts.forEach(p=>{ const b=document.createElement('div'); b.className='blob'; b.style.left=(p[0]-p[2])+'px'; b.style.top=(p[1]-p[2])+'px'; b.style.width=b.style.height=p[2]*2+'px'; wrap.appendChild(b); });
+})();
+// V3 金屬滴
+(function(){ const drips=makeDrips('v3wrap',[40,110,180,250,290],[16,22,13,19,14],'#9aa6b6');
+  (function loop(t){ requestAnimationFrame(loop); drips.forEach(o=>{ const drop=16+Math.sin((t||0)*0.001+o.ph)*12+o.r; o.d.style.bottom=(-drop)+'px'; }); })();
+})();
+// V4 熔岩滴
+(function(){ const drips=makeDrips('v4wrap',[44,120,200,260,300],[18,14,20,15,12],'#ff7a1f');
+  (function loop(t){ requestAnimationFrame(loop); drips.forEach((o,i)=>{ const drop=18+Math.sin((t||0)*0.0011+o.ph)*16+o.r; o.d.style.bottom=(-drop)+'px'; }); })();
+})();
+// V5 hover 拉絲
+(function(){ const wrap=document.getElementById('v5wrap'); const drips=makeDrips('v5wrap',[40,100,160,220,280],[16,20,14,18,15]);
+  drips.forEach((o,i)=>{ o.d.style.bottom=(-(16+o.r))+'px'; });
+  wrap.addEventListener('pointerenter',()=>drips.forEach((o,i)=>{ o.d.style.height=(o.r*2+60+i*18)+'px'; o.d.style.bottom=(-(70+i*18+o.r))+'px'; }));
+  wrap.addEventListener('pointerleave',()=>drips.forEach(o=>{ o.d.style.height=(o.r*2)+'px'; o.d.style.bottom=(-(16+o.r))+'px'; }));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>開發類 程式碼系區塊 C1–C5｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --yellow:255,199,9; --teal:25,211,168; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); overflow-x:hidden; }
+  body::before{ content:''; position:fixed; inset:0; z-index:-2; background:radial-gradient(circle at 50% 30%, #111c38 0%, #0a1226 52%, #05070f 100%); }
+  .sec{ position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:110px 7vw; }
+  .sectag{ position:absolute; top:26px; left:50%; transform:translateX(-50%); z-index:9; font-family:"JetBrains Mono",monospace;
+    font-size:12px; letter-spacing:.13em; color:#06121e; background:rgba(var(--cyan),.85); padding:5px 14px; border-radius:5px; white-space:nowrap; }
+  .menu{ position:fixed; left:14px; top:50%; transform:translateY(-50%); z-index:40; display:flex; flex-direction:column; gap:7px; }
+  .menu a{ font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.55); text-decoration:none; background:rgba(10,18,38,.72);
+    border:1px solid rgba(var(--cyan),.25); padding:4px 9px; border-radius:5px; backdrop-filter:blur(4px); }
+  .menu a:hover{ color:#06121e; background:rgba(var(--cyan),.85); }
+  .mono{ font-family:"JetBrains Mono",monospace; }
+  .caret{ display:inline-block; width:9px; height:1.1em; background:rgba(var(--cyan),.9); vertical-align:-0.15em; animation:blink 1s steps(1) infinite; }
+  @keyframes blink{ 50%{ opacity:0; } }
+  .kw{ color:rgba(var(--cyan),.95); } .str{ color:rgba(var(--yellow),.92); } .fn{ color:rgba(var(--teal),.95); }
+  .cm{ color:rgba(var(--stellar),.35); } .pn{ color:rgba(var(--stellar),.55); } .ok{ color:rgba(var(--teal),.95); }
+
+  /* C1 終端機 */
+  .term{ width:min(760px,86vw); border-radius:12px; overflow:hidden; background:rgba(7,12,24,.92);
+    border:1px solid rgba(var(--stellar),.14); box-shadow:0 30px 90px rgba(0,0,0,.6); }
+  .term .bar{ display:flex; align-items:center; gap:7px; padding:11px 16px; background:rgba(14,22,42,.9); border-bottom:1px solid rgba(var(--stellar),.1); }
+  .term .dot{ width:11px; height:11px; border-radius:50%; background:rgba(var(--stellar),.18); }
+  .term .ttl{ margin-left:10px; font-family:"JetBrains Mono",monospace; font-size:11.5px; color:rgba(var(--stellar),.45); }
+  .term .body{ padding:24px 26px 30px; font-family:"JetBrains Mono",monospace; font-size:14px; line-height:2.05; min-height:330px; white-space:pre-wrap; }
+  .c1cap{ text-align:center; margin-top:30px; }
+  .c1cap .t{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.6rem; }
+  .c1cap .s{ font-size:.85rem; color:rgba(var(--stellar),.5); margin-top:6px; }
+
+  /* C2 程式碼 → 成品 */
+  .duo{ display:grid; grid-template-columns:1fr 1fr; gap:22px; width:min(1100px,88vw); align-items:stretch; }
+  .pane{ border-radius:12px; background:rgba(7,12,24,.92); border:1px solid rgba(var(--stellar),.14); overflow:hidden; box-shadow:0 26px 70px rgba(0,0,0,.55); }
+  .pane .bar{ display:flex; align-items:center; gap:8px; padding:10px 16px; background:rgba(14,22,42,.9); border-bottom:1px solid rgba(var(--stellar),.1);
+    font-family:"JetBrains Mono",monospace; font-size:11.5px; color:rgba(var(--stellar),.45); }
+  .pane .code{ padding:22px 24px; font-family:"JetBrains Mono",monospace; font-size:13.5px; line-height:2.0; min-height:330px; white-space:pre-wrap; }
+  .urlbar{ flex:1; background:rgba(7,12,24,.8); border:1px solid rgba(var(--stellar),.12); border-radius:6px; padding:3px 12px; font-size:11px; }
+  .prev{ padding:26px; min-height:330px; display:flex; flex-direction:column; gap:14px; }
+  .prev>*{ opacity:0; transform:translateY(10px); transition:opacity .5s, transform .6s cubic-bezier(.16,1,.3,1); }
+  .prev>.on{ opacity:1; transform:none; }
+  .pv-nav{ display:flex; align-items:center; gap:12px; padding:10px 14px; border:1px solid rgba(var(--stellar),.14); border-radius:8px; }
+  .pv-logo{ font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--cyan),.9); letter-spacing:.14em; }
+  .pv-links{ margin-left:auto; display:flex; gap:10px; }
+  .pv-links i{ width:34px; height:7px; border-radius:4px; background:rgba(var(--stellar),.18); }
+  .pv-hero{ padding:26px 20px; border:1px solid rgba(var(--stellar),.14); border-radius:10px;
+    background:radial-gradient(circle at 28% 18%, rgba(var(--cyan),.12), transparent 55%); }
+  .pv-hero h4{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.35rem; }
+  .pv-hero p{ font-size:.8rem; color:rgba(var(--stellar),.5); margin-top:8px; }
+  .pv-btn{ display:inline-block; margin-top:16px; font-family:"JetBrains Mono",monospace; font-size:11.5px; padding:7px 16px; border-radius:7px;
+    background:linear-gradient(140deg, rgba(var(--yellow),.95), rgba(255,160,9,.9)); color:#1c1402; }
+  .pv-cards{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .pv-cards i{ height:58px; border:1px solid rgba(var(--stellar),.14); border-radius:8px; background:rgba(14,22,42,.6); }
+
+  /* C3 git graph */
+  .gitwrap{ width:min(980px,88vw); display:grid; grid-template-columns:1.15fr 1fr; gap:40px; align-items:center; }
+  .gitsvg{ width:100%; }
+  .gitlab{ font-family:"JetBrains Mono",monospace; font-size:12px; }
+  .githead h3{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.8rem,3vw,2.5rem); margin-bottom:14px; }
+  .githead p{ color:rgba(var(--stellar),.55); line-height:2; font-size:.93rem; }
+  .githead .cmd{ margin-top:22px; font-family:"JetBrains Mono",monospace; font-size:12.5px; color:rgba(var(--cyan),.9); }
+
+  /* C4 巨型程式碼打字 */
+  #c4 .wrap{ width:min(1050px,88vw); display:grid; grid-template-columns:1.4fr 1fr; gap:48px; align-items:center; }
+  .bigcode{ font-family:"JetBrains Mono",monospace; font-weight:500; font-size:clamp(1.6rem,3.4vw,2.7rem); line-height:1.85; white-space:pre; }
+  #c4 .side{ border-left:1px solid rgba(var(--stellar),.14); padding-left:36px; }
+  #c4 .side h3{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.5rem; margin-bottom:4px; }
+  #c4 .side .en{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.18em; color:rgba(var(--cyan),.85); }
+  #c4 .side p{ font-size:.85rem; color:rgba(var(--stellar),.55); line-height:1.9; margin:10px 0 26px; }
+
+  /* C5 API 回應 */
+  .api{ width:min(720px,86vw); }
+  .api .req{ display:flex; align-items:center; gap:14px; font-family:"JetBrains Mono",monospace; font-size:13.5px; margin-bottom:14px; }
+  .api .method{ color:#06121e; background:rgba(var(--teal),.9); padding:3px 10px; border-radius:5px; font-weight:700; font-size:12px; }
+  .api .status{ margin-left:auto; color:rgba(var(--teal),.95); font-size:12px; }
+  .api .body{ border-radius:12px; background:rgba(7,12,24,.92); border:1px solid rgba(var(--stellar),.14);
+    padding:24px 26px; font-family:"JetBrains Mono",monospace; font-size:13.5px; line-height:2.0; min-height:380px; white-space:pre-wrap;
+    box-shadow:0 26px 70px rgba(0,0,0,.55); }
+
+  .nav{ position:fixed; right:16px; bottom:14px; z-index:30; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.5); }
+</style>
+</head>
+<body>
+<nav class="menu">
+  <a href="#c1">C1 終端機</a>
+  <a href="#c2">C2 碼→成品</a>
+  <a href="#c3">C3 Git 圖</a>
+  <a href="#c4">C4 巨型碼</a>
+  <a href="#c5">C5 API</a>
+</nav>
+
+<!-- C1 終端機打字 -->
+<section class="sec" id="c1">
+  <span class="sectag">C1 終端機 · 指令打字 · 交付項逐行浮現</span>
+  <div>
+    <div class="term">
+      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="ttl">nest@studio: ~/develop</span></div>
+      <div class="body" id="termbody"></div>
+    </div>
+    <div class="c1cap"><div class="t">網站架設 × 客製系統開發</div><div class="s">說得出來，就寫得出來。</div></div>
+  </div>
+</section>
+
+<!-- C2 程式碼 → 成品 -->
+<section class="sec" id="c2">
+  <span class="sectag">C2 左邊寫程式 · 右邊網站同步長出來</span>
+  <div class="duo">
+    <div class="pane">
+      <div class="bar"><span>index.html — nest studio</span></div>
+      <div class="code" id="c2code"></div>
+    </div>
+    <div class="pane">
+      <div class="bar"><span class="urlbar mono">https://your-brand.com</span></div>
+      <div class="prev" id="c2prev">
+        <div class="pv-nav"><span class="pv-logo">YOUR BRAND</span><span class="pv-links"><i></i><i></i><i></i></span></div>
+        <div class="pv-hero"><h4>讓人 3 秒記住你</h4><p>從一頁式到企業電商，門面交給我們。</p><span class="pv-btn">開始合作 →</span></div>
+        <div class="pv-cards"><i></i><i></i></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- C3 Git 分支圖 -->
+<section class="sec" id="c3">
+  <span class="sectag">C3 Git 分支圖 · 專案像 commit 一樣長出來</span>
+  <div class="gitwrap">
+    <svg class="gitsvg" viewBox="0 0 460 340" fill="none">
+      <path id="mainline" d="M60 310 L60 30" stroke="rgba(225,235,255,.25)" stroke-width="2"/>
+      <path id="br1" d="M60 250 C 60 215, 150 235, 150 195 L150 150 C 150 110, 60 130, 60 95" stroke="rgba(0,200,255,.75)" stroke-width="2"/>
+      <path id="br2" d="M60 200 C 60 170, 250 185, 250 140 L250 120 C 250 80, 60 95, 60 60" stroke="rgba(255,199,9,.65)" stroke-width="2"/>
+      <g class="commit" data-d="0"><circle cx="60" cy="310" r="7" fill="#0a1426" stroke="rgba(225,235,255,.6)" stroke-width="2"/><text x="80" y="315" class="gitlab" fill="rgba(225,235,255,.55)">init 需求訪談</text></g>
+      <g class="commit" data-d="1"><circle cx="150" cy="195" r="7" fill="#0a1426" stroke="rgba(0,200,255,.9)" stroke-width="2"/><text x="170" y="200" class="gitlab" fill="rgba(0,200,255,.9)">feat: 網站架設</text></g>
+      <g class="commit" data-d="2"><circle cx="250" cy="130" r="7" fill="#0a1426" stroke="rgba(255,199,9,.9)" stroke-width="2"/><text x="270" y="135" class="gitlab" fill="rgba(255,199,9,.9)">feat: 客製系統</text></g>
+      <g class="commit" data-d="3"><circle cx="60" cy="95" r="7" fill="#0a1426" stroke="rgba(225,235,255,.6)" stroke-width="2"/><text x="80" y="100" class="gitlab" fill="rgba(225,235,255,.55)">merge 整合測試</text></g>
+      <g class="commit" data-d="4"><circle cx="60" cy="30" r="8" fill="rgba(25,211,168,.9)"/><text x="84" y="35" class="gitlab" fill="rgba(25,211,168,.95)">v1.0 上線 🚀</text></g>
+    </svg>
+    <div class="githead">
+      <h3>每一步都看得到進度</h3>
+      <p>需求變 commit、功能變分支。網站架設與客製系統並行開發，最後合併上線，過程全程透明。</p>
+      <div class="cmd">$ git log --oneline --graph<span class="caret"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- C4 巨型程式碼打字 -->
+<section class="sec" id="c4">
+  <span class="sectag">C4 巨型程式碼 · 一行行打出開發哲學</span>
+  <div class="wrap">
+    <div class="bigcode" id="bigcode"></div>
+    <div class="side">
+      <div><span class="en">WEBSITE</span><h3>網站架設</h3><p>3 秒內讓人記住你。從一頁式到企業電商。</p></div>
+      <div><span class="en">SYSTEM</span><h3>客製系統開發</h3><p>說得出來就寫得出來，沒說全的替你想到。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- C5 API 回應 -->
+<section class="sec" id="c5">
+  <span class="sectag">C5 API 回應 · 服務是一包乾淨的 JSON</span>
+  <div class="api">
+    <div class="req"><span class="method">GET</span><span class="pn">/api/services?type=develop</span><span class="status" id="c5status"></span></div>
+    <div class="body" id="c5body"></div>
+  </div>
+</section>
+
+<div class="nav">開發類 程式碼系 C1–C5 · <b>零 WebGL · 純 CSS/JS</b></div>
+
+<script>
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// token typer：tokens=[ [text, cls|null], ... ]，逐字打、保語法色
+async function typeTokens(el, tokens, speed){
+  for(const [txt,cls] of tokens){
+    const span=document.createElement('span'); if(cls) span.className=cls; el.appendChild(span);
+    for(let i=1;i<=txt.length;i++){ span.textContent=txt.slice(0,i); await sleep(speed); }
+  }
+}
+function onView(id, fn){ let ran=false; new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting&&!ran){ ran=true; fn(); } }),{threshold:.35}).observe(document.getElementById(id)); }
+
+// ── C1 終端機 ──
+(async function c1(){
+  const b=document.getElementById('termbody');
+  for(;;){
+    b.innerHTML='';
+    const caret=document.createElement('span'); caret.className='caret';
+    const line=async (tokens,sp=34)=>{ const d=document.createElement('div'); b.appendChild(d); await typeTokens(d,tokens,sp); d.appendChild(caret); };
+    await line([['$ ','pn'],['nest ','kw'],['init ','fn'],['"你的品牌官網"','str']]); await sleep(500);
+    const outs=[['✓ 需求訪談 · 規格確認','ok'],['✓ UI 設計 · 動效打磨','ok'],['✓ 前後端開發','ok'],['✓ 部署上線 · SSL · SEO','ok']];
+    for(const o of outs){ const d=document.createElement('div'); d.innerHTML=`<span class="ok">${o[0].slice(0,2)}</span><span class="pn">${esc(o[0].slice(2))}</span>`; b.appendChild(d); await sleep(420); }
+    await sleep(700);
+    await line([['$ ','pn'],['nest ','kw'],['build ','fn'],['--custom-system','str'],[' "說得出來的需求"','str']]); await sleep(500);
+    const outs2=[['✓ 流程拆解 → 模組設計','ok'],['✓ API 串接 · 資料庫','ok'],['✓ 沒說全的，替你想到','ok']];
+    for(const o of outs2){ const d=document.createElement('div'); d.innerHTML=`<span class="ok">✓ </span><span class="pn">${esc(o[0].slice(2))}</span>`; b.appendChild(d); await sleep(420); }
+    const done=document.createElement('div'); done.innerHTML='<span class="ok">build success</span><span class="pn"> · 交付，不只是交差</span>'; b.appendChild(done);
+    await sleep(3600);
+  }
+})();
+
+// ── C2 碼 → 成品 ──
+(async function c2(){
+  const code=document.getElementById('c2code'); const prev=[...document.getElementById('c2prev').children];
+  for(;;){
+    code.innerHTML=''; prev.forEach(p=>p.classList.remove('on'));
+    await typeTokens(code,[['<nav ','kw'],['brand','fn'],['=','pn'],['"YOUR BRAND"','str'],['>','kw'],['\n','pn']],26);
+    prev[0].classList.add('on');
+    await typeTokens(code,[['\n<hero>','kw'],['\n  ','pn'],['<h1>','kw'],['讓人 3 秒記住你','pn'],['</h1>','kw'],['\n  ','pn'],['<p>','kw'],['門面交給我們','pn'],['</p>','kw'],['\n  ','pn'],['<cta>','kw'],['開始合作','str'],['</cta>','kw'],['\n</hero>','kw'],['\n','pn']],26);
+    prev[1].classList.add('on');
+    await typeTokens(code,[['\n<grid ','kw'],['cols','fn'],['=','pn'],['"2"','str'],['>','kw'],['…','cm'],['</grid>','kw'],['\n\n','pn'],['// 從一頁式到企業電商','cm']],26);
+    prev[2].classList.add('on');
+    await sleep(4200);
+  }
+})();
+
+// ── C3 git graph：線條描繪 + commit 依序亮 ──
+(function c3(){
+  const paths=['mainline','br1','br2'].map(id=>document.getElementById(id));
+  paths.forEach(p=>{ const L=p.getTotalLength(); p.style.strokeDasharray=L; p.style.strokeDashoffset=L; });
+  const commits=[...document.querySelectorAll('#c3 .commit')];
+  commits.forEach(c=>{ c.style.opacity=0; });
+  (async function loop(){ for(;;){
+    paths.forEach(p=>{ p.style.transition='none'; const L=p.getTotalLength(); p.style.strokeDashoffset=L; });
+    commits.forEach(c=>{ c.style.transition='none'; c.style.opacity=0; });
+    await sleep(60);
+    paths.forEach((p,i)=>{ p.style.transition=`stroke-dashoffset ${1.4+i*0.5}s cubic-bezier(.4,0,.2,1) ${i*0.35}s`; p.style.strokeDashoffset=0; });
+    for(const c of commits){ c.style.transition='opacity .5s'; await sleep(620); c.style.opacity=1; }
+    await sleep(4200);
+  } })();
+})();
+
+// ── C4 巨型碼打字 ──
+(async function c4(){
+  const el=document.getElementById('bigcode');
+  for(;;){
+    el.innerHTML='';
+    await typeTokens(el,[
+      ['while ','kw'],['(','pn'],['你有想法','str'],[') {','pn'],
+      ['\n  ','pn'],['我們','fn'],['.','pn'],['寫成系統','fn'],['();','pn'],
+      ['\n  ','pn'],['你','fn'],['.','pn'],['專心做生意','fn'],['();','pn'],
+      ['\n}','pn']
+    ],52);
+    const c=document.createElement('span'); c.className='caret'; el.appendChild(c);
+    await sleep(4200);
+  }
+})();
+
+// ── C5 API JSON ──
+(async function c5(){
+  const b=document.getElementById('c5body'), st=document.getElementById('c5status');
+  for(;;){
+    b.innerHTML=''; st.textContent='';
+    await sleep(400); st.textContent='200 OK · 38ms';
+    await typeTokens(b,[
+      ['{','pn'],
+      ['\n  ','pn'],['"team"','kw'],[': ','pn'],['"創巢數位 Nest Digital"','str'],[',','pn'],
+      ['\n  ','pn'],['"services"','kw'],[': [','pn'],
+      ['\n    { ','pn'],['"name"','kw'],[': ','pn'],['"網站架設"','str'],[', ','pn'],['"pitch"','kw'],[': ','pn'],['"3 秒內讓人記住你"','str'],[' },','pn'],
+      ['\n    { ','pn'],['"name"','kw'],[': ','pn'],['"客製系統開發"','str'],[', ','pn'],['"pitch"','kw'],[': ','pn'],['"說得出來就寫得出來"','str'],[' }','pn'],
+      ['\n  ],','pn'],
+      ['\n  ','pn'],['"promise"','kw'],[': ','pn'],['"沒說全的，替你想到"','str'],[',','pn'],
+      ['\n  ','pn'],['"uptime"','kw'],[': ','pn'],['"陪你到上線之後"','str'],
+      ['\n}','pn']
+    ],22);
+    await sleep(4600);
+  }
+})();
+</script>
+</body>
+</html>
