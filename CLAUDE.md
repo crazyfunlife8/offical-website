@@ -157,7 +157,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 - **已否決方向**：液態水玻璃卡 / 3D 液體 D1–D8 / 液態金屬 fusion / 滴落變體 V / 液態卡 F / 早期 flow 批 / 星球 3D 畫廊。創辦人明確「放棄液態方向」。
 - **現役候選**：**開發類** = N4 捲動堆疊卡（開發→成長→顧問）× **真程式碼流星字雨撞擊**（墨黑不透明覆蓋主視覺星場、整行真 code 旋轉 90° 直立落下、打卡頂迸黃色火花，密度 24 條）；檔 `demo-liquid/service-n4rain-poc.html`。**社群類** = #23 手風琴圖條 `demo-liquid/service-accordion-embed.html`。整合預覽 `index-rain-preview.html`（noindex 副本、**未動正式 index.html**）。
 - **待決**：① N4 含三大類與「社群=手風琴」內容重疊如何分 ② 上下順序／字雨密度定案後才正式整合進 index.html + 5 層 CSS（樣式進 pages/index.css、JS 進 index.js）。
-- **紅線**：`index.html` + `assets/css/{animations,components,pages/index}.css` 工作區目前有早期「液態卡 morph」**未 commit** 修改（`liquid-morph-a/b` 邊角晃動 + `?v=liquid2` 快取參數；液態已否決、不應上線）。下個 session 接手第一動作 `git diff` 確認後決定 `git restore` 丟棄或隔離，**禁止直接 stage+commit**。
+- **早期液態卡 morph 已清（2026-06-14 16:57）**：`index.html` + `assets/css/{animations,components,pages/index}.css` 曾有未 commit 的「液態卡 morph」實驗（`liquid-morph-a/b` 邊角晃動 + `?v=liquid2` 快取參數），已 `git restore` 全數還原、工作區乾淨；液態方向確定不上線。若日後要重看那批 keyframe，本條已記其內容、可重建。
 
 ---
 
