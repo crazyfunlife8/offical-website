@@ -1,14 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "offical-website",
+  "pages_build_output_dir": ".",
   "compatibility_date": "2026-05-11",
-  "observability": {
-    "enabled": true
-  },
-  "assets": {
-    "directory": "."
-  },
   "compatibility_flags": [
     "nodejs_compat"
-  ]
+  ],
+  "observability": {
+    "enabled": true
+  }
 }

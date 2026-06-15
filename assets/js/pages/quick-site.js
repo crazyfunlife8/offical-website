@@ -24,6 +24,8 @@ document.getElementById('siteForm').addEventListener('submit', async function (e
     if (!validateForm1()) return;
 
     form1Data = collectForm1();
+    clearCache();
+    disableGuard();
     showOverlayPhase('generate');
     startStepAnimation();
 
@@ -41,6 +43,8 @@ document.getElementById('siteForm').addEventListener('submit', async function (e
         }
 
         generatedDesigns = result.designs;
+        saveCache();
+        enableGuard();
         finishSteps(() => {
             hideOverlay();
             switchView('viewPreview');
@@ -176,6 +180,7 @@ document.getElementById('enhanceForm').addEventListener('submit', async function
         if (!result.html) throw new Error('Invalid response: missing html');
 
         enhancedHtml = result.html;
+        saveCache();
         hideOverlay();
         showFinalPreview();
 
@@ -326,6 +331,43 @@ document.getElementById('backToForm').addEventListener('click', () => {
     switchView('viewForm');
 });
 
+// 重新生成三款
+document.getElementById('regenBtn').addEventListener('click', async function () {
+    clearCache();
+    disableGuard();
+    showOverlayPhase('generate');
+    startStepAnimation();
+
+    try {
+        const response = await fetch(API_GENERATE, {
+            method: 'POST',
+            body: buildForm1FormData()
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const result = await response.json();
+        if (!result.designs || result.designs.length < 3) {
+            throw new Error('Invalid response: missing designs');
+        }
+
+        generatedDesigns = result.designs;
+        selectedIndex    = null;
+        enhancedHtml     = null;
+        saveCache();
+        enableGuard();
+        finishSteps(() => {
+            hideOverlay();
+            renderPreviewCards(generatedDesigns);
+        });
+
+    } catch (err) {
+        console.error(err);
+        hideOverlay();
+        showToast('生成失敗，請檢查網路後再試。');
+    }
+});
+
 // 回樣板選擇
 document.getElementById('backToPreview').addEventListener('click', () => {
     switchView('viewPreview');
@@ -404,6 +446,7 @@ function scaleAllIframes() {
 
 function selectDesign(index) {
     selectedIndex = index;
+    saveCache();
 
     // 高亮選中卡片
     document.querySelectorAll('.qs-preview-card').forEach((card, i) => {
@@ -516,6 +559,7 @@ function finishSteps(callback) {
 // ════════════════════════════════════════════════
 
 function showResult(success, errorMsg = '') {
+    if (success) { clearCache(); disableGuard(); }
     document.getElementById('resultSuccess').style.display = success ? '' : 'none';
     document.getElementById('resultFail').style.display    = success ? 'none' : '';
     if (!success && errorMsg) {
@@ -538,12 +582,64 @@ function showToast(msg) {
 }
 
 // ════════════════════════════════════════════════
+// 離開警告 + Session 快取
+// ════════════════════════════════════════════════
+
+const SESSION_KEY = 'qs_cache';
+
+function enableGuard()  { window.addEventListener('beforeunload', onBeforeUnload); }
+function disableGuard() { window.removeEventListener('beforeunload', onBeforeUnload); }
+function onBeforeUnload(e) { e.preventDefault(); e.returnValue = ''; }
+
+function saveCache() {
+    try {
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+            designs:  generatedDesigns,
+            selected: selectedIndex,
+            form1:    form1Data,
+            enhanced: enhancedHtml,
+        }));
+    } catch (_) {}
+}
+
+function clearCache() { sessionStorage.removeItem(SESSION_KEY); }
+
+function restoreCache() {
+    try {
+        const raw = sessionStorage.getItem(SESSION_KEY);
+        if (!raw) return false;
+        const d = JSON.parse(raw);
+        if (!d.designs?.length) return false;
+        generatedDesigns = d.designs;
+        selectedIndex    = d.selected ?? null;
+        form1Data        = d.form1 ?? {};
+        enhancedHtml     = d.enhanced ?? null;
+        return d;
+    } catch (_) { return false; }
+}
+
+// ════════════════════════════════════════════════
 // 預覽模式（?preview=loading|preview|form2|result）
 // ════════════════════════════════════════════════
 
 window.addEventListener('load', function () {
     const p = new URLSearchParams(location.search).get('preview');
-    if (!p) return;
+
+    if (!p) {
+        const cached = restoreCache();
+        if (cached) {
+            enableGuard();
+            if (cached.enhanced && cached.selected !== null) {
+                showFinalPreview();
+            } else if (cached.selected !== null) {
+                switchView('viewForm2');
+            } else {
+                switchView('viewPreview');
+                renderPreviewCards(generatedDesigns);
+            }
+        }
+        return;
+    }
 
     const mockDesigns = [
         {
