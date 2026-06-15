@@ -20,7 +20,7 @@ const STEP3_SYSTEM = `你是一位資深前端工程師。你會收到一份完�
   "insertions": [
     {
       "selector": "CSS選擇器（用於找到插入目標元素）",
-      "method": "prepend | append | before | after",
+      "method": "prepend | append | replace | before | after",
       "html": "要插入的 HTML 片段字串"
     }
   ]
@@ -33,25 +33,27 @@ const STEP3_SYSTEM = `你是一位資深前端工程師。你會收到一份完�
 - 插在頁面最頂部，寬版橫幅，有關閉按鈕（onclick="this.parentElement.style.display='none'"）
 
 **社群媒體連結**
-- selector: "footer"，method: "append"（或找 footer 內適合的容器）
-- 使用 Font Awesome 圖示（fa-brands fa-line、fa-facebook-f、fa-instagram、fa-youtube），點擊開新分頁（target="_blank" rel="noopener"）
+- 優先尋找模板中已有社群圖標的容器（footer 內含 "fa-" 類名、或含 href="#" 的社群連結的父層 div/nav/ul），method: "replace"（用有實際 href 的連結取代全部佔位圖標）
+- 若找不到，selector: "footer"，method: "append"
+- 只產生用戶有提供的平台連結，不產生用戶未提供的平台
+- 使用 Font Awesome 圖示（fa-brands fa-line、fa-facebook-f、fa-instagram、fa-youtube），target="_blank" rel="noopener"
 
 **Google 地圖**
-- selector: 找聯絡/地點相關的 section 或 div，method: "append"
-- 使用 <iframe> embed，src 格式：https://maps.google.com/maps?q=地址&output=embed
-- 寬 100%，高 350px，border: none
+- 優先尋找模板中已有地圖佔位元素（含 "map"、"地圖"、"location" 類名或文字的 div/section，或已有 iframe[src*="maps"]），method: "replace"
+- 若找不到，selector: 找聯絡/地點相關的 section 或 div，method: "append"
+- 使用 <iframe> embed，src 格式：https://maps.google.com/maps?q=地址&output=embed，寬 100%，高 350px，border: none
 
 **營業時間**
-- selector: 找聯絡相關 section 或 footer，method: "append"
-- 清晰排版，可多行
+- 優先尋找模板中已有的營業時間元素（含 "時間"、"hours"、"hour"、"business" 文字的 p、div、li 等元素），method: "replace"（用實際內容取代佔位文字，保留原元素結構）
+- 若找不到現有營業時間元素，selector: 找聯絡相關 section 或 footer，method: "append"，清晰排版可多行
 
 **預約連結**
-- selector: 找 hero section 或主要 CTA 區域，method: "append"（或放在 services 附近）
-- 按鈕風格沿用原設計的主要按鈕樣式
+- 優先尋找模板中含 "預約"、"booking"、"appointment" 文字且 href="#" 的 a 元素，method: "replace"（直接更換整個按鈕 html，保留樣式）
+- 若找不到，selector: 找 hero section 或主要 CTA 區域，method: "append"，按鈕風格沿用原設計
 
 **線上訂購連結**
-- selector: 找 hero 或 services 附近，method: "append"
-- 按鈕風格沿用原設計
+- 優先尋找模板中含 "訂購"、"order"、"shop"、"購買" 文字且 href="#" 的 a 元素，method: "replace"
+- 若找不到，selector: 找 hero 或 services 附近，method: "append"，按鈕風格沿用原設計
 
 **菜單 PDF 按鈕**
 - selector: 找適合的區域（services 或 contact 附近），method: "append"
@@ -127,6 +129,7 @@ function applyInsertions(baseHtml, insertions) {
         }
         if (method === 'prepend')      target.set_content(html + target.innerHTML);
         else if (method === 'append')  target.set_content(target.innerHTML + html);
+        else if (method === 'replace') target.set_content(html);
         else if (method === 'before')  target.insertAdjacentHTML('beforebegin', html);
         else if (method === 'after')   target.insertAdjacentHTML('afterend', html);
     }
