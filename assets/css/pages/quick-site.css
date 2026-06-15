@@ -1165,7 +1165,7 @@ button.qs-back-link {
     background: none;
     border: 1px solid rgba(var(--c-stellar-rgb), 0.15);
     border-radius: 6px;
-    color: rgba(var(--c-stellar-rgb), 0.50);
+    color: rgba(var(--c-stellar-rgb), 0.90);
     padding: 0.4em 0.85em;
     display: flex;
     align-items: center;
@@ -1179,7 +1179,7 @@ button.qs-back-link {
 
 .qs-fullscreen__close:hover {
     color: var(--c-stellar);
-    border-color: rgba(var(--c-stellar-rgb), 0.35);
+    border-color: rgba(var(--c-stellar-rgb), 0.5);
 }
 
 #fullscreenFrame {
