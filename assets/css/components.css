@@ -99,7 +99,9 @@
    y 範圍 ~ nav y=-2 to y=61：上方略出 nav 頂、下方 5px 微超出 nav 底緣 hairline
    gradient peak 在 50%（線條中心 ≈ brand 文字高度），向兩端漸隱
    下半段 75-92% 保留可見 alpha 讓過 hairline 後仍有 0.23 → 0 漸隱尾段 */
-.nav__brand-divider {
+/* .nav__divider 共用同款：連結組與「聯絡我們」之間（2026-06-16） */
+.nav__brand-divider,
+.nav__divider {
     width: 1px;
     height: 1em;
     align-self: center;
@@ -107,7 +109,8 @@
     position: relative;
 }
 
-.nav__brand-divider::before {
+.nav__brand-divider::before,
+.nav__divider::before {
     content: '';
     position: absolute;
     top: -22px;
@@ -125,11 +128,10 @@
     box-shadow: 0 0 4px rgba(var(--c-cyan-rgb), 0.30);
 }
 
-/* ─── 連結區：絕對置中，CTA 靠右（margin-left: auto） ──── */
+/* ─── 連結區：靠右成組（margin-left:auto 推到右側、貼 CTA）2026-06-16
+   原為絕對置中（無視鄰居、窄螢幕易疊）；nav 選項收斂後改靠右流式群組 ──── */
 .nav__links {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    margin-left: auto;
     display: flex;
     align-items: center;
     gap: clamp(24px, 3vw, 44px);
@@ -192,7 +194,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin-left: auto;  /* 強制推到右側 */
+    /* 右側群組由 .nav__links margin-left:auto 統一推動（2026-06-16；原 cta 自帶 auto 已移除避免雙 auto） */
     font-family: var(--f-serif-cjk);
     font-size: 14px;
     font-weight: 500;
@@ -284,6 +286,7 @@
 @media (max-width: 900px) {
     /* 桌機 nav__links / nav__cta 隱藏；mobile 改用 hamburger 抽屜 */
     .site-nav .nav__links,
+    .site-nav .nav__divider,
     .site-nav .nav__cta {
         display: none;
     }
