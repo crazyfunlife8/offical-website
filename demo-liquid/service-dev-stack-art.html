@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>軟體開發區 · 捲動堆疊藝術卡 + 程式碼星雨（原型）｜創巢數位（探索）</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Italiana&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+<style>
+  :root{ --cyan:0,200,255; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#020b1e; color:rgba(var(--stellar),.92); }
+  #hero{ height:60vh; display:flex; align-items:center; justify-content:center; color:rgba(var(--stellar),.3);
+    font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.1em; }
+  #dev{ position:relative; }
+  #dev-rain{ position:fixed; inset:0; width:100%; height:100%; z-index:1; pointer-events:none; opacity:0; transition:opacity .5s; }
+  #dev-rain.on{ opacity:1; }
+
+  .stackwrap{ position:relative; z-index:2; }
+  .scard{ position:sticky; top:0; height:100vh; display:flex; align-items:center; justify-content:center; padding:0 5vw; }
+  .inner{ position:relative; width:min(960px,92vw); height:min(560px,78vh); overflow:hidden;
+    border-radius:20px; border:1px solid rgba(var(--stellar),.12);
+    background:radial-gradient(130% 120% at 78% 8%, #16284e, #0a1428 55%, #060b18);
+    box-shadow:0 40px 110px rgba(0,0,0,.6), inset 0 1px 0 rgba(var(--stellar),.09), inset 0 -1px 0 rgba(0,0,0,.45); }
+  .inner::before{ content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(var(--cyan),.85), transparent); }
+  /* 藝術：超大明朝中文當背景書法、不對稱偏右下、極淡 */
+  /* 浮水印大字：前版淡實字樣式（創辦人偏好）；切字位置用 CSS 變數、可即時調 */
+  .ghost{ position:absolute; right:var(--gr,-4%); bottom:var(--gb,-22%); font-family:"Chiron Sung HK","Noto Serif TC",serif; font-weight:600;
+    font-size:var(--gs,min(40vw,440px)); line-height:.8; color:rgba(var(--stellar),.04);
+    text-shadow:0 2px 1px rgba(var(--stellar),.055), 0 -1px 1px rgba(0,0,0,.6);
+    user-select:none; pointer-events:none; letter-spacing:-.02em; }
+  .tunepanel{ position:fixed; left:16px; bottom:16px; z-index:60; background:rgba(8,12,22,.86); border:1px solid rgba(var(--stellar),.14); border-radius:10px; padding:12px 14px; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.8); width:236px; backdrop-filter:blur(6px); }
+  .tunepanel h5{ font-size:10px; letter-spacing:.18em; color:rgba(var(--yellow),.9); margin-bottom:8px; font-weight:500; }
+  .tunepanel .row{ margin:9px 0; }
+  .tunepanel .row label{ display:flex; justify-content:space-between; margin-bottom:3px; color:rgba(var(--stellar),.7); }
+  .tunepanel b{ color:rgba(var(--cyan),.95); font-weight:500; }
+  .tunepanel input{ width:100%; accent-color:rgb(var(--cyan)); }
+  /* code 視窗元素（克制點綴、當開發識別，非完整 IDE 框） */
+  .codebar{ position:absolute; top:0; left:0; right:0; z-index:4; display:flex; align-items:center; gap:7px; padding:15px 22px; border-bottom:1px solid rgba(var(--stellar),.07); }
+  .codebar .cd{ width:9px; height:9px; border-radius:50%; }
+  .codebar .c1{ background:rgba(255,95,86,.5); } .codebar .c2{ background:rgba(255,189,46,.5); } .codebar .c3{ background:rgba(39,201,63,.5); }
+  .codebar .cpath{ margin-left:9px; font-family:"JetBrains Mono",monospace; font-size:11.5px; letter-spacing:.05em; color:rgba(var(--stellar),.34); }
+  /* 藝術：淡程式碼底紋（mono，極淡、斜貼一角） */
+  .grain{ position:absolute; left:0; top:0; width:60%; height:100%; opacity:.05; pointer-events:none;
+    font-family:"JetBrains Mono",monospace; font-size:12px; line-height:2; color:rgb(var(--cyan)); white-space:pre; overflow:hidden; }
+  .content{ position:relative; z-index:3; padding:66px 60px 54px; height:100%; display:flex; flex-direction:column; }
+  .klab{ font-family:"JetBrains Mono",monospace; font-size:12.5px; letter-spacing:.24em; color:rgba(var(--cyan),.85); }
+  .knum{ position:absolute; top:40px; right:54px; font-family:"Italiana",serif; font-size:84px; color:rgba(var(--stellar),.16); line-height:1; }
+  .ztitle{ font-family:"Chiron Sung HK","Noto Serif TC",serif; font-weight:600; font-size:clamp(3rem,7vw,5.2rem);
+    color:rgba(var(--stellar),.97); margin:14px 0 4px; line-height:1.05; }
+  .zen{ font-family:"Italiana",serif; font-size:1.4rem; color:rgba(var(--cyan),.6); letter-spacing:.04em; }
+  .zsub{ margin-top:14px; font-size:.98rem; color:rgba(var(--stellar),.5); }
+  .svc{ list-style:none; margin-top:auto; }
+  .svc li{ display:flex; align-items:baseline; gap:20px; padding:18px 2px; border-top:1px solid rgba(var(--stellar),.12); }
+  .svc li .sn{ font-family:"Chiron Sung HK","Noto Serif TC",serif; font-size:1.32rem; color:rgba(var(--stellar),.95); }
+  .svc li .sd{ margin-left:auto; font-size:.86rem; color:rgba(var(--stellar),.45); white-space:nowrap; }
+  .tag{ position:fixed; top:16px; left:50%; transform:translateX(-50%); font-family:"JetBrains Mono",monospace;
+    font-size:11px; letter-spacing:.06em; color:rgba(var(--stellar),.45); z-index:9; }
+  @media(max-width:640px){ .content{ padding:34px 30px; } .knum{ font-size:56px; top:28px; right:30px; } .svc li{ flex-wrap:wrap; gap:4px 14px; } .svc li .sd{ margin-left:0; } }
+</style>
+</head>
+<body>
+<span class="tag">// 原型 · 捲動堆疊藝術卡 + 程式碼星雨（往下捲切換卡片）</span>
+<div class="tunepanel">
+  <h5>浮水印切字位置</h5>
+  <div class="row"><label>切字 右 <b id="vgr">-4%</b></label><input type="range" id="sgr" min="-35" max="12" value="-4"></div>
+  <div class="row"><label>切字 下 <b id="vgb">-22%</b></label><input type="range" id="sgb" min="-50" max="6" value="-22"></div>
+  <div class="row"><label>字級 <b id="vgs">40vw</b></label><input type="range" id="sgs" min="24" max="64" value="40"></div>
+</div>
+<section id="hero">↓ 往下捲，進入軟體開發區</section>
+
+<section id="dev">
+  <canvas id="dev-rain"></canvas>
+  <div class="stackwrap" id="stack">
+    <div class="scard"><div class="inner">
+      <div class="ghost">開</div>
+      <div class="content">
+        <p class="klab">// SOFTWARE DEVELOPMENT</p>
+        <span class="knum">01</span>
+        <h3 class="ztitle">軟體開發</h3>
+        <p class="zen">Build what works.</p>
+        <p class="zsub">把想法變成會運作的東西。說得出來，就寫得出來。</p>
+        <ul class="svc">
+          <li><span class="sn">網站架設</span><span class="sd">一頁式到企業電商</span></li>
+          <li><span class="sn">客製系統開發</span><span class="sd">說得出來就寫得出來</span></li>
+        </ul>
+      </div>
+    </div></div>
+    <div class="scard"><div class="inner">
+      <div class="ghost">成</div>
+      <div class="content">
+        <p class="klab">// GROWTH</p>
+        <span class="knum">02</span>
+        <h3 class="ztitle">成長</h3>
+        <p class="zen">Be seen.</p>
+        <p class="zsub">讓更多人看見你、記住你。</p>
+        <ul class="svc">
+          <li><span class="sn">社群經營</span><span class="sd">素材、文案、定位</span></li>
+          <li><span class="sn">AI 虛擬網紅</span><span class="sd">永遠不下班的代言人</span></li>
+          <li><span class="sn">跳動E投放</span><span class="sd">個人戶也能投 TikTok</span></li>
+        </ul>
+      </div>
+    </div></div>
+    <div class="scard"><div class="inner">
+      <div class="ghost">顧</div>
+      <div class="content">
+        <p class="klab">// CONSULT</p>
+        <span class="knum">03</span>
+        <h3 class="ztitle">顧問</h3>
+        <p class="zen">Think first.</p>
+        <p class="zsub">先想清楚，再動手。</p>
+        <ul class="svc">
+          <li><span class="sn">產業顧問導入</span><span class="sd">把方向想清楚再決定</span></li>
+        </ul>
+      </div>
+    </div></div>
+  </div>
+</section>
+
+<section style="height:50vh; display:flex; align-items:center; justify-content:center; color:rgba(225,235,255,.25); font-family:'JetBrains Mono',monospace; font-size:12px;">（區塊結束）</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+/* 程式碼底紋填入 */
+const GRAIN=[`const nest = createStudio()`,`export default function App(){`,`return <Section/>`,`await build(idea)`,`if(ready) ship()`,`render(art, code)`,`while(true){ create() }`].join('\n').repeat(8);
+document.querySelectorAll('.inner').forEach(el=>{ const g=document.createElement('div'); g.className='grain'; g.textContent=GRAIN; el.appendChild(g); });
+/* code 視窗列注入（克制點綴） */
+const FILES=['develop.tsx','growth.tsx','consult.tsx'];
+document.querySelectorAll('#dev .inner').forEach((el,i)=>{ const bar=document.createElement('div'); bar.className='codebar';
+  bar.innerHTML='<span class="cd c1"></span><span class="cd c2"></span><span class="cd c3"></span><span class="cpath">~/nest-digital/'+(FILES[i]||'service.tsx')+'</span>'; el.appendChild(bar); });
+
+/* 堆疊：下一張上來時上一張縮小變暗 */
+const scards=[...document.querySelectorAll('.scard')];
+scards.forEach((card,i)=>{ if(i===scards.length-1) return;
+  gsap.to(card.querySelector('.inner'),{ scale:.92, opacity:.4, ease:'none',
+    scrollTrigger:{ trigger:scards[i+1], start:'top bottom', end:'top top', scrub:true } }); });
+
+/* 程式碼星雨（打到前景卡頂緣濺火花）*/
+const rainOn={v:false};
+new IntersectionObserver(es=>es.forEach(e=>{ rainOn.v=e.isIntersecting; document.getElementById('dev-rain').classList.toggle('on',e.isIntersecting); }),{threshold:0.02}).observe(document.getElementById('dev'));
+const CODE=[`const nest = createStudio()`,`export default function App() {`,`<section class="services">`,`router.get('/api/orders', fn)`,`await db.clients.findMany()`,`npm run build && deploy`,`return <Card {...props} />`,`useEffect(() => render(), [])`,`if (user.ready) launch()`,`SELECT * FROM orders;`,`transform: translateY(-4px)`,`git commit -m "ship it"`,`} else { retry() }`];
+const cv=document.getElementById('dev-rain'), ctx=cv.getContext('2d');
+let W,H,dpr; function rs(){ dpr=Math.min(devicePixelRatio,2); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+rs(); addEventListener('resize',rs);
+const hash=(a,b)=>{ const x=Math.sin(a*127.1+b*311.7)*43758.5453; return x-Math.floor(x); };
+const ND=40, D=[]; for(let i=0;i<ND;i++) D.push({ spd:0.09+hash(i,1)*0.10, ph:hash(i,2)*1.8, sz:13+(hash(i,4)*3|0), ye:hash(i,5)<0.12, cy:hash(i,6)<0.30 });
+function frontRects(){ const inners=document.querySelectorAll('#dev .inner'), out=[];
+  for(const el of inners){ if(parseFloat(getComputedStyle(el).opacity)<0.7) continue;
+    const r=el.getBoundingClientRect(); if(r.top>20 && r.top<H-20) out.push({ l:r.left, r:r.right, t:r.top }); } return out; }
+function drawRain(t){ ctx.clearRect(0,0,W,H);
+  const devTop=Math.max(0, document.getElementById('dev').getBoundingClientRect().top);
+  if(devTop>=H-4) return; ctx.save(); ctx.beginPath(); ctx.rect(0,devTop,W,H-devTop); ctx.clip();
+  const rects=frontRects(); ctx.textBaseline='middle';
+  for(let i=0;i<ND;i++){ const d=D[i];
+    const raw=t*d.spd+d.ph, cyc=Math.floor(raw/1.8), prog=raw%1.8-0.25; if(prog<0) continue;
+    const code=CODE[(i*5+cyc)%CODE.length]; ctx.font=`${d.sz}px "JetBrains Mono",monospace`;
+    const w=ctx.measureText(code).width; const x=16+Math.floor(hash(i,cyc*9+5)*(W-32)); const tipY=prog*H;
+    const base=d.ye?'255,199,9':(d.cy?'90,205,255':'150,180,220');
+    let hitY=Infinity; for(const rc of rects) if(x>=rc.l && x<=rc.r && rc.t<hitY) hitY=rc.t; const hitProg=hitY/H;
+    if(prog<=hitProg){ ctx.save(); ctx.translate(x,tipY); ctx.rotate(-Math.PI/2); ctx.textAlign='left';
+      const grd=ctx.createLinearGradient(0,0,w,0); grd.addColorStop(0,`rgba(240,247,255,0.92)`); grd.addColorStop(0.10,`rgba(${base},0.82)`); grd.addColorStop(1,`rgba(${base},0)`);
+      ctx.fillStyle=grd; ctx.fillText(code,0,0); ctx.restore();
+    } else if(hitY<Infinity){ const tau=(prog-hitProg)/d.spd;
+      if(tau<0.6){ const fade=1-tau/0.6;
+        const lg=ctx.createRadialGradient(x,hitY,0,x,hitY,56); lg.addColorStop(0,`rgba(170,240,255,${0.55*fade})`); lg.addColorStop(0.4,`rgba(0,200,255,${0.24*fade})`); lg.addColorStop(1,'rgba(0,200,255,0)');
+        ctx.fillStyle=lg; ctx.fillRect(x-56,hitY-58,112,60);
+        ctx.fillStyle=`rgba(210,245,255,${0.9*fade})`; ctx.fillRect(x-12,hitY-1.5,24,2);
+        ctx.textAlign='center'; for(let j=0;j<8;j++){ const vx=(hash(i,cyc*13+j)-0.5)*150, vy=-(45+hash(i,cyc*17+j)*120);
+          const px=x+vx*tau, py=hitY+vy*tau+175*tau*tau; if(py>hitY+2) continue;
+          ctx.font=`${8+(hash(i,j+9)*4|0)}px "JetBrains Mono",monospace`; ctx.fillStyle=j%2?`rgba(120,225,255,${fade*0.85})`:`rgba(235,242,255,${fade*0.85})`;
+          ctx.fillText(code[(j*5+cyc)%code.length],px,py); } } } }
+  ctx.restore(); }
+const T0=performance.now(); (function loop(){ requestAnimationFrame(loop); if(rainOn.v) drawRain((performance.now()-T0)/1000); else ctx.clearRect(0,0,W,H); })();
+/* 浮水印切字位置調軸（拉到滿意把數值回報、再寫死、移除此面板） */
+const R=document.documentElement, $=id=>document.getElementById(id);
+$('sgr').oninput=e=>{ R.style.setProperty('--gr',e.target.value+'%'); $('vgr').textContent=e.target.value+'%'; };
+$('sgb').oninput=e=>{ R.style.setProperty('--gb',e.target.value+'%'); $('vgb').textContent=e.target.value+'%'; };
+$('sgs').oninput=e=>{ R.style.setProperty('--gs','min('+e.target.value+'vw,580px)'); $('vgs').textContent=e.target.value+'vw'; };
+</script>
+</body>
+</html>
