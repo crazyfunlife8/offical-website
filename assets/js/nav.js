@@ -18,7 +18,7 @@
 
     <ul class="nav__links" role="list">
         <li><a href="index.html#services-section">服務</a></li>
-        <!-- 不正常觀點（部落格）連結待部落格上線再接：<li><a href="blog.html">不正常觀點</a></li> -->
+        <li><a href="blog.html">不正常觀點</a></li>
         <li class="nav__links-cta-mobile">
             <a href="contact.html">聯絡我們 <span aria-hidden="true">→</span></a>
         </li>
