@@ -27,7 +27,7 @@ body{display:flex;align-items:center;justify-content:center;padding:clamp(14px,2
   width:min(1280px,100%); height:min(620px,76vh);
 }
 .panel{
-  position:relative; flex:0 0 76px; min-width:76px;
+  position:relative; flex:1 1 0; min-width:0;
   border-radius:16px; overflow:hidden; cursor:pointer;
   border:1px solid rgba(var(--stellar),.10);
   background:
@@ -37,7 +37,7 @@ body{display:flex;align-items:center;justify-content:center;padding:clamp(14px,2
 }
 .panel:not(.open):hover{ border-color:rgba(var(--cyan),.38); }
 .panel.open{
-  flex:1 1 auto; cursor:default;
+  flex:4 1 0; cursor:default;
   border-color:rgba(var(--cyan),.30);
   background:
     radial-gradient(90% 70% at 12% 0%, rgba(var(--blue),.26), transparent 55%),
@@ -45,29 +45,41 @@ body{display:flex;align-items:center;justify-content:center;padding:clamp(14px,2
 }
 /* 開啟卡左緣冷光 */
 .panel.open::before{
-  content:''; position:absolute; left:0; top:14%; bottom:14%; width:2px;
+  content:''; position:absolute; left:0; top:14%; bottom:14%; width:2px; z-index:3;
   background:linear-gradient(180deg,transparent,rgba(var(--cyan),.9),transparent);
   box-shadow:0 0 14px rgba(var(--cyan),.5);
 }
 
+/* 背景影像（活潑社群視覺）＋遮罩：僅開啟時淡入 */
+/* 影像永遠顯示（收合等寬也看得到）；收合用底部漸層保標籤可讀 */
+.bgimg{ position:absolute; inset:0; background-size:cover; background-position:center; }
+/* 亮月底：遮罩調淡、只留底部一點 vignette（保留卡片邊界感、不壓暗月面）*/
+.bgscrim{ position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(7,14,30,.03) 0%, rgba(7,14,30,.08) 58%, rgba(7,14,30,.30) 100%); }
+
 /* ─── 收合脊柱 ─── */
 .spine{
-  position:absolute; inset:0; display:flex; flex-direction:column;
-  align-items:center; justify-content:space-between; padding:18px 0 22px;
+  position:absolute; inset:0; z-index:2; display:flex; flex-direction:column;
+  align-items:flex-start; justify-content:flex-start; gap:5px; padding:20px 20px;
   opacity:1; transition:opacity .35s var(--ease);
 }
 .panel.open .spine{ opacity:0; pointer-events:none; }
-.spine .num{ font-family:var(--f-en); font-size:1.4rem; color:rgba(var(--stellar),.34); letter-spacing:.02em; }
-.spine .v{ writing-mode:vertical-rl; font-family:var(--f-cjk); font-weight:500; font-size:1.32rem;
-  letter-spacing:.18em; color:rgba(var(--stellar),.92); text-shadow:0 2px 10px rgba(0,0,0,.5); }
-.spine .ven{ writing-mode:vertical-rl; font-family:var(--f-mono); font-size:9.5px; letter-spacing:.28em;
-  text-transform:uppercase; color:rgba(var(--cyan),.78); }
+/* 左上、橫排、承襲浮雕：深色刻字＋上亮下暗做凹刻感 */
+.spine .num{ font-family:var(--f-en); font-size:1.05rem; line-height:1; color:rgba(40,32,20,.5);
+  text-shadow:0 1px 0 rgba(255,255,255,.5); }
+.spine .v{ font-family:var(--f-cjk); font-weight:600; font-size:1.3rem; letter-spacing:.06em; line-height:1.15;
+  color:rgba(28,22,14,.95);
+  text-shadow:0 1px 0 rgba(255,255,255,.6), 0 -1px 1px rgba(40,30,15,.28); }
+.spine .ven{ font-family:var(--f-mono); font-size:9px; letter-spacing:.24em; text-transform:uppercase;
+  color:rgba(52,44,28,.6); text-shadow:0 1px 0 rgba(255,255,255,.4); }
 
 /* ─── 展開內容 ─── */
 .body{
-  position:absolute; inset:0; padding:clamp(22px,3vh,40px) clamp(24px,3vw,48px);
+  position:absolute; inset:0; z-index:2; padding:clamp(22px,3vh,40px) clamp(24px,3vw,48px);
   opacity:0; visibility:hidden; transition:opacity .45s var(--ease) .12s, visibility 0s .6s;
   display:grid; grid-template-rows:auto 1fr;
+  /* 展開時才出現的強遮罩（左重右輕）讓文字＋方案在圖上可讀 */
+  background:linear-gradient(96deg, rgba(7,14,30,.95) 0%, rgba(7,14,30,.88) 42%, rgba(7,14,30,.6) 68%, rgba(7,14,30,.82) 100%);
 }
 .panel.open .body{ opacity:1; visibility:visible; transition:opacity .55s var(--ease) .18s; }
 
@@ -104,11 +116,12 @@ body{display:flex;align-items:center;justify-content:center;padding:clamp(14px,2
 /* 方案 */
 .plans{ display:flex; flex-direction:column; gap:10px; }
 .plan{ position:relative; border:1px solid rgba(var(--stellar),.12); border-radius:12px;
-  padding:13px 16px; background:rgba(255,255,255,.02);
+  padding:13px 16px; background:rgba(7,14,30,.55); backdrop-filter:blur(3px);
   display:grid; grid-template-columns:1fr auto; gap:4px 14px; align-items:baseline;
   transition:border-color .3s var(--ease), background .3s var(--ease); }
 .plan:hover{ border-color:rgba(var(--cyan),.4); background:rgba(var(--cyan),.05); }
-.plan.feat{ border-color:rgba(var(--yellow),.5); background:rgba(var(--yellow),.06); }
+.plan.feat{ border-color:rgba(var(--yellow),.5);
+  background:linear-gradient(0deg,rgba(var(--yellow),.10),rgba(var(--yellow),.10)),rgba(7,14,30,.6); }
 .plan .pn{ font-family:var(--f-cjk); font-weight:500; font-size:1.02rem; color:rgba(var(--stellar),.96); }
 .plan .pp{ font-family:var(--f-mono); font-size:1.02rem; color:rgba(var(--stellar),.96); text-align:right; }
 .plan .pp small{ font-size:.66rem; color:rgba(var(--stellar),.5); letter-spacing:.04em; }
@@ -147,7 +160,7 @@ const DATA=[
   {
     n:'01', cjk:'社群經營', en:'SOCIAL', echo:'Your brand, always on.',
     lead:'不只是代發文。策略、內容、發布、互動、數據——一條龍的社群系統，把帳號養成會自己長大的品牌資產。',
-    social:true,
+    social:true, img:'../_imgtest/social-neopop.png',
     platforms:['LINE','Instagram','Threads','Facebook','TikTok'],
     acts:'<b>海巡漲粉</b> · <b>內容製作</b>（圖文／短影音）· <b>互動經營</b> · <b>數據追蹤</b>',
     plans:[
@@ -173,12 +186,13 @@ const DATA=[
   },
 ];
 
+const MURAL = new URLSearchParams(location.search).get('mural') || 'mural-b.png';
 const acc=document.getElementById('acc');
 DATA.forEach((s,i)=>{
   const p=document.createElement('div');
-  p.className='panel'+(i===0?' open':'');
+  p.className='panel';
   p.tabIndex=0; p.setAttribute('role','button');
-  p.setAttribute('aria-expanded', i===0?'true':'false');
+  p.setAttribute('aria-expanded','false');
   p.setAttribute('aria-label', s.cjk);
 
   let body='';
@@ -218,7 +232,10 @@ DATA.forEach((s,i)=>{
       </div>`;
   }
 
-  p.innerHTML=`
+  // mural 整幅切四份：每條取對應的四分之一（background-position 依序 0/33/67/100%）
+  // 深色刻字後不再需要遮罩；月面以全亮度呈現
+  const bg = `<div class="bgimg" style="background-image:url('../_imgtest/${MURAL}'); background-size:400% 100%; background-position:${(i/3*100).toFixed(2)}% center;"></div>`;
+  p.innerHTML=`${bg}
     <div class="spine"><span class="num">${s.n}</span><span class="v">${s.cjk}</span><span class="ven">${s.en}</span></div>
     <div class="body">${body}</div>`;
   acc.appendChild(p);
@@ -228,9 +245,13 @@ const panels=[...document.querySelectorAll('.panel')];
 function open(idx){
   panels.forEach((p,i)=>{ const on=i===idx; p.classList.toggle('open',on); p.setAttribute('aria-expanded',on?'true':'false'); });
 }
+function toggle(p,i){
+  if(p.classList.contains('open')){ p.classList.remove('open'); p.setAttribute('aria-expanded','false'); }
+  else { open(i); }
+}
 panels.forEach((p,i)=>{
-  p.addEventListener('click',()=>{ if(!p.classList.contains('open')) open(i); });
-  p.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(i); } });
+  p.addEventListener('click',()=>toggle(p,i));
+  p.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(p,i); } });
 });
 </script>
 </body>

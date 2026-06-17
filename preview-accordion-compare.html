@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>手風琴 A / B 對照</title>
+<style>
+  html,body{ margin:0; background:radial-gradient(120% 90% at 50% -10%, #0c1a3e 0%, #050d1f 60%); }
+  .block{ padding:18px 4vw 40px; }
+  .block + .block{ border-top:1px solid rgba(120,160,255,.12); }
+  .lbl{ font-family:"JetBrains Mono",monospace; font-size:13px; letter-spacing:.22em; color:#ffce4a; margin:8px 0 14px; }
+  iframe{ width:100%; max-width:1280px; height:64vh; border:0; background:transparent; display:block; margin:0 auto; }
+</style>
+</head>
+<body>
+  <div class="block">
+    <div class="lbl">版本 A · mural-a.png（暖金沙）</div>
+    <iframe src="demo-liquid/service-accordion-embed.html?mural=mural-a.png" title="手風琴版本 A" loading="eager"></iframe>
+  </div>
+  <div class="block">
+    <div class="lbl">版本 B · mural-b.png（亮灰、刻痕深）</div>
+    <iframe src="demo-liquid/service-accordion-embed.html?mural=mural-b.png" title="手風琴版本 B" loading="eager"></iframe>
+  </div>
+</body>
+</html>
