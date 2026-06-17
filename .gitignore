@@ -28,3 +28,7 @@ assets/images/astronaut/V2後製去背版.mp4
 
 # 本機工具腳本（資產處理用、不進 production）
 _工具參考_local/
+
+# codex image_gen 落檔／中介產物（手風琴月面圖在這生、複製進 _imgtest 後不需 commit 原始落檔）
+generated_images/
+_imgtest/_preview_b64.txt

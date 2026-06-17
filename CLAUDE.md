@@ -161,6 +161,16 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
   - **自有產品展示形式**：已定避開「自動無限跑馬燈 + 小圖示」（公版味 + 永遠在跑卻證明不了產品價值＝同水卡陷阱）；用真截圖／影片。具體容器（跟著捲動的橫向展開 vs 慢速大圖電影劇照）**待創辦人選**。
 - **早期液態卡 morph 已清（2026-06-14 16:57）**：`index.html` + `assets/css/{animations,components,pages/index}.css` 曾有未 commit 的「液態卡 morph」實驗（`liquid-morph-a/b` 邊角晃動 + `?v=liquid2` 快取參數），已 `git restore` 全數還原、工作區乾淨；液態方向確定不上線。若日後要重看那批 keyframe，本條已記其內容、可重建。
 
+### 數位行銷手風琴收合卡視覺定案（2026-06-17 23:11）
+
+收合卡＝「**月面碑刻**」石板。對應任務 11b，仍為預覽（`index-rain-preview.html` 嵌 `demo-liquid/service-accordion-embed.html`）、**未進正式 index.html**。展開後（`.body`）設計待打磨（下一輪）。
+
+- **背景圖** `_imgtest/mural-h.png`：2:1、銀白俯瞰月面、4 等格，每格下半一個**面癱**（無表情、淡定）chibi 太空人線雕＋服務元素、上半留乾淨月面。月面質感照抄 hero 彎月（codex image_gen，歷經 mural-b→h 迭代）。**紅線：太空人要面癱「白爛」不可愛；月面不要沙灘顆粒、也不要塑膠白（要真月亮、坑有立體）。**
+- **比例**：`.acc` 鎖 `aspect-ratio:2/1`，每格＝圖的 1/4（0.5:1），`background-size:400% 100%` 才不壓縮圖。**紅線：禁止改回固定 `height`——容器非 2:1 會把圖橫向壓扁。**
+- **碑刻語彙**（全在 `service-accordion-embed.html`）：服務名直排深凹刻碑文（text-shadow 上暗下亮 ＋ `.25px` text-stroke 刀痕，**描邊再粗會糊筆畫多的字如「營/運/廣」**）；右上大號淡刻編號；卡內緣凹槽邊框 `.bgimg::after`；卡外**純白方向性斜掠光暈**（hover 加亮）；inset bevel 浮雕。
+- **互動**：展開時該卡微浮起（`translateY(-3px)`）＋月面微亮；其他卡 `.acc:has(.panel.open) .panel:not(.open)` 變暗退讓（聚光主從）。
+- 完整迭代脈絡（mural 各版差異、codex 協作、設計判斷）見本次 commit body。
+
 ---
 
 ### 太空人角色敘事實作（2026-05-07 21:46 構想 → 2026-05-08 實作啟動）
