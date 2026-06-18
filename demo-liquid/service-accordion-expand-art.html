@@ -126,10 +126,12 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
 /* 生成的白色系背景圖（隨工具列切換） */
 .bgart{ position:absolute; inset:0; z-index:-2; background:#f3f1ec center/cover no-repeat; }
-[data-art="a"] .bgart{ background-image:url('../_imgtest/ai-v2-a.png'); }
-[data-art="b"] .bgart{ background-image:url('../_imgtest/ai-v2-b.png'); }
-[data-art="c"] .bgart{ background-image:url('../_imgtest/ai-v2-c.png'); }
-[data-art="d"] .bgart{ background-image:url('../_imgtest/ai-v2-d.png'); }
+[data-art="a"] .bgart{ background-image:url('../_imgtest/ai-particle-a-sq.png'); }
+[data-art="b"] .bgart{ background-image:url('../_imgtest/ai-particle-b-sq.png'); }
+[data-art="c"] .bgart{ background-image:url('../_imgtest/ai-shatter-a.png'); }
+[data-art="d"] .bgart{ background-image:url('../_imgtest/ai-shatter-b.png'); }
+[data-art="e"] .bgart{ background-image:url('../_imgtest/ai-particle-c-sq.png'); }
+[data-art="f"] .bgart{ background-image:url('../_imgtest/ai-particle-d-sq.png'); }
 /* 左重右輕的「提亮」柔遮罩：保住左側深色文字的對比，右側讓藝術元素透出 */
 .body::before{ content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
   background:linear-gradient(100deg, rgba(248,247,243,.72) 0%, rgba(248,247,243,.44) 38%, rgba(248,247,243,.08) 64%, rgba(248,247,243,0) 100%); }
@@ -206,11 +208,13 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 </head>
 <body data-art="a">
 <div class="toolbar">
-  <span class="tb-note">AI 形象網紅 · 破框走出 · 非正式</span>
-  <button class="tb on" data-set="a">A 側身走出<small>Walk</small></button>
-  <button class="tb" data-set="b">B 跨步而出<small>Step</small></button>
-  <button class="tb" data-set="c">C 大步動感<small>Stride</small></button>
-  <button class="tb" data-set="d">D 倚框而坐<small>Lean</small></button>
+  <span class="tb-note">AI 形象網紅 · 光粒聚合／碎屏破框 · 非正式</span>
+  <button class="tb on" data-set="a">光粒 1<small>静謐</small></button>
+  <button class="tb" data-set="b">光粒 2<small>動感</small></button>
+  <button class="tb" data-set="e">光粒 3<small>正面破屏</small></button>
+  <button class="tb" data-set="f">光粒 4<small>人／資料對半</small></button>
+  <button class="tb" data-set="c">碎屏 1<small>Shatter</small></button>
+  <button class="tb" data-set="d">碎屏 2<small>Shatter</small></button>
 </div>
 
 <div class="acc" id="acc"></div>
