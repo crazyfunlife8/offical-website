@@ -26,20 +26,26 @@ html,body{background:transparent;font-family:var(--f-body);color:rgba(var(--stel
 body{display:flex;align-items:center;justify-content:center;padding:clamp(14px,2.5vh,28px) clamp(10px,2vw,28px)}
 
 .acc{
-  display:flex; gap:12px;
-  /* 鎖 2:1：每格＝圖的 1/4（0.5:1），background-size:400% 100% 才不會壓縮圖 */
-  width:min(1280px,100%,158vh); aspect-ratio:2/1;
+  position:relative;
+  display:flex; gap:8px;
+  /* 鎖 1.55:1：每格＝圖的 1/4（0.3875:1 窄碑），background-size 才不會壓縮圖 */
+  width:min(1240px,100%,124vh); aspect-ratio:1.55/1;
 }
+/* 整組外光暈：四碑像一整組被冷光罩著，不是各自發光的板子（取代單卡大外光） */
+.acc::before{ content:''; position:absolute; inset:-26px -32px; z-index:0; pointer-events:none;
+  border-radius:36px;
+  background:radial-gradient(ellipse at 50% 48%, rgba(255,255,255,.2), rgba(220,230,238,.09) 42%, transparent 72%);
+  filter:blur(16px); opacity:.7; }
 .panel{
-  position:relative; flex:1 1 0; min-width:0;
+  position:relative; z-index:1; flex:1 1 0; min-width:0;
   border-radius:16px; overflow:hidden; cursor:pointer;
   border:1px solid rgba(var(--stellar),.14);
   background:
     radial-gradient(120% 80% at 50% 0%, rgba(var(--blue),.18), transparent 60%),
     linear-gradient(180deg, rgba(12,22,46,.55), rgba(5,12,26,.78));
-  /* 發光體：左上斜掠硬光 + 右下柔光 + 外羽化（像月岩被冷光掃過，不是均勻光圈） */
-  box-shadow:-1px -1px 0 rgba(255,255,255,.72), 1px 1px 0 rgba(255,255,255,.22),
-             0 0 14px rgba(255,255,255,.58), 0 0 34px 1px rgba(240,247,255,.24),
+  /* 保留碑緣斜掠硬光（左上亮/右下暗），大外光暈移到 .acc 整組（避免各自發光成斷層） */
+  box-shadow:-1px -1px 0 rgba(255,255,255,.6), 1px 1px 0 rgba(255,255,255,.18),
+             0 0 8px rgba(255,255,255,.1),
              0 10px 22px rgba(0,0,0,.34);
   transition:flex .62s var(--ease), transform .62s var(--ease), border-color .5s var(--ease), background .5s var(--ease), box-shadow .5s var(--ease);
 }
@@ -80,24 +86,31 @@ body{display:flex;align-items:center;justify-content:center;padding:clamp(14px,2
   box-shadow:-1px -1px 0 rgba(255,255,255,.4), 0 0 10px rgba(255,255,255,.34),
              0 0 22px rgba(240,247,255,.14), 0 8px 20px rgba(0,0,0,.32); }
 
-/* ─── 收合脊柱：碑刻服務名（定案） ─── */
-.spine{ position:absolute; inset:0; z-index:3; padding:26px 24px;
+/* ─── 收合脊柱：碑刻服務名（1.55:1 高碑重新平衡 2026-06-18） ─── */
+.spine{ position:absolute; inset:0; z-index:3;
   opacity:1; transition:opacity .35s var(--ease); }
 .panel.open .spine{ opacity:0; pointer-events:none; }
-.spine .num{ position:absolute; top:18px; right:20px; font-family:var(--f-en);
-  font-size:3.1rem; line-height:.75; color:rgba(58,64,78,.26);
-  text-shadow:0 1.5px 0 rgba(255,255,255,.55), 0 -1px 1px rgba(0,0,0,.22); }
-.spine__cols{ position:relative; display:flex; flex-direction:row; align-items:flex-start; gap:10px; }
+/* 編號：右上、降存在感（窄碑上大編號太搶） */
+.spine .num{ position:absolute; top:7%; right:12%; font-family:var(--f-en);
+  font-size:clamp(2.15rem,2.2vw,2.55rem); line-height:.75; color:rgba(58,64,78,.12);
+  text-shadow:0 1.5px 0 rgba(255,255,255,.4), 0 -1px 1px rgba(0,0,0,.16); }
+/* 碑文：左上「碑面落款」尺度感（小字＋留白＝高級；創辦人＋兄弟校準 2026-06-18） */
+.spine__cols{ position:absolute; top:11%; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:row; align-items:flex-start; gap:8px; }
+/* 不墊底塊（會像貼紙）：靠強化「刻進石面」的浮雕——字周圍一圈接近白的亮邊（提離月面＋當刻痕受光的凸緣）＋上暗下亮凹槽 */
 .spine .v{ writing-mode:vertical-rl; font-family:var(--f-cjk); font-weight:600;
-  font-size:2.1rem; letter-spacing:.18em; line-height:1; color:rgba(48,54,67,.94);
-  -webkit-text-stroke:.25px rgba(18,24,34,.15);
-  text-shadow:0 2px 0 rgba(255,255,255,.7), 0 -1.5px 1px rgba(0,0,0,.40),
-              1px 0 0 rgba(255,255,255,.14), -1px 0 0 rgba(0,0,0,.10),
-              0 4px 5px rgba(0,0,0,.12); }
-.spine .ven{ writing-mode:vertical-rl; font-family:var(--f-mono); font-size:10px; letter-spacing:.34em;
-  text-transform:uppercase; color:rgba(62,68,82,.52);
-  text-shadow:0 1px 0 rgba(255,255,255,.5), 0 -1px 0 rgba(0,0,0,.14);
-  padding-left:8px; border-left:1px solid rgba(22,28,40,.16); }
+  font-size:clamp(1.55rem,1.45vw,1.82rem); letter-spacing:.18em; line-height:1.18; color:rgba(22,24,27,.9);
+  -webkit-text-stroke:.15px rgba(248,250,255,.45);
+  text-shadow:0 0 2px rgba(250,252,255,.95), 0 1.4px .2px rgba(255,255,255,.85),
+              -.9px -.9px .8px rgba(0,0,0,.52), 0 -1.3px 1.7px rgba(0,0,0,.44);
+  transition:color .4s var(--ease), text-shadow .4s var(--ease); }
+.spine .ven{ writing-mode:vertical-rl; font-family:var(--f-mono); font-size:8.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:rgba(62,68,82,.38);
+  text-shadow:0 1px 0 rgba(255,255,255,.4);
+  padding-left:7px; border-left:1px solid rgba(22,28,40,.12); }
+/* hover：刻文稍微清晰，不位移、不放大 */
+.panel:not(.open):hover .v{ color:rgba(18,19,20,.84);
+  text-shadow:0 .7px 0 rgba(255,255,255,.3), 0 -.8px 1px rgba(0,0,0,.4); }
 
 /* ─── 展開內容容器（白底） ─── */
 .body{
@@ -127,10 +140,15 @@ body{display:flex;align-items:center;justify-content:center;padding:clamp(14px,2
   letter-spacing:.03em; margin-top:4px; }
 .lead{ font-size:clamp(.86rem,1.05vw,.98rem); line-height:1.85; color:rgba(var(--dk2),.86);
   max-width:34em; margin-top:clamp(12px,1.8vh,20px); }
-.grid{ display:grid; grid-template-columns:1.05fr .95fr; gap:clamp(24px,3vw,48px);
-  align-content:start; margin-top:clamp(14px,2vh,22px); }
-@media(max-width:760px){ .grid{ grid-template-columns:1fr; gap:18px; } }
-.meta{ margin-top:16px; }
+/* social：上半說明（copy，限左側可讀區）＋下半成交區（deal，固定卡片下緣帶） */
+.sbody{ display:flex; flex-direction:column; min-height:0; height:100%; }
+.copy{ max-width:min(56%,29em); }
+@media(max-width:760px){ .copy{ max-width:100%; } }
+/* 成交區帶：固定卡片下緣，鋪極淡白漸層保深色字可讀（不是卡片） */
+.deal{ margin-top:auto; padding-top:clamp(8px,1.2vh,12px);
+  background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,.66) 26%, rgba(255,255,255,.82)); }
+.deal .cta{ margin-top:10px; }
+.meta{ margin-top:13px; }
 .meta + .meta{ margin-top:14px; }
 .meta .ml{ font-family:var(--f-mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase;
   color:rgba(var(--dk2),.5); margin-bottom:8px; }
@@ -139,23 +157,26 @@ body{display:flex;align-items:center;justify-content:center;padding:clamp(14px,2
   border:1px solid rgba(var(--teal),.38); background:rgba(var(--teal),.06); }
 .acts{ font-size:.84rem; line-height:1.6; color:rgba(var(--dk2),.78); }
 .acts b{ color:rgba(var(--dk),.92); font-weight:600; }
-.plans{ display:flex; flex-direction:column; gap:10px; }
-.plan{ position:relative; border:1px solid rgba(30,40,55,.14); border-radius:12px;
-  padding:13px 16px; background:rgba(255,255,255,.58); backdrop-filter:blur(4px);
-  box-shadow:0 4px 16px rgba(40,46,60,.08);
-  display:grid; grid-template-columns:1fr auto; gap:4px 14px; align-items:baseline;
-  transition:border-color .3s var(--ease), background .3s var(--ease), box-shadow .3s var(--ease); }
-.plan:hover{ border-color:rgba(var(--teal),.45); background:rgba(255,255,255,.74);
-  box-shadow:0 6px 20px rgba(40,46,60,.12); }
-.plan.feat{ border-color:rgba(200,150,40,.6);
-  background:linear-gradient(0deg,rgba(245,200,80,.16),rgba(245,200,80,.16)),rgba(255,255,255,.72); }
-.plan .pn{ font-family:var(--f-cjk); font-weight:600; font-size:1.02rem; color:rgba(var(--dk),.95); }
-.plan .pp{ font-family:var(--f-mono); font-size:1.02rem; color:rgba(var(--dk),.95); text-align:right; }
-.plan .pp small{ font-size:.66rem; color:rgba(var(--dk2),.55); letter-spacing:.04em; }
-.plan .pd{ grid-column:1/-1; font-size:.76rem; line-height:1.5; color:rgba(var(--dk2),.66); }
-.plan .tag{ position:absolute; top:-9px; right:14px; font-family:var(--f-mono); font-size:9px;
-  letter-spacing:.18em; padding:2px 8px; border-radius:999px; color:#1a1205;
-  background:rgba(var(--yellow),.95); }
+/* 編輯式價格帳：可點擊的方案列（非方塊、非促銷貼紙） */
+.offer{ display:flex; flex-direction:column; max-width:min(88%,44em); }
+.offer-row{ position:relative; display:grid;
+  grid-template-columns:minmax(4.5em,auto) minmax(0,1fr) max-content; align-items:baseline; gap:14px;
+  min-height:38px; padding:6px 2px; border-top:1px solid rgba(20,24,28,.12);
+  text-decoration:none; cursor:pointer; transition:background .25s var(--ease); }
+.offer-row:last-of-type{ border-bottom:1px solid rgba(20,24,28,.12); }
+.offer-row:hover{ background:rgba(255,255,255,.42); }
+.offer-name{ font-family:var(--f-cjk); font-weight:600; font-size:1rem; color:rgba(var(--dk),.96); white-space:nowrap; }
+.offer-name .rec{ font-family:var(--f-mono); font-size:8.5px; letter-spacing:.14em; color:#8a6d2e;
+  margin-left:7px; vertical-align:1px; }
+.offer-note{ font-size:.78rem; line-height:1.35; color:rgba(var(--dk2),.7);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.offer-price{ font-family:var(--f-mono); font-size:.86rem; font-variant-numeric:tabular-nums;
+  color:rgba(var(--dk),.92); white-space:nowrap; }
+.offer-price small{ font-size:.64rem; color:rgba(var(--dk2),.55); letter-spacing:.04em; }
+.offer-price .ar{ color:rgba(160,110,30,.95); margin-left:5px; }
+/* 推薦：左緣一道舊金細線（編輯標註，不整列上色） */
+.offer-row.feat::before{ content:''; position:absolute; left:-10px; top:9px; bottom:9px; width:2px; background:#b99a52; }
+@media(max-width:760px){ .offer{ max-width:100%; } }
 .cta{ display:inline-flex; align-items:center; gap:8px; margin-top:18px;
   font-family:var(--f-body); font-size:.9rem; font-weight:600; letter-spacing:.04em;
   color:rgba(var(--dk),.95); text-decoration:none; }
@@ -175,6 +196,7 @@ body{display:flex;align-items:center;justify-content:center;padding:clamp(14px,2
   .spine .v,.spine .ven{ writing-mode:horizontal-tb; }
   .spine .ven{ border-left:none; padding-left:0; }
   .spine .num{ position:static; font-size:1.1rem; }
+  .spine__cols{ position:static; transform:none; padding:0; background:none; box-shadow:none; backdrop-filter:none; }
   .body{ position:relative; inset:auto; min-height:520px; }
   .grid{ grid-template-columns:1fr; }
 }
@@ -191,9 +213,9 @@ const DATA=[
     platforms:['LINE','Instagram','Threads','Facebook','TikTok'],
     acts:'<b>海巡漲粉</b> · <b>內容製作</b>（圖文／短影音）· <b>互動經營</b> · <b>數據追蹤</b>',
     plans:[
-      {n:'基礎行銷', p:'NT$3,800', u:'／月', d:'4 篇圖文｜排版設計＋市場文案，維持品牌曝光'},
-      {n:'成長推廣', p:'NT$8,500', u:'／月', d:'8 篇圖文｜月度數據分析＋經營方向建議', feat:true},
-      {n:'整合行銷', p:'NT$21,000', u:'／月', d:'12 篇圖文｜完整數據追蹤＋活動企劃＋全面策略'},
+      {n:'基礎行銷', p:'NT$3,800', u:'／月', d:'4 篇圖文 · 維持品牌曝光'},
+      {n:'成長推廣', p:'NT$8,500', u:'／月', d:'8 篇圖文 · 數據分析＋方向建議', feat:true},
+      {n:'整合行銷', p:'NT$21,000', u:'／月', d:'12 篇圖文 · 完整數據＋活動企劃'},
     ],
   },
   {
@@ -206,17 +228,17 @@ const DATA=[
     n:'03', cjk:'廣告投放', en:'PAID ADS', echo:'Spend that performs.',
     lead:'跨 FB／IG／TikTok 代客操盤，含影片與短影音廣告——從素材企劃、出價優化到成效回報，一手包辦。',
     art:'../_imgtest/ads2-a.png',
-    price:'投放金額 10–25% 抽成',
+    price:'投放金額 10–25% 抽成', bgx:65,
   },
   {
     n:'04', cjk:'AI 形象網紅', en:'AI TALENT', echo:'A face that never tires.',
     lead:'為品牌打造可長期經營的虛擬代言人——情緒穩定、形象可控、無出鏡包袱。我們的目標只有一個：做到沒有 AI 感。',
     art:'../_imgtest/ai-particle-a-sq.png',
-    price:'詢價制',
+    price:'詢價制', bgs:400,
   },
 ];
 
-const MURAL = new URLSearchParams(location.search).get('mural') || 'mural-h.png';
+const MURAL = new URLSearchParams(location.search).get('mural') || 'mural-j.png';
 const acc=document.getElementById('acc');
 DATA.forEach((s,i)=>{
   const p=document.createElement('div');
@@ -229,25 +251,23 @@ DATA.forEach((s,i)=>{
   if(s.social){
     body=`
       <div class="head"><span class="kicker">數位行銷 ／ ${s.en}</span><span class="bignum">${s.n}</span></div>
-      <div>
-        <h3 class="title">${s.cjk}</h3>
-        <p class="en">${s.echo}</p>
-        <div class="grid">
-          <div>
-            <p class="lead">${s.lead}</p>
-            <div class="meta"><div class="ml">經營平台</div><div class="chips">${s.platforms.map(x=>`<span class="chip">${x}</span>`).join('')}</div></div>
-            <div class="meta"><div class="ml">日常動作</div><div class="acts">${s.acts}</div></div>
-            <a class="cta" href="../contact.html" target="_top">想開始經營 <span class="ar">→</span></a>
-          </div>
-          <div class="plans">
+      <div class="sbody">
+        <div class="copy">
+          <h3 class="title">${s.cjk}</h3>
+          <p class="en">${s.echo}</p>
+          <p class="lead">${s.lead}</p>
+          <div class="meta"><div class="ml">日常動作</div><div class="acts">${s.acts}</div></div>
+        </div>
+        <div class="deal">
+          <div class="offer">
             ${s.plans.map(pl=>`
-              <div class="plan${pl.feat?' feat':''}">
-                ${pl.feat?'<span class="tag">推薦</span>':''}
-                <span class="pn">${pl.n}</span>
-                <span class="pp">${pl.p}<small>${pl.u}</small></span>
-                <span class="pd">${pl.d}</span>
-              </div>`).join('')}
+              <a class="offer-row${pl.feat?' feat':''}" href="../contact.html" target="_top">
+                <span class="offer-name">${pl.n}${pl.feat?'<span class="rec">推薦</span>':''}</span>
+                <span class="offer-note">${pl.d}</span>
+                <span class="offer-price">${pl.p}<small>${pl.u}</small>${pl.feat?'<span class="ar">→</span>':''}</span>
+              </a>`).join('')}
           </div>
+          <a class="cta" href="../contact.html" target="_top">想開始經營 <span class="ar">→</span></a>
         </div>
       </div>`;
   }else{
@@ -263,7 +283,12 @@ DATA.forEach((s,i)=>{
   }
 
   // mural 整幅切四份：每條取對應的四分之一（background-position 依序 0/33/67/100%）
-  const bg = `<div class="bgimg" style="background-image:url('../_imgtest/${MURAL}'); background-size:400% 100%; background-position:${(i/3*100).toFixed(2)}% center;"></div>`;
+  // background-size 放大到 440%（>400%）：每格往內裁約 2-3%，把 mural 四格接縫推出卡片外
+  // bgx：個別卡可覆寫水平位置（降低 % = 內容右移）；廣告投放卡需右移
+  // bgs：個別卡可覆寫放大倍率（中間卡 440% 推掉接縫；最右卡回 400% 不裁太空人）
+  const px = (s.bgx != null ? s.bgx : i/3*100);
+  const bgs = (s.bgs != null ? s.bgs : 440);
+  const bg = `<div class="bgimg" style="background-image:url('../_imgtest/${MURAL}'); background-size:${bgs}% 100%; background-position:${px.toFixed(2)}% center;"></div>`;
   p.innerHTML=`${bg}
     <div class="spine"><span class="num">${s.n}</span><div class="spine__cols"><span class="v">${s.cjk}</span><span class="ven">${s.en}</span></div></div>
     <div class="body"><div class="bgart" style="background-image:url('${s.art}')"></div>${body}</div>`;
