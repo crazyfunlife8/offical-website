@@ -177,7 +177,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 
 ### 數位行銷手風琴「展開態」設計進度（2026-06-18 23:25，下一輪繼續打磨）
 
-對應任務 11b。展開後（`.body`）＝白色系藝術背景＋深色字，**已整合進預覽主頁**（`demo-liquid/service-accordion-embed.html`，非沙盒）、仍未進正式 index.html。沙盒 `service-accordion-expand-art.html` 為背景挑版工具。
+對應任務 11b。展開後（`.body`）＝白色系藝術背景＋深色字，**2026-06-19 01:42 已原生內嵌進預覽主頁 `index-rain-preview.html`**（全選擇器加 `.svc-accordion` 前綴與全站 CSS 隔離；原 iframe 載 `demo-liquid/service-accordion-embed.html` 版退場為沙盒）、仍未進正式 index.html。沙盒 `service-accordion-expand-art.html` 為背景挑版工具。
 
 **四卡展開背景（皆定，每卡綁自己的圖、非工具列切換）：**
 - 社群經營＝`social-mix-a2.png`（暖白紙雕＋彩色平台 icon）
@@ -193,7 +193,9 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 
 **手機 RWD（延後做、結構已鋪路）**：同一份內容模組，桌機手風琴／未來手機全螢幕滑卡只換外殼、不分叉內容。
 
-**待辦（下個 session 接續）：** ① 展開版面細修（字級/間距/排版）② 部落格／廣告／AI 三張套同社群的「成交區帶」（目前還是單行 priceline）③ AI 卡未來「正在經營的網紅畫廊」彈出（創辦人記得、暫不做）④ 整進正式 index.html。
+**本輪完成（2026-06-19 01:42）：** ① 展開版面細修 ✅ ② 部落格/廣告/AI 三卡內容結構化 ✅——四卡同家族「價值主張→做什麼(flow meta)→證據(proof 大數字)→貼底成交+CTA」，內容取自服務知識庫/總表真實素材（部落格 16 代理/60+ Gate/5 站、廣告 3 平台/10–25% 抽成、AI 3 倍互動/100% 可控/0 翻車）③ CTA＝活潑青膠囊 variant D（白字深底對比修正）④ 文案去 AI 味（破折號/全形斜線/英文縮寫大字清除）⑤ blog 燈塔裁切修復（`background-size:auto 134%` 重新取景）⑥ 原生內嵌進預覽頁（見上段）。
+
+**仍待辦：** ① AI 卡「正在經營的網紅畫廊」彈出（暫不做）② 整進**正式 index.html**（5 層 CSS）。**紅線：手風琴現雙份——預覽頁內嵌版（現役）＋ `demo-liquid/service-accordion-embed.html`（沙盒）；要改手風琴改預覽頁內嵌版，整進正式 index.html 時清掉雙份。**
 
 ---
 

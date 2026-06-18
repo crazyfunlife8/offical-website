@@ -125,6 +125,24 @@ body{display:flex;align-items:center;justify-content:center;padding:clamp(14px,2
 /* 左重右輕的「提亮」柔遮罩：保住左側深色文字的對比，右側讓藝術元素透出 */
 .body::before{ content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
   background:linear-gradient(100deg, rgba(248,247,243,.72) 0%, rgba(248,247,243,.44) 38%, rgba(248,247,243,.08) 64%, rgba(248,247,243,0) 100%); }
+/* social 卡專屬（不動其他三卡）：原始彩度不壓（壓了發死），左側 copy 區可讀性交給加厚的閱讀霧面遮罩到 ~58% */
+.body:has(.sbody)::before{
+  background:linear-gradient(100deg, rgba(248,247,243,.9) 0%, rgba(248,247,243,.84) 38%, rgba(248,247,243,.52) 56%, rgba(248,247,243,.14) 74%, rgba(248,247,243,0) 90%); }
+/* blog 卡專屬：重新取景把右上「燈塔＋逆光天空」帶回來，太空人隊伍退成下緣肌理（解 busy）；夕陽降一點彩度/亮度接暖白調 */
+.panel[data-key="blog"] .bgart{ background-position:82% 22%; background-size:auto 134%; filter:saturate(.82) brightness(.99); }
+/* 夕陽高亮天空會吃掉深色字：左側暖白遮罩比一般卡更厚 */
+.panel[data-key="blog"] .body::before{
+  background:linear-gradient(100deg, rgba(248,247,243,.93) 0%, rgba(248,247,243,.85) 40%, rgba(248,247,243,.5) 60%, rgba(248,247,243,.12) 78%, rgba(248,247,243,0) 92%); }
+/* ads 卡：靶心在右，左半的金字（CTR/Conversions）會蹭文字 → 左側暖白遮罩加厚保可讀 */
+.panel[data-key="ads"] .body::before{
+  background:linear-gradient(100deg, rgba(250,248,243,.94) 0%, rgba(250,248,243,.86) 40%, rgba(250,248,243,.5) 60%, rgba(250,248,243,.12) 78%, rgba(250,248,243,0) 92%); }
+/* ai 卡：真人主體偏中左、會壓文字 → 背景往左定位把人物推到右側當主視覺＋左側暖白遮罩加厚 */
+.panel[data-key="ai"] .bgart{ background-position:14% center; }
+/* 文字區收窄，跟右側真人拉開乾淨間距（避免字壓在臉上） */
+.panel[data-key="ai"] .copy{ max-width:min(50%,22em); }
+.panel[data-key="ai"] .proof,.panel[data-key="ai"] .priceline{ max-width:min(56%,24em); }
+.panel[data-key="ai"] .body::before{
+  background:linear-gradient(100deg, rgba(250,247,242,.95) 0%, rgba(250,247,242,.87) 40%, rgba(250,247,242,.5) 60%, rgba(250,247,242,.1) 78%, rgba(250,247,242,0) 92%); }
 
 /* ─── 展開內文：深色字（白底版） ─── */
 .head{ display:flex; align-items:flex-start; justify-content:space-between; gap:20px; position:relative; }
@@ -138,8 +156,8 @@ body{display:flex;align-items:center;justify-content:center;padding:clamp(14px,2
   text-shadow:0 1px 0 rgba(255,255,255,.6); }
 .en{ font-family:var(--f-en); font-size:clamp(1rem,1.6vw,1.35rem); color:rgba(var(--teal),.85);
   letter-spacing:.03em; margin-top:4px; }
-.lead{ font-size:clamp(.86rem,1.05vw,.98rem); line-height:1.85; color:rgba(var(--dk2),.86);
-  max-width:34em; margin-top:clamp(12px,1.8vh,20px); }
+.lead{ font-size:clamp(.86rem,1.05vw,.98rem); line-height:1.7; color:rgba(var(--dk2),.86);
+  max-width:34em; margin-top:clamp(10px,1.5vh,16px); }
 /* social：上半說明（copy，限左側可讀區）＋下半成交區（deal，固定卡片下緣帶） */
 .sbody{ display:flex; flex-direction:column; min-height:0; height:100%; }
 .copy{ max-width:min(56%,29em); }
@@ -177,14 +195,37 @@ body{display:flex;align-items:center;justify-content:center;padding:clamp(14px,2
 /* 推薦：左緣一道舊金細線（編輯標註，不整列上色） */
 .offer-row.feat::before{ content:''; position:absolute; left:-10px; top:9px; bottom:9px; width:2px; background:#b99a52; }
 @media(max-width:760px){ .offer{ max-width:100%; } }
-.cta{ display:inline-flex; align-items:center; gap:8px; margin-top:18px;
-  font-family:var(--f-body); font-size:.9rem; font-weight:600; letter-spacing:.04em;
-  color:rgba(var(--dk),.95); text-decoration:none; }
-.cta .ar{ font-family:var(--f-mono); transition:transform .3s var(--ease); }
-.cta:hover{ color:rgb(var(--teal)); }
-.cta:hover .ar{ transform:translateX(5px); }
+/* 主 CTA＝活潑亮膠囊（variant D）：唯一像按鈕的東西，與價格表同寬、全圓角實心品牌青＋光澤循環掃過＋白底圓箭頭 */
+.cta{ position:relative; overflow:hidden;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  width:min(88%,44em); height:46px; padding:0 8px 0 22px; margin-top:16px;
+  font-family:var(--f-body); font-size:.94rem; font-weight:700; letter-spacing:.06em;
+  color:#fff; text-shadow:0 1px 2px rgba(0,40,50,.45); text-decoration:none; border-radius:999px;
+  background:linear-gradient(180deg,#0e93ab,#0a5d70);
+  box-shadow:0 8px 22px rgba(12,108,128,.42), inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .25s var(--ease), box-shadow .3s var(--ease); }
+.cta::after{ content:''; position:absolute; top:0; left:-60%; width:45%; height:100%; pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);
+  transform:skewX(-18deg); animation:cta-sheen 3.2s ease-in-out infinite; }
+.cta .ar{ width:32px; height:32px; display:grid; place-items:center; border-radius:50%;
+  font-family:var(--f-mono); font-weight:700; background:#fff; color:#0e7e94; z-index:1;
+  transition:transform .3s var(--ease); }
+.cta:hover{ transform:translateY(-2px) scale(1.012);
+  box-shadow:0 12px 28px rgba(14,126,148,.5), inset 0 1px 0 rgba(255,255,255,.4); }
+.cta:hover .ar{ transform:translateX(3px); }
+@keyframes cta-sheen{ 0%{left:-60%} 38%,100%{left:130%} }
+@media(prefers-reduced-motion:reduce){ .cta::after{ animation:none; } }
+@media(max-width:760px){ .cta{ width:100%; } }
 .priceline{ font-family:var(--f-mono); font-size:.82rem; color:rgba(160,110,30,.95);
   letter-spacing:.04em; margin-top:18px; }
+/* 護城河數字（部落格卡「證據層」＝社群卡方案表的等價說服）：Italiana 大數字＋mono 標籤 */
+.proof{ display:flex; gap:clamp(18px,2.6vw,34px); margin-bottom:6px; }
+.stat{ display:flex; flex-direction:column; line-height:1; }
+.stat b{ font-family:var(--f-en); font-weight:400; font-size:clamp(1.7rem,2.5vw,2.2rem); color:rgba(var(--teal),.96); }
+.stat span{ font-family:var(--f-mono); font-size:9.5px; letter-spacing:.08em; color:rgba(var(--dk2),.72); margin-top:6px; white-space:nowrap; }
+.deal .priceline{ margin-top:0; }
+/* 部落格右上大編號淡掉，讓位給燈塔（避免 02 疊在燈塔上變髒） */
+.panel[data-key="blog"] .bignum{ color:rgba(var(--dk),.05); }
 
 /* ─── 手機：垂直堆疊 ─── */
 @media(max-width:820px){
@@ -207,33 +248,41 @@ body{display:flex;align-items:center;justify-content:center;padding:clamp(14px,2
 <script>
 const DATA=[
   {
-    n:'01', cjk:'社群經營', en:'SOCIAL', echo:'Your brand, always on.',
-    lead:'不只是代發文。策略、內容、發布、互動、數據——一條龍的社群系統，把帳號養成會自己長大的品牌資產。',
+    key:'social', n:'01', cjk:'社群經營', en:'SOCIAL', echo:'Your brand, always on.',
+    lead:'不只是代發文。策略、內容、發布、互動、數據，一條龍把帳號養成會自己長大的品牌資產。',
     social:true, art:'../_imgtest/social-mix-a2.png',
     platforms:['LINE','Instagram','Threads','Facebook','TikTok'],
-    acts:'<b>海巡漲粉</b> · <b>內容製作</b>（圖文／短影音）· <b>互動經營</b> · <b>數據追蹤</b>',
+    acts:'<b>海巡漲粉</b> · <b>內容製作</b>（圖文/短影音）· <b>互動經營</b> · <b>數據追蹤</b>',
     plans:[
-      {n:'基礎行銷', p:'NT$3,800', u:'／月', d:'4 篇圖文 · 維持品牌曝光'},
-      {n:'成長推廣', p:'NT$8,500', u:'／月', d:'8 篇圖文 · 數據分析＋方向建議', feat:true},
-      {n:'整合行銷', p:'NT$21,000', u:'／月', d:'12 篇圖文 · 完整數據＋活動企劃'},
+      {n:'基礎行銷', p:'NT$3,800', u:'/月', d:'4 篇圖文 · 維持品牌曝光'},
+      {n:'成長推廣', p:'NT$8,500', u:'/月', d:'8 篇圖文 · 數據分析＋方向建議', feat:true},
+      {n:'整合行銷', p:'NT$21,000', u:'/月', d:'12 篇圖文 · 完整數據＋活動企劃'},
     ],
   },
   {
-    n:'02', cjk:'部落格代營運', en:'SEO CONTENT', echo:'Traffic that compounds.',
-    lead:'用 16 個 AI 代理、逾 60 道客觀把關的內容產線，幫你長期經營 SEO 部落格——讓搜尋流量自己長進來，而不是丟給 ChatGPT 亂發。',
+    key:'blog', n:'02', cjk:'部落格代營運', en:'SEO CONTENT', echo:'Traffic that compounds.',
+    lead:'用自動化內容產線，為你建立並長期經營 SEO 部落格，讓搜尋與 AI 都找得到你，把網站養成會自己長流量的引流資產。',
     art:'../_imgtest/blog4-b.png',
+    flow:'<b>選題對準搜尋意圖</b> · <b>AI 輔助產文</b> · <b>SEO/GEO 結構化</b> · <b>自動發布＋收錄追蹤</b>',
+    proof:[{n:'16',l:'專責 AI 代理'},{n:'60+',l:'道品質把關'},{n:'5',l:'站自有實證'}],
     price:'依規模規劃 · 訂閱式長期經營',
   },
   {
-    n:'03', cjk:'廣告投放', en:'PAID ADS', echo:'Spend that performs.',
-    lead:'跨 FB／IG／TikTok 代客操盤，含影片與短影音廣告——從素材企劃、出價優化到成效回報，一手包辦。',
+    key:'ads', n:'03', cjk:'廣告投放', en:'PAID ADS', echo:'Spend that performs.',
+    lead:'跨 FB/IG/TikTok 代客操盤，含影片與短影音廣告，把每一塊投放預算都盯成看得見的成效。',
     art:'../_imgtest/ads2-a.png',
-    price:'投放金額 10–25% 抽成', bgx:65,
+    flow:'<b>素材企劃</b>（含影片/短影音）· <b>帳號設定</b> · <b>出價優化</b> · <b>成效回報</b>',
+    flowLabel:'操盤流程',
+    proof:[{n:'3',l:'平台同步代操'},{n:'10–25%',l:'成效抽成'},{n:'4',l:'步驟全包'}],
+    bgx:65,
   },
   {
-    n:'04', cjk:'AI 形象網紅', en:'AI TALENT', echo:'A face that never tires.',
-    lead:'為品牌打造可長期經營的虛擬代言人——情緒穩定、形象可控、無出鏡包袱。我們的目標只有一個：做到沒有 AI 感。',
+    key:'ai', n:'04', cjk:'AI 形象網紅', en:'AI TALENT', echo:'A face that never tires.',
+    lead:'為企業打造可長期經營的專屬虛擬代言人，無出鏡包袱、形象完全可控。標準只有一個：做到沒有 AI 感。',
     art:'../_imgtest/ai-particle-a-sq.png',
+    flow:'<b>人設與世界觀</b> · <b>視覺形象</b> · <b>長期內容經營</b> · <b>角色版權歸品牌</b>',
+    flowLabel:'角色系統',
+    proof:[{n:'3',l:'倍互動率勝真人'},{n:'100%',l:'形象可控'},{n:'0',l:'真人翻車風險'}],
     price:'詢價制', bgs:400,
   },
 ];
@@ -243,6 +292,7 @@ const acc=document.getElementById('acc');
 DATA.forEach((s,i)=>{
   const p=document.createElement('div');
   p.className='panel';
+  if(s.key) p.dataset.key=s.key;
   p.tabIndex=0; p.setAttribute('role','button');
   p.setAttribute('aria-expanded','false');
   p.setAttribute('aria-label', s.cjk);
@@ -250,15 +300,15 @@ DATA.forEach((s,i)=>{
   let body='';
   if(s.social){
     body=`
-      <div class="head"><span class="kicker">數位行銷 ／ ${s.en}</span><span class="bignum">${s.n}</span></div>
+      <div class="head"><span class="kicker">數位行銷 / ${s.en}</span><span class="bignum">${s.n}</span></div>
       <div class="sbody">
         <div class="copy">
           <h3 class="title">${s.cjk}</h3>
           <p class="en">${s.echo}</p>
           <p class="lead">${s.lead}</p>
-          <div class="meta"><div class="ml">日常動作</div><div class="acts">${s.acts}</div></div>
         </div>
         <div class="deal">
+          <div class="meta"><div class="ml">日常動作</div><div class="acts">${s.acts}</div></div>
           <div class="offer">
             ${s.plans.map(pl=>`
               <a class="offer-row${pl.feat?' feat':''}" href="../contact.html" target="_top">
@@ -270,9 +320,27 @@ DATA.forEach((s,i)=>{
           <a class="cta" href="../contact.html" target="_top">想開始經營 <span class="ar">→</span></a>
         </div>
       </div>`;
+  }else if(s.flow){
+    body=`
+      <div class="head"><span class="kicker">數位行銷 / ${s.en}</span><span class="bignum">${s.n}</span></div>
+      <div class="sbody">
+        <div class="copy">
+          <h3 class="title">${s.cjk}</h3>
+          <p class="en">${s.echo}</p>
+          <p class="lead">${s.lead}</p>
+          <div class="meta"><div class="ml">${s.flowLabel||'內容產線'}</div><div class="acts">${s.flow}</div></div>
+        </div>
+        <div class="deal">
+          <div class="proof">
+            ${s.proof.map(p=>`<div class="stat"><b>${p.n}</b><span>${p.l}</span></div>`).join('')}
+          </div>
+          ${s.price?`<p class="priceline">${s.price}</p>`:''}
+          <a class="cta" href="../contact.html" target="_top">想了解更多 <span class="ar">→</span></a>
+        </div>
+      </div>`;
   }else{
     body=`
-      <div class="head"><span class="kicker">數位行銷 ／ ${s.en}</span><span class="bignum">${s.n}</span></div>
+      <div class="head"><span class="kicker">數位行銷 / ${s.en}</span><span class="bignum">${s.n}</span></div>
       <div>
         <h3 class="title">${s.cjk}</h3>
         <p class="en">${s.echo}</p>
