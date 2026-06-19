@@ -161,6 +161,19 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
   - **自有產品展示形式**：已定避開「自動無限跑馬燈 + 小圖示」（公版味 + 永遠在跑卻證明不了產品價值＝同水卡陷阱）；用真截圖／影片。具體容器（跟著捲動的橫向展開 vs 慢速大圖電影劇照）**待創辦人選**。
 - **早期液態卡 morph 已清（2026-06-14 16:57）**：`index.html` + `assets/css/{animations,components,pages/index}.css` 曾有未 commit 的「液態卡 morph」實驗（`liquid-morph-a/b` 邊角晃動 + `?v=liquid2` 快取參數），已 `git restore` 全數還原、工作區乾淨；液態方向確定不上線。若日後要重看那批 keyframe，本條已記其內容、可重建。
 
+### 軟體開發「落雨區」卡片打磨進度（2026-06-20 02:43，下一輪繼續）
+
+對應任務 11b。全部改動在 `index-rain-preview.html`（預覽內嵌 `<style>`/`<script>`），**未碰共用 components.css、未進正式 index.html**。
+
+- **三卡已對齊 SSOT（取代舊「開發/成長/顧問」）**：①網站架設 ②客製化系統開發 ③數位轉型顧問。刪掉舊「成長」卡（其社群/AI網紅/跳動E 屬數位行銷或自有產品、不歸軟體開發）。文案取自 `服務項目總表.md`。codebar 去 IDE 化（檔名 `develop.tsx`→抽象索引 `WEB / SYSTEM / DIGITAL TRANSFORMATION ARCHITECTURE`、拿掉紅黃綠燈）、青 cyan→品牌藍金、`.ztitle` 收俐落明朝。
+- **卡片設計方向定案＝「玻璃面板卡片」**：**整張 `.inner` ＝ CSS glassmorphism**（`backdrop-filter:blur` 磨砂＋亮邊＋外光暈＋frost 透出後方星場/碼雨），內容在玻璃裡面。質感已強化（`.inner::after` 左上斜向反光＋上緣亮邊＋blur30＋藍光外暈）。
+- **紅線澄清**：創辦人那張 4 格參考截圖只是給**玻璃質感**參考，**不要做卡內 3D 玻璃物件**（曾誤解成「卡片旁放一塊玻璃物件」做了側邊 WebGL 玻璃，已退；正解＝卡片本身就是玻璃）。
+- **WebGL 真 3D 玻璃已停用**：曾走「甲」實作進 `#dev-glass`（Three.js r128，r128 不支援 `transmission` 的 thickness/attenuation、玻璃靠 envMap 反射），後創辦人澄清只要玻璃質感 → IIFE 已 `if(true)` 強制 return、`#dev-glass`/`.glass-fallback` `display:none`；**殘碼＋`window.__dg` 驗證 hook 留在檔內待清**。
+- **數位行銷主標骨架修正（順手）**：主標誤吃全站 `h2` 的 `Noto Sans TC 900` 黑體 → 改 `--f-serif-cjk`（Chiron Sung HK 明朝）、字級 `clamp(1.85rem,3.2vw,2.75rem)`（創辦人嫌字大＝呆版，見 [[feedback_dont_oversize_headlines]]）。
+- **進度卡在**：玻璃質感「**甲＝深色玻璃**（配全站黑底最和諧，現役）vs **乙＝硬做亮玻璃**（像截圖但會在黑底浮白霧）」**待創辦人定**。現為深色玻璃版、質感剛推強、等驗收。
+- **收尾待辦**：①清 `.tunepanel`（浮水印切字面板，「定案後移除」）②清停用的 WebGL 殘碼＋`__dg` hook ③整進正式 `index.html`（5 層 CSS）。
+- **本輪沙盒**（`demo-liquid/`，皆探索集不上 production）：`service-title-explore` / `service-title-blackhole` / `service-card-glass-explore` / `service-glass-webgl` / `service-glass-block-test`；生成圖 `generated_images/glass-web-3d(-v2).png`（卡內 3D 物件方向已棄、可刪）。
+
 ### 數位行銷手風琴收合卡視覺定案（2026-06-17 23:11；2026-06-18 23:25 比例/碑文重校）
 
 收合卡＝「**月面碑刻**」石板。**已整合進預覽主頁**（`index-rain-preview.html` iframe 嵌 `demo-liquid/service-accordion-embed.html`）、**仍未進正式 index.html**。

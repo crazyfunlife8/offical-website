@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebGL 真 3D 玻璃面板（沙盒）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Italiana&family=Noto+Sans+TC:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{ --blue:#1736F5; --gold:#FFC709; --cjk:"Chiron Sung HK","Noto Serif TC",serif; --hair:"Italiana",serif; --mono:"JetBrains Mono",monospace; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{ background:#03081a; color:#fff; font-family:var(--mono); min-height:100vh; display:grid; place-items:center; padding:80px 5vw; overflow-x:hidden; }
+.bg{ position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(800px 560px at 30% 20%, rgba(23,54,245,.22), transparent 60%),
+            radial-gradient(700px 520px at 78% 70%, rgba(255,199,9,.08), transparent 60%),
+            linear-gradient(160deg,#050b22,#03081a 60%,#02050f); }
+.bar{ position:fixed; top:0; left:0; right:0; z-index:80; display:flex; gap:14px; align-items:center;
+  padding:12px 22px; background:rgba(4,8,24,.7); backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,199,9,.18); font-size:12px; letter-spacing:.05em; }
+.bar b{ color:var(--gold); font-weight:500; letter-spacing:.12em; } .bar span{ color:rgba(255,255,255,.55); }
+
+/* 落雨卡（深色底，仿正式卡） */
+.card{ position:relative; z-index:2; width:min(820px,92vw); height:min(500px,76vh);
+  border-radius:22px; overflow:hidden;
+  border:1px solid rgba(225,235,255,.12);
+  background:radial-gradient(130% 120% at 78% 8%, #16284e, #0a1428 55%, #060b18);
+  box-shadow:0 40px 110px rgba(0,0,0,.6), inset 0 1px 0 rgba(225,235,255,.09); }
+.card .topline{ position:absolute; top:0; left:0; right:0; height:1px; z-index:6;
+  background:linear-gradient(90deg, transparent, rgba(23,54,245,.8), rgba(255,199,9,.7), transparent); }
+
+/* 玻璃 canvas — 卡片上半當主視覺、透明 */
+#glass{ position:absolute; top:6%; left:50%; transform:translateX(-50%); width:74%; height:50%; z-index:3; pointer-events:none; }
+
+/* 真 HTML 文字（疊在玻璃前面 / 下方） */
+.content{ position:absolute; inset:0; z-index:5; padding:44px 50px; display:flex; flex-direction:column; justify-content:flex-end; }
+.klab{ font-family:var(--mono); font-size:12px; letter-spacing:.26em; color:rgba(255,199,9,.82); }
+.ztitle{ font-family:var(--cjk); font-weight:600; font-size:clamp(2rem,4vw,3rem); color:rgba(225,235,255,.97); margin:14px 0 4px; letter-spacing:.02em; }
+.zen{ font-family:var(--hair); font-size:1.15rem; color:rgba(210,222,245,.5); letter-spacing:.04em; }
+.svc{ list-style:none; margin-top:20px; }
+.svc li{ display:flex; gap:14px; padding:11px 2px; border-top:1px solid rgba(225,235,255,.12); }
+.svc .sn{ font-family:var(--cjk); font-size:1.05rem; color:rgba(225,235,255,.95); }
+.svc .sd{ margin-left:auto; font-size:.82rem; color:rgba(225,235,255,.55); }
+.knum{ position:absolute; top:30px; right:44px; z-index:5; font-family:var(--hair); font-size:58px; color:rgba(255,199,9,.2); line-height:1; }
+
+.note{ position:fixed; bottom:14px; left:50%; transform:translateX(-50%); z-index:80; font-family:var(--mono);
+  font-size:11px; color:rgba(255,255,255,.5); }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="bar"><b>WebGL 真 3D 玻璃</b><span>滑鼠在卡上移動 → 玻璃會轉 · 真 Three.js 折射 · 沙盒</span></div>
+
+<div class="card" id="card">
+  <div class="topline"></div>
+  <span class="knum">01</span>
+  <canvas id="glass"></canvas>
+  <div class="content">
+    <p class="klab">// WEB DEVELOPMENT</p>
+    <h3 class="ztitle">網站架設</h3>
+    <p class="zen">Your digital front door.</p>
+    <ul class="svc">
+      <li><span class="sn">形象 / 一頁式官網</span><span class="sd">乾淨俐落的數位門面</span></li>
+      <li><span class="sn">電商 / 會員整合</span><span class="sd">線上販售與會員經營</span></li>
+    </ul>
+  </div>
+</div>
+<p class="note">玻璃只反射程序生成的藍金光環境（WebGL 讀不到後面 DOM）；真文字疊在前面。</p>
+
+<script>
+(function(){
+  const canvas=document.getElementById('glass');
+  const renderer=new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
+  renderer.setClearAlpha(0);
+  renderer.outputEncoding=THREE.sRGBEncoding;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+  function size(){ const r=canvas.getBoundingClientRect(); renderer.setPixelRatio(Math.min(devicePixelRatio,1.5)); renderer.setSize(r.width,r.height,false); cam.aspect=r.width/r.height; cam.updateProjectionMatrix(); }
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(32, 2, 0.1, 100); cam.position.set(0,0,7);
+
+  /* 程序生成 envMap：深底 + 藍光 + 金高光 + 白細線 */
+  const ec=document.createElement('canvas'); ec.width=1024; ec.height=512; const ex=ec.getContext('2d');
+  ex.fillStyle='#04060e'; ex.fillRect(0,0,1024,512);
+  let g1=ex.createRadialGradient(300,150,0,300,150,420); g1.addColorStop(0,'rgba(60,100,255,.95)'); g1.addColorStop(.5,'rgba(23,54,245,.5)'); g1.addColorStop(1,'rgba(23,54,245,0)'); ex.fillStyle=g1; ex.fillRect(0,0,1024,512);
+  let g2=ex.createRadialGradient(820,360,0,820,360,300); g2.addColorStop(0,'rgba(255,210,90,.9)'); g2.addColorStop(.5,'rgba(255,199,9,.4)'); g2.addColorStop(1,'rgba(255,199,9,0)'); ex.fillStyle=g2; ex.fillRect(0,0,1024,512);
+  ex.strokeStyle='rgba(255,255,255,.85)'; ex.lineWidth=6; ex.beginPath(); ex.moveTo(120,60); ex.lineTo(420,40); ex.stroke();
+  ex.strokeStyle='rgba(200,220,255,.6)'; ex.lineWidth=3; ex.beginPath(); ex.moveTo(560,470); ex.lineTo(900,450); ex.stroke();
+  const envTex=new THREE.CanvasTexture(ec); envTex.mapping=THREE.EquirectangularReflectionMapping; envTex.encoding=THREE.sRGBEncoding;
+  const pmrem=new THREE.PMREMGenerator(renderer); const envRT=pmrem.fromEquirectangular(envTex); scene.environment=envRT.texture;
+
+  /* 薄倒角圓角玻璃板 */
+  function rrect(w,h,r){ const s=new THREE.Shape(); const x=-w/2,y=-h/2;
+    s.moveTo(x+r,y); s.lineTo(x+w-r,y); s.quadraticCurveTo(x+w,y,x+w,y+r);
+    s.lineTo(x+w,y+h-r); s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    s.lineTo(x+r,y+h); s.quadraticCurveTo(x,y+h,x,y+h-r);
+    s.lineTo(x,y+r); s.quadraticCurveTo(x,y,x+r,y); return s; }
+  const geo=new THREE.ExtrudeGeometry(rrect(3.4,2.1,0.34),{depth:0.16, bevelEnabled:true, bevelThickness:0.10, bevelSize:0.10, bevelSegments:8, curveSegments:32});
+  geo.center();
+  const mat=new THREE.MeshPhysicalMaterial({
+    transmission:1.0, thickness:1.4, roughness:0.05, metalness:0,
+    clearcoat:1.0, clearcoatRoughness:0.1,
+    envMap:envRT.texture, envMapIntensity:1.6,
+    color:new THREE.Color(0xcdddff), attenuationColor:new THREE.Color(0x3a5bff), attenuationDistance:3.2,
+    reflectivity:0.65, transparent:true });
+  const glass=new THREE.Mesh(geo,mat); scene.add(glass);
+
+  /* 內部薄玻璃線（代表瀏覽器視窗內容線，也是玻璃）讓它有「內容」感 */
+  const lineMat=new THREE.MeshPhysicalMaterial({ transmission:1, thickness:.3, roughness:.06, metalness:0, envMap:envRT.texture, envMapIntensity:1.4, color:0xdfeaff, transparent:true, opacity:.9 });
+  [[0,.55,1.9],[ -.45,.2,1.0],[-.45,-.1,1.0],[-.45,-.4,1.0],[.55,-.1,.7]].forEach(([px,py,lw])=>{
+    const bar=new THREE.Mesh(new THREE.BoxGeometry(lw,0.12,0.05), lineMat); bar.position.set(px,py,0.12); glass.add(bar); });
+
+  const amb=new THREE.AmbientLight(0x33406a,0.7); scene.add(amb);
+  const d1=new THREE.DirectionalLight(0xffffff,1.1); d1.position.set(-3,4,5); scene.add(d1);
+  const pBlue=new THREE.PointLight(0x4d6bff,1.4,40); pBlue.position.set(-4,2,4); scene.add(pBlue);
+  const pGold=new THREE.PointLight(0xffc709,1.0,40); pGold.position.set(4,-2,4); scene.add(pGold);
+
+  let mx=0,my=0,tx=0,ty=0;
+  document.getElementById('card').addEventListener('pointermove',e=>{ const r=e.currentTarget.getBoundingClientRect(); tx=((e.clientX-r.left)/r.width-.5); ty=((e.clientY-r.top)/r.height-.5); });
+  glass.rotation.set(-0.12,0.18,0);
+  function render(){ glass.rotation.y += ((tx*0.5+0.12)-glass.rotation.y)*0.06; glass.rotation.x += ((-ty*0.4-0.10)-glass.rotation.x)*0.06; renderer.render(scene,cam); }
+  window.__r=render; // 供截圖強制渲染
+  size(); addEventListener('resize',()=>{size();render();});
+  let on=true; function loop(){ requestAnimationFrame(loop); if(!document.hidden) render(); }
+  loop();
+})();
+</script>
+</body>
+</html>

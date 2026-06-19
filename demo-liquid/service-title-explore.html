@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>數位行銷 · 主標題美化探索（沙盒）</title>
+
+<!-- 真實站上字體 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght,SOFT@9..144,100..900,0..100&family=Noto+Sans+TC:wght@100;300;400;700&family=Noto+Serif+TC:wght@400;500;700;900&family=Italiana&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+
+<style>
+:root{
+  --blue:#1736F5; --navy:#0b1a7a; --black:#050d2e; --yellow:#FFC709; --white:#fff;
+  --blue-rgb:23,54,245; --yellow-rgb:255,199,9;
+  --cjk:"Chiron Sung HK","Noto Serif TC",serif;
+  --en:"Fraunces",serif; --hair:"Italiana",serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(1200px 700px at 75% -10%, rgba(var(--blue-rgb),.18), transparent 60%),
+    radial-gradient(900px 600px at 15% 110%, rgba(11,26,122,.45), transparent 60%),
+    linear-gradient(160deg,#040a22 0%,#050d2e 45%,#03081c 100%);
+  color:var(--white); font-family:var(--mono); min-height:100vh;
+}
+/* 細星點 + 黑洞斜帶（仿真實站氛圍） */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(1.2px 1.2px at 20% 30%, rgba(255,255,255,.5), transparent),
+    radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,.35), transparent),
+    radial-gradient(1.4px 1.4px at 80% 20%, rgba(255,255,255,.45), transparent),
+    radial-gradient(1px 1px at 35% 85%, rgba(255,255,255,.3), transparent),
+    radial-gradient(1.1px 1.1px at 90% 55%, rgba(255,255,255,.4), transparent);
+  opacity:.7;}
+
+/* ── 控制列 ── */
+.bar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;gap:14px;align-items:center;
+  padding:12px 22px;background:rgba(4,8,24,.82);backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(var(--yellow-rgb),.18);font-size:12px;letter-spacing:.05em}
+.bar b{color:var(--yellow);font-weight:500;letter-spacing:.12em}
+.bar span{color:rgba(255,255,255,.55)}
+.bar button{margin-left:auto;font-family:var(--mono);font-size:12px;letter-spacing:.1em;
+  color:var(--black);background:var(--yellow);border:0;border-radius:999px;padding:7px 16px;cursor:pointer}
+.bar button:hover{filter:brightness(1.08)}
+
+/* ── 每個方向的展示面板 ── */
+.panel{position:relative;z-index:1;min-height:92vh;display:flex;flex-direction:column;justify-content:center;
+  padding:7vh 8vw 6vh;border-bottom:1px solid rgba(255,255,255,.05)}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:rgba(var(--yellow-rgb),.85);
+  margin-bottom:6px}
+.note{font-family:var(--mono);font-size:12px;line-height:1.7;color:rgba(255,255,255,.5);
+  max-width:640px;margin-top:30px;border-left:2px solid rgba(var(--yellow-rgb),.4);padding-left:14px}
+.note em{color:rgba(255,255,255,.78);font-style:normal}
+.replay{margin-top:18px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;
+  color:rgba(255,255,255,.7);background:transparent;border:1px solid rgba(255,255,255,.25);
+  border-radius:999px;padding:6px 14px;cursor:pointer;width:max-content}
+.replay:hover{border-color:var(--yellow);color:var(--yellow)}
+
+/* 月面卡承接示意（每個方向下方共用，看標題如何承接銀白石板） */
+.moon-hint{display:flex;gap:8px;margin-top:42px;max-width:560px}
+.moon-hint i{flex:1;height:54px;border-radius:6px;
+  background:linear-gradient(150deg,#d9dde4,#b7bcc6 55%,#9aa0ac);
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.6),inset 0 -2px 4px rgba(0,0,0,.25),0 6px 18px rgba(0,0,0,.4);
+  position:relative}
+.moon-hint i::after{content:"";position:absolute;inset:0;border-radius:6px;
+  background:radial-gradient(40px 24px at 30% 30%,rgba(255,255,255,.4),transparent),
+            radial-gradient(30px 20px at 70% 60%,rgba(0,0,0,.12),transparent)}
+
+/* 共用標題基底 */
+.eyebrow{font-family:var(--en);font-size:13px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--yellow);margin-bottom:18px}
+.h2{font-family:var(--cjk);font-weight:700;line-height:1.12;font-size:clamp(2.6rem,6vw,5rem)}
+.alabel{font-family:var(--mono);font-size:11.5px;letter-spacing:.22em;color:rgba(var(--yellow-rgb),.85);margin-top:26px}
+
+/* ════════════════════════════════════════════════
+   現況 BASELINE — 目前正式畫面
+   ════════════════════════════════════════════════ */
+#now .accent{color:var(--yellow)}
+
+/* ════════════════════════════════════════════════
+   方向 A — 月面碑銘前奏（碑刻揭幕 + 金光掃過）
+   ════════════════════════════════════════════════ */
+#A .eyebrow{font-size:11px;letter-spacing:.3em;color:rgba(var(--yellow-rgb),.7);margin-bottom:14px}
+#A .h2{line-height:1.05;position:relative}
+#A .h2 .plain{color:#eef1f6}
+#A .h2 .accent{
+  background:linear-gradient(180deg,#fff 0%,#ffe9a8 30%,#FFC709 60%,#c8930a 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-stroke:.4px rgba(255,255,255,.18);
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.25)) drop-shadow(0 2px 5px rgba(0,0,0,.55));position:relative}
+/* 掃光 */
+#A .h2 .accent::after{content:attr(data-t);position:absolute;inset:0;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.9) 50%,transparent 65%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  background-size:250% 100%;background-position:200% 0;opacity:0}
+#A.play .h2 .accent::after{animation:sweepA 1.1s .55s ease-out forwards}
+@keyframes sweepA{0%{background-position:200% 0;opacity:1}100%{background-position:-60% 0;opacity:0}}
+/* 刀刻亮邊反光線 */
+#A .underline{height:1px;width:0;margin-top:20px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),rgba(var(--yellow-rgb),.6),transparent)}
+#A.play .underline{animation:lineGrow 1s .5s ease-out forwards}
+@keyframes lineGrow{to{width:min(560px,70%)}}
+#A .alabel{margin-top:14px}
+/* 揭幕 clip */
+#A.play .eyebrow{animation:fadeUp .6s ease-out both}
+#A.play .h2{animation:clipReveal 1s .15s cubic-bezier(.16,1,.3,1) both}
+#A.play .alabel{animation:fadeUp .6s .7s ease-out both}
+@keyframes clipReveal{from{clip-path:inset(0 100% 0 0);opacity:.3}to{clip-path:inset(0 0 0 0);opacity:1}}
+
+/* ════════════════════════════════════════════════
+   方向 B — 光譜斷層（白明朝被電光藍切開 + 破格錯位）
+   ════════════════════════════════════════════════ */
+#B .head{position:relative;display:inline-block}
+#B .eyebrow{color:rgba(var(--yellow-rgb),.6);font-size:12px}
+#B .h2{position:relative}
+#B .h2 .plain{color:#fff;display:inline-block;transform:translateX(-2px)}
+#B .h2 .accent{display:inline-block;transform:translateY(4px);
+  color:var(--yellow);
+  text-shadow:-1px 0 rgba(var(--blue-rgb),.55),1px 0 rgba(255,80,80,.18)} /* 微色散 */
+/* 電光藍切線 */
+#B .cut{position:absolute;top:-8%;left:46%;width:2px;height:116%;
+  background:linear-gradient(180deg,transparent,rgba(var(--blue-rgb),.9) 30%,rgba(120,180,255,1) 50%,rgba(var(--blue-rgb),.9) 70%,transparent);
+  box-shadow:0 0 14px rgba(var(--blue-rgb),.8);transform:scaleY(0);transform-origin:top}
+#B.play .cut{animation:cutSweep .7s .2s cubic-bezier(.7,0,.3,1) forwards}
+@keyframes cutSweep{0%{transform:scaleY(0)}55%{transform:scaleY(1)}100%{transform:scaleY(1)}}
+#B.play .h2 .accent{animation:flash .5s .7s ease-out}
+@keyframes flash{0%{filter:brightness(1)}40%{filter:brightness(2) drop-shadow(0 0 12px rgba(var(--yellow-rgb),.9))}100%{filter:brightness(1)}}
+#B .alabel{text-align:right;max-width:560px;margin-top:18px}
+#B.play .head{animation:fadeUp .7s ease-out both}
+#B.play .alabel{animation:fadeUp .6s .6s ease-out both}
+
+/* ════════════════════════════════════════════════
+   方向 C — 黑場劇院字幕（巨大留白 + 殘影背景大字）
+   ════════════════════════════════════════════════ */
+#C{justify-content:center}
+#C .stage{position:relative;padding:4vh 0}
+#C .ghost{position:absolute;top:50%;left:-2%;transform:translateY(-54%);
+  font-family:var(--hair);font-size:clamp(7rem,22vw,20rem);line-height:.8;
+  color:rgba(255,255,255,.04);letter-spacing:.02em;pointer-events:none;white-space:nowrap}
+#C .eyebrow{letter-spacing:.34em;font-size:12px}
+#C .h2{position:relative;font-size:clamp(2.4rem,5.4vw,4.5rem)}
+#C .h2 .plain{color:rgba(255,255,255,.92)}
+#C .h2 .accent{color:var(--yellow);filter:drop-shadow(0 0 18px rgba(var(--yellow-rgb),.35))}
+#C .subline{display:flex;align-items:center;gap:14px;margin-top:26px}
+#C .subline .bar-i{width:46px;height:1px;background:linear-gradient(90deg,var(--yellow),transparent)}
+#C .alabel{margin:0;color:rgba(var(--yellow-rgb),.6);letter-spacing:.3em}
+#C.play .ghost{animation:ghostIn 1.6s ease-out both}
+#C.play .eyebrow{animation:fadeUp .7s .2s ease-out both}
+#C.play .h2{animation:fadeUp .9s .35s cubic-bezier(.16,1,.3,1) both}
+#C.play .subline{animation:fadeUp .7s .7s ease-out both}
+@keyframes ghostIn{from{opacity:0;transform:translateY(-54%) scale(1.06)}to{opacity:1;transform:translateY(-54%) scale(1)}}
+
+/* ════════════════════════════════════════════════
+   方向 D — 綜合推薦（深空底反差銀白卡 + 一道金光刻 + 殘影編號）
+   ════════════════════════════════════════════════ */
+#D .stage{position:relative}
+#D .ghostnum{position:absolute;top:-38%;right:0;font-family:var(--hair);
+  font-size:clamp(8rem,20vw,18rem);line-height:.8;color:rgba(255,255,255,.045);pointer-events:none}
+#D .eyebrow{display:flex;align-items:center;gap:12px;color:rgba(var(--yellow-rgb),.8)}
+#D .eyebrow::before{content:"";width:34px;height:1px;background:rgba(var(--yellow-rgb),.7)}
+#D .h2{line-height:1.08;position:relative}
+#D .h2 .plain{color:#f2f4f8}
+#D .h2 .accent{position:relative;
+  background:linear-gradient(180deg,#fff 0%,#ffe7a0 34%,#FFC709 64%,#cf9709 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.22)) drop-shadow(0 3px 7px rgba(0,0,0,.5))}
+#D .h2 .accent::after{content:attr(data-t);position:absolute;inset:0;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.95) 50%,transparent 62%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  background-size:250% 100%;background-position:200% 0;opacity:0}
+#D.play .h2 .accent::after{animation:sweepA 1.2s .7s ease-out forwards}
+/* 電光藍細軸 + mono label editorial */
+#D .meta{display:flex;align-items:center;gap:16px;margin-top:24px}
+#D .meta .rule{width:2px;height:30px;background:linear-gradient(180deg,var(--blue),transparent);box-shadow:0 0 10px rgba(var(--blue-rgb),.7)}
+#D .meta .alabel{margin:0}
+#D.play .eyebrow{animation:fadeUp .6s .1s ease-out both}
+#D.play .h2{animation:clipReveal 1s .25s cubic-bezier(.16,1,.3,1) both}
+#D.play .ghostnum{animation:ghostIn2 1.4s ease-out both}
+#D.play .meta{animation:fadeUp .6s .8s ease-out both}
+@keyframes ghostIn2{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+/* 共用 */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <b>主標題美化探索</b>
+  <span>數位行銷服務區 · 「我們能做的，比你想的更多」· 沙盒（不影響正式檔）</span>
+  <button onclick="replayAll()">▶ 全部重播動畫</button>
+</div>
+
+<!-- 現況 -->
+<section class="panel" id="now">
+  <div class="tag">BASELINE · 目前正式畫面</div>
+  <p class="eyebrow">OUR SERVICES</p>
+  <h2 class="h2"><span class="plain">我們能做的，</span><span class="accent">比你想的更多</span></h2>
+  <p class="alabel">DIGITAL MARKETING ── 數位行銷</p>
+  <div class="moon-hint"><i></i><i></i><i></i><i></i></div>
+  <p class="note"><em>現況：</em>白字＋金字 serif 大標，乾淨但很普通——沒有層次玩法、沒有質感、進場沒有記憶點。往下捲看 4 個方向 ↓</p>
+</section>
+
+<!-- 方向 A -->
+<section class="panel play" id="A">
+  <div class="tag">方向 A · 月面碑銘前奏</div>
+  <p class="eyebrow">OUR SERVICES</p>
+  <h2 class="h2"><span class="plain">我們能做的，</span><span class="accent" data-t="比你想的更多">比你想的更多</span></h2>
+  <div class="underline"></div>
+  <p class="alabel">DIGITAL MARKETING ── 數位行銷</p>
+  <div class="moon-hint"><i></i><i></i><i></i><i></i></div>
+  <button class="replay" onclick="replay('A')">↻ 重播</button>
+  <p class="note"><em>承接下方月面碑刻。</em>金字改「白→金→暗金」漸層＋細刻亮邊，像被光刻出來；進場用 clip 由左揭幕＋一道金光掃過 accent。最自然連到下方銀白石板卡。<br>風險：刻感做太重會變古風匾額。</p>
+</section>
+
+<!-- 方向 B -->
+<section class="panel play" id="B">
+  <div class="tag">方向 B · 光譜斷層</div>
+  <div class="head">
+    <p class="eyebrow">OUR SERVICES</p>
+    <h2 class="h2"><span class="cut"></span><span class="plain">我們能做的，</span><span class="accent">比你想的更多</span></h2>
+    <p class="alabel">DIGITAL MARKETING ── 數位行銷</p>
+  </div>
+  <div class="moon-hint"><i></i><i></i><i></i><i></i></div>
+  <button class="replay" onclick="replay('B')">↻ 重播</button>
+  <p class="note"><em>銳利、未來感、衝突反差。</em>白明朝被一道電光藍光束切過，金字微錯位下沉＋一點藍色色散；mono label 靠右走雜誌排版。進場：藍線掃落、金字閃一下。<br>風險：藍光太多會搶掉下方銀白石板質感。</p>
+</section>
+
+<!-- 方向 C -->
+<section class="panel play" id="C">
+  <div class="tag">方向 C · 黑場劇院字幕</div>
+  <div class="stage">
+    <div class="ghost">SERVICES</div>
+    <p class="eyebrow">OUR SERVICES</p>
+    <h2 class="h2"><span class="plain">我們能做的，</span><span class="accent">比你想的更多</span></h2>
+    <div class="subline"><span class="bar-i"></span><p class="alabel">DIGITAL MARKETING ── 數位行銷</p></div>
+  </div>
+  <button class="replay" onclick="replay('C')">↻ 重播</button>
+  <p class="note"><em>電影開場字幕，最優雅。</em>巨大黑場留白＋背後一個極淡 Italiana 殘影大字「SERVICES」，金字只加淡外光暈、不漸層。靠時間差與黑場張力，不掃光。<br>風險：最優雅但「不正常」最低、記憶點較弱。</p>
+</section>
+
+<!-- 方向 D -->
+<section class="panel play" id="D">
+  <div class="tag">方向 D · 綜合推薦（兄弟＋我）</div>
+  <div class="stage">
+    <div class="ghostnum">03</div>
+    <p class="eyebrow">OUR SERVICES</p>
+    <h2 class="h2"><span class="plain">我們能做的，</span><span class="accent" data-t="比你想的更多">比你想的更多</span></h2>
+    <div class="meta"><span class="rule"></span><p class="alabel">DIGITAL MARKETING ── 數位行銷</p></div>
+  </div>
+  <div class="moon-hint"><i></i><i></i><i></i><i></i></div>
+  <button class="replay" onclick="replay('D')">↻ 重播</button>
+  <p class="note"><em>標題刻意維持「深空底」＝和下方銀白卡形成反差（品牌反差語彙），同時用 A 的金光刻 accent＋C 的殘影編號「03」做電影層次＋B 的電光藍細軸帶 label。三家的好處都拿、各自的風險都閃掉。</p>
+</section>
+
+<script>
+function replay(id){const el=document.getElementById(id);el.classList.remove('play');void el.offsetWidth;el.classList.add('play');}
+function replayAll(){['A','B','C','D'].forEach(replay);}
+// 捲到哪個面板才播該面板動畫（更接近真實捲動體驗）
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting&&['A','B','C','D'].includes(e.target.id)){replay(e.target.id);}})},{threshold:.4});
+['A','B','C','D'].forEach(id=>io.observe(document.getElementById(id)));
+</script>
+</body>
+</html>

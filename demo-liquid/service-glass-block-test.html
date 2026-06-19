@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>玻璃小塊材質測試台（沙盒）</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{ background:#03081a; color:#fff; font-family:"JetBrains Mono",monospace; min-height:100vh; overflow:hidden; }
+.bg{ position:fixed; inset:0; z-index:0;
+  background:radial-gradient(800px 560px at 30% 25%, rgba(23,54,245,.22), transparent 60%),
+            radial-gradient(700px 520px at 75% 72%, rgba(255,199,9,.09), transparent 60%),
+            linear-gradient(160deg,#050b22,#03081a 60%,#02050f); }
+#c{ position:fixed; inset:0; z-index:1; }
+.bar{ position:fixed; top:0; left:0; right:0; z-index:30; display:flex; gap:12px; align-items:center;
+  padding:11px 20px; background:rgba(4,8,24,.6); backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,199,9,.18); font-size:12px; letter-spacing:.05em; }
+.bar b{ color:#FFC709; font-weight:500; letter-spacing:.12em; } .bar span{ color:rgba(255,255,255,.55); }
+.panel{ position:fixed; top:58px; right:18px; z-index:30; width:248px; background:rgba(8,12,22,.86);
+  border:1px solid rgba(225,235,255,.14); border-radius:12px; padding:14px 16px; font-size:11px;
+  color:rgba(225,235,255,.82); backdrop-filter:blur(8px); }
+.panel h5{ font-size:10px; letter-spacing:.18em; color:rgba(255,199,9,.9); margin-bottom:10px; font-weight:500; }
+.row{ margin:11px 0; }
+.row label{ display:flex; justify-content:space-between; margin-bottom:4px; color:rgba(225,235,255,.72); }
+.row b{ color:rgba(120,160,255,.95); font-weight:500; }
+.row input[type=range]{ width:100%; accent-color:#1736F5; }
+.shapes{ display:flex; gap:6px; margin-top:6px; }
+.shapes button{ flex:1; font-family:inherit; font-size:10px; padding:6px 0; border-radius:6px; cursor:pointer;
+  background:rgba(255,255,255,.06); color:rgba(225,235,255,.8); border:1px solid rgba(255,255,255,.16); }
+.shapes button.on{ background:rgba(23,54,245,.5); border-color:rgba(120,160,255,.6); color:#fff; }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<canvas id="c"></canvas>
+<div class="bar"><b>玻璃小塊測試</b><span>單獨調材質 · 拉桿即時看 · 調好再放大套卡片</span></div>
+<div class="panel">
+  <h5>GLASS MATERIAL</h5>
+  <div class="shapes" id="shapes">
+    <button data-s="panel" class="on">面板</button>
+    <button data-s="block">方塊</button>
+    <button data-s="orb">圓球</button>
+  </div>
+  <div class="row"><label>環境反光 <b id="vEnv">1.8</b></label><input id="env" type="range" min="0.3" max="3.5" step="0.05" value="1.8"></div>
+  <div class="row"><label>霧度(0=透亮) <b id="vRough">0.04</b></label><input id="rough" type="range" min="0" max="0.5" step="0.01" value="0.04"></div>
+  <div class="row"><label>厚度 <b id="vThick">1.4</b></label><input id="thick" type="range" min="0.1" max="3" step="0.1" value="1.4"></div>
+  <div class="row"><label>染色深度(小=更藍) <b id="vAtt">3.0</b></label><input id="att" type="range" min="0.5" max="8" step="0.1" value="3.0"></div>
+  <div class="row"><label>清漆光澤 <b id="vCc">1.0</b></label><input id="cc" type="range" min="0" max="1" step="0.05" value="1.0"></div>
+  <div class="row"><label>自轉速度 <b id="vSpin">0.5</b></label><input id="spin" type="range" min="0" max="2" step="0.05" value="0.5"></div>
+</div>
+
+<script>
+(function(){
+  const canvas=document.getElementById('c');
+  const renderer=new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
+  renderer.setClearAlpha(0); renderer.outputEncoding=THREE.sRGBEncoding;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1;
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(32, innerWidth/innerHeight, .1, 100); cam.position.set(0,0,7);
+  function size(){ renderer.setPixelRatio(Math.min(devicePixelRatio,1.5)); renderer.setSize(innerWidth,innerHeight); cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix(); }
+  size(); addEventListener('resize',size);
+
+  /* 程序 envMap：深底 + 亮藍光帶 + 金高光 + 白線 */
+  const ec=document.createElement('canvas'); ec.width=1024; ec.height=512; const ex=ec.getContext('2d');
+  // 棚拍底（不是全黑，給玻璃通體亮度）
+  let bgg=ex.createLinearGradient(0,0,0,512); bgg.addColorStop(0,'#15244a'); bgg.addColorStop(.5,'#0a1430'); bgg.addColorStop(1,'#050a1a'); ex.fillStyle=bgg; ex.fillRect(0,0,1024,512);
+  // 上方大面柔光（冷白藍）— 玻璃主反光面
+  let soft=ex.createLinearGradient(0,0,0,300); soft.addColorStop(0,'rgba(210,225,255,1)'); soft.addColorStop(.55,'rgba(120,150,255,.55)'); soft.addColorStop(1,'rgba(60,90,220,0)'); ex.fillStyle=soft; ex.fillRect(120,10,780,260);
+  // 藍光暈
+  let g1=ex.createRadialGradient(280,180,0,280,180,420); g1.addColorStop(0,'rgba(140,175,255,.9)'); g1.addColorStop(.5,'rgba(23,54,245,.45)'); g1.addColorStop(1,'rgba(23,54,245,0)'); ex.fillStyle=g1; ex.fillRect(0,0,1024,512);
+  // 金光暈（右下）
+  let g2=ex.createRadialGradient(840,380,0,840,380,360); g2.addColorStop(0,'rgba(255,225,130,.95)'); g2.addColorStop(.5,'rgba(255,199,9,.45)'); g2.addColorStop(1,'rgba(255,199,9,0)'); ex.fillStyle=g2; ex.fillRect(0,0,1024,512);
+  // 兩條俐落亮邊高光（玻璃邊緣會掃到）
+  ex.strokeStyle='rgba(255,255,255,1)'; ex.lineWidth=10; ex.beginPath(); ex.moveTo(120,90); ex.lineTo(470,60); ex.stroke();
+  ex.strokeStyle='rgba(255,236,180,.8)'; ex.lineWidth=5; ex.beginPath(); ex.moveTo(600,470); ex.lineTo(960,448); ex.stroke();
+  const envTex=new THREE.CanvasTexture(ec); envTex.mapping=THREE.EquirectangularReflectionMapping; envTex.encoding=THREE.sRGBEncoding;
+  const pmrem=new THREE.PMREMGenerator(renderer); const envRT=pmrem.fromEquirectangular(envTex); scene.environment=envRT.texture;
+
+  const mat=new THREE.MeshPhysicalMaterial({ transmission:1, thickness:1.4, roughness:.04, metalness:0,
+    clearcoat:1, clearcoatRoughness:.08, envMap:envRT.texture, envMapIntensity:1.8,
+    color:new THREE.Color(0xcfe0ff), attenuationColor:new THREE.Color(0x2f54ff), attenuationDistance:3.0,
+    reflectivity:.7, transparent:true });
+
+  function rrect(w,h,r){ const s=new THREE.Shape(); const x=-w/2,y=-h/2;
+    s.moveTo(x+r,y); s.lineTo(x+w-r,y); s.quadraticCurveTo(x+w,y,x+w,y+r);
+    s.lineTo(x+w,y+h-r); s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    s.lineTo(x+r,y+h); s.quadraticCurveTo(x,y+h,x,y+h-r);
+    s.lineTo(x,y+r); s.quadraticCurveTo(x,y,x+r,y); return s; }
+  function geoPanel(){ const g=new THREE.ExtrudeGeometry(rrect(3.4,2.2,.34),{depth:.18,bevelEnabled:true,bevelThickness:.11,bevelSize:.11,bevelSegments:8,curveSegments:32}); g.center(); return g; }
+  function geoBlock(){ const g=new THREE.ExtrudeGeometry(rrect(2.4,2.4,.3),{depth:1.1,bevelEnabled:true,bevelThickness:.14,bevelSize:.14,bevelSegments:8,curveSegments:28}); g.center(); return g; }
+  function geoOrb(){ return new THREE.SphereGeometry(1.5,96,96); }
+
+  let mesh=new THREE.Mesh(geoPanel(),mat); scene.add(mesh);
+  function setShape(s){ scene.remove(mesh); mesh.geometry.dispose();
+    mesh=new THREE.Mesh(s==='block'?geoBlock():s==='orb'?geoOrb():geoPanel(), mat); scene.add(mesh); }
+
+  scene.add(new THREE.AmbientLight(0x33406a,.7));
+  const d1=new THREE.DirectionalLight(0xffffff,1.2); d1.position.set(-3,4,5); scene.add(d1);
+  const pB=new THREE.PointLight(0x6080ff,1.6,40); pB.position.set(-4,2,4); scene.add(pB);
+  const pG=new THREE.PointLight(0xffc709,1.1,40); pG.position.set(4,-2,4); scene.add(pG);
+
+  let spin=0.5, rot=0.4;
+  mesh && (mesh.rotation.set(-.12,.5,0));
+  const $=id=>document.getElementById(id);
+  function bind(id,vid,fn,fix){ $(id).oninput=e=>{ const v=parseFloat(e.target.value); $(vid).textContent=fix!=null?v.toFixed(fix):v; fn(v); }; }
+  bind('env','vEnv',v=>mat.envMapIntensity=v,2);
+  bind('rough','vRough',v=>{mat.roughness=v;mat.needsUpdate=true;},2);
+  bind('thick','vThick',v=>mat.thickness=v,1);
+  bind('att','vAtt',v=>mat.attenuationDistance=v,1);
+  bind('cc','vCc',v=>{mat.clearcoat=v;mat.needsUpdate=true;},2);
+  bind('spin','vSpin',v=>spin=v,2);
+  document.querySelectorAll('#shapes button').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#shapes button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); setShape(b.dataset.s); });
+
+  function render(){ rot+=spin*0.01; mesh.rotation.y=rot; mesh.rotation.x=-0.12+Math.sin(rot*0.6)*0.08; renderer.render(scene,cam); }
+  window.__r=render;
+  function loop(){ requestAnimationFrame(loop); if(!document.hidden) render(); } loop();
+})();
+</script>
+</body>
+</html>

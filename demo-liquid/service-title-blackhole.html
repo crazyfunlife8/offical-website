@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>能力黑洞 · 主標題破框原型（沙盒）</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Italiana&family=Noto+Sans+TC:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+<style>
+:root{
+  --blue:#1736F5; --navy:#0b1a7a; --black:#050d2e; --yellow:#FFC709; --white:#fff;
+  --blue-rgb:23,54,245; --yellow-rgb:255,199,9;
+  --cjk:"Chiron Sung HK","Noto Serif TC",serif; --hair:"Italiana",serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#03081c;color:var(--white);font-family:var(--mono);overflow-x:hidden}
+
+.bar{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;gap:14px;align-items:center;
+  padding:12px 22px;background:rgba(3,8,24,.78);backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(var(--yellow-rgb),.18);font-size:12px;letter-spacing:.05em}
+.bar b{color:var(--yellow);font-weight:500;letter-spacing:.12em}
+.bar span{color:rgba(255,255,255,.55)}
+.bar button{font-family:var(--mono);font-size:12px;letter-spacing:.1em;
+  color:var(--black);background:var(--yellow);border:0;border-radius:999px;padding:7px 16px;cursor:pointer}
+.bar .ghost{background:transparent;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.25)}
+.bar .right{margin-left:auto;display:flex;gap:10px}
+
+/* ── 黑洞舞台 ── */
+.stage{position:relative;height:100vh;min-height:620px;overflow:hidden;
+  background:
+    radial-gradient(1100px 700px at 50% 48%, rgba(var(--blue-rgb),.14), transparent 62%),
+    radial-gradient(1400px 900px at 50% 120%, rgba(11,26,122,.4), transparent 60%),
+    linear-gradient(160deg,#040a22,#03081c 60%,#02050f);
+  display:flex;align-items:center;justify-content:center}
+/* 星點 */
+.stage::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(1.3px 1.3px at 18% 28%, rgba(255,255,255,.55), transparent),
+    radial-gradient(1px 1px at 62% 72%, rgba(255,255,255,.4), transparent),
+    radial-gradient(1.4px 1.4px at 82% 22%, rgba(255,255,255,.5), transparent),
+    radial-gradient(1px 1px at 33% 84%, rgba(255,255,255,.32), transparent),
+    radial-gradient(1.1px 1.1px at 90% 58%, rgba(255,255,255,.45), transparent),
+    radial-gradient(1px 1px at 8% 60%, rgba(255,255,255,.3), transparent);
+  opacity:.7}
+
+/* 吸積盤（旋轉的 conic 光環） */
+.disk{position:absolute;width:min(120vh,1100px);aspect-ratio:1/1;border-radius:50%;
+  background:conic-gradient(from 0deg,
+     rgba(var(--blue-rgb),0) 0deg, rgba(var(--blue-rgb),.22) 60deg,
+     rgba(var(--yellow-rgb),.10) 120deg, rgba(var(--blue-rgb),0) 180deg,
+     rgba(var(--yellow-rgb),.16) 250deg, rgba(var(--blue-rgb),.22) 320deg, rgba(var(--blue-rgb),0) 360deg);
+  -webkit-mask:radial-gradient(closest-side, transparent 30%, #000 42%, #000 70%, transparent 86%);
+          mask:radial-gradient(closest-side, transparent 30%, #000 42%, #000 70%, transparent 86%);
+  opacity:0;transform:scale(.6)}
+/* 事件視界核心 */
+.core{position:absolute;width:30px;height:30px;border-radius:50%;
+  background:radial-gradient(circle, #fff 0%, rgba(var(--yellow-rgb),.9) 30%, rgba(var(--blue-rgb),.6) 60%, transparent 75%);
+  filter:blur(2px);opacity:0;transform:scale(0)}
+
+/* 能力碎片 */
+.frag{position:absolute;left:50%;top:50%;white-space:nowrap;font-family:var(--cjk);
+  font-size:clamp(13px,1.05vw,17px);font-weight:400;letter-spacing:.04em;
+  padding:5px 13px;border-radius:999px;will-change:transform,opacity;pointer-events:none}
+.frag.g{color:#ffe9a8;border:1px solid rgba(var(--yellow-rgb),.5);box-shadow:0 0 14px rgba(var(--yellow-rgb),.18)}
+.frag.b{color:#bcd0ff;border:1px solid rgba(var(--blue-rgb),.55);box-shadow:0 0 14px rgba(var(--blue-rgb),.28)}
+.frag.w{color:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.22)}
+
+/* 凝結出的主標 */
+.headline{position:absolute;text-align:center;z-index:5;opacity:0;will-change:transform,opacity,filter}
+.headline .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:rgba(var(--yellow-rgb),.85);margin-bottom:20px}
+.headline h2{font-family:var(--cjk);font-weight:700;line-height:1.12;font-size:clamp(2.6rem,6.4vw,5.4rem)}
+.headline h2 .plain{color:#f1f4fa}
+.headline h2 .accent{
+  background:linear-gradient(180deg,#fff 0%,#ffe7a0 36%,#FFC709 66%,#cf9709 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+.headline .label{font-family:var(--mono);font-size:11.5px;letter-spacing:.26em;color:rgba(var(--yellow-rgb),.7);margin-top:26px}
+
+/* 提示捲動 */
+.hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);font-size:11px;letter-spacing:.18em;
+  color:rgba(255,255,255,.4)}
+
+.below{padding:8vh 8vw;background:linear-gradient(180deg,#02050f,#050d2e);position:relative}
+.below .moon{display:flex;gap:8px;max-width:760px;margin:0 auto}
+.below .moon i{flex:1;height:120px;border-radius:8px;
+  background:linear-gradient(150deg,#d9dde4,#b7bcc6 55%,#9aa0ac);
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.6),inset 0 -3px 6px rgba(0,0,0,.25),0 10px 26px rgba(0,0,0,.45)}
+.below p{max-width:760px;margin:22px auto 0;font-size:12.5px;line-height:1.8;color:rgba(255,255,255,.5)}
+.below em{color:rgba(255,255,255,.8);font-style:normal}
+
+@media (prefers-reduced-motion: reduce){
+  .frag,.disk,.core{display:none!important}
+  .headline{opacity:1!important;transform:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <b>能力黑洞</b>
+  <span>主標題破框原型 · 碎片被吸入 → 凝結成主標 · 沙盒（不影響正式檔）</span>
+  <div class="right">
+    <button class="ghost" onclick="setSpeed()">慢動作 ✕<span id="spd">1</span></button>
+    <button onclick="play()">▶ 重播</button>
+  </div>
+</div>
+
+<section class="stage" id="stage">
+  <div class="disk" id="disk"></div>
+  <div class="core" id="core"></div>
+  <div id="field"></div>
+  <div class="headline" id="hl">
+    <p class="eyebrow">OUR SERVICES</p>
+    <h2><span class="plain">我們能做的，</span><span class="accent">比你想的更多</span></h2>
+    <p class="label">DIGITAL MARKETING ── 數位行銷</p>
+  </div>
+  <div class="hint">▼ 往下就是月面服務卡</div>
+</section>
+
+<section class="below">
+  <div class="moon"><i></i><i></i><i></i><i></i></div>
+  <p><em>下方＝現有的月面碑刻卡。</em>概念：上面是「流動、爆量、被吸進重力場」的能力黑洞（動），凝結出主標後裂解、把你帶進「沉重、刻下來」的月面石板卡（靜）。一動一靜的反差，就是進服務區的儀式。<br><em>形式即證明：</em>碎片多到你來不及讀完，就被吸走了——這個「讀不完」本身就證明了「比你想的更多」，不用嘴巴講。</p>
+</section>
+
+<script>
+const CAPS = ["社群經營","廣告投放","AI 形象網紅","部落格代營運","短影音企劃","品牌設計","SEO 優化","數據分析",
+"行銷自動化","網站架設","電商系統","顧問導入","內容企劃","直播經營","名單收集","再行銷","視覺設計","品牌文案",
+"投放優化","KOL 媒合","跳動E投放","一鍵架站","受眾洞察","活動企劃","成效報表","客製系統","形象影片","社群廣告"];
+
+const field = document.getElementById('field');
+const hl = document.getElementById('hl');
+const disk = document.getElementById('disk');
+const core = document.getElementById('core');
+let frags = [];
+let speed = 1;
+const SPEEDS = [1, 0.45, 0.2];
+let spdIdx = 0;
+
+function buildFrags(){
+  field.innerHTML = '';
+  frags = [];
+  const cls = ['g','b','w'];
+  const W = window.innerWidth, H = window.innerHeight;
+  const Rx = Math.min(W*0.46, 760), Ry = Math.min(H*0.40, 380);
+  CAPS.forEach((txt,i)=>{
+    const d = document.createElement('div');
+    d.className = 'frag ' + cls[i % 3];
+    d.textContent = txt;
+    field.appendChild(d);
+    // 散佈在橢圓吸積盤上，角度均分 + 半徑抖動
+    const ang = (i / CAPS.length) * Math.PI * 2 + (i*0.7);
+    const rad = 0.62 + ((i*37)%100)/100 * 0.55; // 0.62~1.17
+    const x = Math.cos(ang) * Rx * rad;
+    const y = Math.sin(ang) * Ry * rad;
+    frags.push({el:d, x, y, ang, rad});
+  });
+}
+
+function play(){
+  buildFrags();
+  gsap.killTweensOf('*');
+  const els = frags.map(f=>f.el);
+
+  // 初始
+  gsap.set(hl,{opacity:0, scale:1.18, filter:'blur(14px)'});
+  gsap.set(disk,{opacity:0, scale:.6, rotate:0});
+  gsap.set(core,{opacity:0, scale:0});
+  frags.forEach(f=>gsap.set(f.el,{x:f.x, y:f.y, opacity:0, scale:.8, rotate:gsap.utils.random(-25,25)}));
+
+  // 吸積盤持續慢轉（獨立 tween，不進主時間軸，避免拉長 timeline）
+  gsap.to(disk,{rotate:'+=360', duration:26, ease:'none', repeat:-1});
+
+  const tl = gsap.timeline({defaults:{ease:'none'}});
+  tl.timeScale(speed);
+
+  // 1) 吸積盤亮起 + 碎片在盤面浮現
+  tl.to(disk,{opacity:1, scale:1, duration:1.0, ease:'power2.out'},0);
+  tl.to(els,{opacity:1, scale:1, duration:0.7, ease:'power2.out',
+      stagger:{each:0.03, from:'random'}},0.15);
+
+  // 2) 重力開始拉（緩慢內縮）
+  tl.to(els,{x:(i)=>frags[i].x*0.8, y:(i)=>frags[i].y*0.8, rotate:'+=20',
+      duration:0.9, ease:'power1.in', stagger:{each:0.008, from:'edges'}},1.7);
+
+  // 3) 核心亮起 + 全部旋進吸入
+  tl.to(core,{opacity:1, scale:1, duration:0.5, ease:'power2.out'},2.4);
+  tl.to(els,{x:0, y:0, scale:0.12, rotate:'+=180', opacity:0,
+      duration:1.0, ease:'power3.in', stagger:{each:0.015, from:'random'}},2.5);
+
+  // 4) 核心閃光膨脹再消
+  tl.to(core,{scale:16, duration:0.34, ease:'power2.in'},3.55);
+  tl.to(core,{opacity:0, duration:0.45, ease:'power2.out'},3.85);
+
+  // 5) 主標從閃光中凝結
+  tl.to(hl,{opacity:1, scale:1, filter:'blur(0px)', duration:0.95, ease:'power3.out'},3.9);
+  tl.to(disk,{opacity:.45, duration:1.2, ease:'power2.out'},3.9);
+}
+
+function setSpeed(){
+  spdIdx = (spdIdx+1) % SPEEDS.length;
+  speed = SPEEDS[spdIdx];
+  document.getElementById('spd').textContent = (1/speed).toFixed(speed===1?0:1);
+  play();
+}
+
+// 只有在分頁真的看得到時才播（背景分頁 rAF 會被節流、動畫會凍住）
+let played=false;
+function tryPlay(){ if(document.hidden) return; gsap.globalTimeline.resume(); play(); played=true; }
+window.addEventListener('load', ()=>setTimeout(tryPlay, 350));
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) tryPlay(); });
+let rt; window.addEventListener('resize', ()=>{clearTimeout(rt); rt=setTimeout(()=>{if(!document.hidden)play();},400);});
+</script>
+</body>
+</html>
