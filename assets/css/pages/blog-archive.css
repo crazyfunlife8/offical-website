@@ -471,6 +471,56 @@ body.archive {
     z-index: 2; pointer-events: none;
 }
 
+/* ORIGIN FILE：本尊嫌犯三面存證單（跨兩欄放大、罪名讀得到）*/
+.casefile--origin { grid-column: span 2; }
+.casefile__evidence {
+    position: relative;
+    margin: 0.3rem 0 1.2rem;
+    transform: rotate(-1deg);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.casefile__evidence > img:not(.casefile__tape) {
+    display: block; width: 100%; height: auto;
+    border: 1px solid rgba(74,52,20,.20);
+    box-shadow: 0 7px 18px rgba(40,24,8,.24), inset 0 1px 0 rgba(255,255,255,.45);
+}
+.casefile__evidence figcaption {
+    font-family: var(--f-mono); font-size: 0.62rem; letter-spacing: 0.12em;
+    color: var(--ink-3); text-align: right; margin-top: 0.45rem;
+}
+.casefile__tape--evidence {
+    top: -14px; left: 22px; right: auto;
+    width: 104px; transform: rotate(-6deg);
+}
+.casefile--origin:hover .casefile__evidence {
+    transform: rotate(0deg) translateY(-2px);
+    box-shadow: 0 11px 24px rgba(40,24,8,.28), inset 0 1px 0 rgba(255,255,255,.45);
+}
+@media (prefers-reduced-motion: reduce) {
+    .casefile__evidence, .casefile--origin:hover .casefile__evidence { transition: none; transform: rotate(-1deg); }
+}
+/* 控罪清單：打字機條列、罪名讀得清楚（小照片蓋章會糊）*/
+.casefile__charges { margin: 0 0 1.3rem; }
+.casefile__charges-label {
+    font-family: var(--f-mono); font-size: 0.64rem; font-weight: 700; letter-spacing: 0.16em;
+    color: var(--stamp-red); margin: 0 0 0.55rem;
+}
+.casefile__charges ol { list-style: none; margin: 0; padding: 0; }
+.casefile__charges li {
+    display: flex; align-items: baseline; gap: 0.7em;
+    padding: 0.5em 0; border-top: 1px dashed rgba(74,52,20,.22);
+}
+.casefile__charges li:last-child { border-bottom: 1px dashed rgba(74,52,20,.22); }
+.chg-no { font-family: var(--f-mono); font-size: 0.72rem; font-weight: 700; color: var(--stamp-red); }
+.chg-name { font-family: var(--f-serif-cjk); font-weight: 700; font-size: 1.12rem; color: var(--ink); }
+.chg-law { margin-left: auto; font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.03em; color: var(--ink-3); white-space: nowrap; }
+@media (max-width: 520px) {
+    .casefile__charges li { flex-wrap: wrap; gap: 0.25em 0.7em; }
+    .chg-law { margin-left: 1.7em; }
+}
+
+@media (max-width: 720px) { .casefile--origin { grid-column: auto; } }
+
 .arc-more { text-align: center; font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.2em; color: var(--ink-3); margin: clamp(2.5rem, 5vw, 4rem) 0 0; }
 
 /* ============================================================
