@@ -161,18 +161,18 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
   - **自有產品展示形式**：已定避開「自動無限跑馬燈 + 小圖示」（公版味 + 永遠在跑卻證明不了產品價值＝同水卡陷阱）；用真截圖／影片。具體容器（跟著捲動的橫向展開 vs 慢速大圖電影劇照）**待創辦人選**。
 - **早期液態卡 morph 已清（2026-06-14 16:57）**：`index.html` + `assets/css/{animations,components,pages/index}.css` 曾有未 commit 的「液態卡 morph」實驗（`liquid-morph-a/b` 邊角晃動 + `?v=liquid2` 快取參數），已 `git restore` 全數還原、工作區乾淨；液態方向確定不上線。若日後要重看那批 keyframe，本條已記其內容、可重建。
 
-### 軟體開發「落雨區」卡片打磨進度（2026-06-20 02:43，下一輪繼續）
+### 軟體開發服務卡視覺：攝影棚容器 + 可移動燈（2026-06-21 23:37 重構定調；沙盒打光已定稿、未進正式 index.html）
 
-對應任務 11b。全部改動在 `index-rain-preview.html`（預覽內嵌 `<style>`/`<script>`），**未碰共用 components.css、未進正式 index.html**。
+對應任務 11b。現役檔＝`demo-liquid/service-glass-webgl-real.html`（Three.js r0.160、MeshPhysicalMaterial transmission 厚折射玻璃卡）。**2026-06-21 23:37 創辦人主導大改：從「浮卡＋補丁反光（舊沉穩/pop 兩版）」重構成「3D 攝影棚容器 ＋ 4 盞可移動柔光、創辦人自己打光」。** 舊「沉穩 vs pop 二選一／補丁反光（edgeBoost/cornerBoost/亮帶/edge rig）」敘述全部作廢。
 
-- **三卡已對齊 SSOT（取代舊「開發/成長/顧問」）**：①網站架設 ②客製化系統開發 ③數位轉型顧問。刪掉舊「成長」卡（其社群/AI網紅/跳動E 屬數位行銷或自有產品、不歸軟體開發）。文案取自 `服務項目總表.md`。codebar 去 IDE 化（檔名 `develop.tsx`→抽象索引 `WEB / SYSTEM / DIGITAL TRANSFORMATION ARCHITECTURE`、拿掉紅黃綠燈）、青 cyan→品牌藍金、`.ztitle` 收俐落明朝。
-- **卡片設計方向定案＝「玻璃面板卡片」**：**整張 `.inner` ＝ CSS glassmorphism**（`backdrop-filter:blur` 磨砂＋亮邊＋外光暈＋frost 透出後方星場/碼雨），內容在玻璃裡面。質感已強化（`.inner::after` 左上斜向反光＋上緣亮邊＋blur30＋藍光外暈）。
-- **紅線澄清**：創辦人那張 4 格參考截圖只是給**玻璃質感**參考，**不要做卡內 3D 玻璃物件**（曾誤解成「卡片旁放一塊玻璃物件」做了側邊 WebGL 玻璃，已退；正解＝卡片本身就是玻璃）。
-- **WebGL 真 3D 玻璃已停用**：曾走「甲」實作進 `#dev-glass`（Three.js r128，r128 不支援 `transmission` 的 thickness/attenuation、玻璃靠 envMap 反射），後創辦人澄清只要玻璃質感 → IIFE 已 `if(true)` 強制 return、`#dev-glass`/`.glass-fallback` `display:none`；**殘碼＋`window.__dg` 驗證 hook 留在檔內待清**。
-- **數位行銷主標骨架修正（順手）**：主標誤吃全站 `h2` 的 `Noto Sans TC 900` 黑體 → 改 `--f-serif-cjk`（Chiron Sung HK 明朝）、字級 `clamp(1.85rem,3.2vw,2.75rem)`（創辦人嫌字大＝呆版，見 [[feedback_dont_oversize_headlines]]）。
-- **進度卡在**：玻璃質感「**甲＝深色玻璃**（配全站黑底最和諧，現役）vs **乙＝硬做亮玻璃**（像截圖但會在黑底浮白霧）」**待創辦人定**。現為深色玻璃版、質感剛推強、等驗收。
-- **收尾待辦**：①清 `.tunepanel`（浮水印切字面板，「定案後移除」）②清停用的 WebGL 殘碼＋`__dg` hook ③整進正式 `index.html`（5 層 CSS）。
-- **本輪沙盒**（`demo-liquid/`，皆探索集不上 production）：`service-title-explore` / `service-title-blackhole` / `service-card-glass-explore` / `service-glass-webgl` / `service-glass-block-test`；生成圖 `generated_images/glass-web-3d(-v2).png`（卡內 3D 物件方向已棄、可刪）。
+- **架構**：深黑冷藍攝影棚（floor/walls 用 MeshBasicMaterial 不吃光，避免被照成白房間）＋卡片＋4 盞 RectAreaLight 柔光（主光/頂光/邊光/背光）。每盞用**球座標**控制：方位角(0–360° 繞卡片、循環不卡死)/高度角/距離/強度。debug 面板全繁中；`?qa=1`＝跳過 hidden-pause＋立即全亮＋碼雨 freeze（供截圖驗收）；`?debug=1`＝顯示拉軸面板。
+- **創辦人定稿打光（已 commit `93e3db4`）**：玻璃 thickness1.55/ior1.05/roughness0.06/transmission1/bevel16/fresnel2.25/envMap1.2/bloom0/tilt9,-12；主光 az13·el80·d6.05·i32、頂光 az65·el8·d8·i134、邊光 az70·el34·d6·i157、背光 az270·el35·d4.7·i39。效果＝頂左邊角晶亮、面乾淨、文字可讀。
+- **卡片骨架**：橫向大卡 `min(960px,92vw)×min(560px,78vh)`、圓角28、雙欄（左 kicker＋宋體大標＋說明／右「服務範疇」金線三條目）、watermark「網」裁進卡、內容＝網站架設/客製化系統開發/數位轉型顧問。
+- **設計紅線（血淚換來，務必守）**：① 反光要在「**邊與角**」不在「面」（面反光＝鏡面過度、會洗掉文字）② 邊角晶亮**靜態就能做、不需動態**（pop 當初的亮也是靜態，來自強面光不是會動）③ 燈要在**觀者側**（camera z=8.1）往卡片打、不是卡片後方④ **禁 PointLight/DirectionalLight**（倒角打等距虛線 dash）；**禁人工描線高光/sparkle/band/ticks**（靠材質＋envMap＋Fresnel 連續機制）⑤ 純黑冷藍底、金 1% accent⑥ RectAreaLight 反射是**矩形**→燈要擺到反射落在邊角、避開文字，或升 roughness 柔化⑦ 可見 softbox 面板會擋內容→已移除、只留燈。
+- **驗證坑**：背景分頁被瀏覽器判 hidden/降速→畫面凍結或偏暗；務必用 `?qa=1` ＋網址**加 cache-bust 參數**（`&cb=隨機`）才看得到最新版（同 URL 會吃快取、誤判沒變）。
+- **協作分工**：WebGL 由 codex（兄弟）實作、主 session 給死設計方向＋用 Chrome 驗收（codex 看不到畫面）。
+- **stage 2 待辦（下個對話接）**：① 燈控面板**分頁化**（主光/頂光/邊光/背光各一頁、收斂拉軸數量）② 3 個 **preset**（乾淨棚拍/銳利晶邊/科技冷光）③ 把背景**碼雨搬進攝影棚**（目前仍是平貼背景、非容器內元素）④ 驗證 **dispersion** 是否該留（r0.160 疑似無效、需 runtime 確認）⑤ 整進**正式 index.html**（5 層 CSS）。
+- **已退場/封存**：`service-glass-webgl-pop.html`＝舊水晶內雕文字版（checkpoint `709101b`，封存備查、非現役）。git 還原點（branch `feature/water-card-native-integration`）：原始沉穩版 `b1d7b65`、攝影棚重構 `d8def49`、定稿 `93e3db4`。
 
 ### 數位行銷手風琴收合卡視覺定案（2026-06-17 23:11；2026-06-18 23:25 比例/碑文重校）
 
