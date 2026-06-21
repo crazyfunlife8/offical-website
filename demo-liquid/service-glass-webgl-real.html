@@ -152,15 +152,15 @@ const PARAMS=[
   {k:'tiltY', name:'左右傾角', min:-24, max:24, step:1, suf:'deg'}
 ];
 const LIGHTS=[
-  {id:'key', name:'主光', color:0xf6fbff, size:2.4, defaults:{x:-4.2,y:-1.2,z:5.6,intensity:24}},
-  {id:'top', name:'頂光', color:0xdfeaff, size:1.45, defaults:{x:0.1,y:2.0,z:4.2,intensity:0}},
-  {id:'rim', name:'邊光', color:0x9edcff, size:1.75, defaults:{x:3.2,y:0.15,z:4.8,intensity:0}},
-  {id:'back', name:'背光', color:0xb8ccff, size:2.1, defaults:{x:-1.8,y:0.45,z:-1.8,intensity:8}}
+  {id:'key', name:'主光', color:0xf6fbff, size:2.4, defaults:{azimuth:323.13,elevation:-9.73,distance:7.10,intensity:24}},
+  {id:'top', name:'頂光', color:0xdfeaff, size:1.45, defaults:{azimuth:1.36,elevation:25.46,distance:4.65,intensity:0}},
+  {id:'rim', name:'邊光', color:0x9edcff, size:1.75, defaults:{azimuth:33.69,elevation:1.49,distance:5.77,intensity:0}},
+  {id:'back', name:'背光', color:0xb8ccff, size:2.1, defaults:{azimuth:225,elevation:10.02,distance:2.59,intensity:8}}
 ];
 const LIGHT_CONTROLS=[
-  {prop:'x', label:'X', min:-4.5, max:4.5, step:0.05},
-  {prop:'y', label:'Y', min:-1.6, max:3.2, step:0.05},
-  {prop:'z', label:'Z', min:-3.2, max:6.0, step:0.05},
+  {prop:'azimuth', label:'方位角', min:0, max:360, step:1, suf:'deg'},
+  {prop:'elevation', label:'高度角', min:-80, max:80, step:1, suf:'deg'},
+  {prop:'distance', label:'距離', min:2, max:8, step:0.05},
   {prop:'intensity', label:'強度', min:0, max:360, step:1}
 ];
 const state={ thickness:1.8, ior:1.5, roughness:0.06, dispersion:0.26, tiltX:7, tiltY:-7, transmission:1, envMapIntensity:1.28, bloomStrength:0.24, fresnelPower:2.65, bevelPx:16 };
@@ -174,6 +174,18 @@ const htmlCard=document.getElementById('htmlCard');
 const wrap=document.querySelector('.panel .rows');
 const GRAIN=['const nest = createStudio()','export default function App(){','return <Section/>','await build(idea)','if(ready) ship()','render(art, code)','while(true){ create() }'].join('\n').repeat(8);
 document.querySelector('.grain').textContent=GRAIN;
+
+function getLightPosition(spec){
+  const az=THREE.MathUtils.degToRad(((state[spec.id+'_azimuth']%360)+360)%360);
+  const el=THREE.MathUtils.degToRad(state[spec.id+'_elevation']);
+  const distance=state[spec.id+'_distance'];
+  const horizontal=Math.cos(el)*distance;
+  return {
+    x:Math.sin(az)*horizontal,
+    y:Math.sin(el)*distance,
+    z:Math.cos(az)*horizontal
+  };
+}
 
 for(const p of PARAMS){
   const row=document.createElement('div');
@@ -199,13 +211,13 @@ for(const spec of LIGHTS){
     const k=spec.id+'_'+ctrl.prop;
     const row=document.createElement('div');
     row.className='row';
-    row.innerHTML='<label><span>'+spec.name+'-'+ctrl.label+'</span><b id="v_'+k+'">'+state[k]+'</b></label>'+
+    row.innerHTML='<label><span>'+spec.name+'-'+ctrl.label+'</span><b id="v_'+k+'">'+state[k]+(ctrl.suf||'')+'</b></label>'+
       '<input type="range" min="'+ctrl.min+'" max="'+ctrl.max+'" step="'+ctrl.step+'" value="'+state[k]+'" data-k="'+k+'">';
     const inp=row.querySelector('input');
     inp.oninput=()=>{
       const v=parseFloat(inp.value);
       state[k]=v;
-      document.getElementById('v_'+k).textContent=v;
+      document.getElementById('v_'+k).textContent=v+(ctrl.suf||'');
       applyState();
       refreshStudioEnvMap();
     };
@@ -246,10 +258,11 @@ function makeStudioEnvMap(){
 
   ctx.globalCompositeOperation='screen';
   for(const spec of LIGHTS){
+    const pos=getLightPosition(spec);
     const size=THREE.MathUtils.clamp(spec.size,0.55,4.2);
     const strength=THREE.MathUtils.clamp(state[spec.id+'_intensity']/180,0,1);
-    const x=512+state[spec.id+'_x']*82;
-    const y=260-state[spec.id+'_y']*86+state[spec.id+'_z']*-14;
+    const x=512+pos.x*82;
+    const y=260-pos.y*86+pos.z*-14;
     const w=120+size*92;
     const h=70+size*48;
     const radius=Math.max(w,h)*0.95;
@@ -774,12 +787,10 @@ function applyState(){
   edgeMat.dispersion=0.62;
   for(const spec of LIGHTS){
     const kit=studioLights[spec.id];
-    const x=state[spec.id+'_x'];
-    const y=state[spec.id+'_y'];
-    const z=state[spec.id+'_z'];
+    const pos=getLightPosition(spec);
     const size=Math.max(0.55,spec.size);
     const intensity=state[spec.id+'_intensity'];
-    kit.light.position.set(x,y,z);
+    kit.light.position.set(pos.x,pos.y,pos.z);
     kit.light.width=size;
     kit.light.height=size;
     kit.light.intensity=intensity;
@@ -797,7 +808,7 @@ function applyState(){
   glassGroup.rotation.y=THREE.MathUtils.degToRad(state.tiltY);
   if(GLASS_BEVEL_PX!==state.bevelPx){ GLASS_BEVEL_PX=state.bevelPx; rebuildGlassGeometry(); }
   dump.textContent=PARAMS.map(p=>p.k+': '+state[p.k]+(p.suf||'')).join('\n')+
-    '\n\n'+LIGHTS.map(spec=>spec.name+': x '+state[spec.id+'_x']+', y '+state[spec.id+'_y']+', z '+state[spec.id+'_z']+', 強度 '+state[spec.id+'_intensity']).join('\n')+
+    '\n\n'+LIGHTS.map(spec=>spec.name+': azimuth '+state[spec.id+'_azimuth']+'deg, elevation '+state[spec.id+'_elevation']+'deg, distance '+state[spec.id+'_distance']+', intensity '+state[spec.id+'_intensity']).join('\n')+
     '\n\nmaterial: MeshPhysicalMaterial\ntexture: CanvasTexture -> rear plane\npost: UnrealBloomPass\nthree: 0.160.0';
   requestSceneRender();
 }
