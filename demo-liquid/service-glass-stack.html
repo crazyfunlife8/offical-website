@@ -50,7 +50,7 @@
      銝?HTML 擃?????WebGL ?餌??憟??臭???閫?蝯曹?鈭斤策?餌? Fresnel + envMap??*/
   .topline{ display:none; }
   .ghost{ position:absolute; right:-4%; bottom:-22%; z-index:2; font-family:"Noto Serif TC",serif; font-weight:700;
-    font-size:min(38vw,420px); line-height:.8; color:rgba(225,235,255,.07); user-select:none; pointer-events:none; letter-spacing:-.02em;
+    font-size:min(38vw,420px); line-height:.8; color:rgba(225,235,255,.032); user-select:none; pointer-events:none; letter-spacing:-.02em;
   }
   .grain{ position:absolute; left:0; top:0; width:32%; height:100%; z-index:3; opacity:.055; pointer-events:none;
     font-family:"JetBrains Mono",monospace; font-size:12px; line-height:2; color:rgb(var(--blue)); white-space:pre; overflow:hidden;
@@ -58,24 +58,28 @@
   }
   .codebar{ position:absolute; top:0; left:0; right:0; z-index:5; padding:13px 26px; border-bottom:1px solid rgba(225,235,255,.05); opacity:.72; }
   .codebar .cpath{ font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:rgba(225,235,255,.42); }
-  .content{ position:relative; z-index:5; width:100%; height:100%; padding:54px 64px 50px; display:flex; flex-direction:row; align-items:center; gap:clamp(36px,5vw,68px); }
+  .content{ position:relative; z-index:5; width:100%; height:100%; padding:54px 56px 50px; display:flex; flex-direction:row; align-items:center; gap:clamp(28px,3.8vw,52px); }
   .content::before{ content:''; position:absolute; left:0; top:28px; bottom:26px; width:54%; z-index:-1; pointer-events:none;
     background:linear-gradient(90deg, rgba(5,13,46,.26), rgba(5,13,46,.12) 52%, transparent 100%);
   }
-  .lead{ flex:1 1 50%; min-width:0; }
+  .lead{ flex:1 1 46%; min-width:0; }
   .klab{ font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.26em; color:rgba(var(--gold),.82); }
   .knum{ position:absolute; top:36px; right:58px; font-family:"Italiana",serif; font-size:54px; color:rgba(var(--gold),.15); line-height:1; }
   .ztitle{ font-family:"Noto Serif TC",serif; font-weight:700; font-size:clamp(2.1rem,4vw,3.2rem); color:rgba(225,235,255,.97); margin:16px 0 8px; line-height:1.12; letter-spacing:.02em; text-shadow:0 2px 18px rgba(0,0,0,.35); }
   .zen{ font-family:"Italiana",serif; font-size:1.18rem; color:rgba(210,222,245,.5); letter-spacing:.04em; text-shadow:0 1px 1px rgba(2,8,22,.75); }
   .zsub{ margin-top:14px; font-size:.92rem; line-height:1.65; color:rgba(225,235,255,.6); max-width:34ch; text-shadow:0 1px 1px rgba(2,8,22,.72); }
-  .svccol{ flex:0 0 40%; }
+  .svccol{ position:relative; z-index:0; flex:0 0 44%; }
+  .svccol::before{ content:''; position:absolute; inset:-28px -22px -30px -24px; z-index:-1; pointer-events:none;
+    background:
+      radial-gradient(ellipse at 48% 46%, rgba(0,0,0,.30) 0%, rgba(1,5,18,.18) 42%, rgba(1,5,18,0) 72%);
+  }
   .svc-head{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:rgba(var(--gold),.72); margin-bottom:26px; }
   .svc{ list-style:none; margin:0; }
   .svc li{ position:relative; margin-bottom:26px; }
   .svc li:last-child{ margin-bottom:0; }
   .svc li::before{ content:''; display:block; width:22px; height:1px; background:rgba(var(--gold),.5); margin-bottom:12px; }
   .svc li .sn{ display:block; font-family:"Noto Serif TC",serif; font-size:1.12rem; color:rgba(225,235,255,.97); letter-spacing:.01em; }
-  .svc li .sd{ display:block; margin-top:5px; font-size:.8rem; line-height:1.55; color:rgba(225,235,255,.55); white-space:normal; text-shadow:0 1px 1px rgba(2,8,22,.72); }
+  .svc li .sd{ display:block; margin-top:5px; font-size:.8rem; line-height:1.55; color:rgba(225,235,255,.76); white-space:normal; text-shadow:0 1px 2px rgba(0,3,14,.92), 0 0 14px rgba(0,0,0,.58); }
 
   .panel{ position:fixed; right:0; top:0; bottom:0; width:230px; z-index:40; overflow-y:auto;
     background:rgba(6,10,20,.9); backdrop-filter:blur(8px); border-left:1px solid rgba(225,235,255,.1);
@@ -127,6 +131,7 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
@@ -268,6 +273,37 @@ const STAR_CANVAS_MAX_WIDTH=1280;
 const STAR_CANVAS_MAX_HEIGHT=900;
 const BLOOM_RESOLUTION_SCALE=0.5;
 const TARGET_FRAME_MS=1000/30;
+const IS_MOBILE=window.matchMedia('(max-width: 760px), (pointer: coarse)').matches;
+const PREFERS_REDUCED_MOTION=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FX={
+  bloom:!IS_MOBILE && !PREFERS_REDUCED_MOTION,
+  codeScale:IS_MOBILE ? 0.58 : 1,
+  codeFrameMs:IS_MOBILE ? 1000/14 : TARGET_FRAME_MS,
+  pixelRatioMax:IS_MOBILE ? 1.5 : 2
+};
+const BLOOM_SCENE=1;
+const fxTuning={ heroEdgeGlow:1.45, bloomStrength:0.26, bloomThreshold:0.985, bloomRadius:0.035, rearFrost:1, codeGlow:0.05 };
+const CRYSTAL_BLOOM={ strength:fxTuning.bloomStrength, radius:fxTuning.bloomRadius, threshold:fxTuning.bloomThreshold };
+const CRYSTAL_FRONT={ edgeEnv:2.85, edgeOpacity:0.105, fresnelStrength:fxTuning.heroEdgeGlow, clearcoat:1, clearcoatRoughness:0.012 };
+const REAR_FROST={ roughness:0.66, transmission:0.058, env:0.095, fresnel:0.028 };
+const DARK_FACE={
+  color:new THREE.Color(0x061126),
+  transmission:0.004,
+  env:0,
+  roughness:0.18,
+  opacity:0.48,
+  thickness:0.78,
+  ior:1.08,
+  clearcoat:0.04,
+  clearcoatRoughness:0.72,
+  attenuationDistance:1.15,
+  edgeEnv:0.018,
+  edgeOpacity:0.010,
+  fresnel:0.010,
+  depthOpacity:0.006
+};
+const FRONT_FACE_COLOR=new THREE.Color(0xeaf3ff);
+const FRONT_FACE={ clearcoat:0.72, clearcoatRoughness:0.08, attenuationDistance:6.5 };
 
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x050d2e);
@@ -276,7 +312,8 @@ camera.position.set(0,0,8.1);
 
 const pmremGenerator=new THREE.PMREMGenerator(renderer);
 let studioEnvRT=null;
-function makeStudioEnvMap(){
+let edgeStudioEnvRT=null;
+function buildStudioEnvMap(includeEdgeStrips){
   const envCanvas=document.createElement('canvas');
   envCanvas.width=1024;
   envCanvas.height=512;
@@ -321,23 +358,61 @@ function makeStudioEnvMap(){
     ctx.fill();
     ctx.restore();
   }
+  if(includeEdgeStrips){
+    const strips=[
+      {x:180,y:112,w:300,h:6,r:-0.10,a:0.030,c:'230,248,255'},
+      {x:620,y:86,w:220,h:5,r:0.08,a:0.024,c:'150,220,255'},
+      {x:710,y:334,w:260,h:5,r:-0.16,a:0.022,c:'0,200,255'},
+      {x:108,y:404,w:190,h:4,r:0.14,a:0.016,c:'120,205,255'}
+    ];
+    for(const strip of strips){
+      ctx.save();
+      ctx.translate(strip.x,strip.y);
+      ctx.rotate(strip.r);
+      const lg=ctx.createLinearGradient(-strip.w*0.5,0,strip.w*0.5,0);
+      lg.addColorStop(0,'rgba('+strip.c+',0)');
+      lg.addColorStop(0.18,'rgba('+strip.c+','+(strip.a*0.46)+')');
+      lg.addColorStop(0.48,'rgba(255,255,255,'+strip.a+')');
+      lg.addColorStop(0.72,'rgba('+strip.c+','+(strip.a*0.58)+')');
+      lg.addColorStop(1,'rgba('+strip.c+',0)');
+      ctx.fillStyle=lg;
+      ctx.shadowColor='rgba(0,200,255,'+(strip.a*0.45)+')';
+      ctx.shadowBlur=8;
+      ctx.fillRect(-strip.w*0.5,-strip.h*0.5,strip.w,strip.h);
+      ctx.restore();
+    }
+  }
   ctx.globalCompositeOperation='source-over';
 
   const envTex=new THREE.CanvasTexture(envCanvas);
   envTex.mapping=THREE.EquirectangularReflectionMapping;
   envTex.colorSpace=THREE.SRGBColorSpace;
-  if(studioEnvRT) studioEnvRT.dispose();
-  studioEnvRT=pmremGenerator.fromEquirectangular(envTex);
+  const rt=pmremGenerator.fromEquirectangular(envTex);
   envTex.dispose();
-  return studioEnvRT.texture;
+  return rt;
 }
-scene.environment=makeStudioEnvMap();
+function rebuildStudioEnvMaps(){
+  if(studioEnvRT) studioEnvRT.dispose();
+  if(edgeStudioEnvRT) edgeStudioEnvRT.dispose();
+  studioEnvRT=buildStudioEnvMap(false);
+  edgeStudioEnvRT=buildStudioEnvMap(true);
+  scene.environment=studioEnvRT.texture;
+}
+function edgeEnvironmentMap(){
+  return edgeStudioEnvRT ? edgeStudioEnvRT.texture : null;
+}
+rebuildStudioEnvMaps();
 function refreshStudioEnvMap(){
-  scene.environment=makeStudioEnvMap();
+  rebuildStudioEnvMaps();
   if(typeof glassMat!=='undefined') glassMat.needsUpdate=true;
-  if(typeof edgeMat!=='undefined') edgeMat.needsUpdate=true;
+  if(typeof edgeMat!=='undefined'){
+    edgeMat.envMap=edgeEnvironmentMap();
+    edgeMat.needsUpdate=true;
+  }
   if(typeof glassCards!=='undefined'){
     for(const card of glassCards){
+      card.body.material.envMap=null;
+      card.edgeGlow.material.envMap=edgeEnvironmentMap();
       card.body.material.needsUpdate=true;
       card.edgeGlow.material.needsUpdate=true;
     }
@@ -345,26 +420,54 @@ function refreshStudioEnvMap(){
   requestSceneRender();
 }
 
+const bloomComposer=new EffectComposer(renderer);
+bloomComposer.renderToScreen=false;
+bloomComposer.addPass(new RenderPass(scene,camera));
+const bloomPass=new UnrealBloomPass(new THREE.Vector2(window.innerWidth*BLOOM_RESOLUTION_SCALE, window.innerHeight*BLOOM_RESOLUTION_SCALE), 0, CRYSTAL_BLOOM.radius, CRYSTAL_BLOOM.threshold);
+bloomComposer.addPass(bloomPass);
+
 const composer=new EffectComposer(renderer);
-const renderPass=new RenderPass(scene,camera);
-composer.addPass(renderPass);
-const bloomPass=new UnrealBloomPass(new THREE.Vector2(window.innerWidth*BLOOM_RESOLUTION_SCALE, window.innerHeight*BLOOM_RESOLUTION_SCALE), state.bloomStrength, 0.28, 0.85);
-composer.addPass(bloomPass);
+composer.addPass(new RenderPass(scene,camera));
+const finalPass=new ShaderPass(
+  new THREE.ShaderMaterial({
+    uniforms:{
+      baseTexture:{ value:null },
+      bloomTexture:{ value:bloomComposer.renderTarget2.texture }
+    },
+    vertexShader:`
+      varying vec2 vUv;
+      void main(){
+        vUv=uv;
+        gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);
+      }
+    `,
+    fragmentShader:`
+      uniform sampler2D baseTexture;
+      uniform sampler2D bloomTexture;
+      varying vec2 vUv;
+      void main(){
+        gl_FragColor=texture2D(baseTexture,vUv)+texture2D(bloomTexture,vUv);
+      }
+    `
+  }),
+  'baseTexture'
+);
+composer.addPass(finalPass);
 const smaaPass=new SMAAPass(window.innerWidth*renderer.getPixelRatio(), window.innerHeight*renderer.getPixelRatio());
 composer.addPass(smaaPass);
 
-const starCanvas=document.createElement('canvas');
-const starCtx=starCanvas.getContext('2d');
-const starTexture=new THREE.CanvasTexture(starCanvas);
-starTexture.colorSpace=THREE.SRGBColorSpace;
-starTexture.wrapS=THREE.ClampToEdgeWrapping;
-starTexture.wrapT=THREE.ClampToEdgeWrapping;
-starTexture.minFilter=THREE.LinearFilter;
-starTexture.magFilter=THREE.LinearFilter;
+const codeCanvas=document.createElement('canvas');
+const codeCtx=codeCanvas.getContext('2d');
+const codeTexture=new THREE.CanvasTexture(codeCanvas);
+codeTexture.colorSpace=THREE.SRGBColorSpace;
+codeTexture.wrapS=THREE.ClampToEdgeWrapping;
+codeTexture.wrapT=THREE.ClampToEdgeWrapping;
+codeTexture.minFilter=THREE.LinearFilter;
+codeTexture.magFilter=THREE.LinearFilter;
 
-const bgMat=new THREE.MeshBasicMaterial({ map:starTexture, toneMapped:false });
+const bgMat=new THREE.MeshBasicMaterial({ map:codeTexture, toneMapped:false });
 const bgPlane=new THREE.Mesh(new THREE.PlaneGeometry(9.6, 10.8, 1, 1), bgMat);
-bgPlane.position.z=-3.0;
+bgPlane.position.z=-2.18;
 scene.add(bgPlane);
 
 const studioGroup=new THREE.Group();
@@ -420,6 +523,7 @@ const glassMat=new THREE.MeshPhysicalMaterial({
   clearcoat:0.72,
   clearcoatRoughness:0.08,
   envMapIntensity:state.envMapIntensity,
+  envMap:null,
   attenuationColor:new THREE.Color(0xacc6ff),
   attenuationDistance:6.5,
   transparent:true,
@@ -438,11 +542,12 @@ const edgeMat=new THREE.MeshPhysicalMaterial({
   ior:1.62,
   dispersion:0.62,
   clearcoat:1,
-  clearcoatRoughness:0.012,
-  envMapIntensity:4.2,
+  clearcoatRoughness:CRYSTAL_FRONT.clearcoatRoughness,
+  envMap:edgeEnvironmentMap(),
+  envMapIntensity:CRYSTAL_FRONT.edgeEnv,
   transparent:true,
   depthWrite:false,
-  opacity:0.19,
+  opacity:CRYSTAL_FRONT.edgeOpacity,
   side:THREE.FrontSide
 });
 const edgeGlow=new THREE.Mesh(edgeGeo, edgeMat);
@@ -453,7 +558,7 @@ let fresnelGeo=smoothRoundedBoxGeometry(1, 1, 0.1, GLASS_BEVEL_SEGMENTS, 0.05);
 const fresnelMat=new THREE.ShaderMaterial({
   uniforms:{
     uPower:{ value:state.fresnelPower },
-    uStrength:{ value:1.28 },
+    uStrength:{ value:CRYSTAL_FRONT.fresnelStrength },
     uCornerBoost:{ value:2.4 },
     uHalfSize:{ value:new THREE.Vector2(0.5,0.5) },
     uColorA:{ value:new THREE.Color(0xe8f0ff) },
@@ -575,35 +680,37 @@ function rebuildHighlightLayer(w,h,r,d,unit){
 
 function makeRearGlassMaterial(layer){
   const mat=glassMat.clone();
-  mat.color=new THREE.Color(layer===1 ? 0xd9ecff : 0xc1dcff);
-  mat.transmission=layer===1 ? 0.24 : 0.16;
-  mat.thickness=layer===1 ? 1.42 : 1.30;
-  mat.roughness=layer===1 ? 0.34 : 0.42;
-  mat.ior=1.12;
-  mat.envMapIntensity=layer===1 ? 1.75 : 1.42;
-  mat.clearcoat=0.74;
-  mat.clearcoatRoughness=layer===1 ? 0.18 : 0.24;
-  mat.opacity=layer===1 ? 0.82 : 0.72;
-  mat.emissive=new THREE.Color(layer===1 ? 0x173b78 : 0x102a5a);
-  mat.emissiveIntensity=layer===1 ? 0.26 : 0.18;
-  mat.attenuationColor=new THREE.Color(layer===1 ? 0xbddcff : 0x8dbfff);
-  mat.attenuationDistance=layer===1 ? 2.6 : 2.1;
+  mat.envMap=null;
+  mat.color=DARK_FACE.color.clone();
+  mat.transmission=DARK_FACE.transmission;
+  mat.thickness=DARK_FACE.thickness;
+  mat.roughness=DARK_FACE.roughness;
+  mat.ior=DARK_FACE.ior;
+  mat.envMapIntensity=DARK_FACE.env;
+  mat.clearcoat=DARK_FACE.clearcoat;
+  mat.clearcoatRoughness=DARK_FACE.clearcoatRoughness;
+  mat.opacity=layer===1 ? DARK_FACE.opacity : DARK_FACE.opacity*0.82;
+  mat.emissive=new THREE.Color(0x000000);
+  mat.emissiveIntensity=0;
+  mat.attenuationColor=new THREE.Color(0x061126);
+  mat.attenuationDistance=DARK_FACE.attenuationDistance;
   return mat;
 }
 
 function makeRearEdgeMaterial(layer){
   const mat=edgeMat.clone();
+  mat.envMap=edgeEnvironmentMap();
   mat.color=new THREE.Color(0xf4fbff);
-  mat.transmission=0.18;
-  mat.thickness=1.18;
-  mat.ior=1.36;
-  mat.envMapIntensity=layer===1 ? 5.8 : 4.65;
-  mat.opacity=layer===1 ? 0.54 : 0.44;
-  mat.roughness=0.004;
+  mat.transmission=0.025;
+  mat.thickness=1.02;
+  mat.ior=1.22;
+  mat.envMapIntensity=layer===1 ? DARK_FACE.edgeEnv : DARK_FACE.edgeEnv*0.72;
+  mat.opacity=layer===1 ? DARK_FACE.edgeOpacity : DARK_FACE.edgeOpacity*0.68;
+  mat.roughness=0.18;
   mat.clearcoat=1;
-  mat.clearcoatRoughness=0.006;
-  mat.attenuationColor=new THREE.Color(layer===1 ? 0xbddfff : 0x8fc6ff);
-  mat.attenuationDistance=layer===1 ? 8.0 : 6.2;
+  mat.clearcoatRoughness=0.18;
+  mat.attenuationColor=new THREE.Color(0x74cfff);
+  mat.attenuationDistance=3.8;
   return mat;
 }
 
@@ -611,8 +718,8 @@ function makeRearFresnelMaterial(layer){
   const mat=fresnelMat.clone();
   mat.uniforms={
     uPower:{ value:1.45 },
-    uStrength:{ value:layer===1 ? 2.85 : 2.20 },
-    uCornerBoost:{ value:4.8 },
+    uStrength:{ value:layer===1 ? DARK_FACE.fresnel : DARK_FACE.fresnel*0.62 },
+    uCornerBoost:{ value:1.35 },
     uHalfSize:{ value:new THREE.Vector2(0.5,0.5) },
     uColorA:{ value:new THREE.Color(0xf1f8ff) },
     uColorB:{ value:new THREE.Color(0x52d8ff) }
@@ -667,6 +774,7 @@ const drops=Array.from({length:34},(_,i)=>({
 let starW=1, starH=1, viewW=1, viewH=1, cardRect={left:0,right:0,top:0,bottom:0};
 let rafId=0;
 let lastFrameTime=0;
+let lastCodeFrameTime=0;
 let needsRender=true;
 let qaFramesRemaining=QA_MODE ? 8 : 0;
 
@@ -687,11 +795,11 @@ function rebuildGlassGeometry(){
   const h=rect.height*unitsPerPx;
   const r=GLASS_BEVEL_PX*unitsPerPx;
   const d=112*unitsPerPx;
-  const edgePad=3*unitsPerPx;
+  const edgePad=2.4*unitsPerPx;
   const nextGlassGeo=smoothRoundedBoxGeometry(w, h, d, GLASS_BEVEL_SEGMENTS, r);
-  const nextEdgeGeo=smoothRoundedBoxGeometry(w+edgePad, h+edgePad, d+(2*unitsPerPx), GLASS_BEVEL_SEGMENTS, r+unitsPerPx*1.2);
-  const nextFresnelGeo=smoothRoundedBoxGeometry(w+edgePad*0.55, h+edgePad*0.55, d+(unitsPerPx*1.5), GLASS_BEVEL_SEGMENTS, r+unitsPerPx*0.9);
-  fresnelMat.uniforms.uHalfSize.value.set((w+edgePad*0.55)*0.5,(h+edgePad*0.55)*0.5);
+  const nextEdgeGeo=smoothRoundedBoxGeometry(w+edgePad, h+edgePad, d+(1.8*unitsPerPx), GLASS_BEVEL_SEGMENTS, r+unitsPerPx*0.85);
+  const nextFresnelGeo=smoothRoundedBoxGeometry(w+edgePad*0.45, h+edgePad*0.45, d+(unitsPerPx*1.15), GLASS_BEVEL_SEGMENTS, r+unitsPerPx*0.65);
+  fresnelMat.uniforms.uHalfSize.value.set((w+edgePad*0.45)*0.5,(h+edgePad*0.45)*0.5);
   rebuildHighlightLayer(w,h,r,d,unitsPerPx);
 
   glass.geometry.dispose();
@@ -725,22 +833,25 @@ function rebuildGlassGeometry(){
 }
 
 function resize(){
-  const dpr=Math.min(window.devicePixelRatio || 1, 2);
+  const dpr=Math.min(window.devicePixelRatio || 1, FX.pixelRatioMax);
   viewW=window.innerWidth;
   viewH=window.innerHeight;
   renderer.setPixelRatio(dpr);
   renderer.setSize(viewW, viewH, false);
   composer.setPixelRatio(dpr);
   composer.setSize(viewW, viewH);
+  bloomComposer.setPixelRatio(dpr);
+  bloomComposer.setSize(viewW, viewH);
   bloomPass.setSize(Math.max(1,Math.floor(viewW*BLOOM_RESOLUTION_SCALE)), Math.max(1,Math.floor(viewH*BLOOM_RESOLUTION_SCALE)));
+  finalPass.material.uniforms.bloomTexture.value=bloomComposer.renderTarget2.texture;
   smaaPass.setSize(viewW*dpr, viewH*dpr);
   camera.aspect=viewW/viewH;
   camera.updateProjectionMatrix();
-  const starScale=Math.min(1, STAR_CANVAS_MAX_WIDTH/viewW, STAR_CANVAS_MAX_HEIGHT/viewH);
-  starW=Math.max(640, Math.floor(viewW*starScale));
-  starH=Math.max(480, Math.floor(viewH*starScale));
-  starCanvas.width=starW;
-  starCanvas.height=starH;
+  const starScale=Math.min(FX.codeScale, STAR_CANVAS_MAX_WIDTH/viewW, STAR_CANVAS_MAX_HEIGHT/viewH);
+  starW=Math.max(IS_MOBILE ? 320 : 640, Math.floor(viewW*starScale));
+  starH=Math.max(IS_MOBILE ? 260 : 480, Math.floor(viewH*starScale));
+  codeCanvas.width=starW;
+  codeCanvas.height=starH;
   cardRect=htmlCard.getBoundingClientRect();
   const planeDist=Math.abs(camera.position.z-bgPlane.position.z);
   const fovRad=THREE.MathUtils.degToRad(camera.fov);
@@ -754,25 +865,26 @@ function resize(){
 window.addEventListener('resize', resize);
 window.addEventListener('keydown', e=>{ if(e.key==='h'||e.key==='H'){ const p=document.querySelector('.panel'); if(p) p.style.display=(p.style.display==='none'?'':'none'); } });
 
-function drawStarRain(time){
+function drawCodeTexture(time){
   const sx=starW/viewW, sy=starH/viewH;
-  const ctx=starCtx;
+  const ctx=codeCtx;
+  const codeGlow=THREE.MathUtils.clamp(fxTuning.codeGlow, 0, 1.2);
   ctx.setTransform(1,0,0,1,0,0);
   const bg=ctx.createLinearGradient(0,0,starW,starH);
-  bg.addColorStop(0,'#061036');
+  bg.addColorStop(0,'#050d24');
   bg.addColorStop(0.46,'#050d2e');
-  bg.addColorStop(1,'#03081f');
+  bg.addColorStop(1,'#020613');
   ctx.fillStyle=bg;
   ctx.fillRect(0,0,starW,starH);
 
   let rg=ctx.createRadialGradient(starW*.78, -starH*.08, 0, starW*.78, -starH*.08, starW*.64);
-  rg.addColorStop(0,'rgba(70,100,210,.34)');
-  rg.addColorStop(.52,'rgba(40,70,160,.18)');
+  rg.addColorStop(0,'rgba(44,72,170,'+(0.10+0.12*codeGlow)+')');
+  rg.addColorStop(.52,'rgba(24,48,130,'+(0.055+0.065*codeGlow)+')');
   rg.addColorStop(1,'rgba(40,70,160,0)');
   ctx.fillStyle=rg;
   ctx.fillRect(0,0,starW,starH);
   rg=ctx.createRadialGradient(starW*.12, starH*1.08, 0, starW*.12, starH*1.08, starW*.56);
-  rg.addColorStop(0,'rgba(35,60,150,.25)');
+  rg.addColorStop(0,'rgba(24,52,135,'+(0.07+0.09*codeGlow)+')');
   rg.addColorStop(1,'rgba(35,60,150,0)');
   ctx.fillStyle=rg;
   ctx.fillRect(0,0,starW,starH);
@@ -795,8 +907,8 @@ function drawStarRain(time){
     ctx.restore();
 
     const reflect=ctx.createRadialGradient(shadowCx,shadowCy-8*sy,0,shadowCx,shadowCy-8*sy,shadowW*.74);
-    reflect.addColorStop(0,'rgba(0,200,255,0.055)');
-    reflect.addColorStop(0.48,'rgba(232,240,255,0.035)');
+    reflect.addColorStop(0,'rgba(0,200,255,'+(0.006+0.020*codeGlow)+')');
+    reflect.addColorStop(0.48,'rgba(170,220,255,'+(0.004+0.014*codeGlow)+')');
     reflect.addColorStop(1,'rgba(0,200,255,0)');
     ctx.save();
     ctx.fillStyle=reflect;
@@ -806,13 +918,13 @@ function drawStarRain(time){
     ctx.restore();
   }
 
-  if(rcPx.width && rcPx.height && STAR_RAIN_GLOW>0){
+  if(rcPx.width && rcPx.height && codeGlow>0){
     const cx=(rcPx.left+rcPx.width*.55)*sx;
     const cy=(rcPx.top+rcPx.height*.46)*sy;
     const pocket=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(rcPx.width*sx*.38, rcPx.height*sy*.56));
-    pocket.addColorStop(0,'rgba(232,240,255,'+(0.28*STAR_RAIN_GLOW)+')');
-    pocket.addColorStop(0.30,'rgba(190,226,255,'+(0.15*STAR_RAIN_GLOW)+')');
-    pocket.addColorStop(0.62,'rgba(0,200,255,'+(0.06*STAR_RAIN_GLOW)+')');
+    pocket.addColorStop(0,'rgba(100,185,245,'+(0.020*codeGlow)+')');
+    pocket.addColorStop(0.30,'rgba(45,145,220,'+(0.012*codeGlow)+')');
+    pocket.addColorStop(0.62,'rgba(0,190,245,'+(0.006*codeGlow)+')');
     pocket.addColorStop(1,'rgba(0,200,255,0)');
     ctx.fillStyle=pocket;
     /* ??憭曉?∠?蝭??扼?交滯?粹?蝺??銝?敺銝?????*/
@@ -854,11 +966,11 @@ function drawStarRain(time){
       ctx.font=Math.max(9,10.5*sx)+'px "JetBrains Mono",monospace';
       ctx.textAlign='left';
       ctx.textBaseline='middle';
-      for(let i=0;i<24;i++){
+      for(let i=0;i<(IS_MOBILE ? 12 : 22);i++){
         const px=left+safeW*(0.08+hash(i,31)*0.84);
         const py=top+safeH*(0.08+hash(i,47)*0.84);
         const len=0.45+hash(i,59)*0.55;
-        const alpha=(0.13+hash(i,71)*0.16)*STAR_RAIN_GLOW;
+        const alpha=(0.018+hash(i,71)*0.036)*codeGlow;
         const cyan=hash(i,83)>0.58;
         ctx.save();
         ctx.translate(px,py);
@@ -875,7 +987,8 @@ function drawStarRain(time){
   ctx.scale(sx, sy);
   ctx.textBaseline='middle';
   const rc=cardRect;
-  for(let i=0;i<drops.length;i++){
+  const streamCount=IS_MOBILE ? 10 : 18;
+  for(let i=0;i<streamCount;i++){
     const d=drops[i];
     const raw=time*d.spd+d.ph;
     const cyc=Math.floor(raw/1.8);
@@ -884,18 +997,20 @@ function drawStarRain(time){
     const code=CODE[(i*5+cyc)%CODE.length];
     ctx.font=d.sz+'px "JetBrains Mono",monospace';
     const w=ctx.measureText(code).width;
-    const x=16+Math.floor(hash(i,cyc*9+5)*(viewW-32));
+    const streamLeft=rc.width ? Math.max(12, rc.left-rc.width*0.34) : 16;
+    const streamRight=rc.width ? Math.min(viewW-12, rc.right+rc.width*0.28) : viewW-16;
+    const x=streamLeft+Math.floor(hash(i,cyc*9+5)*(streamRight-streamLeft));
     const tipY=prog*viewH;
     const inside=x>=rc.left && x<=rc.right && tipY>=rc.top && tipY<=rc.bottom;
     const base=d.ye?'232,240,255':(d.cy || inside?'0,200,255':'150,170,220');
     const topEdgeFade=inside ? smoothstep(0, 54, tipY-rc.top) : 1;
     ctx.save();
     ctx.translate(x,tipY);
-    ctx.rotate(-Math.PI/2);
+    ctx.rotate(-Math.PI/2 + (-0.09+hash(i,cyc+17)*0.18));
     ctx.textAlign='left';
     const g=ctx.createLinearGradient(0,0,w,0);
-    const hotAlpha=Math.min(1,(inside?0.98:0.92)+0.08*STAR_RAIN_GLOW)*topEdgeFade;
-    const trailAlpha=Math.min(1,(inside?0.95:0.86)+0.12*STAR_RAIN_GLOW)*topEdgeFade;
+    const hotAlpha=(inside?0.15:0.020)*codeGlow*topEdgeFade;
+    const trailAlpha=(inside?0.10:0.014)*codeGlow*topEdgeFade;
     g.addColorStop(0,'rgba(232,240,255,'+hotAlpha+')');
     g.addColorStop(0.1,'rgba('+base+','+trailAlpha+')');
     g.addColorStop(1,'rgba('+base+',0)');
@@ -904,54 +1019,60 @@ function drawStarRain(time){
     ctx.restore();
   }
   ctx.restore();
-  starTexture.needsUpdate=true;
+  codeTexture.needsUpdate=true;
 }
 
-function applyGlassCardMaterial(card, idx, frontWeight, visible, rearDepth){
-  const layer=Math.max(0, idx);
-  const layerFade=Math.max(0, layer-1);
-  const rearFaceTrim=THREE.MathUtils.clamp(STACK.rearDim, 0, 0.18);
-  const rearTransmission=THREE.MathUtils.clamp(STACK.rearTransmission - layerFade*0.06, 0.08, 0.32);
-  const rearFaceEnv=THREE.MathUtils.clamp(0.60 - layerFade*0.16 - rearFaceTrim*0.18, 0.38, 0.64);
-  const rearRimEnv=THREE.MathUtils.clamp(1.30 - Math.max(0, layer-1)*0.32, 0.85, 1.30);
-  const rearRimBase=THREE.MathUtils.clamp(0.19 - Math.max(0, layer-1)*0.05, 0.11, 0.19);
-  const rearFresnelBase=THREE.MathUtils.clamp(0.82 - Math.max(0, layer-1)*0.18, 0.55, 0.82);
-  const w=THREE.MathUtils.clamp(frontWeight, 0, 1);
-  const rearFaceOpacity=THREE.MathUtils.clamp(0.82 - layerFade*0.10 - rearFaceTrim*0.10, 0.68, 0.86);
-  const rearRoughness=THREE.MathUtils.clamp(0.34 + layerFade*0.10, 0.34, 0.52);
-  const rearGlow=THREE.MathUtils.clamp(0.07 - layerFade*0.025 - rearFaceTrim*0.04, 0.02, 0.08);
+function applyGlassCardMaterial(card, idx, activeFloat, frontWeight, visible, rearDepth){
+  const focus=smoothstep(0.965, 0.998, THREE.MathUtils.clamp(frontWeight, 0, 1));
+  const distanceFromFocus=Math.abs(idx-activeFloat);
+  const exitDepth=idx<activeFloat ? THREE.MathUtils.clamp(activeFloat-idx, 0, 1) : 0;
+  const rearTrim=THREE.MathUtils.clamp(distanceFromFocus*0.10 + exitDepth*0.18 + STACK.rearDim*0.28, 0, 0.34);
+  const rearFrost=THREE.MathUtils.clamp(fxTuning.rearFrost, 0.5, 1.8);
 
-  card.body.material.transmission=THREE.MathUtils.lerp(rearTransmission, state.transmission, w);
-  card.body.material.thickness=THREE.MathUtils.lerp(1.42-layerFade*0.12, state.thickness, w);
-  card.body.material.ior=THREE.MathUtils.lerp(1.12, state.ior, w);
-  card.body.material.roughness=THREE.MathUtils.lerp(rearRoughness, state.roughness, w);
-  card.body.material.clearcoat=THREE.MathUtils.lerp(0.74, 0.72, w);
-  card.body.material.clearcoatRoughness=THREE.MathUtils.lerp(0.18+layerFade*0.06, 0.08, w);
-  card.body.material.envMapIntensity=THREE.MathUtils.lerp(rearFaceEnv, state.envMapIntensity, w);
-  card.body.material.opacity=visible*THREE.MathUtils.lerp(rearFaceOpacity, 1, w);
-  card.body.material.emissive.set(layerFade>0 ? 0x102a5a : 0x173b78);
-  card.body.material.emissiveIntensity=visible*THREE.MathUtils.lerp(rearGlow, 0, w);
-  card.body.material.attenuationDistance=THREE.MathUtils.lerp(2.6-layerFade*0.5, 6.5, w);
+  const rearTransmission=THREE.MathUtils.clamp(DARK_FACE.transmission/rearFrost - rearTrim*0.006, 0, DARK_FACE.transmission);
+  const rearFaceEnv=0;
+  const rearRimEnv=THREE.MathUtils.clamp(DARK_FACE.edgeEnv/rearFrost - rearTrim*0.010, 0, DARK_FACE.edgeEnv);
+  const rearGlow=0;
+  const rearRimBase=THREE.MathUtils.clamp(DARK_FACE.edgeOpacity/rearFrost - rearTrim*0.006, 0.002, DARK_FACE.edgeOpacity);
+  const rearFresnelBase=THREE.MathUtils.clamp(DARK_FACE.fresnel/rearFrost - rearTrim*0.008, 0.002, DARK_FACE.fresnel);
+  const rearFaceOpacity=THREE.MathUtils.clamp(DARK_FACE.opacity - rearTrim*0.16, 0.30, DARK_FACE.opacity);
+  const rearRoughness=THREE.MathUtils.clamp(DARK_FACE.roughness + (rearFrost-1)*0.035 + rearTrim*0.10, 0.14, 0.34);
+  const rearThickness=THREE.MathUtils.clamp(DARK_FACE.thickness - rearTrim*0.14, 0.58, DARK_FACE.thickness);
+  const rearClearcoat=THREE.MathUtils.clamp(DARK_FACE.clearcoat - rearTrim*0.02, 0, DARK_FACE.clearcoat);
+  const rearClearcoatRoughness=THREE.MathUtils.clamp(DARK_FACE.clearcoatRoughness + rearTrim*0.08, DARK_FACE.clearcoatRoughness, 0.86);
+
+  card.body.material.color.copy(DARK_FACE.color).lerp(FRONT_FACE_COLOR, focus);
+  card.body.material.transmission=THREE.MathUtils.lerp(rearTransmission, state.transmission, focus);
+  card.body.material.thickness=THREE.MathUtils.lerp(rearThickness, state.thickness, focus);
+  card.body.material.ior=THREE.MathUtils.lerp(DARK_FACE.ior, state.ior, focus);
+  card.body.material.roughness=THREE.MathUtils.lerp(rearRoughness, state.roughness, focus);
+  card.body.material.clearcoat=THREE.MathUtils.lerp(rearClearcoat, FRONT_FACE.clearcoat, focus);
+  card.body.material.clearcoatRoughness=THREE.MathUtils.lerp(rearClearcoatRoughness, FRONT_FACE.clearcoatRoughness, focus);
+  card.body.material.envMapIntensity=THREE.MathUtils.lerp(rearFaceEnv, state.envMapIntensity, focus);
+  card.body.material.opacity=visible*THREE.MathUtils.lerp(rearFaceOpacity, 1, focus);
+  card.body.material.emissive.set(0x000000);
+  card.body.material.emissiveIntensity=THREE.MathUtils.lerp(rearGlow, 0, focus);
+  card.body.material.attenuationDistance=THREE.MathUtils.lerp(DARK_FACE.attenuationDistance, FRONT_FACE.attenuationDistance, focus);
   card.body.material.needsUpdate=true;
 
-  card.edgeGlow.material.transmission=THREE.MathUtils.lerp(0.18, 0.66, w);
-  card.edgeGlow.material.thickness=THREE.MathUtils.lerp(1.18, 1.25, w);
-  card.edgeGlow.material.ior=THREE.MathUtils.lerp(1.36, 1.62, w);
-  card.edgeGlow.material.roughness=THREE.MathUtils.lerp(0.004, 0.006, w);
-  card.edgeGlow.material.clearcoat=1;
-  card.edgeGlow.material.clearcoatRoughness=THREE.MathUtils.lerp(0.006, 0.012, w);
-  card.edgeGlow.material.envMapIntensity=visible*THREE.MathUtils.lerp(rearRimEnv, state.envMapIntensity*1.45, w);
-  card.edgeGlow.material.opacity=visible*THREE.MathUtils.lerp(rearRimBase, 0.14, w);
+  card.edgeGlow.material.transmission=THREE.MathUtils.lerp(0.025, 0.66, focus);
+  card.edgeGlow.material.thickness=THREE.MathUtils.lerp(1.02, 1.25, focus);
+  card.edgeGlow.material.ior=THREE.MathUtils.lerp(1.22, 1.62, focus);
+  card.edgeGlow.material.roughness=THREE.MathUtils.lerp(0.18, 0.006, focus);
+  card.edgeGlow.material.clearcoat=CRYSTAL_FRONT.clearcoat;
+  card.edgeGlow.material.clearcoatRoughness=THREE.MathUtils.lerp(0.18, CRYSTAL_FRONT.clearcoatRoughness, focus);
+  card.edgeGlow.material.envMapIntensity=THREE.MathUtils.lerp(rearRimEnv, CRYSTAL_FRONT.edgeEnv, focus);
+  card.edgeGlow.material.opacity=visible*THREE.MathUtils.lerp(rearRimBase, CRYSTAL_FRONT.edgeOpacity, focus);
   card.edgeGlow.material.needsUpdate=true;
 
-  card.fresnelShell.material.uniforms.uPower.value=THREE.MathUtils.lerp(1.45, state.fresnelPower, w);
-  card.fresnelShell.material.uniforms.uStrength.value=visible*THREE.MathUtils.lerp(rearFresnelBase, 0.95, w);
-  card.fresnelShell.material.uniforms.uCornerBoost.value=THREE.MathUtils.lerp(4.8, 2.4, w);
+  card.fresnelShell.material.uniforms.uPower.value=THREE.MathUtils.lerp(1.45, state.fresnelPower, focus);
+  card.fresnelShell.material.uniforms.uStrength.value=THREE.MathUtils.lerp(rearFresnelBase, CRYSTAL_FRONT.fresnelStrength, focus);
+  card.fresnelShell.material.uniforms.uCornerBoost.value=THREE.MathUtils.lerp(1.35, 2.0, focus);
 
   if(card.depthPool){
-    card.depthPool.material.uniforms.uOpacity.value=visible*THREE.MathUtils.lerp(0.018+layerFade*0.010, 0.055, w);
+    card.depthPool.material.uniforms.uOpacity.value=visible*THREE.MathUtils.lerp(DARK_FACE.depthOpacity, 0.055, focus);
   }else{
-    depthPoolMat.uniforms.uOpacity.value=visible*THREE.MathUtils.lerp(0.018, 0.055, w);
+    depthPoolMat.uniforms.uOpacity.value=visible*THREE.MathUtils.lerp(DARK_FACE.depthOpacity, 0.055, focus);
   }
 }
 
@@ -963,12 +1084,18 @@ function applyState(){
   glassMat.roughness=state.roughness;
   glassMat.dispersion=state.dispersion;
   glassMat.transmission=state.transmission;
+  glassMat.color.copy(FRONT_FACE_COLOR);
+  glassMat.envMap=null;
   glassMat.envMapIntensity=state.envMapIntensity;
-  edgeMat.envMapIntensity=state.envMapIntensity*1.45;
-  edgeMat.opacity=0.14;
+  glassMat.clearcoat=FRONT_FACE.clearcoat;
+  glassMat.clearcoatRoughness=FRONT_FACE.clearcoatRoughness;
+  glassMat.attenuationDistance=FRONT_FACE.attenuationDistance;
+  edgeMat.envMap=edgeEnvironmentMap();
+  edgeMat.envMapIntensity=CRYSTAL_FRONT.edgeEnv;
+  edgeMat.opacity=CRYSTAL_FRONT.edgeOpacity;
   edgeMat.roughness=0.006;
-  edgeMat.clearcoat=1;
-  edgeMat.clearcoatRoughness=0.012;
+  edgeMat.clearcoat=CRYSTAL_FRONT.clearcoat;
+  edgeMat.clearcoatRoughness=CRYSTAL_FRONT.clearcoatRoughness;
   edgeMat.dispersion=0.62;
   for(const spec of LIGHTS){
     const kit=studioLights[spec.id];
@@ -981,11 +1108,11 @@ function applyState(){
     kit.light.intensity=intensity;
     aimAtCard(kit.light);
   }
-  bloomPass.strength=state.bloomStrength;
-  bloomPass.radius=0.18;
-  bloomPass.threshold=0.92;
+  bloomPass.strength=FX.bloom ? CRYSTAL_BLOOM.strength : Math.min(state.bloomStrength, 0.08);
+  bloomPass.radius=FX.bloom ? CRYSTAL_BLOOM.radius : 0.08;
+  bloomPass.threshold=FX.bloom ? CRYSTAL_BLOOM.threshold : 0.96;
   fresnelMat.uniforms.uPower.value=state.fresnelPower;
-  fresnelMat.uniforms.uStrength.value=0.95;
+  fresnelMat.uniforms.uStrength.value=CRYSTAL_FRONT.fresnelStrength;
   fresnelMat.uniforms.uCornerBoost.value=2.4;
   glassMat.needsUpdate=true;
   edgeMat.needsUpdate=true;
@@ -995,9 +1122,84 @@ function applyState(){
   dump.textContent=PARAMS.map(p=>p.k+': '+state[p.k]+(p.suf||'')).join('\n')+
     '\n\n'+LIGHTS.map(spec=>spec.name+': azimuth '+state[spec.id+'_azimuth']+'deg, elevation '+state[spec.id+'_elevation']+'deg, distance '+state[spec.id+'_distance']+', intensity '+state[spec.id+'_intensity']).join('\n')+
     '\n\nstack: x '+STACK.xOffset+', y '+STACK.backDrop+', z '+STACK.zSpacing+', scale '+STACK.backScale+', dim '+STACK.rearDim+', rear transmission '+STACK.rearTransmission+', transition '+STACK.transitionStart+'-'+STACK.transitionEnd+
-    '\n\nmaterial: 3x MeshPhysicalMaterial slabs\ntexture: CanvasTexture -> rear plane\npost: UnrealBloomPass\nthree: 0.160.0';
+    '\n\nmaterial: 3x MeshPhysicalMaterial slabs\ntexture: codeTexture CanvasTexture -> glass rear plane\npost: UnrealBloomPass '+(FX.bloom?'desktop edge bloom':'mobile/reduced low bloom')+'\nthree: 0.160.0';
   requestSceneRender();
 }
+
+const FX_CTRL=[
+  {k:'heroEdgeGlow', name:'hero edge glow', min:0, max:1.8, step:0.01},
+  {k:'bloomStrength', name:'bloom strength', min:0, max:0.8, step:0.005},
+  {k:'bloomThreshold', name:'bloom threshold', min:0.82, max:1.2, step:0.001},
+  {k:'bloomRadius', name:'bloom radius', min:0, max:0.18, step:0.001},
+  {k:'rearFrost', name:'rear frost', min:0.5, max:1.8, step:0.01},
+  {k:'codeGlow', name:'code glow', min:0, max:1.2, step:0.01}
+];
+const fxInputs={};
+function clampFxValue(ctrl,value){
+  return THREE.MathUtils.clamp(Number(value), ctrl.min, ctrl.max);
+}
+function syncFxControls(){
+  for(const ctrl of FX_CTRL){
+    const input=fxInputs[ctrl.k];
+    const label=document.getElementById('fx_'+ctrl.k);
+    if(input) input.value=fxTuning[ctrl.k];
+    if(label) label.textContent=Number(fxTuning[ctrl.k]).toFixed(ctrl.step<0.01 ? 3 : 2);
+  }
+}
+function applyFxTuning(){
+  CRYSTAL_BLOOM.strength=fxTuning.bloomStrength;
+  CRYSTAL_BLOOM.threshold=fxTuning.bloomThreshold;
+  CRYSTAL_BLOOM.radius=fxTuning.bloomRadius;
+  CRYSTAL_FRONT.fresnelStrength=fxTuning.heroEdgeGlow;
+  CRYSTAL_FRONT.edgeOpacity=0.052 + fxTuning.heroEdgeGlow*0.072;
+  CRYSTAL_FRONT.edgeEnv=1.45 + fxTuning.heroEdgeGlow*1.90;
+  bloomPass.strength=FX.bloom ? CRYSTAL_BLOOM.strength : Math.min(CRYSTAL_BLOOM.strength, 0.05);
+  bloomPass.threshold=FX.bloom ? CRYSTAL_BLOOM.threshold : Math.max(0.98, CRYSTAL_BLOOM.threshold);
+  bloomPass.radius=FX.bloom ? CRYSTAL_BLOOM.radius : Math.min(CRYSTAL_BLOOM.radius, 0.04);
+  lastCodeFrameTime=0;
+  syncFxControls();
+  applyState();
+  layoutStack();
+}
+const fxApi={};
+for(const ctrl of FX_CTRL){
+  Object.defineProperty(fxApi, ctrl.k, {
+    enumerable:true,
+    get(){ return fxTuning[ctrl.k]; },
+    set(value){
+      fxTuning[ctrl.k]=clampFxValue(ctrl,value);
+      applyFxTuning();
+    }
+  });
+}
+fxApi.set=(key,value)=>{
+  const ctrl=FX_CTRL.find(item=>item.k===key);
+  if(!ctrl) return false;
+  fxTuning[key]=clampFxValue(ctrl,value);
+  applyFxTuning();
+  return true;
+};
+fxApi.values=()=>Object.assign({},fxTuning);
+window.__fx=fxApi;
+
+const fxTitle=document.createElement('h4');
+fxTitle.textContent='FX';
+fxTitle.style.marginTop='20px';
+wrap.appendChild(fxTitle);
+for(const ctrl of FX_CTRL){
+  const row=document.createElement('div');
+  row.className='row';
+  row.innerHTML='<label><span>'+ctrl.name+'</span><b id="fx_'+ctrl.k+'">'+fxTuning[ctrl.k]+'</b></label>'+
+    '<input type="range" min="'+ctrl.min+'" max="'+ctrl.max+'" step="'+ctrl.step+'" value="'+fxTuning[ctrl.k]+'">';
+  const input=row.querySelector('input');
+  fxInputs[ctrl.k]=input;
+  input.oninput=()=>{
+    fxTuning[ctrl.k]=clampFxValue(ctrl,input.value);
+    applyFxTuning();
+  };
+  wrap.appendChild(row);
+}
+syncFxControls();
 
 /* ===== ???券莎??餌??箏?銝剖亢??雿?銝撐 DOM ?⊿?脣??脤 ===== */
 const STACK={ xOffset:0.82, zSpacing:0.88, backDrop:0.46, backScale:0.12, rearDim:0.04, rearTransmission:0.24, transitionStart:0.55, transitionEnd:0.85, fadeEnd:0.90 };
@@ -1070,15 +1272,29 @@ function layoutStack(){
       x=0; y=0; z=0; scale=1; frontWeight=1; visible=1;
     }
     const rearDepth=Math.max(0, Math.min(1, rel));
-    const rearVisible=rel>=0 ? 1-rearDepth*0.10 : visible;
-    visible=QA_MODE ? 1 : Math.max(frontWeight, rearVisible);
+    if(!QA_MODE){
+      if(rel>=0){
+        visible=Math.max(frontWeight, 1-rearDepth*0.10);
+      }else{
+        visible=frontWeight>0 ? Math.min(visible, frontWeight) : visible;
+      }
+    }else{
+      visible=1;
+    }
     if(QA_MODE && idx===0) frontWeight=1;
     card.group.position.set(x,y,z);
     card.group.scale.setScalar(Math.max(0.72,scale));
     card.group.rotation.x=THREE.MathUtils.degToRad(-state.tiltX);
     card.group.rotation.y=THREE.MathUtils.degToRad(state.tiltY);
     card.group.visible=visible>0.01;
-    applyGlassCardMaterial(card, idx, frontWeight, visible, rearDepth);
+    if(frontWeight>0.985 && visible>0.98){
+      card.edgeGlow.layers.enable(BLOOM_SCENE);
+      card.fresnelShell.layers.enable(BLOOM_SCENE);
+    }else{
+      card.edgeGlow.layers.disable(BLOOM_SCENE);
+      card.fresnelShell.layers.disable(BLOOM_SCENE);
+    }
+    applyGlassCardMaterial(card, idx, activeFloat, frontWeight, visible, rearDepth);
   }
   requestSceneRender();
 }
@@ -1140,7 +1356,16 @@ function loop(now){
   lastFrameTime=now-(elapsed%TARGET_FRAME_MS);
   cardRect=htmlCard.getBoundingClientRect();
   const t=QA_MODE ? 0.75 : (performance.now()-t0)/1000;
-  drawStarRain(t);
+  if(forceQaFrame || now-lastCodeFrameTime>=FX.codeFrameMs){
+    drawCodeTexture(t);
+    lastCodeFrameTime=now;
+  }
+  const previousBackground=scene.background;
+  scene.background=new THREE.Color(0x000000);
+  camera.layers.set(BLOOM_SCENE);
+  bloomComposer.render();
+  camera.layers.set(0);
+  scene.background=previousBackground;
   composer.render();
   needsRender=false;
   if(forceQaFrame){
