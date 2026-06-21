@@ -136,7 +136,10 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 
-const PARAMS=[
+const urlParams=new URLSearchParams(window.location.search);
+const QA_MODE=urlParams.get('qa')==='1';
+const DEBUG_MODE=urlParams.has('debug');
+const BASE_PARAMS=[
   {k:'thickness', name:'玻璃厚度', min:0.2, max:4.5, step:0.05},
   {k:'ior', name:'折射率 ior', min:1.05, max:2.2, step:0.01},
   {k:'roughness', name:'粗糙度', min:0, max:0.3, step:0.005},
@@ -150,7 +153,27 @@ const PARAMS=[
   {k:'fresnelPower', name:'Fresnel power', min:1.2, max:6.0, step:0.05},
   {k:'bevelPx', name:'導角大小', min:4, max:40, step:1, suf:'px'}
 ];
-const state={ thickness:1.8, ior:1.5, roughness:0.02, dispersion:0.26, tiltX:7, tiltY:-7, transmission:1, envMapIntensity:2.35, bloomStrength:0.5, backlight:1.0, fresnelPower:2.65, bevelPx:16 };
+const RIM_PARAMS=[
+  {k:'rimStrength', name:'rim strength', min:0.4, max:5.0, step:0.02},
+  {k:'cornerStrength', name:'corner strength', min:0, max:10, step:0.05},
+  {k:'cornerSize', name:'corner size', min:0.45, max:0.96, step:0.01},
+  {k:'rimBandY', name:'rim band Y', min:0.03, max:0.42, step:0.005, env:true},
+  {k:'rimBandWidth', name:'rim band width', min:6, max:120, step:1, env:true, suf:'px'},
+  {k:'rimBandAlpha', name:'rim band alpha', min:0, max:0.85, step:0.005, env:true}
+];
+const PARAMS=DEBUG_MODE ? BASE_PARAMS.concat(RIM_PARAMS) : BASE_PARAMS;
+const state={
+  thickness:1.8, ior:1.5, roughness:0.02, dispersion:0.26, tiltX:7, tiltY:-7, transmission:1,
+  envMapIntensity:2.35, bloomStrength:0.5, backlight:1.0, fresnelPower:2.65, bevelPx:16,
+  rimStrength:3.15, cornerStrength:8.0, cornerSize:0.62,
+  rimBandY:0.12, rimBandWidth:54, rimBandAlpha:0.56
+};
+for(const [key,value] of urlParams){
+  if(Object.prototype.hasOwnProperty.call(state,key)){
+    const parsed=parseFloat(value);
+    if(Number.isFinite(parsed)) state[key]=parsed;
+  }
+}
 const root=document.documentElement;
 const dump=document.getElementById('dump');
 const htmlCard=document.getElementById('htmlCard');
@@ -168,6 +191,7 @@ for(const p of PARAMS){
     const v=parseFloat(inp.value);
     state[p.k]=v;
     document.getElementById('v_'+p.k).textContent=v+(p.suf||'');
+    if(p.env) refreshStudioEnvMap();
     applyState();
   };
   wrap.appendChild(row);
@@ -190,6 +214,7 @@ const camera=new THREE.PerspectiveCamera(34, 1, 0.1, 100);
 camera.position.set(0,0,8.1);
 
 const pmremGenerator=new THREE.PMREMGenerator(renderer);
+let studioEnvRT=null;
 function makeStudioEnvMap(){
   const envCanvas=document.createElement('canvas');
   envCanvas.width=1024;
@@ -204,41 +229,73 @@ function makeStudioEnvMap(){
 
   let g=ctx.createLinearGradient(88,34,936,92);
   g.addColorStop(0,'rgba(255,255,255,0)');
-  g.addColorStop(0.14,'rgba(230,244,255,1)');
-  g.addColorStop(0.48,'rgba(255,255,255,1)');
-  g.addColorStop(0.84,'rgba(180,216,255,0.88)');
+  g.addColorStop(0.14,'rgba(230,244,255,0.30)');
+  g.addColorStop(0.48,'rgba(255,255,255,0.36)');
+  g.addColorStop(0.84,'rgba(180,216,255,0.25)');
   g.addColorStop(1,'rgba(255,255,255,0)');
   ctx.fillStyle=g;
-  ctx.fillRect(48,28,928,64);
+  ctx.fillRect(48,34,928,34);
 
   /* 移除頂部兩條離散窄白線：反射到玻璃圓角上會變成虛線段（業主指出的不規則虛線）。
      頂部光源只保留上方平滑漸層 softbox，反射才是一道連續高光。 */
 
   g=ctx.createRadialGradient(842,250,0,842,250,340);
-  g.addColorStop(0,'rgba(232,240,255,0.96)');
-  g.addColorStop(0.34,'rgba(0,200,255,0.56)');
+  g.addColorStop(0,'rgba(232,240,255,0.32)');
+  g.addColorStop(0.34,'rgba(0,200,255,0.20)');
   g.addColorStop(1,'rgba(0,200,255,0)');
   ctx.fillStyle=g;
   ctx.fillRect(520,0,504,512);
 
   g=ctx.createRadialGradient(512,486,20,512,486,410);
-  g.addColorStop(0,'rgba(232,240,255,0.95)');
-  g.addColorStop(0.28,'rgba(0,200,255,0.46)');
-  g.addColorStop(0.68,'rgba(90,132,255,0.26)');
+  g.addColorStop(0,'rgba(232,240,255,0.30)');
+  g.addColorStop(0.28,'rgba(0,200,255,0.16)');
+  g.addColorStop(0.68,'rgba(90,132,255,0.10)');
   g.addColorStop(1,'rgba(90,132,255,0)');
   ctx.fillStyle=g;
   ctx.fillRect(150,250,724,262);
+
+  const drawRimBand=(yNorm,width,alpha)=>{
+    if(alpha<=0 || width<=0) return;
+    const y=yNorm*envCanvas.height;
+    const half=Math.max(3,width*0.5);
+    const band=ctx.createLinearGradient(0,y-half*2,0,y+half*2);
+    band.addColorStop(0,'rgba(255,255,255,0)');
+    band.addColorStop(0.34,'rgba(210,232,255,'+(alpha*0.38)+')');
+    band.addColorStop(0.5,'rgba(255,255,255,'+alpha+')');
+    band.addColorStop(0.66,'rgba(0,200,255,'+(alpha*0.22)+')');
+    band.addColorStop(1,'rgba(0,200,255,0)');
+    ctx.fillStyle=band;
+    ctx.fillRect(64,Math.max(0,y-half*2),896,half*4);
+
+    const endGlow=ctx.createLinearGradient(64,0,960,0);
+    endGlow.addColorStop(0,'rgba(255,255,255,'+(alpha*0.42)+')');
+    endGlow.addColorStop(0.12,'rgba(255,255,255,0)');
+    endGlow.addColorStop(0.88,'rgba(255,255,255,0)');
+    endGlow.addColorStop(1,'rgba(255,255,255,'+(alpha*0.34)+')');
+    ctx.globalCompositeOperation='screen';
+    ctx.fillStyle=endGlow;
+    ctx.fillRect(64,Math.max(0,y-half*1.4),896,half*2.8);
+    ctx.globalCompositeOperation='source-over';
+  };
+  drawRimBand(state.rimBandY,state.rimBandWidth,state.rimBandAlpha);
 
   /* 移除其餘離散線光源：改全用平滑漸層 / radial softbox，避免任何反射成虛線/段 */
 
   const envTex=new THREE.CanvasTexture(envCanvas);
   envTex.mapping=THREE.EquirectangularReflectionMapping;
   envTex.colorSpace=THREE.SRGBColorSpace;
-  const envRT=pmremGenerator.fromEquirectangular(envTex);
+  if(studioEnvRT) studioEnvRT.dispose();
+  studioEnvRT=pmremGenerator.fromEquirectangular(envTex);
   envTex.dispose();
-  return envRT.texture;
+  return studioEnvRT.texture;
 }
 scene.environment=makeStudioEnvMap();
+function refreshStudioEnvMap(){
+  scene.environment=makeStudioEnvMap();
+  if(typeof glassMat!=='undefined') glassMat.needsUpdate=true;
+  if(typeof edgeMat!=='undefined') edgeMat.needsUpdate=true;
+  requestSceneRender();
+}
 
 const composer=new EffectComposer(renderer);
 const renderPass=new RenderPass(scene,camera);
@@ -317,14 +374,19 @@ let fresnelGeo=smoothRoundedBoxGeometry(1, 1, 0.1, GLASS_BEVEL_SEGMENTS, 0.05);
 const fresnelMat=new THREE.ShaderMaterial({
   uniforms:{
     uPower:{ value:state.fresnelPower },
-    uStrength:{ value:1.28 },
+    uStrength:{ value:state.rimStrength },
+    uCornerStrength:{ value:state.cornerStrength },
+    uCornerSize:{ value:state.cornerSize },
+    uHalfSize:{ value:new THREE.Vector2(0.5,0.5) },
     uColorA:{ value:new THREE.Color(0xe8f0ff) },
     uColorB:{ value:new THREE.Color(0x00c8ff) }
   },
   vertexShader:`
+    varying vec3 vLocalPosition;
     varying vec3 vWorldNormal;
     varying vec3 vWorldPosition;
     void main(){
+      vLocalPosition=position;
       vec4 worldPosition=modelMatrix*vec4(position,1.0);
       vWorldPosition=worldPosition.xyz;
       vWorldNormal=normalize(mat3(modelMatrix)*normal);
@@ -334,15 +396,26 @@ const fresnelMat=new THREE.ShaderMaterial({
   fragmentShader:`
     uniform float uPower;
     uniform float uStrength;
+    uniform float uCornerStrength;
+    uniform float uCornerSize;
+    uniform vec2 uHalfSize;
     uniform vec3 uColorA;
     uniform vec3 uColorB;
+    varying vec3 vLocalPosition;
     varying vec3 vWorldNormal;
     varying vec3 vWorldPosition;
     void main(){
       vec3 viewDir=normalize(cameraPosition-vWorldPosition);
       float fresnel=pow(1.0-max(dot(normalize(vWorldNormal),viewDir),0.0),uPower);
-      vec3 color=mix(uColorA,uColorB,0.22);
-      gl_FragColor=vec4(color,fresnel*uStrength);
+      vec2 edge=abs(vLocalPosition.xy)/max(uHalfSize,vec2(0.001));
+      float rim=max(smoothstep(0.86,1.0,edge.x),smoothstep(0.86,1.0,edge.y));
+      float corner=smoothstep(uCornerSize,1.0,edge.x)*smoothstep(uCornerSize,1.0,edge.y);
+      vec3 color=mix(uColorA,uColorB,0.16+rim*0.10+corner*0.24);
+      float activeFresnel=fresnel*uStrength*(1.0+corner*uCornerStrength);
+      float staticRim=rim*uStrength*0.10;
+      float staticCorner=corner*uCornerStrength*0.16;
+      float alpha=activeFresnel+staticRim+staticCorner;
+      gl_FragColor=vec4(color,alpha);
     }
   `,
   transparent:true,
@@ -447,10 +520,11 @@ let starW=1, starH=1, viewW=1, viewH=1, cardRect={left:0,right:0,top:0,bottom:0}
 let rafId=0;
 let lastFrameTime=0;
 let needsRender=true;
+let qaFramesRemaining=QA_MODE ? 8 : 0;
 
 function requestSceneRender(){
   needsRender=true;
-  if(!document.hidden && !rafId){
+  if((QA_MODE || !document.hidden) && !rafId){
     rafId=requestAnimationFrame(loop);
   }
 }
@@ -469,6 +543,7 @@ function rebuildGlassGeometry(){
   const nextGlassGeo=smoothRoundedBoxGeometry(w, h, d, GLASS_BEVEL_SEGMENTS, r);
   const nextEdgeGeo=smoothRoundedBoxGeometry(w+edgePad, h+edgePad, d+(2*unitsPerPx), GLASS_BEVEL_SEGMENTS, r+unitsPerPx*1.2);
   const nextFresnelGeo=smoothRoundedBoxGeometry(w+edgePad*0.55, h+edgePad*0.55, d+(unitsPerPx*1.5), GLASS_BEVEL_SEGMENTS, r+unitsPerPx*0.9);
+  fresnelMat.uniforms.uHalfSize.value.set((w+edgePad*0.55)*0.5,(h+edgePad*0.55)*0.5);
   rebuildHighlightLayer(w,h,r,d,unitsPerPx);
 
   glass.geometry.dispose();
@@ -679,6 +754,9 @@ function applyState(){
   bloomPass.radius=0.28;
   bloomPass.threshold=0.85;
   fresnelMat.uniforms.uPower.value=state.fresnelPower;
+  fresnelMat.uniforms.uStrength.value=state.rimStrength;
+  fresnelMat.uniforms.uCornerStrength.value=state.cornerStrength;
+  fresnelMat.uniforms.uCornerSize.value=state.cornerSize;
   glassMat.needsUpdate=true;
   edgeMat.needsUpdate=true;
   glassGroup.rotation.x=THREE.MathUtils.degToRad(-state.tiltX);
@@ -695,22 +773,27 @@ applyState();
 const t0=performance.now();
 function loop(now){
   rafId=requestAnimationFrame(loop);
-  if(document.hidden){
+  if(!QA_MODE && document.hidden){
     cancelAnimationFrame(rafId);
     rafId=0;
     return;
   }
   const elapsed=now-lastFrameTime;
-  if(elapsed<TARGET_FRAME_MS && !needsRender) return;
+  const forceQaFrame=QA_MODE && qaFramesRemaining>0;
+  if(elapsed<TARGET_FRAME_MS && !needsRender && !forceQaFrame) return;
   lastFrameTime=now-(elapsed%TARGET_FRAME_MS);
   cardRect=htmlCard.getBoundingClientRect();
-  const t=(performance.now()-t0)/1000;
+  const t=QA_MODE ? 0 : (performance.now()-t0)/1000;
   drawStarRain(t);
   composer.render();
   needsRender=false;
+  if(forceQaFrame){
+    qaFramesRemaining--;
+    needsRender=qaFramesRemaining>0;
+  }
 }
 document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){
+  if(!QA_MODE && document.hidden){
     if(rafId){
       cancelAnimationFrame(rafId);
       rafId=0;
