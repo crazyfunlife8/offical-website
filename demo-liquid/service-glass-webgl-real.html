@@ -135,11 +135,11 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
+import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 
 const urlParams=new URLSearchParams(window.location.search);
 const QA_MODE=urlParams.get('qa')==='1';
-const DEBUG_MODE=urlParams.has('debug');
-const BASE_PARAMS=[
+const PARAMS=[
   {k:'thickness', name:'玻璃厚度', min:0.2, max:4.5, step:0.05},
   {k:'ior', name:'折射率 ior', min:1.05, max:2.2, step:0.01},
   {k:'roughness', name:'粗糙度', min:0, max:0.3, step:0.005},
@@ -150,30 +150,14 @@ const BASE_PARAMS=[
   {k:'envMapIntensity', name:'環境反射', min:0, max:5, step:0.05},
   {k:'bloomStrength', name:'bloom 強度', min:0, max:2.4, step:0.02},
   {k:'backlight', name:'背光亮口袋', min:0, max:2.2, step:0.02},
+  {k:'edgeBoost', name:'edge reflect', min:0, max:12, step:0.1, env:true},
+  {k:'cornerBoost', name:'corner reflect', min:0, max:16, step:0.1, env:true},
+  {k:'envBandWidth', name:'env band width', min:0.04, max:0.34, step:0.005, env:true},
+  {k:'envBandY', name:'env band pos', min:0.02, max:0.34, step:0.005, env:true},
   {k:'fresnelPower', name:'Fresnel power', min:1.2, max:6.0, step:0.05},
   {k:'bevelPx', name:'導角大小', min:4, max:40, step:1, suf:'px'}
 ];
-const RIM_PARAMS=[
-  {k:'rimStrength', name:'rim strength', min:0.4, max:5.0, step:0.02},
-  {k:'cornerStrength', name:'corner strength', min:0, max:10, step:0.05},
-  {k:'cornerSize', name:'corner size', min:0.45, max:0.96, step:0.01},
-  {k:'rimBandY', name:'rim band Y', min:0.03, max:0.42, step:0.005, env:true},
-  {k:'rimBandWidth', name:'rim band width', min:6, max:120, step:1, env:true, suf:'px'},
-  {k:'rimBandAlpha', name:'rim band alpha', min:0, max:0.85, step:0.005, env:true}
-];
-const PARAMS=DEBUG_MODE ? BASE_PARAMS.concat(RIM_PARAMS) : BASE_PARAMS;
-const state={
-  thickness:1.8, ior:1.5, roughness:0.02, dispersion:0.26, tiltX:7, tiltY:-7, transmission:1,
-  envMapIntensity:2.35, bloomStrength:0.5, backlight:1.0, fresnelPower:2.65, bevelPx:16,
-  rimStrength:3.15, cornerStrength:8.0, cornerSize:0.62,
-  rimBandY:0.12, rimBandWidth:54, rimBandAlpha:0.56
-};
-for(const [key,value] of urlParams){
-  if(Object.prototype.hasOwnProperty.call(state,key)){
-    const parsed=parseFloat(value);
-    if(Number.isFinite(parsed)) state[key]=parsed;
-  }
-}
+const state={ thickness:1.8, ior:1.5, roughness:0.02, dispersion:0.26, tiltX:7, tiltY:-7, transmission:1, envMapIntensity:2.35, edgeBoost:2.2, cornerBoost:3.0, envBandWidth:0.095, envBandY:0.105, bloomStrength:0.62, backlight:0.9, fresnelPower:2.65, bevelPx:16 };
 const root=document.documentElement;
 const dump=document.getElementById('dump');
 const htmlCard=document.getElementById('htmlCard');
@@ -203,6 +187,7 @@ renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure=0.95;
 renderer.useLegacyLights=false;
+RectAreaLightUniformsLib.init();
 const STAR_CANVAS_MAX_WIDTH=1280;
 const STAR_CANVAS_MAX_HEIGHT=900;
 const BLOOM_RESOLUTION_SCALE=0.5;
@@ -227,57 +212,78 @@ function makeStudioEnvMap(){
   ctx.fillStyle=base;
   ctx.fillRect(0,0,1024,512);
 
-  let g=ctx.createLinearGradient(88,34,936,92);
+  const edgeAmount=THREE.MathUtils.clamp(state.edgeBoost/12,0,1);
+  const cornerAmount=THREE.MathUtils.clamp(state.cornerBoost/16,0,1);
+  const bandWidth=Math.max(18, state.envBandWidth*512);
+  const bandCenter=state.envBandY*512;
+  let g=ctx.createLinearGradient(88,bandCenter-bandWidth*0.55,936,bandCenter+bandWidth*0.38);
   g.addColorStop(0,'rgba(255,255,255,0)');
-  g.addColorStop(0.14,'rgba(230,244,255,0.30)');
-  g.addColorStop(0.48,'rgba(255,255,255,0.36)');
-  g.addColorStop(0.84,'rgba(180,216,255,0.25)');
+  g.addColorStop(0.14,'rgba(230,244,255,1)');
+  g.addColorStop(0.48,'rgba(255,255,255,1)');
+  g.addColorStop(0.84,'rgba(180,216,255,0.88)');
   g.addColorStop(1,'rgba(255,255,255,0)');
   ctx.fillStyle=g;
-  ctx.fillRect(48,34,928,34);
+  ctx.fillRect(48,bandCenter-bandWidth*0.5,928,bandWidth);
 
   /* 移除頂部兩條離散窄白線：反射到玻璃圓角上會變成虛線段（業主指出的不規則虛線）。
      頂部光源只保留上方平滑漸層 softbox，反射才是一道連續高光。 */
 
   g=ctx.createRadialGradient(842,250,0,842,250,340);
-  g.addColorStop(0,'rgba(232,240,255,0.32)');
-  g.addColorStop(0.34,'rgba(0,200,255,0.20)');
+  g.addColorStop(0,'rgba(232,240,255,0.96)');
+  g.addColorStop(0.34,'rgba(0,200,255,0.56)');
   g.addColorStop(1,'rgba(0,200,255,0)');
   ctx.fillStyle=g;
   ctx.fillRect(520,0,504,512);
 
   g=ctx.createRadialGradient(512,486,20,512,486,410);
-  g.addColorStop(0,'rgba(232,240,255,0.30)');
-  g.addColorStop(0.28,'rgba(0,200,255,0.16)');
-  g.addColorStop(0.68,'rgba(90,132,255,0.10)');
+  g.addColorStop(0,'rgba(232,240,255,0.95)');
+  g.addColorStop(0.28,'rgba(0,200,255,0.46)');
+  g.addColorStop(0.68,'rgba(90,132,255,0.26)');
   g.addColorStop(1,'rgba(90,132,255,0)');
   ctx.fillStyle=g;
   ctx.fillRect(150,250,724,262);
 
-  const drawRimBand=(yNorm,width,alpha)=>{
-    if(alpha<=0 || width<=0) return;
-    const y=yNorm*envCanvas.height;
-    const half=Math.max(3,width*0.5);
-    const band=ctx.createLinearGradient(0,y-half*2,0,y+half*2);
-    band.addColorStop(0,'rgba(255,255,255,0)');
-    band.addColorStop(0.34,'rgba(210,232,255,'+(alpha*0.38)+')');
-    band.addColorStop(0.5,'rgba(255,255,255,'+alpha+')');
-    band.addColorStop(0.66,'rgba(0,200,255,'+(alpha*0.22)+')');
-    band.addColorStop(1,'rgba(0,200,255,0)');
-    ctx.fillStyle=band;
-    ctx.fillRect(64,Math.max(0,y-half*2),896,half*4);
+  const edgeAlpha=0.14+0.62*edgeAmount;
+  const cornerAlpha=0.12+0.70*cornerAmount;
+  ctx.globalCompositeOperation='screen';
 
-    const endGlow=ctx.createLinearGradient(64,0,960,0);
-    endGlow.addColorStop(0,'rgba(255,255,255,'+(alpha*0.42)+')');
-    endGlow.addColorStop(0.12,'rgba(255,255,255,0)');
-    endGlow.addColorStop(0.88,'rgba(255,255,255,0)');
-    endGlow.addColorStop(1,'rgba(255,255,255,'+(alpha*0.34)+')');
-    ctx.globalCompositeOperation='screen';
-    ctx.fillStyle=endGlow;
-    ctx.fillRect(64,Math.max(0,y-half*1.4),896,half*2.8);
-    ctx.globalCompositeOperation='source-over';
+  g=ctx.createLinearGradient(0,86,0,430);
+  g.addColorStop(0,'rgba(232,240,255,0)');
+  g.addColorStop(0.50,'rgba(232,244,255,'+edgeAlpha+')');
+  g.addColorStop(1,'rgba(0,200,255,0)');
+  ctx.fillStyle=g;
+  ctx.fillRect(18,70,58,380);
+
+  g=ctx.createLinearGradient(0,88,0,432);
+  g.addColorStop(0,'rgba(232,240,255,0)');
+  g.addColorStop(0.52,'rgba(210,232,255,'+(edgeAlpha*0.9)+')');
+  g.addColorStop(1,'rgba(0,200,255,0)');
+  ctx.fillStyle=g;
+  ctx.fillRect(948,72,58,378);
+
+  g=ctx.createLinearGradient(120,418,904,486);
+  g.addColorStop(0,'rgba(255,255,255,0)');
+  g.addColorStop(0.18,'rgba(210,232,255,'+(edgeAlpha*0.58)+')');
+  g.addColorStop(0.52,'rgba(232,244,255,'+(edgeAlpha*0.78)+')');
+  g.addColorStop(0.84,'rgba(0,200,255,'+(edgeAlpha*0.36)+')');
+  g.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=g;
+  ctx.fillRect(92,420,840,58);
+
+  const drawCornerSoftbox=(x,y,white,cool)=>{
+    const cg=ctx.createRadialGradient(x,y,0,x,y,132);
+    cg.addColorStop(0,'rgba(255,255,255,'+white+')');
+    cg.addColorStop(0.28,'rgba(232,244,255,'+(white*0.66)+')');
+    cg.addColorStop(0.62,'rgba(0,200,255,'+cool+')');
+    cg.addColorStop(1,'rgba(0,200,255,0)');
+    ctx.fillStyle=cg;
+    ctx.fillRect(x-150,y-150,300,300);
   };
-  drawRimBand(state.rimBandY,state.rimBandWidth,state.rimBandAlpha);
+  drawCornerSoftbox(80,78,cornerAlpha*0.72,cornerAlpha*0.22);
+  drawCornerSoftbox(944,80,cornerAlpha*0.66,cornerAlpha*0.20);
+  drawCornerSoftbox(108,438,cornerAlpha*0.56,cornerAlpha*0.24);
+  drawCornerSoftbox(916,438,cornerAlpha*0.52,cornerAlpha*0.22);
+  ctx.globalCompositeOperation='source-over';
 
   /* 移除其餘離散線光源：改全用平滑漸層 / radial softbox，避免任何反射成虛線/段 */
 
@@ -321,6 +327,29 @@ scene.add(bgPlane);
 
 const glassGroup=new THREE.Group();
 scene.add(glassGroup);
+const edgeLightRig=new THREE.Group();
+scene.add(edgeLightRig);
+
+function makeEdgeRectLight(width,height){
+  const light=new THREE.RectAreaLight(0xf3fbff,1,width,height);
+  edgeLightRig.add(light);
+  return light;
+}
+
+const edgeStripLights={
+  top:makeEdgeRectLight(1,0.08),
+  left:makeEdgeRectLight(0.08,1),
+  right:makeEdgeRectLight(0.08,1),
+  tl:makeEdgeRectLight(0.12,0.12),
+  tr:makeEdgeRectLight(0.12,0.12),
+  bl:makeEdgeRectLight(0.12,0.12),
+  br:makeEdgeRectLight(0.12,0.12)
+};
+
+function aimRectLight(light,x,y,z,tx,ty,tz){
+  light.position.set(x,y,z);
+  light.lookAt(tx,ty,tz);
+}
 
 const GLASS_BEVEL_SEGMENTS=64;
 let GLASS_BEVEL_PX=16;
@@ -354,16 +383,16 @@ glassGroup.add(glass);
 let edgeGeo=smoothRoundedBoxGeometry(1, 1, 0.1, GLASS_BEVEL_SEGMENTS, 0.05);
 const edgeMat=new THREE.MeshPhysicalMaterial({
   color:0xf8fbff,
-  roughness:0.018,
-  transmission:0.72,
-  thickness:1.1,
-  ior:1.58,
-  dispersion:0.58,
-  clearcoat:0.82,
-  clearcoatRoughness:0.04,
-  envMapIntensity:1.6,
+  roughness:0.006,
+  transmission:0.66,
+  thickness:1.25,
+  ior:1.62,
+  dispersion:0.62,
+  clearcoat:1,
+  clearcoatRoughness:0.012,
+  envMapIntensity:4.2,
   transparent:true,
-  opacity:0.105,
+  opacity:0.19,
   side:THREE.FrontSide
 });
 const edgeGlow=new THREE.Mesh(edgeGeo, edgeMat);
@@ -374,9 +403,8 @@ let fresnelGeo=smoothRoundedBoxGeometry(1, 1, 0.1, GLASS_BEVEL_SEGMENTS, 0.05);
 const fresnelMat=new THREE.ShaderMaterial({
   uniforms:{
     uPower:{ value:state.fresnelPower },
-    uStrength:{ value:state.rimStrength },
-    uCornerStrength:{ value:state.cornerStrength },
-    uCornerSize:{ value:state.cornerSize },
+    uStrength:{ value:1.28 },
+    uCornerBoost:{ value:state.cornerBoost },
     uHalfSize:{ value:new THREE.Vector2(0.5,0.5) },
     uColorA:{ value:new THREE.Color(0xe8f0ff) },
     uColorB:{ value:new THREE.Color(0x00c8ff) }
@@ -396,8 +424,7 @@ const fresnelMat=new THREE.ShaderMaterial({
   fragmentShader:`
     uniform float uPower;
     uniform float uStrength;
-    uniform float uCornerStrength;
-    uniform float uCornerSize;
+    uniform float uCornerBoost;
     uniform vec2 uHalfSize;
     uniform vec3 uColorA;
     uniform vec3 uColorB;
@@ -408,14 +435,9 @@ const fresnelMat=new THREE.ShaderMaterial({
       vec3 viewDir=normalize(cameraPosition-vWorldPosition);
       float fresnel=pow(1.0-max(dot(normalize(vWorldNormal),viewDir),0.0),uPower);
       vec2 edge=abs(vLocalPosition.xy)/max(uHalfSize,vec2(0.001));
-      float rim=max(smoothstep(0.86,1.0,edge.x),smoothstep(0.86,1.0,edge.y));
-      float corner=smoothstep(uCornerSize,1.0,edge.x)*smoothstep(uCornerSize,1.0,edge.y);
-      vec3 color=mix(uColorA,uColorB,0.16+rim*0.10+corner*0.24);
-      float activeFresnel=fresnel*uStrength*(1.0+corner*uCornerStrength);
-      float staticRim=rim*uStrength*0.10;
-      float staticCorner=corner*uCornerStrength*0.16;
-      float alpha=activeFresnel+staticRim+staticCorner;
-      gl_FragColor=vec4(color,alpha);
+      float corner=smoothstep(0.82,1.0,edge.x)*smoothstep(0.82,1.0,edge.y);
+      vec3 color=mix(uColorA,uColorB,0.22+corner*0.10);
+      gl_FragColor=vec4(color,fresnel*uStrength*(1.0+corner*(uCornerBoost-1.0)*0.7));
     }
   `,
   transparent:true,
@@ -501,6 +523,30 @@ function rebuildHighlightLayer(w,h,r,d,unit){
 
 /* 直接點光/方向光會在圓角倒角 facet 上打出段狀 specular；玻璃反射改由連續 envMap 承擔。 */
 
+function updateEdgeStripLights(w,h,r,d,unit){
+  const edgeDepth=d*1.95;
+  const cornerSize=Math.max(r*1.45,unit*24);
+  edgeStripLights.top.width=w*0.94;
+  edgeStripLights.top.height=Math.max(r*0.42,unit*10);
+  edgeStripLights.left.width=Math.max(r*0.38,unit*9);
+  edgeStripLights.left.height=h*0.82;
+  edgeStripLights.right.width=Math.max(r*0.38,unit*9);
+  edgeStripLights.right.height=h*0.82;
+  for(const key of ['tl','tr','bl','br']){
+    edgeStripLights[key].width=cornerSize;
+    edgeStripLights[key].height=cornerSize;
+  }
+
+  aimRectLight(edgeStripLights.top,0,h*0.5+r*1.5,edgeDepth,0,h*0.5-r*0.18,d*0.44);
+  aimRectLight(edgeStripLights.left,-w*0.5-r*1.55,0,edgeDepth,-w*0.5+r*0.24,0,d*0.42);
+  aimRectLight(edgeStripLights.right,w*0.5+r*1.55,0,edgeDepth,w*0.5-r*0.24,0,d*0.42);
+  aimRectLight(edgeStripLights.tl,-w*0.5-r*1.25,h*0.5+r*1.25,edgeDepth*1.02,-w*0.5+r*0.35,h*0.5-r*0.35,d*0.45);
+  aimRectLight(edgeStripLights.tr,w*0.5+r*1.25,h*0.5+r*1.25,edgeDepth*1.02,w*0.5-r*0.35,h*0.5-r*0.35,d*0.45);
+  aimRectLight(edgeStripLights.bl,-w*0.5-r*1.20,-h*0.5-r*1.20,edgeDepth*0.96,-w*0.5+r*0.34,-h*0.5+r*0.34,d*0.38);
+  aimRectLight(edgeStripLights.br,w*0.5+r*1.20,-h*0.5-r*1.20,edgeDepth*0.96,w*0.5-r*0.34,-h*0.5+r*0.34,d*0.38);
+  for(const key in edgeStripLights) edgeStripLights[key].updateMatrixWorld();
+}
+
 const CODE=[
   'const nest = createStudio()','export default function App() {','<section class="services">',
   'router.get("/api/orders", fn)','await db.clients.findMany()','npm run build && deploy',
@@ -545,6 +591,7 @@ function rebuildGlassGeometry(){
   const nextFresnelGeo=smoothRoundedBoxGeometry(w+edgePad*0.55, h+edgePad*0.55, d+(unitsPerPx*1.5), GLASS_BEVEL_SEGMENTS, r+unitsPerPx*0.9);
   fresnelMat.uniforms.uHalfSize.value.set((w+edgePad*0.55)*0.5,(h+edgePad*0.55)*0.5);
   rebuildHighlightLayer(w,h,r,d,unitsPerPx);
+  updateEdgeStripLights(w,h,r,d,unitsPerPx);
 
   glass.geometry.dispose();
   edgeGlow.geometry.dispose();
@@ -743,24 +790,38 @@ function drawStarRain(time){
 function applyState(){
   root.style.setProperty('--tiltX', state.tiltX);
   root.style.setProperty('--tiltY', state.tiltY);
+  const edgeAmount=THREE.MathUtils.clamp(state.edgeBoost/12,0,1);
+  const cornerAmount=THREE.MathUtils.clamp(state.cornerBoost/16,0,1);
   glassMat.thickness=state.thickness;
   glassMat.ior=state.ior;
   glassMat.roughness=state.roughness;
   glassMat.dispersion=state.dispersion;
   glassMat.transmission=state.transmission;
   glassMat.envMapIntensity=state.envMapIntensity;
-  edgeMat.envMapIntensity=state.envMapIntensity*1.08;
+  edgeMat.envMapIntensity=state.envMapIntensity*(1.18+edgeAmount*1.9);
+  edgeMat.opacity=0.07+edgeAmount*0.24;
+  edgeMat.roughness=THREE.MathUtils.lerp(0.018,0.003,edgeAmount);
+  edgeMat.clearcoat=THREE.MathUtils.lerp(0.82,1,edgeAmount);
+  edgeMat.clearcoatRoughness=THREE.MathUtils.lerp(0.035,0.006,edgeAmount);
+  edgeMat.dispersion=THREE.MathUtils.lerp(0.42,0.68,edgeAmount);
+  edgeStripLights.top.intensity=state.edgeBoost*28;
+  edgeStripLights.left.intensity=state.edgeBoost*24;
+  edgeStripLights.right.intensity=state.edgeBoost*24;
+  edgeStripLights.tl.intensity=state.cornerBoost*34;
+  edgeStripLights.tr.intensity=state.cornerBoost*34;
+  edgeStripLights.bl.intensity=state.cornerBoost*28;
+  edgeStripLights.br.intensity=state.cornerBoost*28;
   bloomPass.strength=state.bloomStrength;
   bloomPass.radius=0.28;
   bloomPass.threshold=0.85;
   fresnelMat.uniforms.uPower.value=state.fresnelPower;
-  fresnelMat.uniforms.uStrength.value=state.rimStrength;
-  fresnelMat.uniforms.uCornerStrength.value=state.cornerStrength;
-  fresnelMat.uniforms.uCornerSize.value=state.cornerSize;
+  fresnelMat.uniforms.uStrength.value=0.8+state.edgeBoost*0.42;
+  fresnelMat.uniforms.uCornerBoost.value=state.cornerBoost;
   glassMat.needsUpdate=true;
   edgeMat.needsUpdate=true;
   glassGroup.rotation.x=THREE.MathUtils.degToRad(-state.tiltX);
   glassGroup.rotation.y=THREE.MathUtils.degToRad(state.tiltY);
+  edgeLightRig.rotation.copy(glassGroup.rotation);
   if(GLASS_BEVEL_PX!==state.bevelPx){ GLASS_BEVEL_PX=state.bevelPx; rebuildGlassGeometry(); }
   dump.textContent=PARAMS.map(p=>p.k+': '+state[p.k]+(p.suf||'')).join('\n')+
     '\n\nmaterial: MeshPhysicalMaterial\ntexture: CanvasTexture -> rear plane\npost: UnrealBloomPass\nthree: 0.160.0';
@@ -783,7 +844,7 @@ function loop(now){
   if(elapsed<TARGET_FRAME_MS && !needsRender && !forceQaFrame) return;
   lastFrameTime=now-(elapsed%TARGET_FRAME_MS);
   cardRect=htmlCard.getBoundingClientRect();
-  const t=QA_MODE ? 0 : (performance.now()-t0)/1000;
+  const t=QA_MODE ? 0.75 : (performance.now()-t0)/1000;
   drawStarRain(t);
   composer.render();
   needsRender=false;
