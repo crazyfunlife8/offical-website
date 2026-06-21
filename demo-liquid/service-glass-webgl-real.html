@@ -141,23 +141,26 @@ const urlParams=new URLSearchParams(window.location.search);
 const QA_MODE=urlParams.get('qa')==='1';
 const PARAMS=[
   {k:'thickness', name:'玻璃厚度', min:0.2, max:4.5, step:0.05},
-  {k:'ior', name:'折射率 ior', min:1.05, max:2.2, step:0.01},
-  {k:'roughness', name:'粗糙度', min:0, max:0.3, step:0.005},
+  {k:'ior', name:'折射率', min:1.05, max:2.2, step:0.01},
+  {k:'roughness', name:'表面粗糙度', min:0, max:0.3, step:0.005},
   {k:'dispersion', name:'色散', min:0, max:1.2, step:0.01},
-  {k:'tiltX', name:'上下傾', min:-24, max:24, step:1, suf:'deg'},
-  {k:'tiltY', name:'左右傾', min:-24, max:24, step:1, suf:'deg'},
-  {k:'transmission', name:'透射 transmission', min:0, max:1, step:0.01},
-  {k:'envMapIntensity', name:'環境反射', min:0, max:5, step:0.05},
-  {k:'bloomStrength', name:'bloom 強度', min:0, max:2.4, step:0.02},
-  {k:'backlight', name:'背光亮口袋', min:0, max:2.2, step:0.02},
-  {k:'edgeBoost', name:'edge reflect', min:0, max:12, step:0.1, env:true},
-  {k:'cornerBoost', name:'corner reflect', min:0, max:16, step:0.1, env:true},
-  {k:'envBandWidth', name:'env band width', min:0.04, max:0.34, step:0.005, env:true},
-  {k:'envBandY', name:'env band pos', min:0.02, max:0.34, step:0.005, env:true},
-  {k:'fresnelPower', name:'Fresnel power', min:1.2, max:6.0, step:0.05},
+  {k:'tiltX', name:'上下傾角', min:-24, max:24, step:1, suf:'deg'},
+  {k:'tiltY', name:'左右傾角', min:-24, max:24, step:1, suf:'deg'},
+  {k:'transmission', name:'透射度', min:0, max:1, step:0.01},
+  {k:'envMapIntensity', name:'環境反射強度', min:0, max:5, step:0.05},
+  {k:'bloomStrength', name:'泛光強度', min:0, max:2.4, step:0.02},
+  {k:'backlight', name:'背光亮度', min:0, max:2.2, step:0.02},
+  {k:'edgeBoost', name:'邊緣反光強度', min:0, max:12, step:0.1, env:true},
+  {k:'cornerBoost', name:'四角反光強度', min:0, max:16, step:0.1, env:true},
+  {k:'envBandWidth', name:'反光亮帶寬度', min:0.04, max:0.34, step:0.005, env:true},
+  {k:'envBandY', name:'反光亮帶位置', min:0.02, max:0.34, step:0.005, env:true},
+  {k:'lightAzimuth', name:'燈光方位角', min:0, max:360, step:1, suf:'deg'},
+  {k:'lightElevation', name:'燈光仰角', min:4, max:58, step:1, suf:'deg'},
+  {k:'topLightAngle', name:'上邊光角度', min:-28, max:28, step:1, suf:'deg'},
+  {k:'fresnelPower', name:'邊緣光強度', min:1.2, max:6.0, step:0.05},
   {k:'bevelPx', name:'導角大小', min:4, max:40, step:1, suf:'px'}
 ];
-const state={ thickness:1.8, ior:1.5, roughness:0.02, dispersion:0.26, tiltX:7, tiltY:-7, transmission:1, envMapIntensity:2.35, edgeBoost:2.2, cornerBoost:3.0, envBandWidth:0.095, envBandY:0.105, bloomStrength:0.62, backlight:0.9, fresnelPower:2.65, bevelPx:16 };
+const state={ thickness:1.8, ior:1.5, roughness:0.02, dispersion:0.26, tiltX:7, tiltY:-7, transmission:1, envMapIntensity:2.35, edgeBoost:2.2, cornerBoost:3.0, envBandWidth:0.095, envBandY:0.105, lightAzimuth:0, lightElevation:18, topLightAngle:0, bloomStrength:0.62, backlight:0.9, fresnelPower:2.65, bevelPx:16 };
 const root=document.documentElement;
 const dump=document.getElementById('dump');
 const htmlCard=document.getElementById('htmlCard');
@@ -329,6 +332,9 @@ const glassGroup=new THREE.Group();
 scene.add(glassGroup);
 const edgeLightRig=new THREE.Group();
 scene.add(edgeLightRig);
+const edgeLightRigBaseQuat=new THREE.Quaternion();
+const edgeLightAzimuthQuat=new THREE.Quaternion();
+let edgeLightMetrics=null;
 
 function makeEdgeRectLight(width,height){
   const light=new THREE.RectAreaLight(0xf3fbff,1,width,height);
@@ -524,7 +530,13 @@ function rebuildHighlightLayer(w,h,r,d,unit){
 /* 直接點光/方向光會在圓角倒角 facet 上打出段狀 specular；玻璃反射改由連續 envMap 承擔。 */
 
 function updateEdgeStripLights(w,h,r,d,unit){
-  const edgeDepth=d*1.95;
+  edgeLightMetrics={w,h,r,d,unit};
+  const elevation=THREE.MathUtils.clamp(state.lightElevation,4,58);
+  const elevationT=(elevation-4)/(58-4);
+  const edgeDepth=d*THREE.MathUtils.lerp(2.65,1.55,elevationT);
+  const targetDepth=d*THREE.MathUtils.lerp(0.52,0.25,elevationT);
+  const topShift=Math.sin(THREE.MathUtils.degToRad(state.topLightAngle))*r*1.6;
+  const topTargetX=Math.sin(THREE.MathUtils.degToRad(state.topLightAngle))*w*0.18;
   const cornerSize=Math.max(r*1.45,unit*24);
   edgeStripLights.top.width=w*0.94;
   edgeStripLights.top.height=Math.max(r*0.42,unit*10);
@@ -537,13 +549,13 @@ function updateEdgeStripLights(w,h,r,d,unit){
     edgeStripLights[key].height=cornerSize;
   }
 
-  aimRectLight(edgeStripLights.top,0,h*0.5+r*1.5,edgeDepth,0,h*0.5-r*0.18,d*0.44);
-  aimRectLight(edgeStripLights.left,-w*0.5-r*1.55,0,edgeDepth,-w*0.5+r*0.24,0,d*0.42);
-  aimRectLight(edgeStripLights.right,w*0.5+r*1.55,0,edgeDepth,w*0.5-r*0.24,0,d*0.42);
-  aimRectLight(edgeStripLights.tl,-w*0.5-r*1.25,h*0.5+r*1.25,edgeDepth*1.02,-w*0.5+r*0.35,h*0.5-r*0.35,d*0.45);
-  aimRectLight(edgeStripLights.tr,w*0.5+r*1.25,h*0.5+r*1.25,edgeDepth*1.02,w*0.5-r*0.35,h*0.5-r*0.35,d*0.45);
-  aimRectLight(edgeStripLights.bl,-w*0.5-r*1.20,-h*0.5-r*1.20,edgeDepth*0.96,-w*0.5+r*0.34,-h*0.5+r*0.34,d*0.38);
-  aimRectLight(edgeStripLights.br,w*0.5+r*1.20,-h*0.5-r*1.20,edgeDepth*0.96,w*0.5-r*0.34,-h*0.5+r*0.34,d*0.38);
+  aimRectLight(edgeStripLights.top,topShift,h*0.5+r*1.5,edgeDepth,topTargetX,h*0.5-r*0.18,targetDepth);
+  aimRectLight(edgeStripLights.left,-w*0.5-r*1.55,0,edgeDepth,-w*0.5+r*0.24,0,targetDepth*0.96);
+  aimRectLight(edgeStripLights.right,w*0.5+r*1.55,0,edgeDepth,w*0.5-r*0.24,0,targetDepth*0.96);
+  aimRectLight(edgeStripLights.tl,-w*0.5-r*1.25,h*0.5+r*1.25,edgeDepth*1.02,-w*0.5+r*0.35,h*0.5-r*0.35,targetDepth);
+  aimRectLight(edgeStripLights.tr,w*0.5+r*1.25,h*0.5+r*1.25,edgeDepth*1.02,w*0.5-r*0.35,h*0.5-r*0.35,targetDepth);
+  aimRectLight(edgeStripLights.bl,-w*0.5-r*1.20,-h*0.5-r*1.20,edgeDepth*0.96,-w*0.5+r*0.34,-h*0.5+r*0.34,targetDepth*0.86);
+  aimRectLight(edgeStripLights.br,w*0.5+r*1.20,-h*0.5-r*1.20,edgeDepth*0.96,w*0.5-r*0.34,-h*0.5+r*0.34,targetDepth*0.86);
   for(const key in edgeStripLights) edgeStripLights[key].updateMatrixWorld();
 }
 
@@ -811,6 +823,9 @@ function applyState(){
   edgeStripLights.tr.intensity=state.cornerBoost*34;
   edgeStripLights.bl.intensity=state.cornerBoost*28;
   edgeStripLights.br.intensity=state.cornerBoost*28;
+  if(edgeLightMetrics){
+    updateEdgeStripLights(edgeLightMetrics.w,edgeLightMetrics.h,edgeLightMetrics.r,edgeLightMetrics.d,edgeLightMetrics.unit);
+  }
   bloomPass.strength=state.bloomStrength;
   bloomPass.radius=0.28;
   bloomPass.threshold=0.85;
@@ -821,7 +836,9 @@ function applyState(){
   edgeMat.needsUpdate=true;
   glassGroup.rotation.x=THREE.MathUtils.degToRad(-state.tiltX);
   glassGroup.rotation.y=THREE.MathUtils.degToRad(state.tiltY);
-  edgeLightRig.rotation.copy(glassGroup.rotation);
+  edgeLightRigBaseQuat.copy(glassGroup.quaternion);
+  edgeLightAzimuthQuat.setFromAxisAngle(new THREE.Vector3(0,0,1),THREE.MathUtils.degToRad(state.lightAzimuth));
+  edgeLightRig.quaternion.copy(edgeLightRigBaseQuat).multiply(edgeLightAzimuthQuat);
   if(GLASS_BEVEL_PX!==state.bevelPx){ GLASS_BEVEL_PX=state.bevelPx; rebuildGlassGeometry(); }
   dump.textContent=PARAMS.map(p=>p.k+': '+state[p.k]+(p.suf||'')).join('\n')+
     '\n\nmaterial: MeshPhysicalMaterial\ntexture: CanvasTexture -> rear plane\npost: UnrealBloomPass\nthree: 0.160.0';
