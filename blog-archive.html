@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>不正常觀點 · 異常觀察檔案｜創巢數位 Nest Digital</title>
+    <meta name="description" content="創巢數位的異常觀察檔案——把商業世界的怪現象一件件立案、解剖、公開。">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+
+    <link rel="stylesheet" href="assets/css/tokens.css">
+    <link rel="stylesheet" href="assets/css/pages/blog-archive.css">
+    <!-- 早期掛 .anim（讓進場初始狀態先生效、避免內容閃一下才隱藏）-->
+    <script>document.documentElement.classList.add('anim');</script>
+</head>
+<body class="archive">
+
+    <!-- 四角登記十字 -->
+    <span class="reg-mark reg-mark--tl" aria-hidden="true"></span>
+    <span class="reg-mark reg-mark--tr" aria-hidden="true"></span>
+    <span class="reg-mark reg-mark--bl" aria-hidden="true"></span>
+    <span class="reg-mark reg-mark--br" aria-hidden="true"></span>
+
+    <!-- 油墨毛邊濾鏡（SVG 字緣位移；只套大字、文字仍是真 HTML 可爬可選取）-->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <filter id="ink-rough" x="-6%" y="-12%" width="112%" height="124%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.018 0.045" numOctaves="2" seed="7" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="2.8" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+        <filter id="ink-rough-sm" x="-8%" y="-16%" width="116%" height="132%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02 0.05" numOctaves="2" seed="4" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="1.7" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+        <filter id="ink-rough-card" x="-6%" y="-14%" width="112%" height="128%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.022 0.052" numOctaves="2" seed="11" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="1.0" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+    </svg>
+
+    <!-- ── 導覽列（卷宗頂條）─────────────────────────── -->
+    <header class="arc-nav">
+        <a class="arc-nav__brand" href="index.html">
+            <img class="arc-nav__emblem" src="_imgtest/arc-nesthole.png" alt="" aria-hidden="true">
+            <span class="arc-nav__brand-zh">創巢數位</span>
+            <span class="arc-nav__brand-en">NEST&nbsp;DIGITAL</span>
+        </a>
+        <nav class="arc-nav__links" aria-label="主導覽列">
+            <a href="index.html#services-section">服務</a>
+            <a href="blog-archive.html" class="is-active">不正常觀點</a>
+            <a href="contact.html">聯絡我們</a>
+        </nav>
+    </header>
+
+    <main class="arc">
+
+        <!-- ── 卷宗封面 ─────────────────────────────────── -->
+        <section class="dossier" aria-labelledby="dossier-title">
+            <img class="stamp stamp--confidential" src="_imgtest/arc-stamp-confidential.png" alt="機密 文件">
+            <img class="clip" src="_imgtest/arc-clip.png" alt="" aria-hidden="true">
+
+            <div class="dossier__head">
+                <img class="dossier__emblem" src="_imgtest/arc-nesthole.png" alt="" aria-hidden="true">
+                <p class="dossier__org">
+                    NEST&nbsp;DIGITAL
+                    <span>ABNORMAL OBSERVATION FILE ／ 異常觀察檔案</span>
+                </p>
+            </div>
+
+            <h1 class="dossier__title" id="dossier-title">不正常觀點</h1>
+            <p class="dossier__title-en">Unconventional&nbsp;Takes</p>
+
+            <dl class="dossier__form">
+                <div class="ff"><dt>ARCHIVE&nbsp;NO.</dt><dd>ND-UT-2026 ／ FIELD NOTES</dd></div>
+                <div class="ff"><dt>觀測領域</dt><dd>軟體開發 · 數位行銷 · AI 應用 · 數位轉型</dd></div>
+                <div class="ff"><dt>建檔日期</dt><dd>2026.06 — 持續更新中</dd></div>
+                <div class="ff"><dt>存取層級</dt><dd>PUBLIC&nbsp;VERSION（公開版 · 部分內容已遮蔽）</dd></div>
+            </dl>
+
+            <div class="dossier__abstract">
+                <span class="ff-label">摘要&nbsp;ABSTRACT</span>
+                <p>
+                    我們把商業世界裡的怪現象——一件一件立案、解剖、公開。
+                    這不是公司的官方說法，是我們腦袋裡<span class="redact" aria-label="內容已遮蔽">那些不該說的</span>真正在想的東西。
+                </p>
+            </div>
+
+            <img class="stamp stamp--public" src="_imgtest/arc-stamp-public.png" alt="PUBLIC VERSION">
+        </section>
+
+        <!-- ── 本期異常 ─────────────────────────────────── -->
+        <section class="arc-top" aria-labelledby="top-title">
+            <p class="arc-section-flag"><span class="arc-flag-dot" aria-hidden="true"></span>本期異常 <span aria-hidden="true">／</span> TOP&nbsp;ANOMALY</p>
+
+            <a class="anomaly" href="#">
+                <img class="stamp stamp--abnormal anomaly__stamp" src="_imgtest/arc-stamp-abnormal.png" alt="異常確認">
+
+                <div class="anomaly__plate" aria-hidden="true">
+                    <span class="anomaly__case">CASE&nbsp;NO.&nbsp;ND-UT-0001</span>
+                    <span class="anomaly__slogan">
+                        <span data-t="便宜">便宜</span>
+                        <span data-t="又快">又快</span>
+                        <span data-t="又好">又好</span>
+                    </span>
+                    <span class="anomaly__note">＊圈選項：三選二，不是態度，是物理。</span>
+                </div>
+
+                <div class="anomaly__body">
+                    <p class="anomaly__meta">
+                        <span class="arc-tag">觀測領域：軟體開發</span>
+                        <span class="arc-divider" aria-hidden="true"></span>
+                        <time datetime="2026-06">建檔 2026.06</time>
+                    </p>
+                    <h2 class="anomaly__title" id="top-title">為什麼我們拒絕接「便宜又快」的案子</h2>
+                    <p class="anomaly__excerpt">
+                        每個來談的客戶都想要又便宜、又快、又好。我們的回答常讓人傻眼：這三個你只能挑兩個。
+                        不是耍脾氣，是這一行的物理定律。這份檔案記下我們怎麼選案子、為什麼有些錢我們不賺。
+                    </p>
+                    <p class="anomaly__verdict"><span class="ff-label">結論</span>能挑的客戶，比能接的案子重要。</p>
+                    <span class="arc-open">OPEN&nbsp;FILE <span class="arc-open__arrow" aria-hidden="true">→</span></span>
+                </div>
+            </a>
+        </section>
+
+        <!-- ── 檔案牆 ───────────────────────────────────── -->
+        <section class="arc-wall" aria-labelledby="wall-title">
+            <div class="arc-wall__head">
+                <h2 class="arc-wall__title" id="wall-title">全部檔案 <span class="arc-wall__count">／ 7 CASES ON FILE</span></h2>
+                <nav class="arc-filter" aria-label="觀測領域">
+                    <button type="button" class="arc-filter__btn is-active" data-cat="all">全部</button>
+                    <button type="button" class="arc-filter__btn" data-cat="dev">軟體開發</button>
+                    <button type="button" class="arc-filter__btn" data-cat="mkt">數位行銷</button>
+                    <button type="button" class="arc-filter__btn" data-cat="ai">AI 應用</button>
+                    <button type="button" class="arc-filter__btn" data-cat="trans">數位轉型</button>
+                    <button type="button" class="arc-filter__btn" data-cat="ad">廣告投放</button>
+                </nav>
+            </div>
+
+            <div class="arc-grid">
+
+                <article class="casefile" data-cat="mkt">
+                    <span class="casefile__tab" data-area="MKT">MKT</span>
+                    <div class="casefile__head">
+                        <span class="casefile__no">CASE&nbsp;ND-UT-0002</span>
+                        <span class="casefile__status">UNDER REVIEW</span>
+                    </div>
+                    <h3 class="casefile__title"><a href="#">會動的網站不等於好網站：90% 的動效都在偷走你的生意</a></h3>
+                    <p class="casefile__excerpt">跑馬燈、自動輪播、會跳的數字——看起來很厲害，其實正在趕走準備掏錢的客人。</p>
+                    <div class="casefile__foot"><time datetime="2026-06">2026.06</time><span class="arc-dot" aria-hidden="true">·</span>閱讀 6 分</div>
+                    <span class="casefile__open" aria-hidden="true">OPEN&nbsp;FILE</span>
+                </article>
+
+                <article class="casefile" data-cat="ai">
+                    <img class="casefile__tape" src="_imgtest/arc-tape.png" alt="" aria-hidden="true">
+                    <span class="casefile__tab" data-area="AI">AI</span>
+                    <div class="casefile__head">
+                        <span class="casefile__no">CASE&nbsp;ND-UT-0003</span>
+                        <span class="casefile__status">CONFIRMED</span>
+                    </div>
+                    <h3 class="casefile__title"><a href="#">AI 形象網紅不是換臉，是把「人設」變成可量產的資產</a></h3>
+                    <p class="casefile__excerpt">大家以為 AI 網紅就是套個假臉。錯了。值錢的是那套永遠不翻車、可無限複製的人設引擎。</p>
+                    <div class="casefile__foot"><time datetime="2026-06">2026.06</time><span class="arc-dot" aria-hidden="true">·</span>閱讀 7 分</div>
+                    <span class="casefile__open" aria-hidden="true">OPEN&nbsp;FILE</span>
+                </article>
+
+                <article class="casefile" data-cat="trans">
+                    <span class="casefile__tab" data-area="TRANS">TRANS</span>
+                    <div class="casefile__head">
+                        <span class="casefile__no">CASE&nbsp;ND-UT-0004</span>
+                        <span class="casefile__status">UNDER REVIEW</span>
+                    </div>
+                    <h3 class="casefile__title"><a href="#">老闆說要「數位轉型」，其實只想要一張會自動填的 Excel</a></h3>
+                    <p class="casefile__excerpt">轉型不是買一套貴的系統。多數公司真正卡住的，是三張手動 Excel 和一個沒人想接的流程。</p>
+                    <div class="casefile__foot"><time datetime="2026-05">2026.05</time><span class="arc-dot" aria-hidden="true">·</span>閱讀 5 分</div>
+                    <span class="casefile__open" aria-hidden="true">OPEN&nbsp;FILE</span>
+                </article>
+
+                <article class="casefile" data-cat="mkt">
+                    <span class="casefile__tab" data-area="MKT">MKT</span>
+                    <div class="casefile__head">
+                        <span class="casefile__no">CASE&nbsp;ND-UT-0005</span>
+                        <span class="casefile__status">CONFIRMED</span>
+                    </div>
+                    <h3 class="casefile__title"><a href="#">「SEO 已死」是內容農場死了，你還沒開始</a></h3>
+                    <p class="casefile__excerpt">每隔半年就有人喊 SEO 死掉。死的是灌關鍵字的內容農場，AI 時代反而更吃真材實料。</p>
+                    <div class="casefile__foot"><time datetime="2026-05">2026.05</time><span class="arc-dot" aria-hidden="true">·</span>閱讀 6 分</div>
+                    <span class="casefile__open" aria-hidden="true">OPEN&nbsp;FILE</span>
+                </article>
+
+                <article class="casefile" data-cat="ad">
+                    <img class="stamp stamp--rejected casefile__stamp" src="_imgtest/arc-stamp-rejected.png" alt="不予受理">
+                    <span class="casefile__tab" data-area="AD">AD</span>
+                    <div class="casefile__head">
+                        <span class="casefile__no">CASE&nbsp;ND-UT-0006</span>
+                        <span class="casefile__status">FLAGGED</span>
+                    </div>
+                    <h3 class="casefile__title"><a href="#">ROAS 3 倍的廣告，可能正在慢慢殺死你的品牌</a></h3>
+                    <p class="casefile__excerpt">短期數字漂亮不代表你贏了。有些「高效」的打法，是在預支品牌的未來。</p>
+                    <div class="casefile__foot"><time datetime="2026-05">2026.05</time><span class="arc-dot" aria-hidden="true">·</span>閱讀 7 分</div>
+                    <span class="casefile__open" aria-hidden="true">OPEN&nbsp;FILE</span>
+                </article>
+
+                <article class="casefile casefile--origin" data-cat="dev">
+                    <span class="casefile__dogear" aria-hidden="true"></span>
+                    <span class="casefile__tab" data-area="DEV">DEV</span>
+                    <div class="casefile__head">
+                        <span class="casefile__no">CASE&nbsp;ND-UT-0007</span>
+                        <span class="casefile__status">ORIGIN&nbsp;FILE</span>
+                    </div>
+                    <h3 class="casefile__title"><a href="#">我們為什麼把公司取名「不正常人類軟體開發」</a></h3>
+                    <p class="casefile__excerpt">一個會嚇到投資人的名字，背後是我們對這一行的整套態度。這是第一份檔案。</p>
+                    <div class="casefile__foot"><time datetime="2026-05">2026.05</time><span class="arc-dot" aria-hidden="true">·</span>閱讀 4 分</div>
+                    <span class="casefile__open" aria-hidden="true">OPEN&nbsp;FILE</span>
+                </article>
+
+            </div>
+
+            <p class="arc-more">更多檔案陸續解密中 ／ MORE&nbsp;CASES&nbsp;DECLASSIFYING</p>
+        </section>
+
+    </main>
+
+    <footer class="arc-footer">
+        <div class="arc-footer__rule" aria-hidden="true"></div>
+        <p class="arc-footer__mark">NEST&nbsp;DIGITAL ／ 不正常觀點 · 異常觀察檔案</p>
+        <p class="arc-footer__copy">© 2024–2026 創巢數位 Nest Digital ·　不正常人類軟體開發有限公司</p>
+    </footer>
+
+    <script>
+    (function () {
+        'use strict';
+        const btns  = document.querySelectorAll('.arc-filter__btn');
+        const cards = document.querySelectorAll('.casefile');
+        if (!btns.length || !cards.length) return;
+        btns.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const cat = btn.dataset.cat;
+                btns.forEach((b) => b.classList.toggle('is-active', b === btn));
+                cards.forEach((card) => {
+                    const show = cat === 'all' || card.dataset.cat === cat;
+                    card.classList.toggle('is-hidden', !show);
+                });
+            });
+        });
+
+        // 進場：文件被攤開（IntersectionObserver；不支援則直接顯示）
+        if (!('IntersectionObserver' in window)) {
+            document.documentElement.classList.remove('anim');
+        } else {
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach((e) => {
+                    if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+            document.querySelectorAll('.dossier, .anomaly, .casefile').forEach((el) => io.observe(el));
+        }
+    })();
+    </script>
+</body>
+</html>

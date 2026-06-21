@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>不正常觀點｜創巢數位 Nest Digital</title>
-    <meta name="description" content="創巢數位的非常規觀點——把行銷、軟體開發、AI 應用的真實想法與案例拆解寫下來。內容準備中，敬請期待。">
+    <meta name="description" content="創巢數位的非常規觀點——把行銷、軟體開發、AI 應用、數位轉型的真實想法與案例拆解寫下來。別人不敢說、不會說的，我們寫在這裡。">
     <meta property="og:title"       content="不正常觀點｜創巢數位 Nest Digital">
-    <meta property="og:description" content="行銷、開發、AI 的非常規觀點與案例拆解，準備中。">
+    <meta property="og:description" content="行銷、開發、AI 的非常規觀點與案例拆解。別人不敢說、不會說的，我們寫在這裡。">
     <meta property="og:image"       content="https://nestdigitalai.com/assets/images/og/blog.jpg">
     <meta property="og:type"        content="website">
     <meta property="og:url"         content="https://nestdigitalai.com/blog.html">
@@ -30,46 +30,162 @@
     <link rel="stylesheet" href="assets/css/base.css">
     <link rel="stylesheet" href="assets/css/components.css">
     <link rel="stylesheet" href="assets/css/animations.css">
-    <link rel="stylesheet" href="assets/css/pages/coming-soon.css">
+    <link rel="stylesheet" href="assets/css/pages/blog.css">
 </head>
 <body>
     <!-- Nav 由 nav.js 動態注入 -->
 
-    <main>
-        <section class="coming-soon" aria-labelledby="page-title">
-            <div class="coming-soon__inner">
+    <main class="blog">
 
-                <p class="coming-soon__eyebrow" data-reveal>Unconventional Takes</p>
-
-                <h1 class="coming-soon__title" id="page-title" data-reveal data-reveal-delay="0.1">
-                    不正常觀點
-                </h1>
-
-                <div class="coming-soon__divider" aria-hidden="true" data-reveal data-reveal-delay="0.2"></div>
-
-                <p class="coming-soon__lead" data-reveal data-reveal-delay="0.25">
-                    行銷、軟體開發、AI 應用——我們把那些「別人不敢說、不會說」的真實想法與案例拆解，都會寫在這裡。內容準備中。
+        <!-- ── 報頭 Masthead ───────────────────────────────── -->
+        <header class="blog-masthead">
+            <div class="blog-masthead__inner">
+                <p class="blog-masthead__eyebrow" data-reveal>
+                    <span class="blog-masthead__eyebrow-mark">NEST&nbsp;DIGITAL</span>
+                    <span class="blog-masthead__eyebrow-sep" aria-hidden="true"></span>
+                    <span>觀點誌 ／ FIELD&nbsp;NOTES</span>
                 </p>
 
-                <p class="coming-soon__status" data-reveal data-reveal-delay="0.3">
-                    <span class="coming-soon__status-mark">STATUS</span>
-                    <span class="coming-soon__status-divider" aria-hidden="true">·</span>
-                    <span class="coming-soon__status-value">內容準備中 · Coming Soon</span>
+                <h1 class="blog-masthead__title" data-reveal>不正常觀點</h1>
+                <p class="blog-masthead__title-en" data-reveal>Unconventional&nbsp;Takes</p>
+
+                <p class="blog-masthead__lead" data-reveal>
+                    行銷、軟體開發、AI 應用、數位轉型——那些「別人不敢說、不會說」的真實想法與案例拆解，
+                    我們一篇一篇寫下來。看完不一定同意，但你會開始用不一樣的角度想事情。
                 </p>
 
-                <div class="coming-soon__cta-group" data-reveal data-reveal-delay="0.4">
-                    <a href="contact.html" class="btn btn--primary">
-                        想先聊聊
-                        <span class="btn-arrow" aria-hidden="true">→</span>
-                    </a>
+                <p class="blog-masthead__meta" data-reveal>
+                    <span>持續更新中</span>
+                    <span class="blog-dot" aria-hidden="true">·</span>
+                    <span>4 個觀測領域</span>
+                    <span class="blog-dot" aria-hidden="true">·</span>
+                    <span>由不正常人類撰寫</span>
+                </p>
+            </div>
+        </header>
+
+        <!-- ── 頭條 Featured ──────────────────────────────── -->
+        <section class="blog-featured" aria-labelledby="featured-title">
+            <a class="feature" href="#" data-reveal>
+                <div class="feature__plate" aria-hidden="true">
+                    <span class="feature__plate-no">№&nbsp;001</span>
+                    <span class="feature__plate-quote">便宜<br>又快<br>又好</span>
+                    <span class="feature__plate-foot">— 三選二，是物理</span>
                 </div>
 
-                <a href="index.html" class="coming-soon__back-link" data-reveal data-reveal-delay="0.5">
-                    ← 回首頁
-                </a>
+                <div class="feature__body">
+                    <p class="feature__flag">
+                        <span class="feature__flag-dot" aria-hidden="true"></span>
+                        最新頭條 ／ LATEST
+                    </p>
+                    <p class="feature__cat">軟體開發</p>
+                    <h2 class="feature__title" id="featured-title">為什麼我們拒絕接「便宜又快」的案子</h2>
+                    <p class="feature__excerpt">
+                        每個來談的客戶都想要又便宜、又快、又好。我們的回答常常讓人傻眼：這三個你只能挑兩個。
+                        不是耍脾氣，是這一行的物理定律。這篇講清楚我們怎麼選案子、為什麼有些錢我們不賺。
+                    </p>
+                    <div class="feature__meta">
+                        <time datetime="2026-06">2026.06</time>
+                        <span class="blog-dot" aria-hidden="true">·</span>
+                        <span>閱讀 8 分</span>
+                    </div>
+                    <span class="feature__more">讀這篇 <span class="blog-arrow" aria-hidden="true">→</span></span>
+                </div>
+            </a>
+        </section>
+
+        <!-- ── 分類列 + 文章牆 ─────────────────────────────── -->
+        <section class="blog-list" aria-labelledby="list-title">
+            <div class="blog-list__head">
+                <h2 class="blog-list__title" id="list-title" data-reveal>全部觀點</h2>
+                <nav class="blog-filter" aria-label="文章分類" data-reveal>
+                    <button type="button" class="blog-filter__btn is-active" data-cat="all">全部</button>
+                    <button type="button" class="blog-filter__btn" data-cat="dev">軟體開發</button>
+                    <button type="button" class="blog-filter__btn" data-cat="mkt">數位行銷</button>
+                    <button type="button" class="blog-filter__btn" data-cat="ai">AI 應用</button>
+                    <button type="button" class="blog-filter__btn" data-cat="trans">數位轉型</button>
+                </nav>
+            </div>
+
+            <div class="blog-grid">
+
+                <article class="post-card" data-cat="mkt" data-reveal>
+                    <div class="post-card__top">
+                        <span class="post-card__cat">數位行銷</span>
+                        <span class="post-card__no">№&nbsp;002</span>
+                    </div>
+                    <h3 class="post-card__title"><a href="#">會動的網站不等於好網站：90% 的動效都在偷走你的生意</a></h3>
+                    <p class="post-card__excerpt">跑馬燈、自動輪播、會跳的數字——看起來很厲害，其實正在趕走準備掏錢的客人。我們用真實數據說給你聽。</p>
+                    <div class="post-card__meta">
+                        <time datetime="2026-06">2026.06</time><span class="blog-dot" aria-hidden="true">·</span><span>閱讀 6 分</span>
+                    </div>
+                </article>
+
+                <article class="post-card" data-cat="ai" data-reveal>
+                    <div class="post-card__top">
+                        <span class="post-card__cat">AI 應用</span>
+                        <span class="post-card__no">№&nbsp;003</span>
+                    </div>
+                    <h3 class="post-card__title"><a href="#">AI 形象網紅不是換臉，是把「人設」變成可量產的資產</a></h3>
+                    <p class="post-card__excerpt">大家以為 AI 網紅就是套個假臉。錯了。真正值錢的是那套永遠不翻車、可以無限複製的人設與內容引擎。</p>
+                    <div class="post-card__meta">
+                        <time datetime="2026-06">2026.06</time><span class="blog-dot" aria-hidden="true">·</span><span>閱讀 7 分</span>
+                    </div>
+                </article>
+
+                <article class="post-card" data-cat="trans" data-reveal>
+                    <div class="post-card__top">
+                        <span class="post-card__cat">數位轉型</span>
+                        <span class="post-card__no">№&nbsp;004</span>
+                    </div>
+                    <h3 class="post-card__title"><a href="#">老闆說要「數位轉型」，其實只想要一張會自動填的 Excel</a></h3>
+                    <p class="post-card__excerpt">轉型不是買一套貴的系統。多數公司真正卡住的，是三張手動 Excel 和一個沒人想接的流程。先解這個。</p>
+                    <div class="post-card__meta">
+                        <time datetime="2026-05">2026.05</time><span class="blog-dot" aria-hidden="true">·</span><span>閱讀 5 分</span>
+                    </div>
+                </article>
+
+                <article class="post-card" data-cat="mkt" data-reveal>
+                    <div class="post-card__top">
+                        <span class="post-card__cat">數位行銷</span>
+                        <span class="post-card__no">№&nbsp;005</span>
+                    </div>
+                    <h3 class="post-card__title"><a href="#">「SEO 已死」是內容農場死了，你還沒開始</a></h3>
+                    <p class="post-card__excerpt">每隔半年就有人喊 SEO 死掉。死掉的是灌關鍵字的內容農場，不是內容本身。AI 時代反而更吃真材實料。</p>
+                    <div class="post-card__meta">
+                        <time datetime="2026-05">2026.05</time><span class="blog-dot" aria-hidden="true">·</span><span>閱讀 6 分</span>
+                    </div>
+                </article>
+
+                <article class="post-card" data-cat="mkt" data-reveal>
+                    <div class="post-card__top">
+                        <span class="post-card__cat">廣告投放</span>
+                        <span class="post-card__no">№&nbsp;006</span>
+                    </div>
+                    <h3 class="post-card__title"><a href="#">ROAS 3 倍的廣告，可能正在慢慢殺死你的品牌</a></h3>
+                    <p class="post-card__excerpt">短期數字漂亮不代表你贏了。有些「高效」的投放打法，是在預支品牌的未來。我們拆給你看怎麼分辨。</p>
+                    <div class="post-card__meta">
+                        <time datetime="2026-05">2026.05</time><span class="blog-dot" aria-hidden="true">·</span><span>閱讀 7 分</span>
+                    </div>
+                </article>
+
+                <article class="post-card" data-cat="dev" data-reveal>
+                    <div class="post-card__top">
+                        <span class="post-card__cat">軟體開發</span>
+                        <span class="post-card__no">№&nbsp;007</span>
+                    </div>
+                    <h3 class="post-card__title"><a href="#">我們為什麼把公司取名「不正常人類軟體開發」</a></h3>
+                    <p class="post-card__excerpt">一個會嚇到投資人的名字，背後是我們對這一行的整套態度。這是創巢的第一篇——也是最該先看的一篇。</p>
+                    <div class="post-card__meta">
+                        <time datetime="2026-05">2026.05</time><span class="blog-dot" aria-hidden="true">·</span><span>閱讀 4 分</span>
+                    </div>
+                </article>
 
             </div>
+
+            <p class="blog-list__more" data-reveal>更多觀點陸續發佈中 ／ MORE&nbsp;COMING</p>
         </section>
+
     </main>
 
     <!-- Scripts（順序不得更改）-->
@@ -77,5 +193,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="assets/js/core.js"></script>
     <script src="assets/js/nav.js"></script>
+
+    <!-- 分類篩選（頁面專屬、不動共用 JS）-->
+    <script>
+    (function () {
+        'use strict';
+        const btns  = document.querySelectorAll('.blog-filter__btn');
+        const cards = document.querySelectorAll('.post-card');
+        if (!btns.length || !cards.length) return;
+
+        btns.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const cat = btn.dataset.cat;
+                btns.forEach((b) => b.classList.toggle('is-active', b === btn));
+                cards.forEach((card) => {
+                    const show = cat === 'all' || card.dataset.cat === cat;
+                    card.classList.toggle('is-hidden', !show);
+                });
+            });
+        });
+    })();
+    </script>
 </body>
 </html>
