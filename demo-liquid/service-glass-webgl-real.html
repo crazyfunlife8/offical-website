@@ -152,10 +152,10 @@ const PARAMS=[
   {k:'tiltY', name:'左右傾角', min:-24, max:24, step:1, suf:'deg'}
 ];
 const LIGHTS=[
-  {id:'key', name:'主光', color:0xf6fbff, size:2.4, defaults:{x:-2.4,y:0.8,z:5.0,intensity:48}},
-  {id:'top', name:'頂光', color:0xdfeaff, size:1.45, defaults:{x:0.1,y:2.0,z:4.2,intensity:18}},
-  {id:'rim', name:'邊光', color:0x9edcff, size:1.75, defaults:{x:3.2,y:0.15,z:4.8,intensity:65}},
-  {id:'back', name:'背光', color:0xb8ccff, size:2.1, defaults:{x:-1.8,y:0.45,z:-1.8,intensity:16}}
+  {id:'key', name:'主光', color:0xf6fbff, size:2.4, defaults:{x:-4.2,y:-1.2,z:5.6,intensity:24}},
+  {id:'top', name:'頂光', color:0xdfeaff, size:1.45, defaults:{x:0.1,y:2.0,z:4.2,intensity:0}},
+  {id:'rim', name:'邊光', color:0x9edcff, size:1.75, defaults:{x:3.2,y:0.15,z:4.8,intensity:0}},
+  {id:'back', name:'背光', color:0xb8ccff, size:2.1, defaults:{x:-1.8,y:0.45,z:-1.8,intensity:8}}
 ];
 const LIGHT_CONTROLS=[
   {prop:'x', label:'X', min:-4.5, max:4.5, step:0.05},
@@ -163,7 +163,7 @@ const LIGHT_CONTROLS=[
   {prop:'z', label:'Z', min:-3.2, max:6.0, step:0.05},
   {prop:'intensity', label:'強度', min:0, max:360, step:1}
 ];
-const state={ thickness:1.8, ior:1.5, roughness:0.02, dispersion:0.26, tiltX:7, tiltY:-7, transmission:1, envMapIntensity:1.28, bloomStrength:0.24, fresnelPower:2.65, bevelPx:16 };
+const state={ thickness:1.8, ior:1.5, roughness:0.06, dispersion:0.26, tiltX:7, tiltY:-7, transmission:1, envMapIntensity:1.28, bloomStrength:0.24, fresnelPower:2.65, bevelPx:16 };
 for(const spec of LIGHTS){
   for(const prop in spec.defaults) state[spec.id+'_'+prop]=spec.defaults[prop];
 }
