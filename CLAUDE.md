@@ -156,12 +156,14 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 
 - **已否決／退役方向**：液態水玻璃卡 / 3D 液體 D1–D8 / 液態金屬 fusion / 滴落變體 V / 液態卡 F / 早期 flow 批 / 星球 3D 畫廊（創辦人明確「放棄液態方向」）。**N4 捲動堆疊卡 × 程式碼流星字雨**（`service-n4rain-poc.html`）探索後退役。**水珠凝聚成形動畫**（metaball 小水流入 → snap 成卡，`service-card-water-final.html`，曾與 Codex 協作多輪）完整探索後創辦人改走簡單版，保留為探索紀錄、不上線。
 - **水卡輪播已放棄（2026-06-15 19:57 探索後退役）**：WebGL 真水卡左右滑輪播（`service-card-water-carousel.html`）曾於 00:55 定案，後創辦人退一步判斷「整塊怪」→ 再判斷「水意象與軟體開發根本搭不上邊」→ 放棄。水卡探索資產（漂亮、未來若有搭水主題可重用）+ 完整技術紀錄留存於 memory [[project_nestdigital_water_card]]。
-- **定案方向（2026-06-15 19:57）**：**開發區（軟體開發）= 捲動堆疊藝術卡 + 程式碼星雨**。核心原則「**形式即證明**」——每個服務區塊用形式本身證明該服務能力（數位行銷手風琴的藝術感證明設計力、軟體開發的程式碼藝術證明開發力）。藝術卡＝書法明朝超大字浮水印（凹刻浮雕）+ code 視窗列（克制點綴、非 IDE 主體）+ 實心深色卡 + 程式碼星雨打卡頂緣濺火花；3 張 sticky 捲動堆疊（下一張上來、上一張縮小退後）。原型 `demo-liquid/service-dev-stack-art.html`（程式碼雨資產源自退役的 `service-n4rain-poc.html`）；已整合 `index-rain-preview.html`（取代水卡 iframe）、**未動正式 index.html**。**社群類維持手風琴不動。** **紅線：受眾是一般大眾、非工程師——技術素材要「藝術化」不是「IDE 工具化」**（本案連犯兩次工程師向錯，見 memory [[feedback_audience_general_public]]）。
+- **~~定案方向（2026-06-15 19:57）：開發區 = 捲動堆疊藝術卡 + 程式碼星雨~~〔2026-06-22 06:14 退役→開發卡改走下方「三項服務堆疊玻璃」；藝術卡沙盒 `service-dev-stack-art.html` 留探索〕**。仍 active 的核心原則「**形式即證明**」——每個服務區塊用形式本身證明該服務能力（數位行銷手風琴的藝術感證明設計力、軟體開發的程式碼藝術證明開發力）。藝術卡＝書法明朝超大字浮水印（凹刻浮雕）+ code 視窗列（克制點綴、非 IDE 主體）+ 實心深色卡 + 程式碼星雨打卡頂緣濺火花；3 張 sticky 捲動堆疊（下一張上來、上一張縮小退後）。原型 `demo-liquid/service-dev-stack-art.html`（程式碼雨資產源自退役的 `service-n4rain-poc.html`）；已整合 `index-rain-preview.html`（取代水卡 iframe）、**未動正式 index.html**。**社群類維持手風琴不動。** **紅線：受眾是一般大眾、非工程師——技術素材要「藝術化」不是「IDE 工具化」**（本案連犯兩次工程師向錯，見 memory [[feedback_audience_general_public]]）。
 - **整合待辦（正式進 index.html 前）**：① 浮水印切字位置／浮雕深淺待創辦人用 index-rain-preview 左下調軸定數值、再寫死移面板 ② ~~服務區第三塊內容待定~~ **已定（2026-06-15 20:49）：自有產品（跳動E／一鍵架站）獨立成一塊、放開發落雨區之後**，不硬塞「服務區第三塊」（自有產品非服務，見 [[project_nestdigital_service_taxonomy]]）③ 堆疊卡內容（開發/成長/顧問）對應正確服務分類待全局對齊 ④ 進 5 層 CSS（pages/index.css + index.js）⑤ 效能（Canvas2D 程式碼雨 + GSAP 堆疊）⑥ **服務卡片改「純陳列」（移除點進服務頁的連結）+ 7 teaser 服務頁退役** —— 此步綁進本次 index.html 整合一起做（避免先刪 teaser 造成正式頁斷鏈，見「資訊架構（IA）決策」）。
   - **自有產品展示形式**：已定避開「自動無限跑馬燈 + 小圖示」（公版味 + 永遠在跑卻證明不了產品價值＝同水卡陷阱）；用真截圖／影片。具體容器（跟著捲動的橫向展開 vs 慢速大圖電影劇照）**待創辦人選**。
 - **早期液態卡 morph 已清（2026-06-14 16:57）**：`index.html` + `assets/css/{animations,components,pages/index}.css` 曾有未 commit 的「液態卡 morph」實驗（`liquid-morph-a/b` 邊角晃動 + `?v=liquid2` 快取參數），已 `git restore` 全數還原、工作區乾淨；液態方向確定不上線。若日後要重看那批 keyframe，本條已記其內容、可重建。
 
-### 軟體開發服務卡視覺：攝影棚容器 + 可移動燈（2026-06-21 23:37 重構定調；沙盒打光已定稿、未進正式 index.html）
+### ~~軟體開發服務卡視覺：攝影棚容器 + 可移動燈（2026-06-21 23:37）~~〔已退役，2026-06-22 06:14 演進為下方「三項服務堆疊玻璃」〕
+
+> **此段已退役為探索紀錄**（單卡攝影棚 → 三片堆疊延伸）。**仍 active 的只有一條**：創辦人定稿前卡打光值（commit `93e3db4`，見下方條列）＝堆疊玻璃前卡沿用、不准動。沙盒 `service-glass-webgl-real.html` 留存備查。以下為當時紀錄保留（待 §十五 瘦身時可徵詢後精簡）。
 
 對應任務 11b。現役檔＝`demo-liquid/service-glass-webgl-real.html`（Three.js r0.160、MeshPhysicalMaterial transmission 厚折射玻璃卡）。**2026-06-21 23:37 創辦人主導大改：從「浮卡＋補丁反光（舊沉穩/pop 兩版）」重構成「3D 攝影棚容器 ＋ 4 盞可移動柔光、創辦人自己打光」。** 舊「沉穩 vs pop 二選一／補丁反光（edgeBoost/cornerBoost/亮帶/edge rig）」敘述全部作廢。
 
@@ -174,14 +176,18 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 - **stage 2 待辦（下個對話接）**：① 燈控面板**分頁化**（主光/頂光/邊光/背光各一頁、收斂拉軸數量）② 3 個 **preset**（乾淨棚拍/銳利晶邊/科技冷光）③ 把背景**碼雨搬進攝影棚**（目前仍是平貼背景、非容器內元素）④ 驗證 **dispersion** 是否該留（r0.160 疑似無效、需 runtime 確認）⑤ 整進**正式 index.html**（5 層 CSS）。
 - **已退場/封存**：`service-glass-webgl-pop.html`＝舊水晶內雕文字版（checkpoint `709101b`，封存備查、非現役）。git 還原點（branch `feature/water-card-native-integration`）：原始沉穩版 `b1d7b65`、攝影棚重構 `d8def49`、定稿 `93e3db4`。
 
-### 軟體開發卡：三項服務堆疊玻璃版（2026-06-22 02:56 方向定案；沙盒進行中、未進正式 index.html）
+### 軟體開發卡：三項服務堆疊玻璃〔開發卡唯一現役定案〕（2026-06-22 06:14 完成驗收＋commit `442b261`；未進正式 index.html）
+
+> **本段為開發卡唯一現役方向。** 上方「攝影棚容器＋可移動燈」(06-21) 與更早「堆疊藝術卡＋程式碼星雨」(06-15) 兩段**皆已退役**為探索紀錄、僅留沙盒備查，勿再依其往相反方向做。
 
 對應任務 11b。現役沙盒＝`demo-liquid/service-glass-stack.html`（由 `service-glass-webgl-real.html` 打光玻璃引擎延伸，3 片真 WebGL slab；前卡＝創辦人定稿打光值原封不動）。三項服務：**網站架設／客製化系統開發／數位轉型顧問**，捲動推進（前片抬起、下一片升進前位）。
 
-- **視覺方向定案＝「主卡聚光＋景深退場」**（創辦人 2026-06-22 從兩方向選定）：前卡打亮、清楚可讀當主角；後兩片**面壓暗、退入陰影**，靠**比主卡弱的冷光邊**定出輪廓往後退。**非**「三片同時全亮」——後片打太亮會三片搶戲、主從顛倒（本輪踩過）。後片亮度數值在 `applyGlassCardMaterial()`：`rearFaceEnv`／`rearGlow`（面，壓低）、`rearRimEnv`／`rearFresnelBase`／`rearRimBase`（邊，須低於前卡）。
+- **設計鐵律（2026-06-22 06:14 創辦人拍板，務必守）**：① 只有「聚光主卡」是完整發光水晶（冷光邊＋selective bloom）；② **非聚光卡＝全暗平板、零反光**（envMap≈0、transmission≈0、不透出背景）；③ **退場卡捲動時淡出消失**、不賴在主卡後方。②③ 是「透光主卡會透出後卡＝整臉藍霧」那個纏很久的坑的**根本解**——別再退回「後片半亮霧面／景深壓暗」舊路（那條走不通、會洗臉）。
+- **發光由 `window.__fx` 即時調**（debug 面板有同名 slider）：定稿預設 heroEdgeGlow **1.45**、bloomStrength **0.26**、codeGlow 0.05、rearFrost 1、bloomThreshold 0.985；selective bloom＝layer-based 雙 composer、只有聚光主卡進 bloom。背景程式碼透過玻璃折射透出（codeGlow 控、調得很淡）。
 - **紅線／驗收坑（血淚）**：① **WebGL/Canvas 沙盒驗收前必須先捲動觸發重繪**——loop 在無互動時停在舊幀，截圖會看到凍住畫面、誤判「改了沒效」（本輪最大時間黑洞，見 memory [[feedback_verify_webgl_force_repaint]]）② **codex 編碼環境會把整檔中文存成 mojibake／逕改英文**，請 codex 改完**必查中文沒被破壞**、必要時用 Python regex 修回（見 [[feedback_state_origin_before_destructive]] 同精神）③ 內容文案：客製系統**禁「流程自動化」措辭**（避免與 G 類採集混淆，見術語表 B 類本質）。
 - **協作**：WebGL 由 codex 實作、主 session 給死方向＋Chrome 強制重繪驗收。本輪因驗收凍幀誤判，主 session 後段自行微調後片亮度/偏移。
-- **待辦**：① 「主卡聚光」明暗反差可再加強（前更跳、後更沉）② 手機 RWD ③ 整進**正式 index.html**（5 層 CSS）④ 後片邊光無拉軸、目前寫死於 `applyGlassCardMaterial()`。
+- **待辦**：① 整進**正式 index.html**（5 層 CSS）② 手機 RWD／效能降階（__fx 已留 `FX` 降階鉤子）。
+- **完整迭代脈絡**（selective bloom／envMap body-edge 拆分／退場淡出怎麼演進、踩過哪些坑）**見 commit `442b261` body**，不在主文件重述。
 
 ### 數位行銷手風琴收合卡視覺定案（2026-06-17 23:11；2026-06-18 23:25 比例/碑文重校）
 
