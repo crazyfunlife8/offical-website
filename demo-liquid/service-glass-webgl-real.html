@@ -143,24 +143,31 @@ const PARAMS=[
   {k:'thickness', name:'玻璃厚度', min:0.2, max:4.5, step:0.05},
   {k:'ior', name:'折射率', min:1.05, max:2.2, step:0.01},
   {k:'roughness', name:'表面粗糙度', min:0, max:0.3, step:0.005},
-  {k:'dispersion', name:'色散', min:0, max:1.2, step:0.01},
-  {k:'tiltX', name:'上下傾角', min:-24, max:24, step:1, suf:'deg'},
-  {k:'tiltY', name:'左右傾角', min:-24, max:24, step:1, suf:'deg'},
   {k:'transmission', name:'透射度', min:0, max:1, step:0.01},
+  {k:'bevelPx', name:'導角大小', min:4, max:40, step:1, suf:'px'},
+  {k:'fresnelPower', name:'邊緣光強度', min:1.2, max:6.0, step:0.05},
   {k:'envMapIntensity', name:'環境反射強度', min:0, max:5, step:0.05},
   {k:'bloomStrength', name:'泛光強度', min:0, max:2.4, step:0.02},
-  {k:'backlight', name:'背光亮度', min:0, max:2.2, step:0.02},
-  {k:'edgeBoost', name:'邊緣反光強度', min:0, max:12, step:0.1, env:true},
-  {k:'cornerBoost', name:'四角反光強度', min:0, max:16, step:0.1, env:true},
-  {k:'envBandWidth', name:'反光亮帶寬度', min:0.04, max:0.34, step:0.005, env:true},
-  {k:'envBandY', name:'反光亮帶位置', min:0.02, max:0.34, step:0.005, env:true},
-  {k:'lightAzimuth', name:'燈光方位角', min:0, max:360, step:1, suf:'deg'},
-  {k:'lightElevation', name:'燈光仰角', min:4, max:58, step:1, suf:'deg'},
-  {k:'topLightAngle', name:'上邊光角度', min:-28, max:28, step:1, suf:'deg'},
-  {k:'fresnelPower', name:'邊緣光強度', min:1.2, max:6.0, step:0.05},
-  {k:'bevelPx', name:'導角大小', min:4, max:40, step:1, suf:'px'}
+  {k:'tiltX', name:'上下傾角', min:-24, max:24, step:1, suf:'deg'},
+  {k:'tiltY', name:'左右傾角', min:-24, max:24, step:1, suf:'deg'}
 ];
-const state={ thickness:1.8, ior:1.5, roughness:0.02, dispersion:0.26, tiltX:7, tiltY:-7, transmission:1, envMapIntensity:2.35, edgeBoost:2.2, cornerBoost:3.0, envBandWidth:0.095, envBandY:0.105, lightAzimuth:0, lightElevation:18, topLightAngle:0, bloomStrength:0.62, backlight:0.9, fresnelPower:2.65, bevelPx:16 };
+const LIGHTS=[
+  {id:'key', name:'主光', color:0xf6fbff, size:2.4, defaults:{x:-2.6,y:1.15,z:3.2,intensity:44}},
+  {id:'top', name:'頂光', color:0xdfeaff, size:2.8, defaults:{x:0.2,y:2.45,z:1.1,intensity:22}},
+  {id:'rim', name:'邊光', color:0x9edcff, size:1.75, defaults:{x:3.15,y:0.35,z:1.65,intensity:58}},
+  {id:'back', name:'背光', color:0xb8ccff, size:2.1, defaults:{x:-1.65,y:0.55,z:-2.15,intensity:28}}
+];
+const LIGHT_CONTROLS=[
+  {prop:'x', label:'X', min:-4.5, max:4.5, step:0.05},
+  {prop:'y', label:'Y', min:-1.6, max:3.2, step:0.05},
+  {prop:'z', label:'Z', min:-3.2, max:4.2, step:0.05},
+  {prop:'intensity', label:'強度', min:0, max:360, step:1}
+];
+const state={ thickness:1.8, ior:1.5, roughness:0.02, dispersion:0.26, tiltX:7, tiltY:-7, transmission:1, envMapIntensity:1.28, bloomStrength:0.24, fresnelPower:2.65, bevelPx:16 };
+for(const spec of LIGHTS){
+  for(const prop in spec.defaults) state[spec.id+'_'+prop]=spec.defaults[prop];
+}
+const STAR_RAIN_GLOW=0.9;
 const root=document.documentElement;
 const dump=document.getElementById('dump');
 const htmlCard=document.getElementById('htmlCard');
@@ -178,17 +185,39 @@ for(const p of PARAMS){
     const v=parseFloat(inp.value);
     state[p.k]=v;
     document.getElementById('v_'+p.k).textContent=v+(p.suf||'');
-    if(p.env) refreshStudioEnvMap();
     applyState();
   };
   wrap.appendChild(row);
+}
+
+for(const spec of LIGHTS){
+  const title=document.createElement('h4');
+  title.textContent=spec.name;
+  title.style.marginTop='18px';
+  wrap.appendChild(title);
+  for(const ctrl of LIGHT_CONTROLS){
+    const k=spec.id+'_'+ctrl.prop;
+    const row=document.createElement('div');
+    row.className='row';
+    row.innerHTML='<label><span>'+spec.name+'-'+ctrl.label+'</span><b id="v_'+k+'">'+state[k]+'</b></label>'+
+      '<input type="range" min="'+ctrl.min+'" max="'+ctrl.max+'" step="'+ctrl.step+'" value="'+state[k]+'" data-k="'+k+'">';
+    const inp=row.querySelector('input');
+    inp.oninput=()=>{
+      const v=parseFloat(inp.value);
+      state[k]=v;
+      document.getElementById('v_'+k).textContent=v;
+      applyState();
+      refreshStudioEnvMap();
+    };
+    wrap.appendChild(row);
+  }
 }
 
 const canvas=document.getElementById('webgl');
 const renderer=new THREE.WebGLRenderer({ canvas, antialias:true, alpha:false, powerPreference:'high-performance' });
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=0.95;
+renderer.toneMappingExposure=0.62;
 renderer.useLegacyLights=false;
 RectAreaLightUniformsLib.init();
 const STAR_CANVAS_MAX_WIDTH=1280;
@@ -209,86 +238,47 @@ function makeStudioEnvMap(){
   envCanvas.height=512;
   const ctx=envCanvas.getContext('2d');
   const base=ctx.createLinearGradient(0,0,0,512);
-  base.addColorStop(0,'#22325a');
+  base.addColorStop(0,'#071331');
   base.addColorStop(0.45,'#050d2e');
-  base.addColorStop(1,'#020510');
+  base.addColorStop(1,'#01030b');
   ctx.fillStyle=base;
   ctx.fillRect(0,0,1024,512);
 
-  const edgeAmount=THREE.MathUtils.clamp(state.edgeBoost/12,0,1);
-  const cornerAmount=THREE.MathUtils.clamp(state.cornerBoost/16,0,1);
-  const bandWidth=Math.max(18, state.envBandWidth*512);
-  const bandCenter=state.envBandY*512;
-  let g=ctx.createLinearGradient(88,bandCenter-bandWidth*0.55,936,bandCenter+bandWidth*0.38);
-  g.addColorStop(0,'rgba(255,255,255,0)');
-  g.addColorStop(0.14,'rgba(230,244,255,1)');
-  g.addColorStop(0.48,'rgba(255,255,255,1)');
-  g.addColorStop(0.84,'rgba(180,216,255,0.88)');
-  g.addColorStop(1,'rgba(255,255,255,0)');
-  ctx.fillStyle=g;
-  ctx.fillRect(48,bandCenter-bandWidth*0.5,928,bandWidth);
-
-  /* 移除頂部兩條離散窄白線：反射到玻璃圓角上會變成虛線段（業主指出的不規則虛線）。
-     頂部光源只保留上方平滑漸層 softbox，反射才是一道連續高光。 */
-
-  g=ctx.createRadialGradient(842,250,0,842,250,340);
-  g.addColorStop(0,'rgba(232,240,255,0.96)');
-  g.addColorStop(0.34,'rgba(0,200,255,0.56)');
-  g.addColorStop(1,'rgba(0,200,255,0)');
-  ctx.fillStyle=g;
-  ctx.fillRect(520,0,504,512);
-
-  g=ctx.createRadialGradient(512,486,20,512,486,410);
-  g.addColorStop(0,'rgba(232,240,255,0.95)');
-  g.addColorStop(0.28,'rgba(0,200,255,0.46)');
-  g.addColorStop(0.68,'rgba(90,132,255,0.26)');
-  g.addColorStop(1,'rgba(90,132,255,0)');
-  ctx.fillStyle=g;
-  ctx.fillRect(150,250,724,262);
-
-  const edgeAlpha=0.14+0.62*edgeAmount;
-  const cornerAlpha=0.12+0.70*cornerAmount;
   ctx.globalCompositeOperation='screen';
-
-  g=ctx.createLinearGradient(0,86,0,430);
-  g.addColorStop(0,'rgba(232,240,255,0)');
-  g.addColorStop(0.50,'rgba(232,244,255,'+edgeAlpha+')');
-  g.addColorStop(1,'rgba(0,200,255,0)');
-  ctx.fillStyle=g;
-  ctx.fillRect(18,70,58,380);
-
-  g=ctx.createLinearGradient(0,88,0,432);
-  g.addColorStop(0,'rgba(232,240,255,0)');
-  g.addColorStop(0.52,'rgba(210,232,255,'+(edgeAlpha*0.9)+')');
-  g.addColorStop(1,'rgba(0,200,255,0)');
-  ctx.fillStyle=g;
-  ctx.fillRect(948,72,58,378);
-
-  g=ctx.createLinearGradient(120,418,904,486);
-  g.addColorStop(0,'rgba(255,255,255,0)');
-  g.addColorStop(0.18,'rgba(210,232,255,'+(edgeAlpha*0.58)+')');
-  g.addColorStop(0.52,'rgba(232,244,255,'+(edgeAlpha*0.78)+')');
-  g.addColorStop(0.84,'rgba(0,200,255,'+(edgeAlpha*0.36)+')');
-  g.addColorStop(1,'rgba(255,255,255,0)');
-  ctx.fillStyle=g;
-  ctx.fillRect(92,420,840,58);
-
-  const drawCornerSoftbox=(x,y,white,cool)=>{
-    const cg=ctx.createRadialGradient(x,y,0,x,y,132);
-    cg.addColorStop(0,'rgba(255,255,255,'+white+')');
-    cg.addColorStop(0.28,'rgba(232,244,255,'+(white*0.66)+')');
-    cg.addColorStop(0.62,'rgba(0,200,255,'+cool+')');
+  for(const spec of LIGHTS){
+    const size=THREE.MathUtils.clamp(spec.size,0.55,4.2);
+    const strength=THREE.MathUtils.clamp(state[spec.id+'_intensity']/180,0,1);
+    const x=512+state[spec.id+'_x']*82;
+    const y=260-state[spec.id+'_y']*86+state[spec.id+'_z']*-14;
+    const w=92+size*72;
+    const h=42+size*34;
+    const radius=Math.max(w,h)*0.72;
+    const cg=ctx.createRadialGradient(x,y,0,x,y,radius);
+    cg.addColorStop(0,'rgba(255,255,255,'+(0.035+strength*0.12)+')');
+    cg.addColorStop(0.42,'rgba(232,244,255,'+(0.025+strength*0.075)+')');
     cg.addColorStop(1,'rgba(0,200,255,0)');
     ctx.fillStyle=cg;
-    ctx.fillRect(x-150,y-150,300,300);
-  };
-  drawCornerSoftbox(80,78,cornerAlpha*0.72,cornerAlpha*0.22);
-  drawCornerSoftbox(944,80,cornerAlpha*0.66,cornerAlpha*0.20);
-  drawCornerSoftbox(108,438,cornerAlpha*0.56,cornerAlpha*0.24);
-  drawCornerSoftbox(916,438,cornerAlpha*0.52,cornerAlpha*0.22);
+    ctx.fillRect(x-radius,y-radius,radius*2,radius*2);
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate(spec.id==='rim' ? -0.1 : spec.id==='back' ? 0.16 : 0);
+    const panel=ctx.createLinearGradient(-w*0.5,0,w*0.5,0);
+    panel.addColorStop(0,'rgba(255,255,255,0)');
+    panel.addColorStop(0.18,'rgba(232,244,255,'+(0.035+strength*0.08)+')');
+    panel.addColorStop(0.50,'rgba(255,255,255,'+(0.05+strength*0.11)+')');
+    panel.addColorStop(0.82,'rgba(232,244,255,'+(0.035+strength*0.08)+')');
+    panel.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=panel;
+    if(ctx.roundRect){
+      ctx.beginPath();
+      ctx.roundRect(-w*0.5,-h*0.5,w,h,Math.min(26,h*0.45));
+      ctx.fill();
+    }else{
+      ctx.fillRect(-w*0.5,-h*0.5,w,h);
+    }
+    ctx.restore();
+  }
   ctx.globalCompositeOperation='source-over';
-
-  /* 移除其餘離散線光源：改全用平滑漸層 / radial softbox，避免任何反射成虛線/段 */
 
   const envTex=new THREE.CanvasTexture(envCanvas);
   envTex.mapping=THREE.EquirectangularReflectionMapping;
@@ -328,34 +318,40 @@ const bgPlane=new THREE.Mesh(new THREE.PlaneGeometry(9.6, 10.8, 1, 1), bgMat);
 bgPlane.position.z=-3.0;
 scene.add(bgPlane);
 
+const studioGroup=new THREE.Group();
+scene.add(studioGroup);
+const wallMat=new THREE.MeshBasicMaterial({ color:0x050d2e, side:THREE.DoubleSide, transparent:true, opacity:0.88, toneMapped:false });
+const floorMat=new THREE.MeshBasicMaterial({ color:0x030817, transparent:true, opacity:0.92, toneMapped:false });
+const softboxMat=new THREE.MeshBasicMaterial({ color:0xe8f0ff, transparent:true, opacity:0.075, side:THREE.DoubleSide, toneMapped:false });
+function addStudioPlane(w,h,mat,pos,rot){
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,h,1,1),mat);
+  mesh.position.set(pos.x,pos.y,pos.z);
+  mesh.rotation.set(rot.x,rot.y,rot.z);
+  studioGroup.add(mesh);
+  return mesh;
+}
+addStudioPlane(10.5,7.2,floorMat,{x:0,y:-2.05,z:0.05},{x:-Math.PI/2,y:0,z:0});
+addStudioPlane(10.5,5.8,wallMat,{x:0,y:0.35,z:-2.55},{x:0,y:0,z:0});
+addStudioPlane(5.8,5.4,wallMat,{x:-4.4,y:0.22,z:-0.05},{x:0,y:Math.PI/2,z:0});
+addStudioPlane(5.8,5.4,wallMat,{x:4.4,y:0.22,z:-0.05},{x:0,y:-Math.PI/2,z:0});
+
 const glassGroup=new THREE.Group();
 scene.add(glassGroup);
-const edgeLightRig=new THREE.Group();
-scene.add(edgeLightRig);
-const edgeLightRigBaseQuat=new THREE.Quaternion();
-const edgeLightAzimuthQuat=new THREE.Quaternion();
-let edgeLightMetrics=null;
-
-function makeEdgeRectLight(width,height){
-  const light=new THREE.RectAreaLight(0xf3fbff,1,width,height);
-  edgeLightRig.add(light);
-  return light;
+const studioLights={};
+function createStudioLight(spec){
+  const softboxSize=Math.max(0.55,spec.size);
+  const light=new THREE.RectAreaLight(spec.color, spec.defaults.intensity, softboxSize, softboxSize);
+  const panel=new THREE.Mesh(new THREE.PlaneGeometry(1,1,1,1), softboxMat.clone());
+  panel.material.color.set(spec.color);
+  panel.material.opacity=0.04+THREE.MathUtils.clamp(spec.defaults.intensity/180,0,1)*0.07;
+  studioGroup.add(light);
+  studioGroup.add(panel);
+  studioLights[spec.id]={light,panel,spec};
 }
-
-const edgeStripLights={
-  top:makeEdgeRectLight(1,0.08),
-  left:makeEdgeRectLight(0.08,1),
-  right:makeEdgeRectLight(0.08,1),
-  tl:makeEdgeRectLight(0.12,0.12),
-  tr:makeEdgeRectLight(0.12,0.12),
-  bl:makeEdgeRectLight(0.12,0.12),
-  br:makeEdgeRectLight(0.12,0.12)
-};
-
-function aimRectLight(light,x,y,z,tx,ty,tz){
-  light.position.set(x,y,z);
-  light.lookAt(tx,ty,tz);
+function aimAtCard(obj){
+  obj.lookAt(0,0,0);
 }
+for(const spec of LIGHTS) createStudioLight(spec);
 
 const GLASS_BEVEL_SEGMENTS=64;
 let GLASS_BEVEL_PX=16;
@@ -410,7 +406,7 @@ const fresnelMat=new THREE.ShaderMaterial({
   uniforms:{
     uPower:{ value:state.fresnelPower },
     uStrength:{ value:1.28 },
-    uCornerBoost:{ value:state.cornerBoost },
+    uCornerBoost:{ value:2.4 },
     uHalfSize:{ value:new THREE.Vector2(0.5,0.5) },
     uColorA:{ value:new THREE.Color(0xe8f0ff) },
     uColorB:{ value:new THREE.Color(0x00c8ff) }
@@ -529,36 +525,6 @@ function rebuildHighlightLayer(w,h,r,d,unit){
 
 /* 直接點光/方向光會在圓角倒角 facet 上打出段狀 specular；玻璃反射改由連續 envMap 承擔。 */
 
-function updateEdgeStripLights(w,h,r,d,unit){
-  edgeLightMetrics={w,h,r,d,unit};
-  const elevation=THREE.MathUtils.clamp(state.lightElevation,4,58);
-  const elevationT=(elevation-4)/(58-4);
-  const edgeDepth=d*THREE.MathUtils.lerp(2.65,1.55,elevationT);
-  const targetDepth=d*THREE.MathUtils.lerp(0.52,0.25,elevationT);
-  const topShift=Math.sin(THREE.MathUtils.degToRad(state.topLightAngle))*r*1.6;
-  const topTargetX=Math.sin(THREE.MathUtils.degToRad(state.topLightAngle))*w*0.18;
-  const cornerSize=Math.max(r*1.45,unit*24);
-  edgeStripLights.top.width=w*0.94;
-  edgeStripLights.top.height=Math.max(r*0.42,unit*10);
-  edgeStripLights.left.width=Math.max(r*0.38,unit*9);
-  edgeStripLights.left.height=h*0.82;
-  edgeStripLights.right.width=Math.max(r*0.38,unit*9);
-  edgeStripLights.right.height=h*0.82;
-  for(const key of ['tl','tr','bl','br']){
-    edgeStripLights[key].width=cornerSize;
-    edgeStripLights[key].height=cornerSize;
-  }
-
-  aimRectLight(edgeStripLights.top,topShift,h*0.5+r*1.5,edgeDepth,topTargetX,h*0.5-r*0.18,targetDepth);
-  aimRectLight(edgeStripLights.left,-w*0.5-r*1.55,0,edgeDepth,-w*0.5+r*0.24,0,targetDepth*0.96);
-  aimRectLight(edgeStripLights.right,w*0.5+r*1.55,0,edgeDepth,w*0.5-r*0.24,0,targetDepth*0.96);
-  aimRectLight(edgeStripLights.tl,-w*0.5-r*1.25,h*0.5+r*1.25,edgeDepth*1.02,-w*0.5+r*0.35,h*0.5-r*0.35,targetDepth);
-  aimRectLight(edgeStripLights.tr,w*0.5+r*1.25,h*0.5+r*1.25,edgeDepth*1.02,w*0.5-r*0.35,h*0.5-r*0.35,targetDepth);
-  aimRectLight(edgeStripLights.bl,-w*0.5-r*1.20,-h*0.5-r*1.20,edgeDepth*0.96,-w*0.5+r*0.34,-h*0.5+r*0.34,targetDepth*0.86);
-  aimRectLight(edgeStripLights.br,w*0.5+r*1.20,-h*0.5-r*1.20,edgeDepth*0.96,w*0.5-r*0.34,-h*0.5+r*0.34,targetDepth*0.86);
-  for(const key in edgeStripLights) edgeStripLights[key].updateMatrixWorld();
-}
-
 const CODE=[
   'const nest = createStudio()','export default function App() {','<section class="services">',
   'router.get("/api/orders", fn)','await db.clients.findMany()','npm run build && deploy',
@@ -603,7 +569,6 @@ function rebuildGlassGeometry(){
   const nextFresnelGeo=smoothRoundedBoxGeometry(w+edgePad*0.55, h+edgePad*0.55, d+(unitsPerPx*1.5), GLASS_BEVEL_SEGMENTS, r+unitsPerPx*0.9);
   fresnelMat.uniforms.uHalfSize.value.set((w+edgePad*0.55)*0.5,(h+edgePad*0.55)*0.5);
   rebuildHighlightLayer(w,h,r,d,unitsPerPx);
-  updateEdgeStripLights(w,h,r,d,unitsPerPx);
 
   glass.geometry.dispose();
   edgeGlow.geometry.dispose();
@@ -698,13 +663,13 @@ function drawStarRain(time){
     ctx.restore();
   }
 
-  if(rcPx.width && rcPx.height && state.backlight>0){
+  if(rcPx.width && rcPx.height && STAR_RAIN_GLOW>0){
     const cx=(rcPx.left+rcPx.width*.55)*sx;
     const cy=(rcPx.top+rcPx.height*.46)*sy;
     const pocket=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(rcPx.width*sx*.38, rcPx.height*sy*.56));
-    pocket.addColorStop(0,'rgba(232,240,255,'+(0.28*state.backlight)+')');
-    pocket.addColorStop(0.30,'rgba(190,226,255,'+(0.15*state.backlight)+')');
-    pocket.addColorStop(0.62,'rgba(0,200,255,'+(0.06*state.backlight)+')');
+    pocket.addColorStop(0,'rgba(232,240,255,'+(0.28*STAR_RAIN_GLOW)+')');
+    pocket.addColorStop(0.30,'rgba(190,226,255,'+(0.15*STAR_RAIN_GLOW)+')');
+    pocket.addColorStop(0.62,'rgba(0,200,255,'+(0.06*STAR_RAIN_GLOW)+')');
     pocket.addColorStop(1,'rgba(0,200,255,0)');
     ctx.fillStyle=pocket;
     /* 光暈夾在卡片範圍內、只略溢出邊緣，不再往下撐成一坨 */
@@ -750,7 +715,7 @@ function drawStarRain(time){
         const px=left+safeW*(0.08+hash(i,31)*0.84);
         const py=top+safeH*(0.08+hash(i,47)*0.84);
         const len=0.45+hash(i,59)*0.55;
-        const alpha=(0.13+hash(i,71)*0.16)*state.backlight;
+        const alpha=(0.13+hash(i,71)*0.16)*STAR_RAIN_GLOW;
         const cyan=hash(i,83)>0.58;
         ctx.save();
         ctx.translate(px,py);
@@ -786,8 +751,8 @@ function drawStarRain(time){
     ctx.rotate(-Math.PI/2);
     ctx.textAlign='left';
     const g=ctx.createLinearGradient(0,0,w,0);
-    const hotAlpha=Math.min(1,(inside?0.98:0.92)+0.08*state.backlight)*topEdgeFade;
-    const trailAlpha=Math.min(1,(inside?0.95:0.86)+0.12*state.backlight)*topEdgeFade;
+    const hotAlpha=Math.min(1,(inside?0.98:0.92)+0.08*STAR_RAIN_GLOW)*topEdgeFade;
+    const trailAlpha=Math.min(1,(inside?0.95:0.86)+0.12*STAR_RAIN_GLOW)*topEdgeFade;
     g.addColorStop(0,'rgba(232,240,255,'+hotAlpha+')');
     g.addColorStop(0.1,'rgba('+base+','+trailAlpha+')');
     g.addColorStop(1,'rgba('+base+',0)');
@@ -802,45 +767,48 @@ function drawStarRain(time){
 function applyState(){
   root.style.setProperty('--tiltX', state.tiltX);
   root.style.setProperty('--tiltY', state.tiltY);
-  const edgeAmount=THREE.MathUtils.clamp(state.edgeBoost/12,0,1);
-  const cornerAmount=THREE.MathUtils.clamp(state.cornerBoost/16,0,1);
   glassMat.thickness=state.thickness;
   glassMat.ior=state.ior;
   glassMat.roughness=state.roughness;
   glassMat.dispersion=state.dispersion;
   glassMat.transmission=state.transmission;
   glassMat.envMapIntensity=state.envMapIntensity;
-  edgeMat.envMapIntensity=state.envMapIntensity*(1.18+edgeAmount*1.9);
-  edgeMat.opacity=0.07+edgeAmount*0.24;
-  edgeMat.roughness=THREE.MathUtils.lerp(0.018,0.003,edgeAmount);
-  edgeMat.clearcoat=THREE.MathUtils.lerp(0.82,1,edgeAmount);
-  edgeMat.clearcoatRoughness=THREE.MathUtils.lerp(0.035,0.006,edgeAmount);
-  edgeMat.dispersion=THREE.MathUtils.lerp(0.42,0.68,edgeAmount);
-  edgeStripLights.top.intensity=state.edgeBoost*28;
-  edgeStripLights.left.intensity=state.edgeBoost*24;
-  edgeStripLights.right.intensity=state.edgeBoost*24;
-  edgeStripLights.tl.intensity=state.cornerBoost*34;
-  edgeStripLights.tr.intensity=state.cornerBoost*34;
-  edgeStripLights.bl.intensity=state.cornerBoost*28;
-  edgeStripLights.br.intensity=state.cornerBoost*28;
-  if(edgeLightMetrics){
-    updateEdgeStripLights(edgeLightMetrics.w,edgeLightMetrics.h,edgeLightMetrics.r,edgeLightMetrics.d,edgeLightMetrics.unit);
+  edgeMat.envMapIntensity=state.envMapIntensity*1.45;
+  edgeMat.opacity=0.14;
+  edgeMat.roughness=0.006;
+  edgeMat.clearcoat=1;
+  edgeMat.clearcoatRoughness=0.012;
+  edgeMat.dispersion=0.62;
+  for(const spec of LIGHTS){
+    const kit=studioLights[spec.id];
+    const x=state[spec.id+'_x'];
+    const y=state[spec.id+'_y'];
+    const z=state[spec.id+'_z'];
+    const size=Math.max(0.55,spec.size);
+    const intensity=state[spec.id+'_intensity'];
+    kit.light.position.set(x,y,z);
+    kit.light.width=size;
+    kit.light.height=size;
+    kit.light.intensity=intensity;
+    aimAtCard(kit.light);
+    kit.panel.position.set(x,y,z);
+    kit.panel.scale.set(size,size,1);
+    kit.panel.material.opacity=0.04+THREE.MathUtils.clamp(intensity/180,0,1)*0.07;
+    aimAtCard(kit.panel);
   }
   bloomPass.strength=state.bloomStrength;
-  bloomPass.radius=0.28;
-  bloomPass.threshold=0.85;
+  bloomPass.radius=0.18;
+  bloomPass.threshold=0.92;
   fresnelMat.uniforms.uPower.value=state.fresnelPower;
-  fresnelMat.uniforms.uStrength.value=0.8+state.edgeBoost*0.42;
-  fresnelMat.uniforms.uCornerBoost.value=state.cornerBoost;
+  fresnelMat.uniforms.uStrength.value=0.95;
+  fresnelMat.uniforms.uCornerBoost.value=2.4;
   glassMat.needsUpdate=true;
   edgeMat.needsUpdate=true;
   glassGroup.rotation.x=THREE.MathUtils.degToRad(-state.tiltX);
   glassGroup.rotation.y=THREE.MathUtils.degToRad(state.tiltY);
-  edgeLightRigBaseQuat.copy(glassGroup.quaternion);
-  edgeLightAzimuthQuat.setFromAxisAngle(new THREE.Vector3(0,0,1),THREE.MathUtils.degToRad(state.lightAzimuth));
-  edgeLightRig.quaternion.copy(edgeLightRigBaseQuat).multiply(edgeLightAzimuthQuat);
   if(GLASS_BEVEL_PX!==state.bevelPx){ GLASS_BEVEL_PX=state.bevelPx; rebuildGlassGeometry(); }
   dump.textContent=PARAMS.map(p=>p.k+': '+state[p.k]+(p.suf||'')).join('\n')+
+    '\n\n'+LIGHTS.map(spec=>spec.name+': x '+state[spec.id+'_x']+', y '+state[spec.id+'_y']+', z '+state[spec.id+'_z']+', 強度 '+state[spec.id+'_intensity']).join('\n')+
     '\n\nmaterial: MeshPhysicalMaterial\ntexture: CanvasTexture -> rear plane\npost: UnrealBloomPass\nthree: 0.160.0';
   requestSceneRender();
 }
