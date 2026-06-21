@@ -1,15 +1,15 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WebGL 玻璃卡 · 三服務堆疊版</title>
 <!--
-  探索沙盒（不上 production）- 軟體開發玻璃卡「三服務堆疊版」
-  基底：service-glass-webgl-real.html（創辦人定稿打光，glass engine 原封保留）。
-  本檔差異：玻璃固定在中央「聚光位」，三張 DOM 卡（網站架設／客製化系統開發／數位轉型顧問）
-  隨捲動堆疊推進——最前卡透明讓打光玻璃透出、後兩卡縮小壓暗當堆疊厚度。
-  目的：讓創辦人滑一滑感覺堆疊節奏，右下「堆疊」面板可即時調手感。
+  ?Ｙ揣瘝?嚗?銝?production嚗? 頠???餌??～???????
+  ?箏?嚗ervice-glass-webgl-real.html嚗颲虫犖摰阮??嚗lass engine ??靽?嚗?
+  ?祆?撌桃嚗?摰銝剖亢??????銝撐 DOM ?∴?蝬脩??嗉身嚗恥鋆賢?蝟餌絞?嚗雿??“??
+  ?冽????聆????霈??????拙蝮桀?憯??嗅???摨艾?
+  ?桃?嚗??菔齒鈭箸?銝皛?閬箏???憟??喃?????踹?單?隤踵???
 -->
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Italiana&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
@@ -31,10 +31,10 @@
     font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.22em; color:rgba(0,200,255,.85);
     border:1px solid rgba(0,200,255,.3); border-radius:999px; padding:7px 18px; background:rgba(6,10,20,.6);
   }
-  /* 捲動軌道：高度 = 進度長度（三服務）。sticky-stage 釘在畫面中、卡片在裡面堆疊推進 */
+  /* ?脣?頠?嚗?摨?= ?脣漲?瑕漲嚗???嚗ticky-stage ??恍銝准?鋆⊿???券?*/
   .scroll-track{ position:relative; z-index:2; width:100%; }
   .sticky-stage{ position:sticky; top:0; height:100vh; width:100%; }
-  /* slot：隱形量尺，只用來告訴 WebGL 玻璃「聚光位」在哪、多大（固定置中、不隨捲動移動） */
+  /* slot嚗敶ａ?撠綽??芰靘?閮?WebGL ?餌???????芥?憭改??箏?蝵桐葉???冽?宏?? */
   .slot{ position:absolute; left:50%; top:50%; width:var(--cardW); height:var(--cardH);
     transform:translate(-50%,-50%); visibility:hidden; pointer-events:none; }
   .deck{ position:absolute; inset:0; }
@@ -44,21 +44,10 @@
     transform-origin:center center; will-change:transform,opacity; backface-visibility:hidden;
     background:transparent;
   }
-  /* 後方堆疊卡：半透明玻璃殼（只有邊與淡光、不占字、不擋住前卡的真玻璃）→ 透出來像疊著的玻璃片 */
-  .html-card:not(.is-front){
-    background:linear-gradient(158deg, rgba(110,150,255,.055), rgba(70,110,230,.022));
-    box-shadow:inset 0 0 0 1px rgba(150,185,255,.30), inset 0 1px 0 rgba(195,218,255,.32), 0 22px 55px rgba(0,0,0,.42);
-  }
-  /* 非前卡：藏掉內文，只留玻璃殼當「堆疊厚度」 */
-  .html-card:not(.is-front) .content,
-  .html-card:not(.is-front) .codebar,
-  .html-card:not(.is-front) .ghost,
-  .html-card:not(.is-front) .grain{ opacity:0; }
-  .html-card .content,.html-card .codebar,.html-card .ghost,.html-card .grain{ transition:opacity .4s ease; }
-  /* 最前卡：透明無底，讓 WebGL 打光玻璃透出來當卡面 + 顯示內文 */
-  .html-card.is-front{ background:transparent; box-shadow:none; }
-  /* .html-card::before 已移除：每個角不同色的人工光暈（左上白/右上青/右下藍）是「邊角怪」的來源，
-     且 HTML 高光與後方 WebGL 玻璃邊兩套會錯位。邊角光統一交給玻璃 Fresnel + envMap。 */
+  .html-card .content,.html-card .codebar,.html-card .ghost,.html-card .grain{ transition:none; }
+  .html-card{ background:transparent; box-shadow:none; }
+  /* .html-card::before 撌脩宏?歹?瘥?銝??脩?鈭箏極??嚗椰銝/?喃????喃????胯?閫芥?靘?嚗?
+     銝?HTML 擃?????WebGL ?餌??憟??臭???閫?蝯曹?鈭斤策?餌? Fresnel + envMap??*/
   .topline{ display:none; }
   .ghost{ position:absolute; right:-4%; bottom:-22%; z-index:2; font-family:"Noto Serif TC",serif; font-weight:700;
     font-size:min(38vw,420px); line-height:.8; color:rgba(225,235,255,.07); user-select:none; pointer-events:none; letter-spacing:-.02em;
@@ -120,7 +109,7 @@
   </div>
 
   <aside class="panel">
-    <h4>WebGL 厚玻璃 · 拉軸</h4>
+    <h4>WebGL ???繚 ?遘</h4>
     <div class="rows"></div>
     <div class="dump" id="dump"></div>
   </aside>
@@ -145,28 +134,28 @@ import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUnifo
 const urlParams=new URLSearchParams(window.location.search);
 const QA_MODE=urlParams.get('qa')==='1';
 const PARAMS=[
-  {k:'thickness', name:'玻璃厚度', min:0.2, max:4.5, step:0.05},
-  {k:'ior', name:'折射率', min:1.05, max:2.2, step:0.01},
-  {k:'roughness', name:'表面粗糙度', min:0, max:0.3, step:0.005},
-  {k:'transmission', name:'透射度', min:0, max:1, step:0.01},
-  {k:'bevelPx', name:'導角大小', min:4, max:40, step:1, suf:'px'},
-  {k:'fresnelPower', name:'邊緣光強度', min:1.2, max:6.0, step:0.05},
-  {k:'envMapIntensity', name:'環境反射強度', min:0, max:5, step:0.05},
-  {k:'bloomStrength', name:'泛光強度', min:0, max:2.4, step:0.02},
-  {k:'tiltX', name:'上下傾角', min:-24, max:24, step:1, suf:'deg'},
-  {k:'tiltY', name:'左右傾角', min:-24, max:24, step:1, suf:'deg'}
+  {k:'thickness', name:'thickness', min:0.2, max:4.5, step:0.05},
+  {k:'ior', name:'ior', min:1.05, max:2.2, step:0.01},
+  {k:'roughness', name:'roughness', min:0, max:0.3, step:0.005},
+  {k:'transmission', name:'transmission', min:0, max:1, step:0.01},
+  {k:'bevelPx', name:'bevel px', min:4, max:40, step:1, suf:'px'},
+  {k:'fresnelPower', name:'fresnel power', min:1.2, max:6.0, step:0.05},
+  {k:'envMapIntensity', name:'env map intensity', min:0, max:5, step:0.05},
+  {k:'bloomStrength', name:'bloom strength', min:0, max:2.4, step:0.02},
+  {k:'tiltX', name:'tilt X', min:-24, max:24, step:1, suf:'deg'},
+  {k:'tiltY', name:'tilt Y', min:-24, max:24, step:1, suf:'deg'}
 ];
 const LIGHTS=[
-  {id:'key', name:'主光', color:0xf6fbff, size:2.4, defaults:{azimuth:13,elevation:80,distance:6.05,intensity:32}},
-  {id:'top', name:'頂光', color:0xdfeaff, size:1.45, defaults:{azimuth:65,elevation:8,distance:8,intensity:134}},
-  {id:'rim', name:'邊光', color:0x9edcff, size:1.75, defaults:{azimuth:70,elevation:34,distance:6,intensity:157}},
-  {id:'back', name:'背光', color:0xb8ccff, size:2.1, defaults:{azimuth:270,elevation:35,distance:4.7,intensity:39}}
+  {id:'key', name:'key', color:0xf6fbff, size:2.4, defaults:{azimuth:13,elevation:80,distance:6.05,intensity:32}},
+  {id:'top', name:'top', color:0xdfeaff, size:1.45, defaults:{azimuth:65,elevation:8,distance:8,intensity:134}},
+  {id:'rim', name:'rim', color:0x9edcff, size:1.75, defaults:{azimuth:70,elevation:34,distance:6,intensity:157}},
+  {id:'back', name:'back', color:0xb8ccff, size:2.1, defaults:{azimuth:270,elevation:35,distance:4.7,intensity:39}}
 ];
 const LIGHT_CONTROLS=[
-  {prop:'azimuth', label:'方位角', min:0, max:360, step:1, suf:'deg'},
-  {prop:'elevation', label:'高度角', min:-80, max:80, step:1, suf:'deg'},
-  {prop:'distance', label:'距離', min:2, max:8, step:0.05},
-  {prop:'intensity', label:'強度', min:0, max:360, step:1}
+  {prop:'azimuth', label:'azimuth', min:0, max:360, step:1, suf:'deg'},
+  {prop:'elevation', label:'elevation', min:-80, max:80, step:1, suf:'deg'},
+  {prop:'distance', label:'distance', min:2, max:8, step:0.05},
+  {prop:'intensity', label:'intensity', min:0, max:360, step:1}
 ];
 const state={ thickness:1.55, ior:1.05, roughness:0.06, dispersion:0.26, tiltX:9, tiltY:-12, transmission:1, envMapIntensity:1.2, bloomStrength:0, fresnelPower:2.25, bevelPx:16 };
 for(const spec of LIGHTS){
@@ -179,7 +168,7 @@ const htmlCard=document.getElementById('htmlCard');
 const wrap=document.querySelector('.panel .rows');
 const GRAIN=['const nest = createStudio()','export default function App(){','return <Section/>','await build(idea)','if(ready) ship()','render(art, code)','while(true){ create() }'].join('\n').repeat(8);
 
-/* 三張服務卡內容（對齊 CLAUDE.md B 類本質：軟體開發本業；客製系統描述避開「流程自動化」措辭、不與 G 類採集混淆） */
+/* 銝撐???∪摰對?撠? CLAUDE.md B 憿鞈迎?頠???祆平嚗恥鋆賜頂蝯望?餈圈??蝔???颲准???G 憿?毽瘛? */
 const CARDS=[
   { i:'01', cpath:'WEB ARCHITECTURE', klab:'// WEB DEVELOPMENT', title:'網站架設', en:'Your digital front door.',
     sub:'從一頁式門面到企業電商，依需求量身打造，不套公版。', ghost:'網',
@@ -347,6 +336,12 @@ function refreshStudioEnvMap(){
   scene.environment=makeStudioEnvMap();
   if(typeof glassMat!=='undefined') glassMat.needsUpdate=true;
   if(typeof edgeMat!=='undefined') edgeMat.needsUpdate=true;
+  if(typeof glassCards!=='undefined'){
+    for(const card of glassCards){
+      card.body.material.needsUpdate=true;
+      card.edgeGlow.material.needsUpdate=true;
+    }
+  }
   requestSceneRender();
 }
 
@@ -388,8 +383,10 @@ addStudioPlane(10.5,5.8,wallMat,{x:0,y:0.35,z:-2.55},{x:0,y:0,z:0});
 addStudioPlane(5.8,5.4,wallMat,{x:-4.4,y:0.22,z:-0.05},{x:0,y:Math.PI/2,z:0});
 addStudioPlane(5.8,5.4,wallMat,{x:4.4,y:0.22,z:-0.05},{x:0,y:-Math.PI/2,z:0});
 
+const glassDeckGroup=new THREE.Group();
+scene.add(glassDeckGroup);
 const glassGroup=new THREE.Group();
-scene.add(glassGroup);
+glassDeckGroup.add(glassGroup);
 const studioLights={};
 function createStudioLight(spec){
   const softboxSize=Math.max(0.55,spec.size);
@@ -426,6 +423,7 @@ const glassMat=new THREE.MeshPhysicalMaterial({
   attenuationColor:new THREE.Color(0xacc6ff),
   attenuationDistance:6.5,
   transparent:true,
+  depthWrite:false,
   opacity:1
 });
 const glass=new THREE.Mesh(glassGeo, glassMat);
@@ -443,6 +441,7 @@ const edgeMat=new THREE.MeshPhysicalMaterial({
   clearcoatRoughness:0.012,
   envMapIntensity:4.2,
   transparent:true,
+  depthWrite:false,
   opacity:0.19,
   side:THREE.FrontSide
 });
@@ -562,17 +561,93 @@ function rebuildHighlightLayer(w,h,r,d,unit){
   const nearStrip=Math.max(unit*18, d*0.36);
   const farStrip=Math.max(unit*9, d*0.16);
 
-  /* 移除 nearSide(右+下) / farSide(左+上) 假厚邊高光面板：那條白色「大倒角」是人工貼的，
-     厚邊感改交給玻璃幾何倒角 + Fresnel + envMap 反射自然呈現 */
+  /* 蝘駁 nearSide(??銝? / farSide(撌?銝? ??????選?????質?之???鈭箏極鞎潛?嚗?
+     ???鈭斤策?餌?撟曆??? + Fresnel + envMap ???芰? */
 
   const pool=new THREE.Mesh(new THREE.PlaneGeometry(w*0.94,h*0.90,1,1),depthPoolMat);
   pool.position.set(0,0,z+unit*0.8);
   highlightGroup.add(pool);
 
-  /* 邊緣受光只交給 Fresnel shell + 玻璃材質自然呈現，不使用描線型高光 */
+  /* ?楠???芯漱蝯?Fresnel shell + ?餌??釭?芰?嚗?雿輻??????*/
 }
 
-/* 直接點光/方向光會在圓角倒角 facet 上打出段狀 specular；玻璃反射改由連續 envMap 承擔。 */
+/* ?湔暺?/?孵????典?閫? facet 銝??箸挾? specular嚗??撠?梢?? envMap ?踵???*/
+
+function makeRearGlassMaterial(layer){
+  const mat=glassMat.clone();
+  mat.color=new THREE.Color(layer===1 ? 0xd9ecff : 0xc1dcff);
+  mat.transmission=layer===1 ? 0.24 : 0.16;
+  mat.thickness=layer===1 ? 1.42 : 1.30;
+  mat.roughness=layer===1 ? 0.34 : 0.42;
+  mat.ior=1.12;
+  mat.envMapIntensity=layer===1 ? 1.75 : 1.42;
+  mat.clearcoat=0.74;
+  mat.clearcoatRoughness=layer===1 ? 0.18 : 0.24;
+  mat.opacity=layer===1 ? 0.82 : 0.72;
+  mat.emissive=new THREE.Color(layer===1 ? 0x173b78 : 0x102a5a);
+  mat.emissiveIntensity=layer===1 ? 0.26 : 0.18;
+  mat.attenuationColor=new THREE.Color(layer===1 ? 0xbddcff : 0x8dbfff);
+  mat.attenuationDistance=layer===1 ? 2.6 : 2.1;
+  return mat;
+}
+
+function makeRearEdgeMaterial(layer){
+  const mat=edgeMat.clone();
+  mat.color=new THREE.Color(0xf4fbff);
+  mat.transmission=0.18;
+  mat.thickness=1.18;
+  mat.ior=1.36;
+  mat.envMapIntensity=layer===1 ? 5.8 : 4.65;
+  mat.opacity=layer===1 ? 0.54 : 0.44;
+  mat.roughness=0.004;
+  mat.clearcoat=1;
+  mat.clearcoatRoughness=0.006;
+  mat.attenuationColor=new THREE.Color(layer===1 ? 0xbddfff : 0x8fc6ff);
+  mat.attenuationDistance=layer===1 ? 8.0 : 6.2;
+  return mat;
+}
+
+function makeRearFresnelMaterial(layer){
+  const mat=fresnelMat.clone();
+  mat.uniforms={
+    uPower:{ value:1.45 },
+    uStrength:{ value:layer===1 ? 2.85 : 2.20 },
+    uCornerBoost:{ value:4.8 },
+    uHalfSize:{ value:new THREE.Vector2(0.5,0.5) },
+    uColorA:{ value:new THREE.Color(0xf1f8ff) },
+    uColorB:{ value:new THREE.Color(0x52d8ff) }
+  };
+  return mat;
+}
+
+function makeRearDepthPoolMaterial(layer){
+  const mat=depthPoolMat.clone();
+  mat.uniforms={
+    uColor:{ value:new THREE.Color(0x01040d) },
+    uCool:{ value:new THREE.Color(0x06122f) },
+    uOpacity:{ value:0.018 }
+  };
+  return mat;
+}
+
+function createRearGlassCard(layer){
+  const group=new THREE.Group();
+  const body=new THREE.Mesh(smoothRoundedBoxGeometry(1,1,0.1,GLASS_BEVEL_SEGMENTS,0.05), makeRearGlassMaterial(layer));
+  const edgeGlow=new THREE.Mesh(smoothRoundedBoxGeometry(1,1,0.1,GLASS_BEVEL_SEGMENTS,0.05), makeRearEdgeMaterial(layer));
+  const fresnelShell=new THREE.Mesh(smoothRoundedBoxGeometry(1,1,0.1,GLASS_BEVEL_SEGMENTS,0.05), makeRearFresnelMaterial(layer));
+  const depthPool=new THREE.Mesh(new THREE.PlaneGeometry(1,1,1,1), makeRearDepthPoolMaterial(layer));
+  edgeGlow.scale.set(1.004,1.004,1.004);
+  fresnelShell.scale.set(1.004,1.004,1.004);
+  group.add(body, edgeGlow, fresnelShell, depthPool);
+  glassDeckGroup.add(group);
+  return { group, body, edgeGlow, fresnelShell, depthPool, rearLayer:layer };
+}
+
+const glassCards=[
+  { group:glassGroup, body:glass, edgeGlow, fresnelShell, depthPool:null, highlightGroup, rearLayer:0 },
+  createRearGlassCard(1),
+  createRearGlassCard(2)
+];
 
 const CODE=[
   'const nest = createStudio()','export default function App() {','<section class="services">',
@@ -628,6 +703,25 @@ function rebuildGlassGeometry(){
   glassGeo=nextGlassGeo;
   edgeGeo=nextEdgeGeo;
   fresnelGeo=nextFresnelGeo;
+  for(let i=1;i<glassCards.length;i++){
+    const card=glassCards[i];
+    const layer=i;
+    const rearPad=edgePad*(1.3+layer*0.18);
+    const rearDepth=d*(0.86-layer*0.06);
+    const rearGlassGeo=smoothRoundedBoxGeometry(w, h, rearDepth, GLASS_BEVEL_SEGMENTS, r);
+    const rearEdgeGeo=smoothRoundedBoxGeometry(w+rearPad, h+rearPad, rearDepth+(2*unitsPerPx), GLASS_BEVEL_SEGMENTS, r+unitsPerPx*1.4);
+    const rearFresnelGeo=smoothRoundedBoxGeometry(w+rearPad*0.6, h+rearPad*0.6, rearDepth+(unitsPerPx*1.5), GLASS_BEVEL_SEGMENTS, r+unitsPerPx);
+    card.body.geometry.dispose();
+    card.edgeGlow.geometry.dispose();
+    card.fresnelShell.geometry.dispose();
+    card.depthPool.geometry.dispose();
+    card.body.geometry=rearGlassGeo;
+    card.edgeGlow.geometry=rearEdgeGeo;
+    card.fresnelShell.geometry=rearFresnelGeo;
+    card.depthPool.geometry=new THREE.PlaneGeometry(w*0.94,h*0.90,1,1);
+    card.depthPool.position.set(0,0,rearDepth/2+unitsPerPx*2.8);
+    card.fresnelShell.material.uniforms.uHalfSize.value.set((w+rearPad*0.6)*0.5,(h+rearPad*0.6)*0.5);
+  }
 }
 
 function resize(){
@@ -721,7 +815,7 @@ function drawStarRain(time){
     pocket.addColorStop(0.62,'rgba(0,200,255,'+(0.06*STAR_RAIN_GLOW)+')');
     pocket.addColorStop(1,'rgba(0,200,255,0)');
     ctx.fillStyle=pocket;
-    /* 光暈夾在卡片範圍內、只略溢出邊緣，不再往下撐成一坨 */
+    /* ??憭曉?∠?蝭??扼?交滯?粹?蝺??銝?敺銝?????*/
     ctx.fillRect((rcPx.left-40)*sx,(rcPx.top-45)*sy,(rcPx.width+80)*sx,(rcPx.height+80)*sy);
   }
 
@@ -813,6 +907,54 @@ function drawStarRain(time){
   starTexture.needsUpdate=true;
 }
 
+function applyGlassCardMaterial(card, idx, frontWeight, visible, rearDepth){
+  const layer=Math.max(0, idx);
+  const layerFade=Math.max(0, layer-1);
+  const rearFaceTrim=THREE.MathUtils.clamp(STACK.rearDim, 0, 0.18);
+  const rearTransmission=THREE.MathUtils.clamp(STACK.rearTransmission - layerFade*0.06, 0.08, 0.32);
+  const rearFaceEnv=THREE.MathUtils.clamp(0.60 - layerFade*0.16 - rearFaceTrim*0.18, 0.38, 0.64);
+  const rearRimEnv=THREE.MathUtils.clamp(1.30 - Math.max(0, layer-1)*0.32, 0.85, 1.30);
+  const rearRimBase=THREE.MathUtils.clamp(0.19 - Math.max(0, layer-1)*0.05, 0.11, 0.19);
+  const rearFresnelBase=THREE.MathUtils.clamp(0.82 - Math.max(0, layer-1)*0.18, 0.55, 0.82);
+  const w=THREE.MathUtils.clamp(frontWeight, 0, 1);
+  const rearFaceOpacity=THREE.MathUtils.clamp(0.82 - layerFade*0.10 - rearFaceTrim*0.10, 0.68, 0.86);
+  const rearRoughness=THREE.MathUtils.clamp(0.34 + layerFade*0.10, 0.34, 0.52);
+  const rearGlow=THREE.MathUtils.clamp(0.07 - layerFade*0.025 - rearFaceTrim*0.04, 0.02, 0.08);
+
+  card.body.material.transmission=THREE.MathUtils.lerp(rearTransmission, state.transmission, w);
+  card.body.material.thickness=THREE.MathUtils.lerp(1.42-layerFade*0.12, state.thickness, w);
+  card.body.material.ior=THREE.MathUtils.lerp(1.12, state.ior, w);
+  card.body.material.roughness=THREE.MathUtils.lerp(rearRoughness, state.roughness, w);
+  card.body.material.clearcoat=THREE.MathUtils.lerp(0.74, 0.72, w);
+  card.body.material.clearcoatRoughness=THREE.MathUtils.lerp(0.18+layerFade*0.06, 0.08, w);
+  card.body.material.envMapIntensity=THREE.MathUtils.lerp(rearFaceEnv, state.envMapIntensity, w);
+  card.body.material.opacity=visible*THREE.MathUtils.lerp(rearFaceOpacity, 1, w);
+  card.body.material.emissive.set(layerFade>0 ? 0x102a5a : 0x173b78);
+  card.body.material.emissiveIntensity=visible*THREE.MathUtils.lerp(rearGlow, 0, w);
+  card.body.material.attenuationDistance=THREE.MathUtils.lerp(2.6-layerFade*0.5, 6.5, w);
+  card.body.material.needsUpdate=true;
+
+  card.edgeGlow.material.transmission=THREE.MathUtils.lerp(0.18, 0.66, w);
+  card.edgeGlow.material.thickness=THREE.MathUtils.lerp(1.18, 1.25, w);
+  card.edgeGlow.material.ior=THREE.MathUtils.lerp(1.36, 1.62, w);
+  card.edgeGlow.material.roughness=THREE.MathUtils.lerp(0.004, 0.006, w);
+  card.edgeGlow.material.clearcoat=1;
+  card.edgeGlow.material.clearcoatRoughness=THREE.MathUtils.lerp(0.006, 0.012, w);
+  card.edgeGlow.material.envMapIntensity=visible*THREE.MathUtils.lerp(rearRimEnv, state.envMapIntensity*1.45, w);
+  card.edgeGlow.material.opacity=visible*THREE.MathUtils.lerp(rearRimBase, 0.14, w);
+  card.edgeGlow.material.needsUpdate=true;
+
+  card.fresnelShell.material.uniforms.uPower.value=THREE.MathUtils.lerp(1.45, state.fresnelPower, w);
+  card.fresnelShell.material.uniforms.uStrength.value=visible*THREE.MathUtils.lerp(rearFresnelBase, 0.95, w);
+  card.fresnelShell.material.uniforms.uCornerBoost.value=THREE.MathUtils.lerp(4.8, 2.4, w);
+
+  if(card.depthPool){
+    card.depthPool.material.uniforms.uOpacity.value=visible*THREE.MathUtils.lerp(0.018+layerFade*0.010, 0.055, w);
+  }else{
+    depthPoolMat.uniforms.uOpacity.value=visible*THREE.MathUtils.lerp(0.018, 0.055, w);
+  }
+}
+
 function applyState(){
   root.style.setProperty('--tiltX', state.tiltX);
   root.style.setProperty('--tiltY', state.tiltY);
@@ -852,48 +994,93 @@ function applyState(){
   if(GLASS_BEVEL_PX!==state.bevelPx){ GLASS_BEVEL_PX=state.bevelPx; rebuildGlassGeometry(); }
   dump.textContent=PARAMS.map(p=>p.k+': '+state[p.k]+(p.suf||'')).join('\n')+
     '\n\n'+LIGHTS.map(spec=>spec.name+': azimuth '+state[spec.id+'_azimuth']+'deg, elevation '+state[spec.id+'_elevation']+'deg, distance '+state[spec.id+'_distance']+', intensity '+state[spec.id+'_intensity']).join('\n')+
-    '\n\nmaterial: MeshPhysicalMaterial\ntexture: CanvasTexture -> rear plane\npost: UnrealBloomPass\nthree: 0.160.0';
+    '\n\nstack: x '+STACK.xOffset+', y '+STACK.backDrop+', z '+STACK.zSpacing+', scale '+STACK.backScale+', dim '+STACK.rearDim+', rear transmission '+STACK.rearTransmission+', transition '+STACK.transitionStart+'-'+STACK.transitionEnd+
+    '\n\nmaterial: 3x MeshPhysicalMaterial slabs\ntexture: CanvasTexture -> rear plane\npost: UnrealBloomPass\nthree: 0.160.0';
   requestSceneRender();
 }
 
-/* ===== 堆疊推進：玻璃固定中央聚光位，三張 DOM 卡隨捲動進退 ===== */
-const STACK={ offset:42, scaleStep:0.075, dimStep:0.46, blur:1.1, exit:0.92 };
+/* ===== ???券莎??餌??箏?銝剖亢??雿?銝撐 DOM ?⊿?脣??脤 ===== */
+const STACK={ xOffset:0.82, zSpacing:0.88, backDrop:0.46, backScale:0.12, rearDim:0.04, rearTransmission:0.24, transitionStart:0.55, transitionEnd:0.85, fadeEnd:0.90 };
 const scrollTrack=document.getElementById('scrollTrack');
-scrollTrack.style.height=(100 + (CARDS.length-1)*90)+'vh';   /* 每多一張服務 +90vh 捲動行程 */
+scrollTrack.style.height=(100 + (CARDS.length-1)*90)+'vh';   /* 瘥?銝撘菜???+90vh ?脣?銵? */
 
 function layoutStack(){
   const trackH=scrollTrack.offsetHeight;
   const travel=Math.max(1, trackH - window.innerHeight);
   const top=scrollTrack.getBoundingClientRect().top;
-  const progress=Math.min(1, Math.max(0, -top/travel));
+  const progress=QA_MODE ? 0 : Math.min(1, Math.max(0, -top/travel));
   const N=CARDS.length;
   const activeFloat=progress*(N-1);
-  const frontIdx=Math.min(N-1, Math.max(0, Math.round(activeFloat)));
+  const segment=Math.min(N-2, Math.max(0, Math.floor(activeFloat)));
+  const phase=activeFloat>=N-1 ? 1 : activeFloat-segment;
+  const move=smoothstep(STACK.transitionStart, STACK.transitionEnd, phase);
+  const fadeOut=1-smoothstep(STACK.transitionStart, STACK.fadeEnd, phase);
+  const fadeIn=smoothstep(STACK.transitionStart, STACK.fadeEnd, phase);
+
   for(let idx=0; idx<cardEls.length; idx++){
     const el=cardEls[idx];
-    const rel=idx-activeFloat;
-    let ty, sc, op, bl, z;
-    if(rel>=0){               /* 前卡(0)與其後堆疊卡 */
-      const r=Math.min(rel, 2.4);
-      ty=r*STACK.offset;
-      sc=1 - r*STACK.scaleStep;
-      op=Math.max(0, 1 - r*STACK.dimStep);
-      bl=r*STACK.blur;
-      z=200 - Math.round(r*10);
-    }else{                    /* 已看完、往上退場的卡 */
-      const t=Math.min(-rel, 1.8);
-      ty=-t*window.innerHeight*STACK.exit;
-      sc=1 + t*0.03;
-      op=Math.max(0, 1 - t*1.7);
-      bl=0;
-      z=210;
+    let textWeight=0;
+    let textY=24;
+    if(idx===segment) textWeight=fadeOut;
+    if(idx===segment) textY=-18*(1-fadeOut);
+    if(idx===segment+1){
+      textWeight=Math.max(textWeight, fadeIn);
+      textY=22*(1-fadeIn);
     }
-    el.style.transform='perspective(1700px) translateY('+ty.toFixed(1)+'px) scale('+sc.toFixed(3)+') rotateX(calc(var(--tiltX)*1deg)) rotateY(calc(var(--tiltY)*1deg))';
-    el.style.opacity=op.toFixed(3);
-    el.style.filter=bl>0.02 ? 'blur('+bl.toFixed(2)+'px)' : 'none';
-    el.style.zIndex=z;
-    el.classList.toggle('is-front', idx===frontIdx);
+    if(activeFloat>=N-1 && idx===N-1){ textWeight=1; textY=0; }
+    if(QA_MODE && idx===0){ textWeight=1; textY=0; }
+    el.style.transform='perspective(1700px) translateY('+textY.toFixed(1)+'px) scale(1) rotateX(calc(var(--tiltX)*1deg)) rotateY(calc(var(--tiltY)*1deg))';
+    el.style.opacity=textWeight.toFixed(3);
+    el.style.filter='none';
+    el.style.zIndex=String(220+Math.round(textWeight*10));
+    el.classList.toggle('is-front', textWeight>0.5);
   }
+
+  for(let idx=0; idx<glassCards.length; idx++){
+    const card=glassCards[idx];
+    const rel=idx-activeFloat;
+    let x=0, y=0, z=0, scale=1, frontWeight=0, visible=1;
+    if(idx===segment){
+      frontWeight=fadeOut;
+      x=-STACK.xOffset*0.28*move;
+      y=0.30*move;
+      z=0.16*move;
+      scale=1+0.014*move;
+    }else if(idx===segment+1){
+      frontWeight=fadeIn;
+      x=STACK.xOffset*(1-move);
+      y=-STACK.backDrop*(1-move);
+      z=-STACK.zSpacing*(1-move);
+      scale=1-STACK.backScale*(1-move);
+    }else if(rel>0){
+      const r=Math.min(rel,2.2);
+      x=STACK.xOffset*r;
+      y=-STACK.backDrop*r;
+      z=-STACK.zSpacing*r;
+      scale=1-STACK.backScale*r;
+    }else{
+      const gone=Math.min(-rel,1.4);
+      x=-STACK.xOffset*(0.45+gone*0.20);
+      y=0.46+0.42*gone;
+      z=0.20+0.10*gone;
+      scale=1.02+0.015*gone;
+      visible=Math.max(0, 1-gone*1.3);
+    }
+    if(activeFloat>=N-1 && idx===N-1){
+      x=0; y=0; z=0; scale=1; frontWeight=1; visible=1;
+    }
+    const rearDepth=Math.max(0, Math.min(1, rel));
+    const rearVisible=rel>=0 ? 1-rearDepth*0.10 : visible;
+    visible=QA_MODE ? 1 : Math.max(frontWeight, rearVisible);
+    if(QA_MODE && idx===0) frontWeight=1;
+    card.group.position.set(x,y,z);
+    card.group.scale.setScalar(Math.max(0.72,scale));
+    card.group.rotation.x=THREE.MathUtils.degToRad(-state.tiltX);
+    card.group.rotation.y=THREE.MathUtils.degToRad(state.tiltY);
+    card.group.visible=visible>0.01;
+    applyGlassCardMaterial(card, idx, frontWeight, visible, rearDepth);
+  }
+  requestSceneRender();
 }
 let stackTick=false;
 window.addEventListener('scroll', ()=>{
@@ -901,18 +1088,22 @@ window.addEventListener('scroll', ()=>{
 }, {passive:true});
 window.addEventListener('resize', layoutStack);
 
-/* 堆疊手感拉軸（接在玻璃/燈面板之後） */
+/* ?????遘嚗?函????蹂?敺? */
 const STACK_CTRL=[
-  {k:'offset', name:'堆疊間距', min:10, max:90, step:1, suf:'px'},
-  {k:'scaleStep', name:'每層縮小', min:0, max:0.16, step:0.005},
-  {k:'dimStep', name:'每層變暗', min:0, max:0.8, step:0.02},
-  {k:'blur', name:'後層模糊', min:0, max:3, step:0.1, suf:'px'},
-  {k:'exit', name:'退場距離', min:0.4, max:1.2, step:0.02}
+  {k:'zSpacing', name:'stack Z gap', min:0.24, max:1.2, step:0.01},
+  {k:'backDrop', name:'stack Y offset', min:0.05, max:0.9, step:0.01},
+  {k:'backScale', name:'rear scale step', min:0, max:0.18, step:0.005},
+  {k:'rearDim', name:'rear body glow trim', min:0, max:0.18, step:0.005},
+  {k:'rearTransmission', name:'rear frost transmission', min:0.08, max:0.32, step:0.005},
+  {k:'transitionStart', name:'transition start', min:0.35, max:0.7, step:0.01},
+  {k:'transitionEnd', name:'transition end', min:0.7, max:0.95, step:0.01},
+  {k:'fadeEnd', name:'text fade end', min:0.8, max:1, step:0.01}
 ];
 const stackTitle=document.createElement('h4');
-stackTitle.textContent='堆疊手感';
+stackTitle.textContent='????';
 stackTitle.style.marginTop='20px';
 wrap.appendChild(stackTitle);
+STACK_CTRL.splice(1,0,{k:'xOffset', name:'stack X offset', min:-1.8, max:1.8, step:0.01});
 for(const p of STACK_CTRL){
   const row=document.createElement('div');
   row.className='row';
@@ -922,7 +1113,10 @@ for(const p of STACK_CTRL){
   inp.oninput=()=>{
     const v=parseFloat(inp.value);
     STACK[p.k]=v;
+    if(STACK.transitionEnd<=STACK.transitionStart) STACK.transitionEnd=STACK.transitionStart+0.01;
+    if(STACK.fadeEnd<STACK.transitionEnd) STACK.fadeEnd=STACK.transitionEnd;
     document.getElementById('sv_'+p.k).textContent=v+(p.suf||'');
+    applyState();
     layoutStack();
   };
   wrap.appendChild(row);

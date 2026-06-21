@@ -174,6 +174,15 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 - **stage 2 待辦（下個對話接）**：① 燈控面板**分頁化**（主光/頂光/邊光/背光各一頁、收斂拉軸數量）② 3 個 **preset**（乾淨棚拍/銳利晶邊/科技冷光）③ 把背景**碼雨搬進攝影棚**（目前仍是平貼背景、非容器內元素）④ 驗證 **dispersion** 是否該留（r0.160 疑似無效、需 runtime 確認）⑤ 整進**正式 index.html**（5 層 CSS）。
 - **已退場/封存**：`service-glass-webgl-pop.html`＝舊水晶內雕文字版（checkpoint `709101b`，封存備查、非現役）。git 還原點（branch `feature/water-card-native-integration`）：原始沉穩版 `b1d7b65`、攝影棚重構 `d8def49`、定稿 `93e3db4`。
 
+### 軟體開發卡：三項服務堆疊玻璃版（2026-06-22 02:56 方向定案；沙盒進行中、未進正式 index.html）
+
+對應任務 11b。現役沙盒＝`demo-liquid/service-glass-stack.html`（由 `service-glass-webgl-real.html` 打光玻璃引擎延伸，3 片真 WebGL slab；前卡＝創辦人定稿打光值原封不動）。三項服務：**網站架設／客製化系統開發／數位轉型顧問**，捲動推進（前片抬起、下一片升進前位）。
+
+- **視覺方向定案＝「主卡聚光＋景深退場」**（創辦人 2026-06-22 從兩方向選定）：前卡打亮、清楚可讀當主角；後兩片**面壓暗、退入陰影**，靠**比主卡弱的冷光邊**定出輪廓往後退。**非**「三片同時全亮」——後片打太亮會三片搶戲、主從顛倒（本輪踩過）。後片亮度數值在 `applyGlassCardMaterial()`：`rearFaceEnv`／`rearGlow`（面，壓低）、`rearRimEnv`／`rearFresnelBase`／`rearRimBase`（邊，須低於前卡）。
+- **紅線／驗收坑（血淚）**：① **WebGL/Canvas 沙盒驗收前必須先捲動觸發重繪**——loop 在無互動時停在舊幀，截圖會看到凍住畫面、誤判「改了沒效」（本輪最大時間黑洞，見 memory [[feedback_verify_webgl_force_repaint]]）② **codex 編碼環境會把整檔中文存成 mojibake／逕改英文**，請 codex 改完**必查中文沒被破壞**、必要時用 Python regex 修回（見 [[feedback_state_origin_before_destructive]] 同精神）③ 內容文案：客製系統**禁「流程自動化」措辭**（避免與 G 類採集混淆，見術語表 B 類本質）。
+- **協作**：WebGL 由 codex 實作、主 session 給死方向＋Chrome 強制重繪驗收。本輪因驗收凍幀誤判，主 session 後段自行微調後片亮度/偏移。
+- **待辦**：① 「主卡聚光」明暗反差可再加強（前更跳、後更沉）② 手機 RWD ③ 整進**正式 index.html**（5 層 CSS）④ 後片邊光無拉軸、目前寫死於 `applyGlassCardMaterial()`。
+
 ### 數位行銷手風琴收合卡視覺定案（2026-06-17 23:11；2026-06-18 23:25 比例/碑文重校）
 
 收合卡＝「**月面碑刻**」石板。**已整合進預覽主頁**（`index-rain-preview.html` iframe 嵌 `demo-liquid/service-accordion-embed.html`）、**仍未進正式 index.html**。
