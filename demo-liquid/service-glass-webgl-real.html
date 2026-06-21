@@ -152,15 +152,15 @@ const PARAMS=[
   {k:'tiltY', name:'左右傾角', min:-24, max:24, step:1, suf:'deg'}
 ];
 const LIGHTS=[
-  {id:'key', name:'主光', color:0xf6fbff, size:2.4, defaults:{x:-2.6,y:1.15,z:3.2,intensity:44}},
-  {id:'top', name:'頂光', color:0xdfeaff, size:2.8, defaults:{x:0.2,y:2.45,z:1.1,intensity:22}},
-  {id:'rim', name:'邊光', color:0x9edcff, size:1.75, defaults:{x:3.15,y:0.35,z:1.65,intensity:58}},
-  {id:'back', name:'背光', color:0xb8ccff, size:2.1, defaults:{x:-1.65,y:0.55,z:-2.15,intensity:28}}
+  {id:'key', name:'主光', color:0xf6fbff, size:2.4, defaults:{x:-2.4,y:0.8,z:5.0,intensity:48}},
+  {id:'top', name:'頂光', color:0xdfeaff, size:1.45, defaults:{x:0.1,y:2.0,z:4.2,intensity:18}},
+  {id:'rim', name:'邊光', color:0x9edcff, size:1.75, defaults:{x:3.2,y:0.15,z:4.8,intensity:65}},
+  {id:'back', name:'背光', color:0xb8ccff, size:2.1, defaults:{x:-1.8,y:0.45,z:-1.8,intensity:16}}
 ];
 const LIGHT_CONTROLS=[
   {prop:'x', label:'X', min:-4.5, max:4.5, step:0.05},
   {prop:'y', label:'Y', min:-1.6, max:3.2, step:0.05},
-  {prop:'z', label:'Z', min:-3.2, max:4.2, step:0.05},
+  {prop:'z', label:'Z', min:-3.2, max:6.0, step:0.05},
   {prop:'intensity', label:'強度', min:0, max:360, step:1}
 ];
 const state={ thickness:1.8, ior:1.5, roughness:0.02, dispersion:0.26, tiltX:7, tiltY:-7, transmission:1, envMapIntensity:1.28, bloomStrength:0.24, fresnelPower:2.65, bevelPx:16 };
@@ -250,32 +250,30 @@ function makeStudioEnvMap(){
     const strength=THREE.MathUtils.clamp(state[spec.id+'_intensity']/180,0,1);
     const x=512+state[spec.id+'_x']*82;
     const y=260-state[spec.id+'_y']*86+state[spec.id+'_z']*-14;
-    const w=92+size*72;
-    const h=42+size*34;
-    const radius=Math.max(w,h)*0.72;
+    const w=120+size*92;
+    const h=70+size*48;
+    const radius=Math.max(w,h)*0.95;
     const cg=ctx.createRadialGradient(x,y,0,x,y,radius);
-    cg.addColorStop(0,'rgba(255,255,255,'+(0.035+strength*0.12)+')');
-    cg.addColorStop(0.42,'rgba(232,244,255,'+(0.025+strength*0.075)+')');
+    cg.addColorStop(0,'rgba(255,255,255,'+(0.018+strength*0.055)+')');
+    cg.addColorStop(0.34,'rgba(232,244,255,'+(0.012+strength*0.038)+')');
+    cg.addColorStop(0.72,'rgba(120,190,255,'+(strength*0.018)+')');
     cg.addColorStop(1,'rgba(0,200,255,0)');
     ctx.fillStyle=cg;
     ctx.fillRect(x-radius,y-radius,radius*2,radius*2);
+
     ctx.save();
     ctx.translate(x,y);
     ctx.rotate(spec.id==='rim' ? -0.1 : spec.id==='back' ? 0.16 : 0);
-    const panel=ctx.createLinearGradient(-w*0.5,0,w*0.5,0);
-    panel.addColorStop(0,'rgba(255,255,255,0)');
-    panel.addColorStop(0.18,'rgba(232,244,255,'+(0.035+strength*0.08)+')');
-    panel.addColorStop(0.50,'rgba(255,255,255,'+(0.05+strength*0.11)+')');
-    panel.addColorStop(0.82,'rgba(232,244,255,'+(0.035+strength*0.08)+')');
-    panel.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle=panel;
-    if(ctx.roundRect){
-      ctx.beginPath();
-      ctx.roundRect(-w*0.5,-h*0.5,w,h,Math.min(26,h*0.45));
-      ctx.fill();
-    }else{
-      ctx.fillRect(-w*0.5,-h*0.5,w,h);
-    }
+    ctx.scale(1, h/w);
+    const soft=ctx.createRadialGradient(0,0,0,0,0,w*0.54);
+    soft.addColorStop(0,'rgba(255,255,255,'+(0.016+strength*0.050)+')');
+    soft.addColorStop(0.30,'rgba(232,244,255,'+(0.011+strength*0.034)+')');
+    soft.addColorStop(0.68,'rgba(120,190,255,'+(strength*0.014)+')');
+    soft.addColorStop(1,'rgba(0,200,255,0)');
+    ctx.fillStyle=soft;
+    ctx.beginPath();
+    ctx.arc(0,0,w*0.54,0,Math.PI*2);
+    ctx.fill();
     ctx.restore();
   }
   ctx.globalCompositeOperation='source-over';
@@ -322,7 +320,6 @@ const studioGroup=new THREE.Group();
 scene.add(studioGroup);
 const wallMat=new THREE.MeshBasicMaterial({ color:0x050d2e, side:THREE.DoubleSide, transparent:true, opacity:0.88, toneMapped:false });
 const floorMat=new THREE.MeshBasicMaterial({ color:0x030817, transparent:true, opacity:0.92, toneMapped:false });
-const softboxMat=new THREE.MeshBasicMaterial({ color:0xe8f0ff, transparent:true, opacity:0.075, side:THREE.DoubleSide, toneMapped:false });
 function addStudioPlane(w,h,mat,pos,rot){
   const mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,h,1,1),mat);
   mesh.position.set(pos.x,pos.y,pos.z);
@@ -341,12 +338,8 @@ const studioLights={};
 function createStudioLight(spec){
   const softboxSize=Math.max(0.55,spec.size);
   const light=new THREE.RectAreaLight(spec.color, spec.defaults.intensity, softboxSize, softboxSize);
-  const panel=new THREE.Mesh(new THREE.PlaneGeometry(1,1,1,1), softboxMat.clone());
-  panel.material.color.set(spec.color);
-  panel.material.opacity=0.04+THREE.MathUtils.clamp(spec.defaults.intensity/180,0,1)*0.07;
   studioGroup.add(light);
-  studioGroup.add(panel);
-  studioLights[spec.id]={light,panel,spec};
+  studioLights[spec.id]={light,spec};
 }
 function aimAtCard(obj){
   obj.lookAt(0,0,0);
@@ -791,10 +784,6 @@ function applyState(){
     kit.light.height=size;
     kit.light.intensity=intensity;
     aimAtCard(kit.light);
-    kit.panel.position.set(x,y,z);
-    kit.panel.scale.set(size,size,1);
-    kit.panel.material.opacity=0.04+THREE.MathUtils.clamp(intensity/180,0,1)*0.07;
-    aimAtCard(kit.panel);
   }
   bloomPass.strength=state.bloomStrength;
   bloomPass.radius=0.18;
