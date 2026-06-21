@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebGL 玻璃卡 · 三服務堆疊版</title>
+<!--
+  探索沙盒（不上 production）- 軟體開發玻璃卡「三服務堆疊版」
+  基底：service-glass-webgl-real.html（創辦人定稿打光，glass engine 原封保留）。
+  本檔差異：玻璃固定在中央「聚光位」，三張 DOM 卡（網站架設／客製化系統開發／數位轉型顧問）
+  隨捲動堆疊推進——最前卡透明讓打光玻璃透出、後兩卡縮小壓暗當堆疊厚度。
+  目的：讓創辦人滑一滑感覺堆疊節奏，右下「堆疊」面板可即時調手感。
+-->
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Italiana&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  :root{
+    --deep:#050d2e; --star:#e8f0ff; --cyan:#00c8ff; --blue:23,54,245; --gold:245,166,35;
+    --tiltX:7; --tiltY:-7; --cardW:min(960px,92vw); --cardH:min(560px,78vh); --cardRadius:28px;
+  }
+  html{ scroll-behavior:auto; }
+  body{ background:var(--deep); color:var(--star); font-family:"Noto Sans TC",sans-serif; overflow-x:hidden; }
+  body::before{ content:''; position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(120% 90% at 78% -8%, rgba(40,70,160,.30), transparent 52%),
+      radial-gradient(90% 80% at 12% 108%, rgba(20,40,120,.22), transparent 56%),
+      linear-gradient(160deg, #061036 0%, #050d2e 46%, #03081f 100%);
+  }
+  #webgl{ position:fixed; inset:0; width:100%; height:100%; z-index:1; display:block; }
+  .badge{ position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:30;
+    font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.22em; color:rgba(0,200,255,.85);
+    border:1px solid rgba(0,200,255,.3); border-radius:999px; padding:7px 18px; background:rgba(6,10,20,.6);
+  }
+  /* 捲動軌道：高度 = 進度長度（三服務）。sticky-stage 釘在畫面中、卡片在裡面堆疊推進 */
+  .scroll-track{ position:relative; z-index:2; width:100%; }
+  .sticky-stage{ position:sticky; top:0; height:100vh; width:100%; }
+  /* slot：隱形量尺，只用來告訴 WebGL 玻璃「聚光位」在哪、多大（固定置中、不隨捲動移動） */
+  .slot{ position:absolute; left:50%; top:50%; width:var(--cardW); height:var(--cardH);
+    transform:translate(-50%,-50%); visibility:hidden; pointer-events:none; }
+  .deck{ position:absolute; inset:0; }
+  .html-card{ position:absolute; left:50%; top:50%; width:var(--cardW); height:var(--cardH);
+    margin-left:calc(var(--cardW) / -2); margin-top:calc(var(--cardH) / -2);
+    border-radius:var(--cardRadius); overflow:hidden; pointer-events:none;
+    transform-origin:center center; will-change:transform,opacity; backface-visibility:hidden;
+    background:transparent;
+  }
+  /* 後方堆疊卡：半透明玻璃殼（只有邊與淡光、不占字、不擋住前卡的真玻璃）→ 透出來像疊著的玻璃片 */
+  .html-card:not(.is-front){
+    background:linear-gradient(158deg, rgba(110,150,255,.055), rgba(70,110,230,.022));
+    box-shadow:inset 0 0 0 1px rgba(150,185,255,.30), inset 0 1px 0 rgba(195,218,255,.32), 0 22px 55px rgba(0,0,0,.42);
+  }
+  /* 非前卡：藏掉內文，只留玻璃殼當「堆疊厚度」 */
+  .html-card:not(.is-front) .content,
+  .html-card:not(.is-front) .codebar,
+  .html-card:not(.is-front) .ghost,
+  .html-card:not(.is-front) .grain{ opacity:0; }
+  .html-card .content,.html-card .codebar,.html-card .ghost,.html-card .grain{ transition:opacity .4s ease; }
+  /* 最前卡：透明無底，讓 WebGL 打光玻璃透出來當卡面 + 顯示內文 */
+  .html-card.is-front{ background:transparent; box-shadow:none; }
+  /* .html-card::before 已移除：每個角不同色的人工光暈（左上白/右上青/右下藍）是「邊角怪」的來源，
+     且 HTML 高光與後方 WebGL 玻璃邊兩套會錯位。邊角光統一交給玻璃 Fresnel + envMap。 */
+  .topline{ display:none; }
+  .ghost{ position:absolute; right:-4%; bottom:-22%; z-index:2; font-family:"Noto Serif TC",serif; font-weight:700;
+    font-size:min(38vw,420px); line-height:.8; color:rgba(225,235,255,.07); user-select:none; pointer-events:none; letter-spacing:-.02em;
+  }
+  .grain{ position:absolute; left:0; top:0; width:32%; height:100%; z-index:3; opacity:.055; pointer-events:none;
+    font-family:"JetBrains Mono",monospace; font-size:12px; line-height:2; color:rgb(var(--blue)); white-space:pre; overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 50%,transparent 100%); mask-image:linear-gradient(90deg,#000 0%,#000 50%,transparent 100%);
+  }
+  .codebar{ position:absolute; top:0; left:0; right:0; z-index:5; padding:13px 26px; border-bottom:1px solid rgba(225,235,255,.05); opacity:.72; }
+  .codebar .cpath{ font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:rgba(225,235,255,.42); }
+  .content{ position:relative; z-index:5; width:100%; height:100%; padding:54px 64px 50px; display:flex; flex-direction:row; align-items:center; gap:clamp(36px,5vw,68px); }
+  .content::before{ content:''; position:absolute; left:0; top:28px; bottom:26px; width:54%; z-index:-1; pointer-events:none;
+    background:linear-gradient(90deg, rgba(5,13,46,.26), rgba(5,13,46,.12) 52%, transparent 100%);
+  }
+  .lead{ flex:1 1 50%; min-width:0; }
+  .klab{ font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.26em; color:rgba(var(--gold),.82); }
+  .knum{ position:absolute; top:36px; right:58px; font-family:"Italiana",serif; font-size:54px; color:rgba(var(--gold),.15); line-height:1; }
+  .ztitle{ font-family:"Noto Serif TC",serif; font-weight:700; font-size:clamp(2.1rem,4vw,3.2rem); color:rgba(225,235,255,.97); margin:16px 0 8px; line-height:1.12; letter-spacing:.02em; text-shadow:0 2px 18px rgba(0,0,0,.35); }
+  .zen{ font-family:"Italiana",serif; font-size:1.18rem; color:rgba(210,222,245,.5); letter-spacing:.04em; text-shadow:0 1px 1px rgba(2,8,22,.75); }
+  .zsub{ margin-top:14px; font-size:.92rem; line-height:1.65; color:rgba(225,235,255,.6); max-width:34ch; text-shadow:0 1px 1px rgba(2,8,22,.72); }
+  .svccol{ flex:0 0 40%; }
+  .svc-head{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:rgba(var(--gold),.72); margin-bottom:26px; }
+  .svc{ list-style:none; margin:0; }
+  .svc li{ position:relative; margin-bottom:26px; }
+  .svc li:last-child{ margin-bottom:0; }
+  .svc li::before{ content:''; display:block; width:22px; height:1px; background:rgba(var(--gold),.5); margin-bottom:12px; }
+  .svc li .sn{ display:block; font-family:"Noto Serif TC",serif; font-size:1.12rem; color:rgba(225,235,255,.97); letter-spacing:.01em; }
+  .svc li .sd{ display:block; margin-top:5px; font-size:.8rem; line-height:1.55; color:rgba(225,235,255,.55); white-space:normal; text-shadow:0 1px 1px rgba(2,8,22,.72); }
+
+  .panel{ position:fixed; right:0; top:0; bottom:0; width:230px; z-index:40; overflow-y:auto;
+    background:rgba(6,10,20,.9); backdrop-filter:blur(8px); border-left:1px solid rgba(225,235,255,.1);
+    padding:16px 16px 40px; font-family:"JetBrains Mono",monospace; font-size:10.5px; color:rgba(225,235,255,.8);
+  }
+  .panel h4{ font-size:11px; letter-spacing:.16em; margin-bottom:14px; color:rgba(0,200,255,.95); font-weight:500; }
+  .row{ margin:12px 0; }
+  .row label{ display:flex; justify-content:space-between; margin-bottom:4px; gap:10px; }
+  .row b{ color:rgba(0,200,255,.95); font-weight:500; }
+  .row input{ width:100%; accent-color:var(--cyan); }
+  .dump{ margin-top:14px; padding:10px; border-radius:6px; background:rgba(0,0,0,.45); border:1px solid rgba(225,235,255,.1);
+    font-size:9px; line-height:1.55; color:rgba(170,225,255,.85); white-space:pre-wrap;
+  }
+  @media (max-width:760px){
+    .panel{ width:100%; height:188px; top:auto; left:0; border-left:0; border-top:1px solid rgba(225,235,255,.1); }
+    .stage{ align-items:flex-start; padding-top:80px; }
+    .svc li{ display:block; }
+    .svc li .sd{ display:block; margin:4px 0 0; white-space:normal; }
+  }
+</style>
+</head>
+<body>
+  <canvas id="webgl" aria-hidden="true"></canvas>
+  <div class="badge">三服務堆疊版　·　捲動切換　·　按 H 隱藏面板</div>
+
+  <div class="scroll-track" id="scrollTrack">
+    <div class="sticky-stage">
+      <div class="slot" id="htmlCard"></div>
+      <div class="deck" id="deck"></div>
+    </div>
+  </div>
+
+  <aside class="panel">
+    <h4>WebGL 厚玻璃 · 拉軸</h4>
+    <div class="rows"></div>
+    <div class="dump" id="dump"></div>
+  </aside>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
+import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+
+const urlParams=new URLSearchParams(window.location.search);
+const QA_MODE=urlParams.get('qa')==='1';
+const PARAMS=[
+  {k:'thickness', name:'玻璃厚度', min:0.2, max:4.5, step:0.05},
+  {k:'ior', name:'折射率', min:1.05, max:2.2, step:0.01},
+  {k:'roughness', name:'表面粗糙度', min:0, max:0.3, step:0.005},
+  {k:'transmission', name:'透射度', min:0, max:1, step:0.01},
+  {k:'bevelPx', name:'導角大小', min:4, max:40, step:1, suf:'px'},
+  {k:'fresnelPower', name:'邊緣光強度', min:1.2, max:6.0, step:0.05},
+  {k:'envMapIntensity', name:'環境反射強度', min:0, max:5, step:0.05},
+  {k:'bloomStrength', name:'泛光強度', min:0, max:2.4, step:0.02},
+  {k:'tiltX', name:'上下傾角', min:-24, max:24, step:1, suf:'deg'},
+  {k:'tiltY', name:'左右傾角', min:-24, max:24, step:1, suf:'deg'}
+];
+const LIGHTS=[
+  {id:'key', name:'主光', color:0xf6fbff, size:2.4, defaults:{azimuth:13,elevation:80,distance:6.05,intensity:32}},
+  {id:'top', name:'頂光', color:0xdfeaff, size:1.45, defaults:{azimuth:65,elevation:8,distance:8,intensity:134}},
+  {id:'rim', name:'邊光', color:0x9edcff, size:1.75, defaults:{azimuth:70,elevation:34,distance:6,intensity:157}},
+  {id:'back', name:'背光', color:0xb8ccff, size:2.1, defaults:{azimuth:270,elevation:35,distance:4.7,intensity:39}}
+];
+const LIGHT_CONTROLS=[
+  {prop:'azimuth', label:'方位角', min:0, max:360, step:1, suf:'deg'},
+  {prop:'elevation', label:'高度角', min:-80, max:80, step:1, suf:'deg'},
+  {prop:'distance', label:'距離', min:2, max:8, step:0.05},
+  {prop:'intensity', label:'強度', min:0, max:360, step:1}
+];
+const state={ thickness:1.55, ior:1.05, roughness:0.06, dispersion:0.26, tiltX:9, tiltY:-12, transmission:1, envMapIntensity:1.2, bloomStrength:0, fresnelPower:2.25, bevelPx:16 };
+for(const spec of LIGHTS){
+  for(const prop in spec.defaults) state[spec.id+'_'+prop]=spec.defaults[prop];
+}
+const STAR_RAIN_GLOW=0.9;
+const root=document.documentElement;
+const dump=document.getElementById('dump');
+const htmlCard=document.getElementById('htmlCard');
+const wrap=document.querySelector('.panel .rows');
+const GRAIN=['const nest = createStudio()','export default function App(){','return <Section/>','await build(idea)','if(ready) ship()','render(art, code)','while(true){ create() }'].join('\n').repeat(8);
+
+/* 三張服務卡內容（對齊 CLAUDE.md B 類本質：軟體開發本業；客製系統描述避開「流程自動化」措辭、不與 G 類採集混淆） */
+const CARDS=[
+  { i:'01', cpath:'WEB ARCHITECTURE', klab:'// WEB DEVELOPMENT', title:'網站架設', en:'Your digital front door.',
+    sub:'從一頁式門面到企業電商，依需求量身打造，不套公版。', ghost:'網',
+    svc:[['形象 / 一頁式官網','乾淨俐落的數位門面'],['電商 / 會員整合','線上販售與會員經營'],['客製整合站','特殊流程、活動、訂閱']] },
+  { i:'02', cpath:'CUSTOM SYSTEM', klab:'// SYSTEM DEVELOPMENT', title:'客製化系統開發', en:'Built around how you work.',
+    sub:'現成軟體框不住的需求，從零打造只屬於你的系統。', ghost:'系',
+    svc:[['內部管理後台','訂單、客戶、庫存一站管理'],['系統串接整合','打通既有工具與金流物流'],['資料庫 / 報表系統','數據集中、決策看得見']] },
+  { i:'03', cpath:'DIGITAL STRATEGY', klab:'// TRANSFORMATION', title:'數位轉型顧問', en:'Strategy before tooling.',
+    sub:'不急著買工具，先把數位這條路怎麼走想清楚。', ghost:'轉',
+    svc:[['數位策略診斷','盤點現況、找出卡點'],['工具導入規劃','選對工具、不花冤枉錢'],['團隊數位賦能','讓人跟得上系統']] }
+];
+const deck=document.getElementById('deck');
+const cardEls=CARDS.map((c,idx)=>{
+  const el=document.createElement('article');
+  el.className='html-card';
+  el.dataset.i=idx;
+  el.innerHTML=
+    '<div class="ghost">'+c.ghost+'</div>'+
+    '<div class="grain"></div>'+
+    '<div class="codebar"><span class="cpath">'+c.cpath+'</span></div>'+
+    '<div class="content">'+
+      '<span class="knum">'+c.i+'</span>'+
+      '<div class="lead">'+
+        '<p class="klab">'+c.klab+'</p>'+
+        '<h3 class="ztitle">'+c.title+'</h3>'+
+        '<p class="zen">'+c.en+'</p>'+
+        '<p class="zsub">'+c.sub+'</p>'+
+      '</div>'+
+      '<div class="svccol">'+
+        '<p class="svc-head">服務範疇</p>'+
+        '<ul class="svc">'+c.svc.map(s=>'<li><span class="sn">'+s[0]+'</span><span class="sd">'+s[1]+'</span></li>').join('')+'</ul>'+
+      '</div>'+
+    '</div>';
+  el.querySelector('.grain').textContent=GRAIN;
+  deck.appendChild(el);
+  return el;
+});
+
+function getLightPosition(spec){
+  const az=THREE.MathUtils.degToRad(((state[spec.id+'_azimuth']%360)+360)%360);
+  const el=THREE.MathUtils.degToRad(state[spec.id+'_elevation']);
+  const distance=state[spec.id+'_distance'];
+  const horizontal=Math.cos(el)*distance;
+  return {
+    x:Math.sin(az)*horizontal,
+    y:Math.sin(el)*distance,
+    z:Math.cos(az)*horizontal
+  };
+}
+
+for(const p of PARAMS){
+  const row=document.createElement('div');
+  row.className='row';
+  row.innerHTML='<label><span>'+p.name+'</span><b id="v_'+p.k+'">'+state[p.k]+(p.suf||'')+'</b></label>'+
+    '<input type="range" min="'+p.min+'" max="'+p.max+'" step="'+p.step+'" value="'+state[p.k]+'" data-k="'+p.k+'">';
+  const inp=row.querySelector('input');
+  inp.oninput=()=>{
+    const v=parseFloat(inp.value);
+    state[p.k]=v;
+    document.getElementById('v_'+p.k).textContent=v+(p.suf||'');
+    applyState();
+  };
+  wrap.appendChild(row);
+}
+
+for(const spec of LIGHTS){
+  const title=document.createElement('h4');
+  title.textContent=spec.name;
+  title.style.marginTop='18px';
+  wrap.appendChild(title);
+  for(const ctrl of LIGHT_CONTROLS){
+    const k=spec.id+'_'+ctrl.prop;
+    const row=document.createElement('div');
+    row.className='row';
+    row.innerHTML='<label><span>'+spec.name+'-'+ctrl.label+'</span><b id="v_'+k+'">'+state[k]+(ctrl.suf||'')+'</b></label>'+
+      '<input type="range" min="'+ctrl.min+'" max="'+ctrl.max+'" step="'+ctrl.step+'" value="'+state[k]+'" data-k="'+k+'">';
+    const inp=row.querySelector('input');
+    inp.oninput=()=>{
+      const v=parseFloat(inp.value);
+      state[k]=v;
+      document.getElementById('v_'+k).textContent=v+(ctrl.suf||'');
+      applyState();
+      refreshStudioEnvMap();
+    };
+    wrap.appendChild(row);
+  }
+}
+
+const canvas=document.getElementById('webgl');
+const renderer=new THREE.WebGLRenderer({ canvas, antialias:true, alpha:false, powerPreference:'high-performance' });
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=0.62;
+renderer.useLegacyLights=false;
+RectAreaLightUniformsLib.init();
+const STAR_CANVAS_MAX_WIDTH=1280;
+const STAR_CANVAS_MAX_HEIGHT=900;
+const BLOOM_RESOLUTION_SCALE=0.5;
+const TARGET_FRAME_MS=1000/30;
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x050d2e);
+const camera=new THREE.PerspectiveCamera(34, 1, 0.1, 100);
+camera.position.set(0,0,8.1);
+
+const pmremGenerator=new THREE.PMREMGenerator(renderer);
+let studioEnvRT=null;
+function makeStudioEnvMap(){
+  const envCanvas=document.createElement('canvas');
+  envCanvas.width=1024;
+  envCanvas.height=512;
+  const ctx=envCanvas.getContext('2d');
+  const base=ctx.createLinearGradient(0,0,0,512);
+  base.addColorStop(0,'#071331');
+  base.addColorStop(0.45,'#050d2e');
+  base.addColorStop(1,'#01030b');
+  ctx.fillStyle=base;
+  ctx.fillRect(0,0,1024,512);
+
+  ctx.globalCompositeOperation='screen';
+  for(const spec of LIGHTS){
+    const pos=getLightPosition(spec);
+    const size=THREE.MathUtils.clamp(spec.size,0.55,4.2);
+    const strength=THREE.MathUtils.clamp(state[spec.id+'_intensity']/180,0,1);
+    const x=512+pos.x*82;
+    const y=260-pos.y*86+pos.z*-14;
+    const w=120+size*92;
+    const h=70+size*48;
+    const radius=Math.max(w,h)*0.95;
+    const cg=ctx.createRadialGradient(x,y,0,x,y,radius);
+    cg.addColorStop(0,'rgba(255,255,255,'+(0.018+strength*0.055)+')');
+    cg.addColorStop(0.34,'rgba(232,244,255,'+(0.012+strength*0.038)+')');
+    cg.addColorStop(0.72,'rgba(120,190,255,'+(strength*0.018)+')');
+    cg.addColorStop(1,'rgba(0,200,255,0)');
+    ctx.fillStyle=cg;
+    ctx.fillRect(x-radius,y-radius,radius*2,radius*2);
+
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate(spec.id==='rim' ? -0.1 : spec.id==='back' ? 0.16 : 0);
+    ctx.scale(1, h/w);
+    const soft=ctx.createRadialGradient(0,0,0,0,0,w*0.54);
+    soft.addColorStop(0,'rgba(255,255,255,'+(0.016+strength*0.050)+')');
+    soft.addColorStop(0.30,'rgba(232,244,255,'+(0.011+strength*0.034)+')');
+    soft.addColorStop(0.68,'rgba(120,190,255,'+(strength*0.014)+')');
+    soft.addColorStop(1,'rgba(0,200,255,0)');
+    ctx.fillStyle=soft;
+    ctx.beginPath();
+    ctx.arc(0,0,w*0.54,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.globalCompositeOperation='source-over';
+
+  const envTex=new THREE.CanvasTexture(envCanvas);
+  envTex.mapping=THREE.EquirectangularReflectionMapping;
+  envTex.colorSpace=THREE.SRGBColorSpace;
+  if(studioEnvRT) studioEnvRT.dispose();
+  studioEnvRT=pmremGenerator.fromEquirectangular(envTex);
+  envTex.dispose();
+  return studioEnvRT.texture;
+}
+scene.environment=makeStudioEnvMap();
+function refreshStudioEnvMap(){
+  scene.environment=makeStudioEnvMap();
+  if(typeof glassMat!=='undefined') glassMat.needsUpdate=true;
+  if(typeof edgeMat!=='undefined') edgeMat.needsUpdate=true;
+  requestSceneRender();
+}
+
+const composer=new EffectComposer(renderer);
+const renderPass=new RenderPass(scene,camera);
+composer.addPass(renderPass);
+const bloomPass=new UnrealBloomPass(new THREE.Vector2(window.innerWidth*BLOOM_RESOLUTION_SCALE, window.innerHeight*BLOOM_RESOLUTION_SCALE), state.bloomStrength, 0.28, 0.85);
+composer.addPass(bloomPass);
+const smaaPass=new SMAAPass(window.innerWidth*renderer.getPixelRatio(), window.innerHeight*renderer.getPixelRatio());
+composer.addPass(smaaPass);
+
+const starCanvas=document.createElement('canvas');
+const starCtx=starCanvas.getContext('2d');
+const starTexture=new THREE.CanvasTexture(starCanvas);
+starTexture.colorSpace=THREE.SRGBColorSpace;
+starTexture.wrapS=THREE.ClampToEdgeWrapping;
+starTexture.wrapT=THREE.ClampToEdgeWrapping;
+starTexture.minFilter=THREE.LinearFilter;
+starTexture.magFilter=THREE.LinearFilter;
+
+const bgMat=new THREE.MeshBasicMaterial({ map:starTexture, toneMapped:false });
+const bgPlane=new THREE.Mesh(new THREE.PlaneGeometry(9.6, 10.8, 1, 1), bgMat);
+bgPlane.position.z=-3.0;
+scene.add(bgPlane);
+
+const studioGroup=new THREE.Group();
+scene.add(studioGroup);
+const wallMat=new THREE.MeshBasicMaterial({ color:0x050d2e, side:THREE.DoubleSide, transparent:true, opacity:0.88, toneMapped:false });
+const floorMat=new THREE.MeshBasicMaterial({ color:0x030817, transparent:true, opacity:0.92, toneMapped:false });
+function addStudioPlane(w,h,mat,pos,rot){
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,h,1,1),mat);
+  mesh.position.set(pos.x,pos.y,pos.z);
+  mesh.rotation.set(rot.x,rot.y,rot.z);
+  studioGroup.add(mesh);
+  return mesh;
+}
+addStudioPlane(10.5,7.2,floorMat,{x:0,y:-2.05,z:0.05},{x:-Math.PI/2,y:0,z:0});
+addStudioPlane(10.5,5.8,wallMat,{x:0,y:0.35,z:-2.55},{x:0,y:0,z:0});
+addStudioPlane(5.8,5.4,wallMat,{x:-4.4,y:0.22,z:-0.05},{x:0,y:Math.PI/2,z:0});
+addStudioPlane(5.8,5.4,wallMat,{x:4.4,y:0.22,z:-0.05},{x:0,y:-Math.PI/2,z:0});
+
+const glassGroup=new THREE.Group();
+scene.add(glassGroup);
+const studioLights={};
+function createStudioLight(spec){
+  const softboxSize=Math.max(0.55,spec.size);
+  const light=new THREE.RectAreaLight(spec.color, spec.defaults.intensity, softboxSize, softboxSize);
+  studioGroup.add(light);
+  studioLights[spec.id]={light,spec};
+}
+function aimAtCard(obj){
+  obj.lookAt(0,0,0);
+}
+for(const spec of LIGHTS) createStudioLight(spec);
+
+const GLASS_BEVEL_SEGMENTS=64;
+let GLASS_BEVEL_PX=16;
+
+function smoothRoundedBoxGeometry(width,height,depth,segments,radius){
+  const geo=new RoundedBoxGeometry(width,height,depth,segments,radius);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+let glassGeo=smoothRoundedBoxGeometry(1, 1, 0.1, GLASS_BEVEL_SEGMENTS, 0.05);
+const glassMat=new THREE.MeshPhysicalMaterial({
+  color:0xeaf3ff,
+  metalness:0,
+  roughness:state.roughness,
+  transmission:state.transmission,
+  thickness:state.thickness,
+  ior:state.ior,
+  dispersion:state.dispersion,
+  clearcoat:0.72,
+  clearcoatRoughness:0.08,
+  envMapIntensity:state.envMapIntensity,
+  attenuationColor:new THREE.Color(0xacc6ff),
+  attenuationDistance:6.5,
+  transparent:true,
+  opacity:1
+});
+const glass=new THREE.Mesh(glassGeo, glassMat);
+glassGroup.add(glass);
+
+let edgeGeo=smoothRoundedBoxGeometry(1, 1, 0.1, GLASS_BEVEL_SEGMENTS, 0.05);
+const edgeMat=new THREE.MeshPhysicalMaterial({
+  color:0xf8fbff,
+  roughness:0.006,
+  transmission:0.66,
+  thickness:1.25,
+  ior:1.62,
+  dispersion:0.62,
+  clearcoat:1,
+  clearcoatRoughness:0.012,
+  envMapIntensity:4.2,
+  transparent:true,
+  opacity:0.19,
+  side:THREE.FrontSide
+});
+const edgeGlow=new THREE.Mesh(edgeGeo, edgeMat);
+edgeGlow.scale.set(1.004,1.004,1.004);
+glassGroup.add(edgeGlow);
+
+let fresnelGeo=smoothRoundedBoxGeometry(1, 1, 0.1, GLASS_BEVEL_SEGMENTS, 0.05);
+const fresnelMat=new THREE.ShaderMaterial({
+  uniforms:{
+    uPower:{ value:state.fresnelPower },
+    uStrength:{ value:1.28 },
+    uCornerBoost:{ value:2.4 },
+    uHalfSize:{ value:new THREE.Vector2(0.5,0.5) },
+    uColorA:{ value:new THREE.Color(0xe8f0ff) },
+    uColorB:{ value:new THREE.Color(0x00c8ff) }
+  },
+  vertexShader:`
+    varying vec3 vLocalPosition;
+    varying vec3 vWorldNormal;
+    varying vec3 vWorldPosition;
+    void main(){
+      vLocalPosition=position;
+      vec4 worldPosition=modelMatrix*vec4(position,1.0);
+      vWorldPosition=worldPosition.xyz;
+      vWorldNormal=normalize(mat3(modelMatrix)*normal);
+      gl_Position=projectionMatrix*viewMatrix*worldPosition;
+    }
+  `,
+  fragmentShader:`
+    uniform float uPower;
+    uniform float uStrength;
+    uniform float uCornerBoost;
+    uniform vec2 uHalfSize;
+    uniform vec3 uColorA;
+    uniform vec3 uColorB;
+    varying vec3 vLocalPosition;
+    varying vec3 vWorldNormal;
+    varying vec3 vWorldPosition;
+    void main(){
+      vec3 viewDir=normalize(cameraPosition-vWorldPosition);
+      float fresnel=pow(1.0-max(dot(normalize(vWorldNormal),viewDir),0.0),uPower);
+      vec2 edge=abs(vLocalPosition.xy)/max(uHalfSize,vec2(0.001));
+      float corner=smoothstep(0.82,1.0,edge.x)*smoothstep(0.82,1.0,edge.y);
+      vec3 color=mix(uColorA,uColorB,0.22+corner*0.10);
+      gl_FragColor=vec4(color,fresnel*uStrength*(1.0+corner*(uCornerBoost-1.0)*0.7));
+    }
+  `,
+  transparent:true,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false,
+  toneMapped:false
+});
+const fresnelShell=new THREE.Mesh(fresnelGeo,fresnelMat);
+fresnelShell.scale.set(1.004,1.004,1.004);
+glassGroup.add(fresnelShell);
+
+const highlightGroup=new THREE.Group();
+glassGroup.add(highlightGroup);
+const nearSideMat=new THREE.ShaderMaterial({
+  uniforms:{ uColor:{ value:new THREE.Color(0xe8f0ff) }, uAccent:{ value:new THREE.Color(0x00c8ff) }, uOpacity:{ value:0.26 } },
+  vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader:`
+    uniform vec3 uColor;
+    uniform vec3 uAccent;
+    uniform float uOpacity;
+    varying vec2 vUv;
+    void main(){
+      float edgeFade=smoothstep(0.0,0.35,vUv.x)*(1.0-smoothstep(0.72,1.0,vUv.x));
+      float endFade=smoothstep(0.0,0.08,vUv.y)*(1.0-smoothstep(0.92,1.0,vUv.y));
+      float core=smoothstep(0.22,0.58,vUv.x);
+      vec3 color=mix(uColor,uAccent,core*0.18);
+      gl_FragColor=vec4(color,edgeFade*endFade*uOpacity);
+    }
+  `,
+  transparent:true,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false,
+  toneMapped:false
+});
+const farSideMat=nearSideMat.clone();
+farSideMat.uniforms.uOpacity={ value:0.06 };
+const depthPoolMat=new THREE.ShaderMaterial({
+  uniforms:{
+    uColor:{ value:new THREE.Color(0x020816) },
+    uCool:{ value:new THREE.Color(0x07183e) },
+    uOpacity:{ value:0.055 }
+  },
+  vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader:`
+    uniform vec3 uColor;
+    uniform vec3 uCool;
+    uniform float uOpacity;
+    varying vec2 vUv;
+    void main(){
+      vec2 p=vUv-0.5;
+      float oval=1.0-smoothstep(0.20,0.86,length(p*vec2(0.92,1.18)));
+      float edgeDist=min(min(vUv.x,1.0-vUv.x),min(vUv.y,1.0-vUv.y));
+      float edgeRelease=smoothstep(0.03,0.24,edgeDist);
+      float nearSideRelease=smoothstep(0.38,0.98,vUv.x)*smoothstep(0.38,0.98,1.0-vUv.y);
+      float absorption=oval*edgeRelease*(1.0-nearSideRelease*0.18);
+      vec3 color=mix(uColor,uCool,smoothstep(0.25,0.72,vUv.y)*0.22);
+      gl_FragColor=vec4(color,absorption*uOpacity);
+    }
+  `,
+  transparent:true,
+  depthWrite:false,
+  toneMapped:false
+});
+
+function rebuildHighlightLayer(w,h,r,d,unit){
+  while(highlightGroup.children.length){
+    const child=highlightGroup.children.pop();
+    child.geometry.dispose();
+  }
+  const z=d/2+unit*2;
+  const nearStrip=Math.max(unit*18, d*0.36);
+  const farStrip=Math.max(unit*9, d*0.16);
+
+  /* 移除 nearSide(右+下) / farSide(左+上) 假厚邊高光面板：那條白色「大倒角」是人工貼的，
+     厚邊感改交給玻璃幾何倒角 + Fresnel + envMap 反射自然呈現 */
+
+  const pool=new THREE.Mesh(new THREE.PlaneGeometry(w*0.94,h*0.90,1,1),depthPoolMat);
+  pool.position.set(0,0,z+unit*0.8);
+  highlightGroup.add(pool);
+
+  /* 邊緣受光只交給 Fresnel shell + 玻璃材質自然呈現，不使用描線型高光 */
+}
+
+/* 直接點光/方向光會在圓角倒角 facet 上打出段狀 specular；玻璃反射改由連續 envMap 承擔。 */
+
+const CODE=[
+  'const nest = createStudio()','export default function App() {','<section class="services">',
+  'router.get("/api/orders", fn)','await db.clients.findMany()','npm run build && deploy',
+  'return <Card {...props} />','useEffect(() => render(), [])','if (user.ready) launch()',
+  'SELECT * FROM orders;','transform: translateY(-4px)','git commit -m "ship it"'
+];
+const hash=(a,b)=>{ const x=Math.sin(a*127.1+b*311.7)*43758.5453; return x-Math.floor(x); };
+const smoothstep=(a,b,x)=>{ const t=Math.max(0,Math.min(1,(x-a)/(b-a))); return t*t*(3-2*t); };
+const drops=Array.from({length:34},(_,i)=>({
+  spd:0.085+hash(i,1)*0.11,
+  ph:hash(i,2)*1.8,
+  sz:18+(hash(i,4)*7|0),
+  ye:hash(i,5)<0.12,
+  cy:hash(i,6)<0.32
+}));
+let starW=1, starH=1, viewW=1, viewH=1, cardRect={left:0,right:0,top:0,bottom:0};
+let rafId=0;
+let lastFrameTime=0;
+let needsRender=true;
+let qaFramesRemaining=QA_MODE ? 8 : 0;
+
+function requestSceneRender(){
+  needsRender=true;
+  if((QA_MODE || !document.hidden) && !rafId){
+    rafId=requestAnimationFrame(loop);
+  }
+}
+
+function rebuildGlassGeometry(){
+  const rect=htmlCard.getBoundingClientRect();
+  if(!rect.width || !rect.height || !viewH) return;
+  const cameraDist=Math.abs(camera.position.z-glassGroup.position.z);
+  const fovRad=THREE.MathUtils.degToRad(camera.fov);
+  const unitsPerPx=(2*cameraDist*Math.tan(fovRad/2))/viewH;
+  const w=rect.width*unitsPerPx;
+  const h=rect.height*unitsPerPx;
+  const r=GLASS_BEVEL_PX*unitsPerPx;
+  const d=112*unitsPerPx;
+  const edgePad=3*unitsPerPx;
+  const nextGlassGeo=smoothRoundedBoxGeometry(w, h, d, GLASS_BEVEL_SEGMENTS, r);
+  const nextEdgeGeo=smoothRoundedBoxGeometry(w+edgePad, h+edgePad, d+(2*unitsPerPx), GLASS_BEVEL_SEGMENTS, r+unitsPerPx*1.2);
+  const nextFresnelGeo=smoothRoundedBoxGeometry(w+edgePad*0.55, h+edgePad*0.55, d+(unitsPerPx*1.5), GLASS_BEVEL_SEGMENTS, r+unitsPerPx*0.9);
+  fresnelMat.uniforms.uHalfSize.value.set((w+edgePad*0.55)*0.5,(h+edgePad*0.55)*0.5);
+  rebuildHighlightLayer(w,h,r,d,unitsPerPx);
+
+  glass.geometry.dispose();
+  edgeGlow.geometry.dispose();
+  fresnelShell.geometry.dispose();
+  glass.geometry=nextGlassGeo;
+  edgeGlow.geometry=nextEdgeGeo;
+  fresnelShell.geometry=nextFresnelGeo;
+  glassGeo=nextGlassGeo;
+  edgeGeo=nextEdgeGeo;
+  fresnelGeo=nextFresnelGeo;
+}
+
+function resize(){
+  const dpr=Math.min(window.devicePixelRatio || 1, 2);
+  viewW=window.innerWidth;
+  viewH=window.innerHeight;
+  renderer.setPixelRatio(dpr);
+  renderer.setSize(viewW, viewH, false);
+  composer.setPixelRatio(dpr);
+  composer.setSize(viewW, viewH);
+  bloomPass.setSize(Math.max(1,Math.floor(viewW*BLOOM_RESOLUTION_SCALE)), Math.max(1,Math.floor(viewH*BLOOM_RESOLUTION_SCALE)));
+  smaaPass.setSize(viewW*dpr, viewH*dpr);
+  camera.aspect=viewW/viewH;
+  camera.updateProjectionMatrix();
+  const starScale=Math.min(1, STAR_CANVAS_MAX_WIDTH/viewW, STAR_CANVAS_MAX_HEIGHT/viewH);
+  starW=Math.max(640, Math.floor(viewW*starScale));
+  starH=Math.max(480, Math.floor(viewH*starScale));
+  starCanvas.width=starW;
+  starCanvas.height=starH;
+  cardRect=htmlCard.getBoundingClientRect();
+  const planeDist=Math.abs(camera.position.z-bgPlane.position.z);
+  const fovRad=THREE.MathUtils.degToRad(camera.fov);
+  const planeH=2*planeDist*Math.tan(fovRad/2);
+  const planeW=planeH*camera.aspect;
+  bgPlane.geometry.dispose();
+  bgPlane.geometry=new THREE.PlaneGeometry(planeW*1.04,planeH*1.04,1,1);
+  rebuildGlassGeometry();
+  requestSceneRender();
+}
+window.addEventListener('resize', resize);
+window.addEventListener('keydown', e=>{ if(e.key==='h'||e.key==='H'){ const p=document.querySelector('.panel'); if(p) p.style.display=(p.style.display==='none'?'':'none'); } });
+
+function drawStarRain(time){
+  const sx=starW/viewW, sy=starH/viewH;
+  const ctx=starCtx;
+  ctx.setTransform(1,0,0,1,0,0);
+  const bg=ctx.createLinearGradient(0,0,starW,starH);
+  bg.addColorStop(0,'#061036');
+  bg.addColorStop(0.46,'#050d2e');
+  bg.addColorStop(1,'#03081f');
+  ctx.fillStyle=bg;
+  ctx.fillRect(0,0,starW,starH);
+
+  let rg=ctx.createRadialGradient(starW*.78, -starH*.08, 0, starW*.78, -starH*.08, starW*.64);
+  rg.addColorStop(0,'rgba(70,100,210,.34)');
+  rg.addColorStop(.52,'rgba(40,70,160,.18)');
+  rg.addColorStop(1,'rgba(40,70,160,0)');
+  ctx.fillStyle=rg;
+  ctx.fillRect(0,0,starW,starH);
+  rg=ctx.createRadialGradient(starW*.12, starH*1.08, 0, starW*.12, starH*1.08, starW*.56);
+  rg.addColorStop(0,'rgba(35,60,150,.25)');
+  rg.addColorStop(1,'rgba(35,60,150,0)');
+  ctx.fillStyle=rg;
+  ctx.fillRect(0,0,starW,starH);
+
+  const rcPx=cardRect;
+  if(rcPx.width && rcPx.height){
+    const shadowCx=(rcPx.left+rcPx.width*.56)*sx;
+    const shadowCy=(rcPx.bottom+16)*sy;
+    const shadowW=rcPx.width*sx*.42;
+    const shadowH=Math.max(18*sy,rcPx.height*sy*.075);
+    const shadow=ctx.createRadialGradient(shadowCx,shadowCy,0,shadowCx,shadowCy,shadowW);
+    shadow.addColorStop(0,'rgba(0,0,0,0.30)');
+    shadow.addColorStop(0.42,'rgba(1,6,20,0.22)');
+    shadow.addColorStop(1,'rgba(1,6,20,0)');
+    ctx.save();
+    ctx.fillStyle=shadow;
+    ctx.beginPath();
+    ctx.ellipse(shadowCx,shadowCy,shadowW,shadowH,0,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    const reflect=ctx.createRadialGradient(shadowCx,shadowCy-8*sy,0,shadowCx,shadowCy-8*sy,shadowW*.74);
+    reflect.addColorStop(0,'rgba(0,200,255,0.055)');
+    reflect.addColorStop(0.48,'rgba(232,240,255,0.035)');
+    reflect.addColorStop(1,'rgba(0,200,255,0)');
+    ctx.save();
+    ctx.fillStyle=reflect;
+    ctx.beginPath();
+    ctx.ellipse(shadowCx,shadowCy-8*sy,shadowW*.74,shadowH*.72,0,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  if(rcPx.width && rcPx.height && STAR_RAIN_GLOW>0){
+    const cx=(rcPx.left+rcPx.width*.55)*sx;
+    const cy=(rcPx.top+rcPx.height*.46)*sy;
+    const pocket=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(rcPx.width*sx*.38, rcPx.height*sy*.56));
+    pocket.addColorStop(0,'rgba(232,240,255,'+(0.28*STAR_RAIN_GLOW)+')');
+    pocket.addColorStop(0.30,'rgba(190,226,255,'+(0.15*STAR_RAIN_GLOW)+')');
+    pocket.addColorStop(0.62,'rgba(0,200,255,'+(0.06*STAR_RAIN_GLOW)+')');
+    pocket.addColorStop(1,'rgba(0,200,255,0)');
+    ctx.fillStyle=pocket;
+    /* 光暈夾在卡片範圍內、只略溢出邊緣，不再往下撐成一坨 */
+    ctx.fillRect((rcPx.left-40)*sx,(rcPx.top-45)*sy,(rcPx.width+80)*sx,(rcPx.height+80)*sy);
+  }
+
+  if(rcPx.width && rcPx.height){
+    ctx.save();
+    const rawLeft=rcPx.left*sx, rawTop=rcPx.top*sy, rawRight=rcPx.right*sx, rawBottom=rcPx.bottom*sy;
+    const safeInsetX=Math.max(34*sx,rcPx.width*sx*.075);
+    const safeInsetTop=Math.max(34*sy,rcPx.height*sy*.085);
+    const safeInsetBottom=Math.max(28*sy,rcPx.height*sy*.065);
+    const safeLeft=rawLeft+safeInsetX;
+    const safeTop=rawTop+safeInsetTop;
+    const safeRight=rawRight-safeInsetX*1.18;
+    const safeBottom=rawBottom-safeInsetBottom;
+    const safeW=safeRight-safeLeft;
+    const safeH=safeBottom-safeTop;
+    if(safeW>0 && safeH>0){
+      ctx.beginPath();
+      if(ctx.roundRect){
+        ctx.roundRect(safeLeft,safeTop,safeW,safeH,Math.max(18*sx,22));
+      }else{
+        ctx.rect(safeLeft,safeTop,safeW,safeH);
+      }
+      ctx.clip();
+
+      const left=safeLeft, top=safeTop, right=safeRight, bottom=safeBottom;
+      const organicCode=[
+        'const view = render(glass)',
+        'shader.uniforms.ior',
+        'await deploy(site)',
+        'return <ServiceCard />',
+        'route.post("/lead")',
+        'cms.render(page)',
+        'build: production',
+        'db.sync(client)'
+      ];
+      ctx.font=Math.max(9,10.5*sx)+'px "JetBrains Mono",monospace';
+      ctx.textAlign='left';
+      ctx.textBaseline='middle';
+      for(let i=0;i<24;i++){
+        const px=left+safeW*(0.08+hash(i,31)*0.84);
+        const py=top+safeH*(0.08+hash(i,47)*0.84);
+        const len=0.45+hash(i,59)*0.55;
+        const alpha=(0.13+hash(i,71)*0.16)*STAR_RAIN_GLOW;
+        const cyan=hash(i,83)>0.58;
+        ctx.save();
+        ctx.translate(px,py);
+        ctx.rotate((-0.14+hash(i,97)*0.28));
+        ctx.fillStyle=cyan?'rgba(0,200,255,'+alpha+')':'rgba(232,240,255,'+alpha+')';
+        ctx.fillText(organicCode[(i*3)%organicCode.length].slice(0,Math.floor(10+len*16)),0,0);
+        ctx.restore();
+      }
+    }
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.scale(sx, sy);
+  ctx.textBaseline='middle';
+  const rc=cardRect;
+  for(let i=0;i<drops.length;i++){
+    const d=drops[i];
+    const raw=time*d.spd+d.ph;
+    const cyc=Math.floor(raw/1.8);
+    const prog=raw%1.8-0.25;
+    if(prog<0) continue;
+    const code=CODE[(i*5+cyc)%CODE.length];
+    ctx.font=d.sz+'px "JetBrains Mono",monospace';
+    const w=ctx.measureText(code).width;
+    const x=16+Math.floor(hash(i,cyc*9+5)*(viewW-32));
+    const tipY=prog*viewH;
+    const inside=x>=rc.left && x<=rc.right && tipY>=rc.top && tipY<=rc.bottom;
+    const base=d.ye?'232,240,255':(d.cy || inside?'0,200,255':'150,170,220');
+    const topEdgeFade=inside ? smoothstep(0, 54, tipY-rc.top) : 1;
+    ctx.save();
+    ctx.translate(x,tipY);
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign='left';
+    const g=ctx.createLinearGradient(0,0,w,0);
+    const hotAlpha=Math.min(1,(inside?0.98:0.92)+0.08*STAR_RAIN_GLOW)*topEdgeFade;
+    const trailAlpha=Math.min(1,(inside?0.95:0.86)+0.12*STAR_RAIN_GLOW)*topEdgeFade;
+    g.addColorStop(0,'rgba(232,240,255,'+hotAlpha+')');
+    g.addColorStop(0.1,'rgba('+base+','+trailAlpha+')');
+    g.addColorStop(1,'rgba('+base+',0)');
+    ctx.fillStyle=g;
+    ctx.fillText(code,0,0);
+    ctx.restore();
+  }
+  ctx.restore();
+  starTexture.needsUpdate=true;
+}
+
+function applyState(){
+  root.style.setProperty('--tiltX', state.tiltX);
+  root.style.setProperty('--tiltY', state.tiltY);
+  glassMat.thickness=state.thickness;
+  glassMat.ior=state.ior;
+  glassMat.roughness=state.roughness;
+  glassMat.dispersion=state.dispersion;
+  glassMat.transmission=state.transmission;
+  glassMat.envMapIntensity=state.envMapIntensity;
+  edgeMat.envMapIntensity=state.envMapIntensity*1.45;
+  edgeMat.opacity=0.14;
+  edgeMat.roughness=0.006;
+  edgeMat.clearcoat=1;
+  edgeMat.clearcoatRoughness=0.012;
+  edgeMat.dispersion=0.62;
+  for(const spec of LIGHTS){
+    const kit=studioLights[spec.id];
+    const pos=getLightPosition(spec);
+    const size=Math.max(0.55,spec.size);
+    const intensity=state[spec.id+'_intensity'];
+    kit.light.position.set(pos.x,pos.y,pos.z);
+    kit.light.width=size;
+    kit.light.height=size;
+    kit.light.intensity=intensity;
+    aimAtCard(kit.light);
+  }
+  bloomPass.strength=state.bloomStrength;
+  bloomPass.radius=0.18;
+  bloomPass.threshold=0.92;
+  fresnelMat.uniforms.uPower.value=state.fresnelPower;
+  fresnelMat.uniforms.uStrength.value=0.95;
+  fresnelMat.uniforms.uCornerBoost.value=2.4;
+  glassMat.needsUpdate=true;
+  edgeMat.needsUpdate=true;
+  glassGroup.rotation.x=THREE.MathUtils.degToRad(-state.tiltX);
+  glassGroup.rotation.y=THREE.MathUtils.degToRad(state.tiltY);
+  if(GLASS_BEVEL_PX!==state.bevelPx){ GLASS_BEVEL_PX=state.bevelPx; rebuildGlassGeometry(); }
+  dump.textContent=PARAMS.map(p=>p.k+': '+state[p.k]+(p.suf||'')).join('\n')+
+    '\n\n'+LIGHTS.map(spec=>spec.name+': azimuth '+state[spec.id+'_azimuth']+'deg, elevation '+state[spec.id+'_elevation']+'deg, distance '+state[spec.id+'_distance']+', intensity '+state[spec.id+'_intensity']).join('\n')+
+    '\n\nmaterial: MeshPhysicalMaterial\ntexture: CanvasTexture -> rear plane\npost: UnrealBloomPass\nthree: 0.160.0';
+  requestSceneRender();
+}
+
+/* ===== 堆疊推進：玻璃固定中央聚光位，三張 DOM 卡隨捲動進退 ===== */
+const STACK={ offset:42, scaleStep:0.075, dimStep:0.46, blur:1.1, exit:0.92 };
+const scrollTrack=document.getElementById('scrollTrack');
+scrollTrack.style.height=(100 + (CARDS.length-1)*90)+'vh';   /* 每多一張服務 +90vh 捲動行程 */
+
+function layoutStack(){
+  const trackH=scrollTrack.offsetHeight;
+  const travel=Math.max(1, trackH - window.innerHeight);
+  const top=scrollTrack.getBoundingClientRect().top;
+  const progress=Math.min(1, Math.max(0, -top/travel));
+  const N=CARDS.length;
+  const activeFloat=progress*(N-1);
+  const frontIdx=Math.min(N-1, Math.max(0, Math.round(activeFloat)));
+  for(let idx=0; idx<cardEls.length; idx++){
+    const el=cardEls[idx];
+    const rel=idx-activeFloat;
+    let ty, sc, op, bl, z;
+    if(rel>=0){               /* 前卡(0)與其後堆疊卡 */
+      const r=Math.min(rel, 2.4);
+      ty=r*STACK.offset;
+      sc=1 - r*STACK.scaleStep;
+      op=Math.max(0, 1 - r*STACK.dimStep);
+      bl=r*STACK.blur;
+      z=200 - Math.round(r*10);
+    }else{                    /* 已看完、往上退場的卡 */
+      const t=Math.min(-rel, 1.8);
+      ty=-t*window.innerHeight*STACK.exit;
+      sc=1 + t*0.03;
+      op=Math.max(0, 1 - t*1.7);
+      bl=0;
+      z=210;
+    }
+    el.style.transform='perspective(1700px) translateY('+ty.toFixed(1)+'px) scale('+sc.toFixed(3)+') rotateX(calc(var(--tiltX)*1deg)) rotateY(calc(var(--tiltY)*1deg))';
+    el.style.opacity=op.toFixed(3);
+    el.style.filter=bl>0.02 ? 'blur('+bl.toFixed(2)+'px)' : 'none';
+    el.style.zIndex=z;
+    el.classList.toggle('is-front', idx===frontIdx);
+  }
+}
+let stackTick=false;
+window.addEventListener('scroll', ()=>{
+  if(!stackTick){ stackTick=true; requestAnimationFrame(()=>{ layoutStack(); stackTick=false; }); }
+}, {passive:true});
+window.addEventListener('resize', layoutStack);
+
+/* 堆疊手感拉軸（接在玻璃/燈面板之後） */
+const STACK_CTRL=[
+  {k:'offset', name:'堆疊間距', min:10, max:90, step:1, suf:'px'},
+  {k:'scaleStep', name:'每層縮小', min:0, max:0.16, step:0.005},
+  {k:'dimStep', name:'每層變暗', min:0, max:0.8, step:0.02},
+  {k:'blur', name:'後層模糊', min:0, max:3, step:0.1, suf:'px'},
+  {k:'exit', name:'退場距離', min:0.4, max:1.2, step:0.02}
+];
+const stackTitle=document.createElement('h4');
+stackTitle.textContent='堆疊手感';
+stackTitle.style.marginTop='20px';
+wrap.appendChild(stackTitle);
+for(const p of STACK_CTRL){
+  const row=document.createElement('div');
+  row.className='row';
+  row.innerHTML='<label><span>'+p.name+'</span><b id="sv_'+p.k+'">'+STACK[p.k]+(p.suf||'')+'</b></label>'+
+    '<input type="range" min="'+p.min+'" max="'+p.max+'" step="'+p.step+'" value="'+STACK[p.k]+'">';
+  const inp=row.querySelector('input');
+  inp.oninput=()=>{
+    const v=parseFloat(inp.value);
+    STACK[p.k]=v;
+    document.getElementById('sv_'+p.k).textContent=v+(p.suf||'');
+    layoutStack();
+  };
+  wrap.appendChild(row);
+}
+
+resize();
+applyState();
+layoutStack();
+
+const t0=performance.now();
+function loop(now){
+  rafId=requestAnimationFrame(loop);
+  if(!QA_MODE && document.hidden){
+    cancelAnimationFrame(rafId);
+    rafId=0;
+    return;
+  }
+  const elapsed=now-lastFrameTime;
+  const forceQaFrame=QA_MODE && qaFramesRemaining>0;
+  if(elapsed<TARGET_FRAME_MS && !needsRender && !forceQaFrame) return;
+  lastFrameTime=now-(elapsed%TARGET_FRAME_MS);
+  cardRect=htmlCard.getBoundingClientRect();
+  const t=QA_MODE ? 0.75 : (performance.now()-t0)/1000;
+  drawStarRain(t);
+  composer.render();
+  needsRender=false;
+  if(forceQaFrame){
+    qaFramesRemaining--;
+    needsRender=qaFramesRemaining>0;
+  }
+}
+document.addEventListener('visibilitychange',()=>{
+  if(!QA_MODE && document.hidden){
+    if(rafId){
+      cancelAnimationFrame(rafId);
+      rafId=0;
+    }
+  }else{
+    lastFrameTime=0;
+    requestSceneRender();
+  }
+});
+requestSceneRender();
+</script>
+</body>
+</html>
