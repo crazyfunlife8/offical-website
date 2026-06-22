@@ -189,6 +189,15 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 - **待辦**：① 整進**正式 index.html**（5 層 CSS）② 手機 RWD／效能降階（__fx 已留 `FX` 降階鉤子）。
 - **完整迭代脈絡**（selective bloom／envMap body-edge 拆分／退場淡出怎麼演進、踩過哪些坑）**見 commit `442b261` body**，不在主文件重述。
 
+### 軟體開發卡落雨：對齊 `service-glass-codeRain.html` 修復（2026-06-22 23:36，創辦人驗收通過）
+
+對應任務 11b。**現役落雨在 `index-rain-preview.html` 的 #dev**（不是 `service-glass-stack.html`——那版無落雨）。落雨曾分岔壞掉（commit 191e762 整合時 innerRain 改不透明、**拿掉邊緣羽化遮罩**、加 cardBackPool 硬底 →「比玻璃小的內縮暗卡」＋中央遮罩擋雨，調亮度/codeGlow 救不回、繞好幾天）。**已逐項對齊確定版沙盒 `demo-liquid/service-glass-codeRain.html` 修復。**
+
+- **三檔關係（別再混淆）**：`service-glass-stack.html`（442b261·三片堆疊玻璃定案沙盒·**無落雨**）／`service-glass-codeRain.html`（**落雨參考**·含邊緣羽化遮罩）／`index-rain-preview.html #dev`（**現役整合**·堆疊玻璃＋落雨合體）。
+- **落雨定案做法（對齊 codeRain）**：drawInnerRain 填深底＋落雨後做 `destination-in` 邊緣羽化遮罩（featherX 0.045／featherY 0.052）；innerRain `transparent:true`／w*1.08／depthWrite:true；depthPool uOpacity 0.055；亮度 0.92・0.78×glow×0.52；codeGlow 0.05；玻璃材質 envMap1.2/clearcoat0.72/roughness0.06。
+- **紅線（血淚，別再踩）**：① **別拿掉邊緣羽化遮罩**（它就是「無硬邊內縮暗卡」的關鍵）② 別把 innerRain 改不透明、別加 opaque 暗底 plane ③ 落雨要改**先對齊 `service-glass-codeRain.html`**、別在 index-rain-preview 憑空改參數。
+- **待辦**：① cardBackPool 目前留前移位置（驗收已過、暫不動）② 整進正式 index.html（5 層 CSS）③ 手機 RWD／效能。方法教訓見 memory `feedback_match_reference_dont_patch_diverged`。
+
 ### 數位行銷手風琴收合卡視覺定案（2026-06-17 23:11；2026-06-18 23:25 比例/碑文重校）
 
 收合卡＝「**月面碑刻**」石板。**已整合進預覽主頁**（`index-rain-preview.html` iframe 嵌 `demo-liquid/service-accordion-embed.html`）、**仍未進正式 index.html**。

@@ -986,6 +986,7 @@
     function drawInnerRain(time){
       const W=rainCanvas.width, H=rainCanvas.height, ctx=rainCtx;
       ctx.setTransform(1,0,0,1,0,0);
+      ctx.clearRect(0,0,W,H);
       const bg=ctx.createLinearGradient(0,0,0,H);
       bg.addColorStop(0,'#040a1e'); bg.addColorStop(0.52,'#050d2a'); bg.addColorStop(1,'#02060f');
       ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
@@ -994,7 +995,9 @@
       ctx.textBaseline='middle';
       for(let c=0;c<cols;c++){
         const col=rainCols[c % rainCols.length];
-        const x=W*(RAIN.lead + ((c+0.5)/cols)*RAIN.spread);
+        const codeInset=W*0.08;
+        const codeW=W*0.84;
+        const x=codeInset + codeW*(RAIN.lead + ((c+0.5)/cols)*RAIN.spread);
         const raw=time*col.spd*RAIN.speed + col.ph;
         const cyc=Math.floor(raw/1.8);
         const prog=raw%1.8-0.25;
@@ -1016,6 +1019,25 @@
         ctx.fillText(code,0,0);
         ctx.restore();
       }
+      ctx.save();
+      ctx.globalCompositeOperation='destination-in';
+      const featherX=W*0.045;
+      const featherY=H*0.052;
+      const edgeMask=ctx.createLinearGradient(0,0,W,0);
+      edgeMask.addColorStop(0,'rgba(0,0,0,0)');
+      edgeMask.addColorStop(featherX/W,'rgba(0,0,0,1)');
+      edgeMask.addColorStop(1-featherX/W,'rgba(0,0,0,1)');
+      edgeMask.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=edgeMask;
+      ctx.fillRect(0,0,W,H);
+      const verticalMask=ctx.createLinearGradient(0,0,0,H);
+      verticalMask.addColorStop(0,'rgba(0,0,0,0)');
+      verticalMask.addColorStop(featherY/H,'rgba(0,0,0,1)');
+      verticalMask.addColorStop(1-featherY/H,'rgba(0,0,0,1)');
+      verticalMask.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=verticalMask;
+      ctx.fillRect(0,0,W,H);
+      ctx.restore();
       rainTexture.needsUpdate=true;
     }
     function sizeInnerRain(card,w,h,depth){
@@ -1025,7 +1047,7 @@
       card.innerRain.position.set(0,0, THREE.MathUtils.clamp(RAIN.depth,0,0.98)*depth*0.5);
     }
     for(const card of glassCards){
-      const mat=new THREE.MeshBasicMaterial({ map:rainTexture, toneMapped:false, transparent:false, depthWrite:true });
+      const mat=new THREE.MeshBasicMaterial({ map:rainTexture, toneMapped:false, transparent:true, depthWrite:true });
       const mesh=new THREE.Mesh(new THREE.PlaneGeometry(1,1,1,1), mat);
       mesh.renderOrder=-1; mesh.visible=false;
       card.group.add(mesh);
@@ -1081,8 +1103,9 @@
       edgeGeo=nextEdgeGeo;
       fresnelGeo=nextFresnelGeo;
       cardBackPool.geometry.dispose();
-      cardBackPool.geometry=new THREE.PlaneGeometry(w*1.16,h*1.16,1,1);
-      cardBackPool.position.set(0,0,-d*0.22);
+      cardBackPool.geometry=new THREE.PlaneGeometry(w,h,1,1);
+      cardBackPool.position.set(0,0,THREE.MathUtils.clamp(RAIN.depth,0,0.98)*d*0.5 - unitsPerPx*1.5);
+      cardBackPool.scale.set(1.012,1.012,1);
       cardGroundShadow.geometry.dispose();
       cardGroundShadow.geometry=new THREE.PlaneGeometry(w*0.86,h*0.18,1,1);
       cardGroundShadow.position.set(w*0.04,-h*0.54,-d*0.66);
