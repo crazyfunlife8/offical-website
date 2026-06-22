@@ -296,8 +296,20 @@
         }
     })();
 
-    let animId;
+    let animId = 0;
+    let running = false;
+    let apiPaused = false;
+
+    function stopLoop() {
+        if (animId) {
+            cancelAnimationFrame(animId);
+            animId = 0;
+        }
+        running = false;
+    }
+
     function animate() {
+        if (!running) return;
         if (!DESIGN_MODE) animId = requestAnimationFrame(animate);
         const t = Date.now() * 0.001;
 
@@ -378,7 +390,29 @@
 
         renderer.render(scene, camera);
     }
-    animate();
+
+    function startLoop() {
+        if (running || document.hidden || apiPaused) return;
+        running = true;
+        animate();
+    }
+
+    window.__starfield = {
+        pause() {
+            apiPaused = true;
+            stopLoop();
+        },
+        resume() {
+            apiPaused = false;
+            startLoop();
+        },
+        isRunning() {
+            return running;
+        }
+    };
+    window.dispatchEvent(new CustomEvent('starfield:ready'));
+
+    startLoop();
 
     window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -387,7 +421,7 @@
     });
 
     document.addEventListener('visibilitychange', () => {
-        if (document.hidden) cancelAnimationFrame(animId);
-        else animate();
+        if (document.hidden) stopLoop();
+        else startLoop();
     });
 })();
