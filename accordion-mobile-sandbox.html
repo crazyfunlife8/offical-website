@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="no-js">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手風琴手機版 A · 橫向石碑展櫃 沙盒（非正式）</title>
+    <meta name="robots" content="noindex">
+
+    <!-- 與正式 index.html 相同的 CSS 與字型（沙盒直接吃正式樣式，改 index.css 即時反映） -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@100;300;400;700;900&family=Noto+Serif+TC:wght@400;500;700;900&family=Italiana&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+
+    <link rel="stylesheet" href="assets/css/tokens.css">
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
+    <link rel="stylesheet" href="assets/css/pages/index.css">
+
+    <style>
+      /* 沙盒外殼：深底、置中、上下留白，模擬服務區在頁面中的環境 */
+      body{ background:#020b1e; min-height:100vh; padding:48px 0 96px; }
+      .sandbox-tag{ position:fixed; top:10px; left:50%; transform:translateX(-50%); z-index:200;
+        font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.1em; color:#1c1402;
+        background:rgba(255,199,9,.92); padding:3px 10px; border-radius:5px; }
+    </style>
+</head>
+<body class="has-threejs">
+    <span class="sandbox-tag">手機版 A 沙盒 · 非正式</span>
+
+    <section class="services-section" id="services-section" aria-labelledby="services-title">
+        <div class="services-section__inner">
+            <div class="section-header">
+                <p class="section-header__eyebrow">OUR SERVICES</p>
+                <h2 class="section-header__title" id="services-title">我們能做的，<span class="accent">比你想的更多</span></h2>
+            </div>
+            <div class="accordion-wrap">
+                <div class="alabel">DIGITAL MARKETING ── 數位行銷</div>
+                <div class="svc-accordion"><div class="acc"></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 沿用正式手風琴腳本（同一份 DATA 與結構，避免重打中文） -->
+    <script src="assets/js/pages/index-accordion.js"></script>
+
+</body>
+</html>

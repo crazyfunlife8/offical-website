@@ -89,19 +89,9 @@
             }
         );
 
-        // ── Section 3：Bento 卡片錯開進場（純 opacity stagger，避免 transform inline 衝突）──
-        // GSAP fromTo 的 transform inline 會被 .card:hover translateY 撞掉，hover 不上移；故只動 opacity
-        const cards = document.querySelectorAll('.bento-grid .card');
-        gsap.fromTo(cards,
-            { opacity: 0 },
-            {
-                opacity: 1,
-                duration: 0.65,
-                stagger: 0.12,
-                ease: 'power2.out',
-                scrollTrigger: { trigger: '.bento-grid', start: 'top 80%', toggleActions: 'play none none none' }
-            }
-        );
+        // ── Section 3：服務區（手風琴 3a + 堆疊玻璃 3b）──
+        // 2026-06-23 舊 bento 卡片 stagger 移除；手風琴/玻璃卡靜態呈現、各有獨立互動腳本。
+        // section-header 的淡入由 core.js initScrollReveal 統一處理（eyebrow/title 帶 data-reveal），此處不重複綁定。
 
         // ── Section 5：終點 CTA ──
         const ctaEls = document.querySelectorAll('.final-cta__inner > *');

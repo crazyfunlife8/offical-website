@@ -610,26 +610,35 @@
    5. Section 標題區塊
    ════════════════════════════════════════════════════════════ */
 
+/* 2026-06-23 標題碑銘式精修（由 index-rain-preview 併入）：
+   主標換品牌明朝 Chiron Sung、字重降至 600、字距開為 +0.05em，
+   避免誤吃全站 h2 的 Noto Sans 900 黑體變呆版。 */
 .section-header {
-    margin-bottom: var(--sp-lg);
+    margin-bottom: 2.6rem;
 }
 
 .section-header__eyebrow {
     font-family: var(--f-serif);
-    font-size: var(--fs-xs);
-    font-weight: 700;
-    letter-spacing: 0.2em;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.32em;
     text-transform: uppercase;
-    color: var(--c-yellow);
-    margin-bottom: var(--sp-sm);
+    color: rgba(var(--c-yellow-rgb), 0.72);
+    margin-bottom: 0.9rem;
 }
 
 .section-header__title {
-    color: var(--c-white);
+    font-family: var(--f-serif-cjk);
+    font-weight: 600;
+    font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+    line-height: 1.15;
+    letter-spacing: 0.05em;
+    color: rgba(var(--c-stellar-rgb), 0.96);
 }
 
 .section-header__title .accent {
     color: var(--c-yellow);
+    font-weight: 700;
 }
 
 
