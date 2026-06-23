@@ -165,7 +165,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 對應任務 11b。服務區三塊已全整合進**正式 `index.html`**（5 層架構，commit `3d60a1b`/`5b77624`/`65582e4`）：
 
 - **3a 數位行銷手風琴**（`.svc-accordion`）：收合卡＝「月面碑刻」石板（背景 `assets/images/services/mural-j.png`、`.acc` 鎖 `aspect-ratio:1.55/1`）；展開態＝白底藝術背景＋深色字，四卡各綁背景圖（社群 `social-mix-a2`／部落格 `blog4-b`／廣告 `ads2-a`／AI `ai-particle-a-sq`，皆在 `assets/images/services/`）。手機 RWD＝單卡滑動牌組＋點卡全螢幕接管。
-- **3b 軟體開發**（`#dev`）：**開放程式碼空間**——玻璃已退場（`index-glass-stack.js` `REMOVE_GLASS=true`，WebGL 引擎保留、一旗標可還原）＋程式碼落雨左右出血（順傾角 −12°）。
+- **3b 軟體開發**（`#dev`）：**斜卡片浮在深空程式碼雨前、無進場動畫**——程式碼落雨左右出血（順傾角 −12°）＋切卡（左右滑/鍵盤/導引點）。〔2026-06-24 05:43〕玻璃機制原為 `REMOVE_GLASS=true` 藏而不刪，已確認永久退場後**整批刪除死碼**（隱藏 mesh/4 燈/bloom-SMAA/env map/`drawCodeTexture`），`index-glass-stack.js` **1221→428 行**（commit `a7414dc`），render loop 簡化為 `renderer.render`；落雨+切卡現役路徑零改動、`?qa=1` 驗證畫面一致。玻璃版還原靠 git 歷史（見下行）。**曾試把落雨改 2D 省效能→丟深邃感、又試全新 WebGL 進場動畫→否決，最後退回此原版**（脈絡見 memory [[project_nestdigital_dev_glass_card]]）。
 - **自有產品（跳動E／一鍵架站）**：🔲 待做（容器形式未選；避開「自動跑馬燈＋小圖示」公版味，用真截圖／影片）。
 
 **現役紅線（務必守）：**
