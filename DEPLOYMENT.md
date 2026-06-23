@@ -1,6 +1,6 @@
 # 創巢數位官網 nestdigitalai.com 部署紀錄
 
-**最後更新：2026-05-11 18:55 +0800**
+**最後更新：2026-06-24 02:30 +0800**
 
 ---
 
@@ -43,9 +43,9 @@
 - 無自訂網域（CNAME 檔案已於 commit `006ec1c Delete CNAME` 刪除）
 - 如要關閉：repo Settings → Pages → Source 設為 None
 
-## 四、重新部署步驟（目前手動模式）
+## 四、手動部署（fallback：GHA 失敗時 retry／本地測試用）
 
-每次程式碼更新到 GitHub main 後，網站**不會自動更新**，需手動執行以下流程：
+現在 push 到 GitHub `main` 由 **GitHub Actions 自動部署**（見 §一）、無需手動。以下手動流程**僅在 GHA 失敗需 retry、或要從本地 working tree 直接測試部署時**使用：
 
 **API Token 統一來源（單一事實）：**
 ```
