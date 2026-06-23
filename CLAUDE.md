@@ -110,7 +110,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | 術語 | 說明 |
 |------|------|
 | Glass Card | 玻璃擬態卡片（`backdrop-filter: blur`，`.card` class） |
-| Bento Grid | 非對稱格線布局，用於首頁服務星圖（Section 3） |
+| Bento Grid | 〔已退役〕舊首頁服務非對稱格線（`.bento-grid`/`.bento--a~e`），2026-06-23 被手風琴取代、class 已從程式碼移除；僅 coming-soon/contact CSS 註解保留為設計語言血統 |
 | has-threejs | `<body>` class，控制 Three.js canvas 顯示 / CSS 星空隱藏 |
 | js / no-js | `<html>` class，JS 可用性標記（core.js 切換） |
 | js-hidden | 入場動畫前預隱藏 class（GSAP 負責顯示） |
@@ -118,11 +118,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | data-stagger-group | 子元素 stagger 進場屬性（core.js 處理） |
 | f-display-en | Italiana 英文 echo 副標字型（`--f-display-en`） |
 | f-fang-cjk | cwTeX Q Fangsong 仿宋字型，副標編輯感（`--f-fang-cjk`） |
-| A–F | 服務六大類（A社群經營、B開發、C虛擬網紅、D顧問、E跳動E投放、F粉絲與互動買賣 *首頁退役*）；G 類自動化採集（ADSPOWER+PY）為待新增類別，**不可併入 B 類**。命名規則：A/E 用首頁卡聚焦 sub 名（規格書類名分別為「社群服務 / 自營平台」），其他 4 類用規格書類名短化 |
-| B 類本質 | 軟體開發本業（網站架設 + 客製系統開發），對應「不正常人類軟體開發有限公司」核心服務；描述客製系統禁止用「流程自動化」措辭、避免與 G 類自動化採集混淆 |
-| F 類首頁退役 | 2026-05-11 起 F 類「粉絲與互動買賣」服務從首頁 bento 拿掉（地下性質服務不適形象首頁主動曝光）；規格書 §F 類保留並明確化定義，未來若有獨立 landing page 再評估上線 |
-| G 類待新增 | 自動化採集服務（ADSPOWER + Python）為瀏覽器指紋分流 + 腳本驅動的資料採集與帳號模擬操作；規格書 v0.2 §四 已加備註但未展開、首頁 bento 不露 |
-| FEATURED | bento--c 卡片右上角裝飾標籤（CSS ::after 生成） |
+| 服務分類 | 以 `服務項目總表.md`(SSOT，在父層工作區) 為準＝數位行銷／軟體開發／數位轉型顧問＋自有產品（跳動E／一鍵架站）。**舊 A–F 類碼已退役、G 類自動化採集已退場**（2026-06-15 SSOT 決策；連帶解除「客製系統禁用『流程自動化』措辭」舊規則）。首頁現役：手風琴露數位行銷 4 卡（社群／部落格／廣告／AI 形象網紅）、`#dev` 露軟體開發 3 項；粉絲與互動買賣不上首頁 |
 
 ---
 
@@ -179,7 +175,6 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 - **落雨**：別拿掉邊緣羽化遮罩（`destination-in` featherX 0.045／featherY 0.052）、別把 innerRain 改不透明／加 opaque 暗底；要改先對齊 `demo-liquid/service-glass-codeRain.html`，別憑空改參數（見 memory [[feedback_match_reference_dont_patch_diverged]]）。
 - **收合卡**：禁改回 2:1 或固定 height（會把 mural-j 橫向壓扁）；碑文別放大置中、別用墊底色塊（已否決）。太空人面癱不可愛、月坑要立體不要塑膠白。
 - **展開態**：人物一律台灣人；社群卡＝編輯式價格帳（細線條列、非促銷貼紙）；背景別塞滿保藝術感。
-- **客製系統文案禁「流程自動化」措辭**（避免與已退場的自動化採集混淆，見術語表 B 類本質）。
 
 > 完整視覺迭代脈絡（攝影棚→堆疊玻璃→玻璃退場、落雨怎麼壞怎麼修、收合卡碑文重校、展開態）見 `_archive/服務區視覺迭代史_2026-05~06.md` 與 commit body（`93e3db4`/`442b261`/`65582e4`）。WebGL 還原點：玻璃定稿打光值在 commit `93e3db4`、堆疊玻璃在 `442b261`、玻璃退場在 `65582e4`。
 
