@@ -104,7 +104,7 @@
         const px = (s.bgx != null ? s.bgx : i/3*100);
         const bgs = (s.bgs != null ? s.bgs : 440);
         const bg = `<div class="bgimg" style="background-image:url('assets/images/services/${MURAL}'); background-size:${bgs}% 100%; background-position:${px.toFixed(2)}% center;"></div>`;
-        p.innerHTML=`${bg}<svg class="svc-cracks" viewBox="0 0 100 154" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M50 88 L44 70 L49 52 L41 36 M49 52 L37 49"/><path d="M50 88 L57 69 L52 51 L60 35 M52 51 L65 47"/><path d="M50 88 L46 108 L51 126 L43 146 M51 126 L38 130"/><path d="M50 88 L61 105 L56 124 L65 144"/></svg>
+        p.innerHTML=`${bg}
           <div class="spine"><span class="num">${s.n}</span><div class="spine__cols"><span class="v">${s.cjk}</span><span class="ven">${s.en}</span></div></div>
           <div class="body"><div class="bgart" style="background-image:url('${s.art}')"></div>${body}</div>`;
         acc.appendChild(p);
