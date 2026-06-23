@@ -15,6 +15,9 @@
 
     const urlParams=new URLSearchParams(window.location.search);
     const QA_MODE=urlParams.get('qa')==='1';
+    /* 2026-06-23 創辦人決定拿掉玻璃面板：隱藏玻璃/邊光/Fresnel/背板/陰影/高光，
+       只留程式碼雨在深色空間流動、服務文字浮在前。引擎其餘結構保留、可一鍵還原（false）。 */
+    const REMOVE_GLASS=true;
     const LIGHTS=[
       {id:'key', name:'key', color:0xf6fbff, size:2.4, defaults:{azimuth:13,elevation:80,distance:6.05,intensity:32}},
       {id:'top', name:'top', color:0xdfeaff, size:1.45, defaults:{azimuth:65,elevation:8,distance:8,intensity:134}},
@@ -327,6 +330,7 @@
     });
     const cardBackPool=new THREE.Mesh(new THREE.PlaneGeometry(1,1,1,1),cardBackPoolMat);
     cardBackPool.renderOrder=-4;
+    cardBackPool.visible=!REMOVE_GLASS;
     glassGroup.add(cardBackPool);
     const cardGroundShadowMat=new THREE.ShaderMaterial({
       uniforms:{
@@ -355,6 +359,7 @@
     });
     const cardGroundShadow=new THREE.Mesh(new THREE.PlaneGeometry(1,1,1,1),cardGroundShadowMat);
     cardGroundShadow.renderOrder=-5;
+    cardGroundShadow.visible=!REMOVE_GLASS;
     glassGroup.add(cardGroundShadow);
     const studioLights={};
     function createStudioLight(spec){
@@ -397,6 +402,7 @@
       opacity:1
     });
     const glass=new THREE.Mesh(glassGeo, glassMat);
+    glass.visible=!REMOVE_GLASS;
     glassGroup.add(glass);
 
     let edgeGeo=smoothRoundedBoxGeometry(1, 1, 0.1, GLASS_BEVEL_SEGMENTS, 0.05);
@@ -419,6 +425,7 @@
     const edgeGlow=new THREE.Mesh(edgeGeo, edgeMat);
     edgeGlow.layers.enable(BLOOM_SCENE);
     edgeGlow.scale.set(1.004,1.004,1.004);
+    edgeGlow.visible=!REMOVE_GLASS;
     glassGroup.add(edgeGlow);
 
     let fresnelGeo=smoothRoundedBoxGeometry(1, 1, 0.1, GLASS_BEVEL_SEGMENTS, 0.05);
@@ -470,9 +477,11 @@
     const fresnelShell=new THREE.Mesh(fresnelGeo,fresnelMat);
     fresnelShell.layers.enable(BLOOM_SCENE);
     fresnelShell.scale.set(1.004,1.004,1.004);
+    fresnelShell.visible=!REMOVE_GLASS;
     glassGroup.add(fresnelShell);
 
     const highlightGroup=new THREE.Group();
+    highlightGroup.visible=!REMOVE_GLASS;
     glassGroup.add(highlightGroup);
     const nearSideMat=new THREE.ShaderMaterial({
       uniforms:{ uColor:{ value:new THREE.Color(0xe8f0ff) }, uAccent:{ value:new THREE.Color(0x00c8ff) }, uOpacity:{ value:0.26 } },
@@ -560,9 +569,9 @@
     }));
     /* ===== 卡內程式碼落雨：雨在玻璃裡（不透明深底+落雨碼 plane 置於玻璃 slab 內、被前玻璃折射；只在聚光主卡顯示）
        參數沿用既有程式碼落雨：spd 0.085–0.195（慢）、字級 18–26px、cyc/1.8、白頭+藍/青/金尾漸層（#dev-rain / n4rain 血統）。 */
-    const RAIN={ glow:0.9, density:36, speed:1.0, depth:0.45, spread:1.0, lead:0.0 };
+    const RAIN={ glow:0.84, density:40, speed:0.62, depth:0.78, spread:0.92, lead:0.04, pocket:0.52, pocketR:0.19, bleedX:1.4 };
     const rainCanvas=document.createElement('canvas');
-    rainCanvas.width=1024; rainCanvas.height=600;
+    rainCanvas.width=1792; rainCanvas.height=600;
     const rainCtx=rainCanvas.getContext('2d');
     const rainTexture=new THREE.CanvasTexture(rainCanvas);
     rainTexture.colorSpace=THREE.SRGBColorSpace;
@@ -578,12 +587,12 @@
       bg.addColorStop(0,'#040a1e'); bg.addColorStop(0.52,'#050d2a'); bg.addColorStop(1,'#02060f');
       ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
       const glow=THREE.MathUtils.clamp(RAIN.glow,0,1.6);
-      const cols=Math.max(6, Math.round(RAIN.density));
+      const cols=Math.max(6, Math.round(RAIN.density * (W/1024)));
       ctx.textBaseline='middle';
       for(let c=0;c<cols;c++){
         const col=rainCols[c % rainCols.length];
-        const codeInset=W*0.08;
-        const codeW=W*0.84;
+        const codeInset=REMOVE_GLASS ? 0 : W*0.08;
+        const codeW=REMOVE_GLASS ? W : W*0.84;
         const x=codeInset + codeW*(RAIN.lead + ((c+0.5)/cols)*RAIN.spread);
         const raw=time*col.spd*RAIN.speed + col.ph;
         const cyc=Math.floor(raw/1.8);
@@ -599,24 +608,41 @@
         ctx.textAlign='left';
         const base=col.ye?'255,199,9':col.cyan?'0,200,255':'150,180,235';
         const g=ctx.createLinearGradient(0,0,w,0);
-        g.addColorStop(0,'rgba(232,244,255,'+(0.92*glow*0.52)+')');
-        g.addColorStop(0.12,'rgba('+base+','+(0.78*glow*0.52)+')');
+        g.addColorStop(0,'rgba(232,244,255,'+(0.92*glow*0.62)+')');
+        g.addColorStop(0.12,'rgba('+base+','+(0.78*glow*0.58)+')');
         g.addColorStop(1,'rgba('+base+',0)');
         ctx.fillStyle=g;
         ctx.fillText(code,0,0);
+        ctx.restore();
+      }
+      if(REMOVE_GLASS){
+        /* 玻璃拿掉後：文字後方壓一塊暗 pocket，讓雨退到深處、前景文字坐在安靜深底上 */
+        ctx.save();
+        ctx.globalCompositeOperation='source-over';
+        const pk=RAIN.pocket, pkR=RAIN.pocketR;
+        const pocket=ctx.createRadialGradient(W*0.50,H*0.50,0,W*0.50,H*0.50,W*pkR);
+        pocket.addColorStop(0,'rgba(0,3,12,'+pk+')');
+        pocket.addColorStop(0.46,'rgba(1,7,22,'+(pk*0.66)+')');
+        pocket.addColorStop(0.78,'rgba(2,10,30,'+(pk*0.21)+')');
+        pocket.addColorStop(1,'rgba(2,10,30,0)');
+        ctx.fillStyle=pocket;
+        ctx.fillRect(0,0,W,H);
         ctx.restore();
       }
       ctx.save();
       ctx.globalCompositeOperation='destination-in';
       const featherX=W*0.045;
       const featherY=H*0.052;
-      const edgeMask=ctx.createLinearGradient(0,0,W,0);
-      edgeMask.addColorStop(0,'rgba(0,0,0,0)');
-      edgeMask.addColorStop(featherX/W,'rgba(0,0,0,1)');
-      edgeMask.addColorStop(1-featherX/W,'rgba(0,0,0,1)');
-      edgeMask.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=edgeMask;
-      ctx.fillRect(0,0,W,H);
+      /* 拿掉玻璃＋左右出血時：不做水平羽化，讓程式碼流出畫面左右緣（仍保留上下羽化） */
+      if(!REMOVE_GLASS){
+        const edgeMask=ctx.createLinearGradient(0,0,W,0);
+        edgeMask.addColorStop(0,'rgba(0,0,0,0)');
+        edgeMask.addColorStop(featherX/W,'rgba(0,0,0,1)');
+        edgeMask.addColorStop(1-featherX/W,'rgba(0,0,0,1)');
+        edgeMask.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=edgeMask;
+        ctx.fillRect(0,0,W,H);
+      }
       const verticalMask=ctx.createLinearGradient(0,0,0,H);
       verticalMask.addColorStop(0,'rgba(0,0,0,0)');
       verticalMask.addColorStop(featherY/H,'rgba(0,0,0,1)');
@@ -630,8 +656,18 @@
     function sizeInnerRain(card,w,h,depth){
       if(!card.innerRain) return;
       card.innerRain.geometry.dispose();
-      card.innerRain.geometry=new THREE.PlaneGeometry(w*1.08,h*1.08,1,1);
-      card.innerRain.position.set(0,0, THREE.MathUtils.clamp(RAIN.depth,0,0.98)*depth*0.5);
+      const rainDepth=THREE.MathUtils.clamp(RAIN.depth,0,0.98);
+      const z=REMOVE_GLASS ? -rainDepth*depth*0.86 : rainDepth*depth*0.5;
+      let planeW=w*1.08, planeH=h*1.08;
+      if(REMOVE_GLASS){
+        /* 左右延伸超過畫面邊界：依平面實際 z 算可視寬度再乘 bleedX；高度維持卡片高（只往左右延） */
+        const camDist=Math.abs(camera.position.z - z);
+        const fovRad=THREE.MathUtils.degToRad(camera.fov);
+        const visW=2*Math.tan(fovRad/2)*camDist*camera.aspect;
+        planeW=visW*(RAIN.bleedX||1.4);
+      }
+      card.innerRain.geometry=new THREE.PlaneGeometry(planeW,planeH,1,1);
+      card.innerRain.position.set(0,0,z);
     }
     for(const card of glassCards){
       const mat=new THREE.MeshBasicMaterial({ map:rainTexture, toneMapped:false, transparent:true, depthWrite:true });
