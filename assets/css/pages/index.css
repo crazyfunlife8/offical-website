@@ -489,6 +489,12 @@ body {
     padding: 0 var(--sec-px);
 }
 
+/* 服務區標題三行（eyebrow / title / label）左緣對齊主視覺 Hero —— Hero `.hero__content` 有額外
+   padding-left:1.5rem，服務區原本只有 gutter、少這 24px 才會太靠左。兩區容器同 max-w 1200/sec-px、
+   左緣一致，故此縮排全斷點通用（桌機+手機一致對齊）。2026-06-23 */
+.section-header { padding-left: 1.5rem; }
+.accordion-wrap .alabel { padding-left: 1.5rem; }
+
 /* 2026-06-23 舊非對稱 Bento Grid（.bento-grid / .bento--a~e）已移除，
    由手風琴（3a）＋三服務堆疊玻璃（3b）取代（樣式見本檔末段整併區塊）。
    service-card 樣式保留於 components.css 備他頁，本頁不再引用。 */
@@ -764,7 +770,7 @@ body {
    3a 數位行銷手風琴（.svc-accordion 前綴隔離）／3b 軟體開發三服務堆疊玻璃（.dev-glass-stack）
    ════════════════════════════════════════════════════════════ */
       /* 手風琴容器 — 2026-06-19 原生內嵌（原為 iframe service-accordion-embed.html；改為 .svc-accordion 前綴隔離） */
-      .accordion-wrap{ position:relative; z-index:2; width:100%; max-width:1280px; margin:0 auto; padding:0 4vw; }
+      .accordion-wrap{ position:relative; z-index:2; width:100%; max-width:1280px; margin:0 auto; padding:0; }
       .accordion-wrap .alabel{ font-family:"JetBrains Mono",monospace; font-size:11.5px; letter-spacing:.28em;
         color:rgba(var(--c-yellow-rgb),.58); padding:0 1vw 14px; margin-top:-.4rem; }
 
@@ -784,7 +790,7 @@ body {
         --svc-frame-idle:.28;  --svc-frame-hover:.82;
         --svc-fog-idle:.22;    --svc-fog-hover:.58;
         --svc-text-idle:.28;   --svc-text-hover:.72;
-        --svc-halo-idle:.46;   --svc-halo-hover:.95;   /* breathing glow AROUND the card outline */
+        --svc-halo-idle:.82;   --svc-halo-hover:1.25;   /* breathing glow AROUND the card outline（2026-06-23 增強周圍呼吸；卡內 edge/frame/fog/text 不動）*/
         --svc-open-muted:.06;
         --svc-pulse:1;         /* breathing multiplier, animated via @property below */
         display:flex; align-items:center; justify-content:center; width:100%; font-family:var(--f-body);
@@ -852,6 +858,7 @@ body {
       .svc-accordion .cta:hover{ transform:translateY(-2px) scale(1.012); box-shadow:0 12px 28px rgba(14,126,148,.5), inset 0 1px 0 rgba(255,255,255,.4); }
       .svc-accordion .cta:hover .ar{ transform:translateX(3px); }
       @keyframes svc-cta-sheen{ 0%{left:-60%} 38%,100%{left:130%} }
+      @keyframes svc-sheet-up{ from{ transform:translateY(100%); } to{ transform:translateY(0); } }   /* 全螢幕展開滑入 */
       @keyframes svc-lid-pulse{ 0%,100%{ opacity:.72; filter:drop-shadow(0 0 5px rgba(0,200,255,.36)) } 48%{ opacity:1; filter:drop-shadow(0 0 13px rgba(0,200,255,.82)) } }
       .svc-accordion .priceline{ font-family:var(--f-mono); font-size:.82rem; color:rgba(160,110,30,.95); letter-spacing:.04em; margin-top:18px; }
       .svc-accordion .proof{ display:flex; gap:clamp(18px,2.6vw,34px); margin-bottom:6px; }
@@ -876,10 +883,10 @@ body {
         --svc-halo-live:var(--svc-halo-idle);
         box-shadow:
           -1px -1px 0 rgba(255,255,255,.55), 1px 1px 0 rgba(255,255,255,.16),
-          0 0 12px rgba(0,200,255,calc(var(--svc-halo-live) * var(--svc-pulse) * .40)),
-          0 0 36px rgba(0,200,255,calc(var(--svc-halo-live) * var(--svc-pulse) * .26)),
-          0 0 76px rgba(0,200,255,calc(var(--svc-halo-live) * var(--svc-pulse) * .15)),
-          0 0 130px rgba(0,200,255,calc(var(--svc-halo-live) * var(--svc-pulse) * .08)),
+          0 0 16px rgba(0,200,255,calc(var(--svc-halo-live) * var(--svc-pulse) * .58)),
+          0 0 44px rgba(0,200,255,calc(var(--svc-halo-live) * var(--svc-pulse) * .40)),
+          0 0 92px rgba(0,200,255,calc(var(--svc-halo-live) * var(--svc-pulse) * .25)),
+          0 0 160px rgba(0,200,255,calc(var(--svc-halo-live) * var(--svc-pulse) * .14)),
           0 10px 22px rgba(0,0,0,.34);
         animation:svc-breathe var(--svc-cycle) ease-in-out infinite;
       }
@@ -960,38 +967,108 @@ body {
       @media(prefers-reduced-motion:reduce){
         .svc-accordion .panel:not(.open){ animation:none; }
       }
-      /* 手機（≤820px）方案 A：橫向滑動「石碑展櫃」——保留直立月面碑刻、不壓成 FAQ 短條
-         （2026-06-23 由垂直堆疊改版；方向經創辦人＋Codex＋Gemini 三方收斂） */
+      /* 手機（≤820px）方案 B：堆疊牌組 — 單卡置中、左右拖曳換卡、點焦點卡就地展開
+         （2026-06-23 取代橫向展櫃；以使用者體驗最佳為準則，與下方開發區「單卡滑動」同操作語言）
+         每張牌的 transform / opacity / z-index / filter 由 index-accordion.js 依與焦點卡距離即時設定。*/
       @media(max-width:820px){
-        .svc-accordion{ align-items:stretch; }
-        /* 標題斷行：「我們能做的，」一行、強調句另起一行 */
-        .section-header__title .accent{ display:block; }
-        /* 橫向 scroll-snap 展櫃：露出下一張邊緣當滑動提示 */
+        /* 桌機 .svc-accordion 是 flex（置中受限寬的 .acc）；手機改 block，讓 .acc 撐滿 350、牌組真正置中 */
+        .svc-accordion{ display:block; }
+        /* 手機移除桌機用的外層 4vw 留白，只留 .services-section__inner 的 20px 頁面邊距
+           （桌機 4vw 是寬幅手風琴的呼吸框，到手機會與頁面邊距疊成雙重縮排）2026-06-23 */
+        .accordion-wrap{ padding-inline:0; }
+        /* 標題改單行＋縮小（2026-06-23 創辦人推翻原雙行）：accent 回 inline 同一行、
+           font 用 clamp 縮到 360–430px 手機都能一行容下（12 字 × ~1.05em ≤ 內容寬）*/
+        .section-header__title{ font-size:clamp(20px,6.1vw,26px); white-space:nowrap; }
+        .section-header__title .accent{ display:inline; }
+
+        /* 收斂頭部垂直空間：桌機的大留白在手機上嚴重佔版面、把牌組推到半頁以下，
+           手機壓掉約 110px（112→34 上 padding、41.6→16 標題下距、eyebrow/alabel 收緊）2026-06-23 */
+        .services-section{ padding-top:2.1rem; padding-bottom:2.8rem; }
+        /* 標題文字左緣對齊主視覺 Hero：Hero __content 有額外 padding-left:1.5rem，服務區原本只有 gutter、少這 24px 才會太靠左 2026-06-23 */
+        .section-header{ margin-bottom:1rem; padding-left:1.5rem; }
+        .section-header__eyebrow{ margin-bottom:.5rem; }
+        .accordion-wrap .alabel{ padding-bottom:9px; padding-left:1.5rem; }
+
+        /* 牌組舞台：相對定位容器，卡片絕對堆疊置中；高度由 JS 量焦點卡後寫入 --deck-h */
         .svc-accordion .acc{
-          flex-direction:row; align-items:flex-start;
-          width:100%; height:auto; aspect-ratio:auto; gap:14px;
-          overflow-x:auto; overflow-y:visible;
-          scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
-          padding:8px 2px 22px; scroll-padding-inline:12vw;
-          scrollbar-width:none;
+          position:relative; display:block;
+          width:100%; height:auto; aspect-ratio:auto; gap:0;
+          overflow:visible; padding:10px 0 4px;
+          min-height:var(--deck-h,118vw);
+          touch-action:pan-y; user-select:none; -webkit-user-select:none;
         }
-        .svc-accordion .acc::-webkit-scrollbar{ display:none; }
-        .svc-accordion .acc::before{ display:none; }            /* 桌機環境光暈在橫滑下不適用 */
-        /* 每張＝直立月面石碑（細長石板比例、貼近桌機；窄一點→碑文置中＋露邊明顯）*/
-        .svc-accordion .panel{
-          flex:0 0 var(--card-w,67vw); max-width:var(--card-w,67vw); min-width:0;
-          aspect-ratio:var(--card-aspect,.388); scroll-snap-align:center; transform:none;
+        .svc-accordion .acc::before{ display:none; }            /* 桌機環境光暈在牌組下不適用 */
+
+        /* 卡片比例鎖死 .388（＝月面碑刻單格自然比例 1.55÷4），由 height 驅動隨畫面縮放、
+           width 自動換算，永不壓縮圖像；展開時於下方 .open 規則解鎖回流內撐高 */
+        .svc-accordion .acc.is-deck .panel{
+          position:absolute; left:50%; top:10px;
+          height:var(--card-h,clamp(440px,72vh,610px)); width:auto; aspect-ratio:var(--card-aspect,.388);
+          margin:0; transform:translateX(-50%); transform-origin:center 40%;
+          transition:transform .5s var(--ease), opacity .42s var(--ease), filter .42s var(--ease), box-shadow .5s var(--ease);
+          will-change:transform,opacity; backface-visibility:hidden;
         }
-        .svc-accordion .panel:not(.open):hover{ transform:none; }
-        /* 能量已統一於上方（桌機＋手機同響應）：藍光呼吸光暈＋碑文藍光呼吸，無閃電裂縫線 */
-        /* 點開：該卡自然撐高顯示白底藝術，鄰卡維持石碑高度（align-items:flex-start）*/
-        .svc-accordion .panel.open{ flex:0 0 84vw; max-width:84vw; aspect-ratio:auto; transform:none; }
+        .svc-accordion .acc.is-dragging .panel{ transition:none; }   /* 拖曳中貼著手指、不延遲 */
+        .svc-accordion .panel:not(.open):hover{ transform:translateX(-50%); }
+
+        /* 展開：點卡 → 該服務白底藝術＋內容「滑上來蓋滿整個螢幕」（含 nav），內容可上下捲、左上 ✕ 退出
+           （2026-06-23 由區塊內就地展開改為全螢幕接管；.acc 不設 min-height:0、保留 deck-h 避免背後塌陷跳動）*/
+        .svc-accordion .acc.is-deck.is-open .panel:not(.open){ opacity:0; pointer-events:none; }
+        .svc-accordion .acc.is-deck .panel.open{
+          position:fixed; inset:0; left:0; top:0; width:100vw; height:100vh; height:100dvh;
+          margin:0; border-radius:0; aspect-ratio:auto; overflow:hidden;
+          transform:none; opacity:1; filter:none; z-index:9000;
+          transition:none;   /* 關掉牌組殘留的 .5s transform transition，避免與 slide-up 雙力道疊加變糊 */
+          animation:svc-sheet-up .42s cubic-bezier(.22,1,.36,1);
+        }
         .svc-accordion .panel:not(.open) .body{ display:none; }
-        .svc-accordion .panel.open .body{ position:relative; inset:auto; min-height:auto; height:auto; overflow:visible; display:block; }
-        .svc-accordion .copy{ max-width:100%; }
-        .svc-accordion .offer{ max-width:100%; }
+        .svc-accordion .panel.open .body{
+          position:absolute; inset:0; height:auto; min-height:100%; display:block;
+          overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+          padding:66px clamp(22px,6vw,40px) calc(44px + env(safe-area-inset-bottom));
+        }
+        /* 手機全螢幕展開：背景圖當「全幅背景」。① 關掉桌機左重遮罩 ② 改用靜態垂直遮罩（上下可讀、中段透出圖；
+           貼在 .bgart::after 不隨內容捲動）③ 各卡 background-position 把主體帶進直式畫面（2026-06-23）*/
+        .svc-accordion .acc.is-deck .panel.open .body::before{ background:none; }
+        .svc-accordion .acc.is-deck .panel.open .bgart{ background-size:cover; }
+        .svc-accordion .acc.is-deck .panel.open .bgart::after{ content:''; position:absolute; inset:0; pointer-events:none;
+          background:linear-gradient(180deg, rgba(248,247,243,.85) 0%, rgba(248,247,243,.6) 17%, rgba(248,247,243,.3) 38%,
+            rgba(248,247,243,.18) 58%, rgba(248,247,243,.36) 80%, rgba(248,247,243,.62) 100%); }
+        .svc-accordion .acc.is-deck .panel.open[data-key="social"] .bgart{ background-position:56% 42%; }
+        .svc-accordion .acc.is-deck .panel.open[data-key="blog"]   .bgart{ background-position:88% center; }   /* 圖左移、露出右上角燈塔（直式為左右裁切，y 無作用）*/
+        .svc-accordion .acc.is-deck .panel.open[data-key="ads"]    .bgart{ background-position:72% 40%; }
+        .svc-accordion .acc.is-deck .panel.open[data-key="ai"]     .bgart{ background-position:46% center; }
+        .svc-accordion .copy,.svc-accordion .offer,
+        .svc-accordion .panel[data-key="ai"] .copy,
+        .svc-accordion .panel[data-key="ai"] .proof,
+        .svc-accordion .panel[data-key="ai"] .priceline{ max-width:100%; }
         .svc-accordion .cta{ width:100%; }
+        /* 堆疊牢籠（血淚）：.services-section 自帶 position:relative+z-index:1、accordion-wrap 自帶 z-index:2，
+           兩層脈絡會把 z-9000 全螢幕蓋層困在 nav(z-100) 底下。展開時兩層都抬到 nav 之上，蓋層才真的蓋掉 nav
+           （含左上關閉鈕，因它也在 accordion-wrap 脈絡內）。桌機 .acc 不會有 is-open，:has 不觸發、不受影響。2026-06-23 */
+        .services-section:has(.acc.is-open){ z-index:9000; }
+        .accordion-wrap:has(.acc.is-open){ z-index:9000; }
+
+        /* 導引點（手勢替代控制：UX gesture-alternative；JS 動態建立、置於 .acc 之後）
+           2026-06-23 收斂精緻化：細點＋窄帶（點擊區 24×20、原 40×40），把垂直空間還給卡片 */
+        .svc-deck-dots{ display:flex; justify-content:center; align-items:center; gap:6px; margin-top:8px; }
+        .svc-deck-dots.is-hidden{ display:none; }
+        /* 宇宙元素圖示（星/月/日/土星）取代圓點：未選＝暗白、選中＝青光＋微放大（沿用青光語言）*/
+        .svc-deck-dot{ width:30px; height:26px; padding:0; border:0; background:transparent; display:grid; place-items:center; cursor:pointer; -webkit-tap-highlight-color:transparent;
+          color:rgba(225,235,255,.30); transition:color .28s var(--ease), transform .28s var(--ease), filter .28s var(--ease); }
+        .svc-deck-dot svg{ width:16px; height:16px; display:block; }
+        .svc-deck-dot.is-active{ color:rgba(0,200,255,.95); transform:scale(1.18); filter:drop-shadow(0 0 5px rgba(0,200,255,.55)); }
+        .svc-deck-dot:focus-visible{ outline:2px solid rgba(0,200,255,.55); outline-offset:2px; border-radius:8px; }
+
+        /* 收合鈕：全螢幕展開時固定左上、深圓底白叉，明確退出路徑（UX escape-routes）；z 高於 9000 蓋層 */
+        .svc-deck-close{ display:none; position:fixed; top:calc(12px + env(safe-area-inset-top)); left:12px; z-index:9001;
+          width:42px; height:42px; padding:0; border:0; border-radius:50%; cursor:pointer;
+          align-items:center; justify-content:center; font-size:17px; line-height:1; color:#fff;
+          background:rgba(8,14,30,.62); box-shadow:0 2px 12px rgba(0,0,0,.3); backdrop-filter:blur(8px);
+          -webkit-tap-highlight-color:transparent; }
+        .svc-accordion .acc.is-open ~ .svc-deck-close{ display:flex; }
       }
+      @media(min-width:821px){ .svc-deck-dots,.svc-deck-close{ display:none !important; } }
 
       /* ── 軟體開發區：三服務單卡玻璃（WebGL r0.160，2026-06-22 取代藝術卡/星雨） ──
          源自 demo-liquid/service-glass-stack.html；全選擇器加 .dev-glass-stack 前綴與全站 CSS 隔離；

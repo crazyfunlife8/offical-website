@@ -122,17 +122,23 @@
         initHeroEntrance();
         initScrollAnimations();
 
-        // 太空人 ScrollTrigger 偵序列（Beat 02）
-        try { initAstronautScroll(); } catch(e) { console.warn('[index.js] astronaut scroll failed:', e); }
+        // 開發用輕量模式：?lite 跳過太空人偵序列（省 ~32MB 影格下載 + Beat04 連續重繪），協作時不拖累機器
+        const LITE = /[?&]lite\b/.test(location.search);
+        if (LITE) {
+            console.info('[index.js] ?lite 模式 — 跳過太空人偵序列（省 32MB 下載與連續重繪）');
+        } else {
+            // 太空人 ScrollTrigger 偵序列（Beat 02）
+            try { initAstronautScroll(); } catch(e) { console.warn('[index.js] astronaut scroll failed:', e); }
 
-        // 太空人 ScrollTrigger 偵序列（Beat 03）
-        try { initManifestoAstronautScroll(); } catch(e) { console.warn('[index.js] manifesto astronaut failed:', e); }
+            // 太空人 ScrollTrigger 偵序列（Beat 03）
+            try { initManifestoAstronautScroll(); } catch(e) { console.warn('[index.js] manifesto astronaut failed:', e); }
 
-        // 太空人 Beat 04 WebP 偵序列繪製（取代 video 標籤、全平台真透明）
-        try { initFooterAstronautFrameLoop(); } catch(e) { console.warn('[index.js] footer astronaut frame loop failed:', e); }
+            // 太空人 Beat 04 WebP 偵序列繪製（取代 video 標籤、全平台真透明）
+            try { initFooterAstronautFrameLoop(); } catch(e) { console.warn('[index.js] footer astronaut frame loop failed:', e); }
 
-        // 太空人隨機漂移（Beat 04）—— 漂移 transform 由 GSAP 控制 wrapper、與 frame loop 並行
-        try { initFooterAstronautDrift(); } catch(e) { console.warn('[index.js] footer astronaut drift failed:', e); }
+            // 太空人隨機漂移（Beat 04）—— 漂移 transform 由 GSAP 控制 wrapper、與 frame loop 並行
+            try { initFooterAstronautDrift(); } catch(e) { console.warn('[index.js] footer astronaut drift failed:', e); }
+        }
     }
 
     // ═══════════════════════════════════════════════════════════

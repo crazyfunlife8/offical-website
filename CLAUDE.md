@@ -148,6 +148,12 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | 15 | 測試與部署上線 | 🔲 待完成 |
 | 16 | 太空人角色敘事實作 | ✅ 完成（beat01-04 全上線 2026-05-10） |
 
+> **2026-06-23 17:43 整合＋手機 RWD 狀態更新（修正下方多處「未進正式 index.html」舊敘述）：**
+> ① **整合已完成**：數位行銷手風琴（3a）＋軟體開發三服務堆疊玻璃＋落雨（3b）皆已從 `index-rain-preview.html` 整進**正式 `index.html`** 的 5 層架構（commit `3d60a1b`/`5b77624`）。下方各沙盒小節仍寫「未進正式 index.html／整進正式 index.html」者為**舊敘述、已過時**。
+> ② **數位行銷手風琴(3a) 手機 RWD 已完成**（`@media(max-width:820px)`）：單卡滑動牌組（取代橫向手風琴）＋點卡**全螢幕接管**（含 nav、z-9000、用 `:has(.acc.is-open)` 把 `.services-section`(z-1)＋`.accordion-wrap`(z-2) 抬出堆疊牢籠才蓋得掉 nav）＋宇宙天體導引點（星/月/日/土星 SVG）＋展開背景改全幅直式（`.bgart::after` 垂直遮罩＋各卡 `background-position`：social56/blog88露燈塔/ads72/ai46，4 張背景不重生）＋三行標題左緣對齊 Hero(補 1.5rem)＋外圈藍光 `--svc-halo` 加強。**桌機完全未動。** 完整脈絡見 memory `project_nestdigital_services_mobile_rwd`。
+> ③ **開發工具**：`?lite` URL 開關（`nav.js` 跳過 Three.js 星場、`index.js` 跳過太空人偵序列，省 GPU＋32MB；正式訪客不帶）；本機預覽 `_nocache_server.py`（選擇性 no-cache：只 css/js/html 不快取）。
+> ④ **全部未 commit**（branch `feature/water-card-native-integration`）。**剩**：軟體開發玻璃卡(3b)手機 RWD、自有產品區塊、commit＋部署。
+
 ---
 
 ### 服務區塊視覺探索結論（探索期 2026-05-31 ~ 2026-06-15；記錄 2026-06-15 00:55）
