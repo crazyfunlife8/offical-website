@@ -37,3 +37,6 @@ _imgtest/_preview_b64.txt
 .claude/launch.json
 _nocache_server.py
 _imgtest/_*.py
+
+# _imgtest 整目錄（.assetsignore 已排除不上站；純 repo 體積債，2026-06-24 git rm --cached）
+_imgtest/
