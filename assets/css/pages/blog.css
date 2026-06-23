@@ -62,7 +62,11 @@ body.archive {
     align-items: center;
     justify-content: space-between;
     gap: var(--sp-md);
-    padding: 0.85rem clamp(1.25rem, 4vw, 3rem);
+    /* 幾何對齊首頁 .site-nav：同左右 inset clamp(1.25,3vw,2.5rem)＋同高 56px，降低跨頁切換位移（2026-06-23） */
+    /* 本頁未載 base.css 的 border-box 重置，這裡 scoped 補上，讓 height 含 1.5px 邊框＝首頁同值 56 */
+    box-sizing: border-box;
+    height: 56px;
+    padding: 0 clamp(1.25rem, 3vw, 2.5rem);
     border-bottom: 1.5px solid var(--ink);
     background: rgba(243, 234, 217, 0.82);
     backdrop-filter: blur(3px);
@@ -71,10 +75,15 @@ body.archive {
 .arc-nav__emblem { width: 26px; height: 26px; object-fit: contain; }
 .arc-nav__brand-zh { font-family: var(--f-serif-cjk); font-weight: 700; font-size: 1.12rem; letter-spacing: 0.04em; }
 .arc-nav__brand-en { font-family: var(--f-mono); font-size: 0.6rem; letter-spacing: 0.26em; color: var(--ink-3); }
-.arc-nav__links { display: flex; gap: clamp(1rem, 3vw, 2.2rem); font-size: 0.92rem; font-weight: 500; }
-.arc-nav__links a { color: var(--ink-2); text-decoration: none; padding-bottom: 2px; border-bottom: 1.5px solid transparent; transition: color .2s, border-color .2s; }
+.arc-nav__links { display: flex; gap: clamp(24px, 3vw, 44px); font-size: 0.92rem; font-weight: 500; margin-left: auto; }
+.arc-nav__links a { color: var(--ink-2); text-decoration: none; letter-spacing: 0.1em; padding-bottom: 2px; border-bottom: 1.5px solid transparent; transition: color .2s, border-color .2s; }
 .arc-nav__links a:hover { color: var(--ink); }
 .arc-nav__links a.is-active { color: var(--ink); border-bottom-color: var(--pen-blue); }
+/* 鏡像首頁右側群組：連結組 │ 分隔線 │ 加寬 CTA，讓三按鈕落點對齊首頁（2026-06-23）。
+   分隔線用 --pen-blue＝部落格自有的「冷電藍校樣線」語彙，非硬搬首頁青色。 */
+.arc-nav__divider { width: 1px; height: 1em; align-self: center; flex-shrink: 0; background: var(--pen-blue); opacity: 0.55; }
+.arc-nav__cta { font-size: 0.92rem; font-weight: 500; letter-spacing: 0.28em; color: var(--ink); text-decoration: none; white-space: nowrap; padding-bottom: 2px; transition: color .2s; }
+.arc-nav__cta:hover { color: var(--pen-blue); }
 
 /* ============================================================
    版心 + 共用
@@ -595,7 +604,9 @@ body.archive {
 }
 @media (max-width: 560px) {
     .arc-grid { grid-template-columns: 1fr; }
-    .arc-nav { flex-direction: column; gap: 0.7rem; align-items: flex-start; }
+    .arc-nav { flex-direction: column; gap: 0.7rem; align-items: flex-start; height: auto; padding: 0.8rem clamp(1.25rem, 4vw, 3rem); }
+    .arc-nav__links { margin-left: 0; }
+    .arc-nav__divider { display: none; }
     .reg-mark { display: none; }
     .dossier, .anomaly, .casefile { transform: none; }
     .stamp--confidential { width: 120px; top: 16px; right: 16px; }
