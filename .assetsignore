@@ -11,12 +11,4 @@ _imgtest
 demo-liquid
 generated_images
 _nocache_server.py
-# 開發/沙盒/測試 HTML（正式頁與 nav 均無連結）
-index-rain-preview.html
-index-planets-preview.html
-preview-accordion-a.html
-preview-accordion-b.html
-preview-accordion-compare.html
-preview-accordion-e.html
-accordion-mobile-sandbox.html
-test-astronaut-scroll.html
+# 開發/沙盒/測試 HTML（2026-06-23 清債已刪除實體檔，此處不再列舉）
