@@ -59,7 +59,7 @@
   - `--f-display-en`：**Italiana**（hairline serif，雜誌封面感）→ 英文 echo 副標
   - `--f-sans`：Noto Sans TC（Google Fonts，100–900）→ 內文/說明/次要中文
   - `--f-mono`：JetBrains Mono → 等寬資料讀出條、Nav 品牌名、按鈕箭頭
-- **部署**：GitHub Pages（CNAME: nestxmedia.com）
+- **部署**：Cloudflare Pages（`.github/workflows/deploy.yml` push main 自動部署、Pages 專案 `nestdigitalai`），對外網域 `nestdigitalai.com`（舊 `nestxmedia.com` 已退役）
 
 ### CSS 5 層架構（載入順序不得更改）
 ```
@@ -149,7 +149,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | 16 | 太空人角色敘事實作 | ✅ 完成（beat01-04 全上線 2026-05-10） |
 
 > **2026-06-23 17:43 整合＋手機 RWD 狀態更新（修正下方多處「未進正式 index.html」舊敘述）：**
-> ① **整合已完成**：數位行銷手風琴（3a）＋軟體開發三服務堆疊玻璃＋落雨（3b）皆已從 `index-rain-preview.html` 整進**正式 `index.html`** 的 5 層架構（commit `3d60a1b`/`5b77624`）。下方各沙盒小節仍寫「未進正式 index.html／整進正式 index.html」者為**舊敘述、已過時**。
+> ① **整合已完成**：數位行銷手風琴（3a）＋軟體開發三服務堆疊玻璃＋落雨（3b）皆已從 `index-rain-preview.html` 整進**正式 `index.html`** 的 5 層架構（commit `3d60a1b`/`5b77624`）。服務區各小節已於 2026-06-24 對齊現況、迭代史移入 `_archive/`（見下方「服務區現役狀態」）。
 > ② **數位行銷手風琴(3a) 手機 RWD 已完成**（`@media(max-width:820px)`）：單卡滑動牌組（取代橫向手風琴）＋點卡**全螢幕接管**（含 nav、z-9000、用 `:has(.acc.is-open)` 把 `.services-section`(z-1)＋`.accordion-wrap`(z-2) 抬出堆疊牢籠才蓋得掉 nav）＋宇宙天體導引點（星/月/日/土星 SVG）＋展開背景改全幅直式（`.bgart::after` 垂直遮罩＋各卡 `background-position`：social56/blog88露燈塔/ads72/ai46，4 張背景不重生）＋三行標題左緣對齊 Hero(補 1.5rem)＋外圈藍光 `--svc-halo` 加強。**桌機完全未動。** 完整脈絡見 memory `project_nestdigital_services_mobile_rwd`。
 > ③ **開發工具**：`?lite` URL 開關（`nav.js` 跳過 Three.js 星場、`index.js` 跳過太空人偵序列，省 GPU＋32MB；正式訪客不帶）；本機預覽 `_nocache_server.py`（選擇性 no-cache：只 css/js/html 不快取）。
 > ④ **commit 狀態（2026-06-23 20:37）**：3a 整合＋手機 RWD 已 commit（`3d60a1b`/`5b77624`/`55e42ec`）；軟體開發區玻璃退場已 commit（`65582e4`，見 ⑤）。全在 branch `feature/water-card-native-integration`、**未 push／未併 main／未部署**（線上仍舊玻璃版）。**剩**：自有產品區塊（跳動E／一鍵架站，容器形式未選）、對外推送/部署。
@@ -164,89 +164,24 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 
 ---
 
-### 服務區塊視覺探索結論（探索期 2026-05-31 ~ 2026-06-15；記錄 2026-06-15 00:55）
+### 服務區現役狀態（2026-06-24 00:53 對齊；完整迭代史見 `_archive/服務區視覺迭代史_2026-05~06.md`）
 
-對應任務 11b。服務區卡片視覺做了完整探索週期，所有 POC 存檔於 `demo-liquid/`（探索集，**不上 production**；總索引 `demo-liquid/_index.html`、非液體總展示 `demo-liquid/showcase-all-cards.html`）。
+對應任務 11b。服務區三塊已全整合進**正式 `index.html`**（5 層架構，commit `3d60a1b`/`5b77624`/`65582e4`）：
 
-- **已否決／退役方向**：液態水玻璃卡 / 3D 液體 D1–D8 / 液態金屬 fusion / 滴落變體 V / 液態卡 F / 早期 flow 批 / 星球 3D 畫廊（創辦人明確「放棄液態方向」）。**N4 捲動堆疊卡 × 程式碼流星字雨**（`service-n4rain-poc.html`）探索後退役。**水珠凝聚成形動畫**（metaball 小水流入 → snap 成卡，`service-card-water-final.html`，曾與 Codex 協作多輪）完整探索後創辦人改走簡單版，保留為探索紀錄、不上線。
-- **水卡輪播已放棄（2026-06-15 19:57 探索後退役）**：WebGL 真水卡左右滑輪播（`service-card-water-carousel.html`）曾於 00:55 定案，後創辦人退一步判斷「整塊怪」→ 再判斷「水意象與軟體開發根本搭不上邊」→ 放棄。水卡探索資產（漂亮、未來若有搭水主題可重用）+ 完整技術紀錄留存於 memory [[project_nestdigital_water_card]]。
-- **~~定案方向（2026-06-15 19:57）：開發區 = 捲動堆疊藝術卡 + 程式碼星雨~~〔2026-06-22 06:14 退役→開發卡改走下方「三項服務堆疊玻璃」；藝術卡沙盒 `service-dev-stack-art.html` 留探索〕**。仍 active 的核心原則「**形式即證明**」——每個服務區塊用形式本身證明該服務能力（數位行銷手風琴的藝術感證明設計力、軟體開發的程式碼藝術證明開發力）。藝術卡＝書法明朝超大字浮水印（凹刻浮雕）+ code 視窗列（克制點綴、非 IDE 主體）+ 實心深色卡 + 程式碼星雨打卡頂緣濺火花；3 張 sticky 捲動堆疊（下一張上來、上一張縮小退後）。原型 `demo-liquid/service-dev-stack-art.html`（程式碼雨資產源自退役的 `service-n4rain-poc.html`）；已整合 `index-rain-preview.html`（取代水卡 iframe）、**未動正式 index.html**。**社群類維持手風琴不動。** **紅線：受眾是一般大眾、非工程師——技術素材要「藝術化」不是「IDE 工具化」**（本案連犯兩次工程師向錯，見 memory [[feedback_audience_general_public]]）。
-- **整合待辦（正式進 index.html 前）**：① 浮水印切字位置／浮雕深淺待創辦人用 index-rain-preview 左下調軸定數值、再寫死移面板 ② ~~服務區第三塊內容待定~~ **已定（2026-06-15 20:49）：自有產品（跳動E／一鍵架站）獨立成一塊、放開發落雨區之後**，不硬塞「服務區第三塊」（自有產品非服務，見 [[project_nestdigital_service_taxonomy]]）③ 堆疊卡內容（開發/成長/顧問）對應正確服務分類待全局對齊 ④ 進 5 層 CSS（pages/index.css + index.js）⑤ 效能（Canvas2D 程式碼雨 + GSAP 堆疊）⑥ **服務卡片改「純陳列」（移除點進服務頁的連結）+ 7 teaser 服務頁退役** —— 此步綁進本次 index.html 整合一起做（避免先刪 teaser 造成正式頁斷鏈，見「資訊架構（IA）決策」）。
-  - **自有產品展示形式**：已定避開「自動無限跑馬燈 + 小圖示」（公版味 + 永遠在跑卻證明不了產品價值＝同水卡陷阱）；用真截圖／影片。具體容器（跟著捲動的橫向展開 vs 慢速大圖電影劇照）**待創辦人選**。
-- **早期液態卡 morph 已清（2026-06-14 16:57）**：`index.html` + `assets/css/{animations,components,pages/index}.css` 曾有未 commit 的「液態卡 morph」實驗（`liquid-morph-a/b` 邊角晃動 + `?v=liquid2` 快取參數），已 `git restore` 全數還原、工作區乾淨；液態方向確定不上線。若日後要重看那批 keyframe，本條已記其內容、可重建。
+- **3a 數位行銷手風琴**（`.svc-accordion`）：收合卡＝「月面碑刻」石板（背景 `assets/images/services/mural-j.png`、`.acc` 鎖 `aspect-ratio:1.55/1`）；展開態＝白底藝術背景＋深色字，四卡各綁背景圖（社群 `social-mix-a2`／部落格 `blog4-b`／廣告 `ads2-a`／AI `ai-particle-a-sq`，皆在 `assets/images/services/`）。手機 RWD＝單卡滑動牌組＋點卡全螢幕接管。
+- **3b 軟體開發**（`#dev`）：**開放程式碼空間**——玻璃已退場（`index-glass-stack.js` `REMOVE_GLASS=true`，WebGL 引擎保留、一旗標可還原）＋程式碼落雨左右出血（順傾角 −12°）。
+- **自有產品（跳動E／一鍵架站）**：🔲 待做（容器形式未選；避開「自動跑馬燈＋小圖示」公版味，用真截圖／影片）。
 
-### ~~軟體開發服務卡視覺：攝影棚容器 + 可移動燈（2026-06-21 23:37）~~〔已退役，2026-06-22 06:14 演進為下方「三項服務堆疊玻璃」〕
+**現役紅線（務必守）：**
+- **形式即證明**：每個服務區塊用形式本身證明該服務能力（手風琴藝術感證明設計力、開發區程式碼藝術證明開發力）。
+- **受眾是一般大眾、非工程師**：技術素材要「藝術化」不是「IDE 工具化」（連犯兩次工程師向錯，見 memory [[feedback_audience_general_public]]）。
+- **WebGL 驗收必用 `?qa=1`**（背景分頁 `document.hidden` 凍結 render loop、靜態截圖誤判；`?lite` 會把捲動卡在半路，驗服務區別用 lite）。
+- **落雨**：別拿掉邊緣羽化遮罩（`destination-in` featherX 0.045／featherY 0.052）、別把 innerRain 改不透明／加 opaque 暗底；要改先對齊 `demo-liquid/service-glass-codeRain.html`，別憑空改參數（見 memory [[feedback_match_reference_dont_patch_diverged]]）。
+- **收合卡**：禁改回 2:1 或固定 height（會把 mural-j 橫向壓扁）；碑文別放大置中、別用墊底色塊（已否決）。太空人面癱不可愛、月坑要立體不要塑膠白。
+- **展開態**：人物一律台灣人；社群卡＝編輯式價格帳（細線條列、非促銷貼紙）；背景別塞滿保藝術感。
+- **客製系統文案禁「流程自動化」措辭**（避免與已退場的自動化採集混淆，見術語表 B 類本質）。
 
-> **此段已退役為探索紀錄**（單卡攝影棚 → 三片堆疊延伸）。**仍 active 的只有一條**：創辦人定稿前卡打光值（commit `93e3db4`，見下方條列）＝堆疊玻璃前卡沿用、不准動。沙盒 `service-glass-webgl-real.html` 留存備查。以下為當時紀錄保留（待 §十五 瘦身時可徵詢後精簡）。
-
-對應任務 11b。現役檔＝`demo-liquid/service-glass-webgl-real.html`（Three.js r0.160、MeshPhysicalMaterial transmission 厚折射玻璃卡）。**2026-06-21 23:37 創辦人主導大改：從「浮卡＋補丁反光（舊沉穩/pop 兩版）」重構成「3D 攝影棚容器 ＋ 4 盞可移動柔光、創辦人自己打光」。** 舊「沉穩 vs pop 二選一／補丁反光（edgeBoost/cornerBoost/亮帶/edge rig）」敘述全部作廢。
-
-- **架構**：深黑冷藍攝影棚（floor/walls 用 MeshBasicMaterial 不吃光，避免被照成白房間）＋卡片＋4 盞 RectAreaLight 柔光（主光/頂光/邊光/背光）。每盞用**球座標**控制：方位角(0–360° 繞卡片、循環不卡死)/高度角/距離/強度。debug 面板全繁中；`?qa=1`＝跳過 hidden-pause＋立即全亮＋碼雨 freeze（供截圖驗收）；`?debug=1`＝顯示拉軸面板。
-- **創辦人定稿打光（已 commit `93e3db4`）**：玻璃 thickness1.55/ior1.05/roughness0.06/transmission1/bevel16/fresnel2.25/envMap1.2/bloom0/tilt9,-12；主光 az13·el80·d6.05·i32、頂光 az65·el8·d8·i134、邊光 az70·el34·d6·i157、背光 az270·el35·d4.7·i39。效果＝頂左邊角晶亮、面乾淨、文字可讀。
-- **卡片骨架**：橫向大卡 `min(960px,92vw)×min(560px,78vh)`、圓角28、雙欄（左 kicker＋宋體大標＋說明／右「服務範疇」金線三條目）、watermark「網」裁進卡、內容＝網站架設/客製化系統開發/數位轉型顧問。
-- **設計紅線（血淚換來，務必守）**：① 反光要在「**邊與角**」不在「面」（面反光＝鏡面過度、會洗掉文字）② 邊角晶亮**靜態就能做、不需動態**（pop 當初的亮也是靜態，來自強面光不是會動）③ 燈要在**觀者側**（camera z=8.1）往卡片打、不是卡片後方④ **禁 PointLight/DirectionalLight**（倒角打等距虛線 dash）；**禁人工描線高光/sparkle/band/ticks**（靠材質＋envMap＋Fresnel 連續機制）⑤ 純黑冷藍底、金 1% accent⑥ RectAreaLight 反射是**矩形**→燈要擺到反射落在邊角、避開文字，或升 roughness 柔化⑦ 可見 softbox 面板會擋內容→已移除、只留燈。
-- **驗證坑**：背景分頁被瀏覽器判 hidden/降速→畫面凍結或偏暗；務必用 `?qa=1` ＋網址**加 cache-bust 參數**（`&cb=隨機`）才看得到最新版（同 URL 會吃快取、誤判沒變）。
-- **協作分工**：WebGL 由 codex（兄弟）實作、主 session 給死設計方向＋用 Chrome 驗收（codex 看不到畫面）。
-- **stage 2 待辦（下個對話接）**：① 燈控面板**分頁化**（主光/頂光/邊光/背光各一頁、收斂拉軸數量）② 3 個 **preset**（乾淨棚拍/銳利晶邊/科技冷光）③ 把背景**碼雨搬進攝影棚**（目前仍是平貼背景、非容器內元素）④ 驗證 **dispersion** 是否該留（r0.160 疑似無效、需 runtime 確認）⑤ 整進**正式 index.html**（5 層 CSS）。
-- **已退場/封存**：`service-glass-webgl-pop.html`＝舊水晶內雕文字版（checkpoint `709101b`，封存備查、非現役）。git 還原點（branch `feature/water-card-native-integration`）：原始沉穩版 `b1d7b65`、攝影棚重構 `d8def49`、定稿 `93e3db4`。
-
-### 軟體開發卡：三項服務堆疊玻璃〔開發卡唯一現役定案〕（2026-06-22 06:14 完成驗收＋commit `442b261`；未進正式 index.html）
-
-> **本段為開發卡唯一現役方向。** 上方「攝影棚容器＋可移動燈」(06-21) 與更早「堆疊藝術卡＋程式碼星雨」(06-15) 兩段**皆已退役**為探索紀錄、僅留沙盒備查，勿再依其往相反方向做。
-
-對應任務 11b。現役沙盒＝`demo-liquid/service-glass-stack.html`（由 `service-glass-webgl-real.html` 打光玻璃引擎延伸，3 片真 WebGL slab；前卡＝創辦人定稿打光值原封不動）。三項服務：**網站架設／客製化系統開發／數位轉型顧問**，捲動推進（前片抬起、下一片升進前位）。
-
-- **設計鐵律（2026-06-22 06:14 創辦人拍板，務必守）**：① 只有「聚光主卡」是完整發光水晶（冷光邊＋selective bloom）；② **非聚光卡＝全暗平板、零反光**（envMap≈0、transmission≈0、不透出背景）；③ **退場卡捲動時淡出消失**、不賴在主卡後方。②③ 是「透光主卡會透出後卡＝整臉藍霧」那個纏很久的坑的**根本解**——別再退回「後片半亮霧面／景深壓暗」舊路（那條走不通、會洗臉）。
-- **發光由 `window.__fx` 即時調**（debug 面板有同名 slider）：定稿預設 heroEdgeGlow **1.45**、bloomStrength **0.26**、codeGlow 0.05、rearFrost 1、bloomThreshold 0.985；selective bloom＝layer-based 雙 composer、只有聚光主卡進 bloom。背景程式碼透過玻璃折射透出（codeGlow 控、調得很淡）。
-- **紅線／驗收坑（血淚）**：① **WebGL/Canvas 沙盒驗收前必須先捲動觸發重繪**——loop 在無互動時停在舊幀，截圖會看到凍住畫面、誤判「改了沒效」（本輪最大時間黑洞，見 memory [[feedback_verify_webgl_force_repaint]]）② **codex 編碼環境會把整檔中文存成 mojibake／逕改英文**，請 codex 改完**必查中文沒被破壞**、必要時用 Python regex 修回（見 [[feedback_state_origin_before_destructive]] 同精神）③ 內容文案：客製系統**禁「流程自動化」措辭**（避免與 G 類採集混淆，見術語表 B 類本質）。
-- **協作**：WebGL 由 codex 實作、主 session 給死方向＋Chrome 強制重繪驗收。本輪因驗收凍幀誤判，主 session 後段自行微調後片亮度/偏移。
-- **待辦**：① 整進**正式 index.html**（5 層 CSS）② 手機 RWD／效能降階（__fx 已留 `FX` 降階鉤子）。
-- **完整迭代脈絡**（selective bloom／envMap body-edge 拆分／退場淡出怎麼演進、踩過哪些坑）**見 commit `442b261` body**，不在主文件重述。
-
-### 軟體開發卡落雨：對齊 `service-glass-codeRain.html` 修復（2026-06-22 23:36，創辦人驗收通過）
-
-對應任務 11b。**現役落雨在 `index-rain-preview.html` 的 #dev**（不是 `service-glass-stack.html`——那版無落雨）。落雨曾分岔壞掉（commit 191e762 整合時 innerRain 改不透明、**拿掉邊緣羽化遮罩**、加 cardBackPool 硬底 →「比玻璃小的內縮暗卡」＋中央遮罩擋雨，調亮度/codeGlow 救不回、繞好幾天）。**已逐項對齊確定版沙盒 `demo-liquid/service-glass-codeRain.html` 修復。**
-
-- **三檔關係（別再混淆）**：`service-glass-stack.html`（442b261·三片堆疊玻璃定案沙盒·**無落雨**）／`service-glass-codeRain.html`（**落雨參考**·含邊緣羽化遮罩）／`index-rain-preview.html #dev`（**現役整合**·堆疊玻璃＋落雨合體）。
-- **落雨定案做法（對齊 codeRain）**：drawInnerRain 填深底＋落雨後做 `destination-in` 邊緣羽化遮罩（featherX 0.045／featherY 0.052）；innerRain `transparent:true`／w*1.08／depthWrite:true；depthPool uOpacity 0.055；亮度 0.92・0.78×glow×0.52；codeGlow 0.05；玻璃材質 envMap1.2/clearcoat0.72/roughness0.06。
-- **紅線（血淚，別再踩）**：① **別拿掉邊緣羽化遮罩**（它就是「無硬邊內縮暗卡」的關鍵）② 別把 innerRain 改不透明、別加 opaque 暗底 plane ③ 落雨要改**先對齊 `service-glass-codeRain.html`**、別在 index-rain-preview 憑空改參數。
-- **待辦**：① cardBackPool 目前留前移位置（驗收已過、暫不動）② 整進正式 index.html（5 層 CSS）③ 手機 RWD／效能。方法教訓見 memory `feedback_match_reference_dont_patch_diverged`。
-
-### 數位行銷手風琴收合卡視覺定案（2026-06-17 23:11；2026-06-18 23:25 比例/碑文重校）
-
-收合卡＝「**月面碑刻**」石板。**已整合進預覽主頁**（`index-rain-preview.html` iframe 嵌 `demo-liquid/service-accordion-embed.html`）、**仍未進正式 index.html**。
-
-- **背景圖** `_imgtest/mural-j.png`（**2026-06-18 取代 mural-h**）：**1.55:1**、銀白俯瞰真月面、**連續無接縫**、4 等格各一個面癱 chibi 太空人凹刻＋服務元素、**圖內無中文字**（服務名是 CSS 疊上）。〔mural-i＝同批但四格有分隔脊線版、未採用〕**紅線：太空人面癱「白爛」不可愛；真月亮坑有立體、不要沙灘顆粒/塑膠白。**
-- **比例（2026-06-18 改，兄弟校準）**：`.acc` 鎖 `aspect-ratio:1.55/1`（原 2:1 太矮、展開擠不下＋整排像矮 banner）、`width:min(1240px,100%,124vh)`；每格≈0.39:1 窄碑；預覽主頁 iframe 高 90vh 配合。**紅線：禁止改回 2:1 或固定 height——比例變了會把 mural-j 橫向壓扁。**
-- **每格背景放大（解 mural 接縫，不重生）**：`background-size` 預設 **440%**（>400% 往內裁、把四格接縫推出卡片外）；JS 逐卡可覆寫 `bgs`/`bgx`——**AI 卡 `bgs:400`**（440% 會裁掉它太空人左側）、**廣告卡 `bgx:65`**（內容右移）。
-- **碑文（2026-06-18 重校，創辦人+兄弟多輪）**：直排、**字小求精致** `clamp(1.55rem,1.45vw,1.82rem)`/字距 .18em、**置中** `top:11%;left:50%`、靠**強化浮雕**讀字＝字周圍一圈接近白亮邊（提離月面＋刻痕受光凸緣）＋上暗下亮凹槽。**紅線：碑文別放大置中（大字創辦人嫌「很呆」）、別用墊底色塊（像貼紙、已否決）。** 右上淡刻編號 opacity .12、英文 echo 8.5px 旁註。
-- **整組光暈**：每卡大外光降掉、改 `.acc::before` 整組一層外光暈、gap 8px（原各自發光+12px 會斷層）。
-- **互動**：展開該卡月面淡出換白底藝術（見下段）、其他卡變暗退讓；hover 只掃亮刻文不位移。
-- 完整迭代脈絡見 commit body。
-
----
-
-### 數位行銷手風琴「展開態」設計進度（2026-06-18 23:25，下一輪繼續打磨）
-
-對應任務 11b。展開後（`.body`）＝白色系藝術背景＋深色字，**2026-06-19 01:42 已原生內嵌進預覽主頁 `index-rain-preview.html`**（全選擇器加 `.svc-accordion` 前綴與全站 CSS 隔離；原 iframe 載 `demo-liquid/service-accordion-embed.html` 版退場為沙盒）、仍未進正式 index.html。沙盒 `service-accordion-expand-art.html` 為背景挑版工具。
-
-**四卡展開背景（皆定，每卡綁自己的圖、非工具列切換）：**
-- 社群經營＝`social-mix-a2.png`（暖白紙雕＋彩色平台 icon）
-- 部落格代營運＝`blog4-b.png`（台灣太空人工人衝權威燈塔）
-- 廣告投放＝`ads2-a.png`（暖金命中靶心）
-- AI 形象網紅＝`ai-particle-a-sq.png`（**光粒聚合成人**；概念由「破框走出 lookbook」**改成「光粒凝聚」**；正方形 1:1，2:1 會被裁；原 `ai-v2-a~d` lookbook 退役）
-
-**展開版面原則（上半共用骨架＋下半各卡模組；創辦人+兄弟對齊）：**
-- 上半共用：kicker＋宋體標題＋Italiana 英文 echo＋說明，限左側可讀區（max-width＋`.body::before` 左重右輕提亮遮罩）。
-- 下半「成交區」固定卡片下緣帶（`.deal`＋極淡白漸層托字）；四卡掏錢點同位置。
-- **社群卡＝編輯式價格帳（A+，已做）**：三方案不做盒子、改可點擊細線條列（名｜一句差異｜mono 等寬價靠右），推薦列左緣舊金細線 `#b99a52`＋mono「推薦」＋金箭頭，**非促銷貼紙**。
-- 背景別塞滿（保藝術感）、CTA 文案四卡同語氣層級。**人物一律台灣人。**
-
-**手機 RWD（延後做、結構已鋪路）**：同一份內容模組，桌機手風琴／未來手機全螢幕滑卡只換外殼、不分叉內容。
-
-**本輪完成（2026-06-19 01:42）：** ① 展開版面細修 ✅ ② 部落格/廣告/AI 三卡內容結構化 ✅——四卡同家族「價值主張→做什麼(flow meta)→證據(proof 大數字)→貼底成交+CTA」，內容取自服務知識庫/總表真實素材（部落格 16 代理/60+ Gate/5 站、廣告 3 平台/10–25% 抽成、AI 3 倍互動/100% 可控/0 翻車）③ CTA＝活潑青膠囊 variant D（白字深底對比修正）④ 文案去 AI 味（破折號/全形斜線/英文縮寫大字清除）⑤ blog 燈塔裁切修復（`background-size:auto 134%` 重新取景）⑥ 原生內嵌進預覽頁（見上段）。
-
-**仍待辦：** ① AI 卡「正在經營的網紅畫廊」彈出（暫不做）② 整進**正式 index.html**（5 層 CSS）。**紅線：手風琴現雙份——預覽頁內嵌版（現役）＋ `demo-liquid/service-accordion-embed.html`（沙盒）；要改手風琴改預覽頁內嵌版，整進正式 index.html 時清掉雙份。**
+> 完整視覺迭代脈絡（攝影棚→堆疊玻璃→玻璃退場、落雨怎麼壞怎麼修、收合卡碑文重校、展開態）見 `_archive/服務區視覺迭代史_2026-05~06.md` 與 commit body（`93e3db4`/`442b261`/`65582e4`）。WebGL 還原點：玻璃定稿打光值在 commit `93e3db4`、堆疊玻璃在 `442b261`、玻璃退場在 `65582e4`。
 
 ---
 
@@ -372,7 +307,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 
 ### 主視覺背景技術規格（已確認，禁止改動核心數值）
 
-**檔案**：`assets/js/pages/index.js` → `initStarfield()`、`assets/css/pages/index.css` → `#blackhole`
+**檔案**：`assets/js/pages/index.js` → `initStarfield()`、`assets/css/pages/index.css`（黑洞斜帶現由 `#css-starfield::before` 承擔；`#blackhole` 元素 2026-05-10 已退役）
 
 #### 粒子系統（Three.js）
 
@@ -381,7 +316,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | COUNT | 6500 | 主軌道粒子數 |
 | R_MIN | 0.42 | 事件視界半徑 |
 | SPIRAL_K | 0.42 | 螺旋臂捲曲係數 |
-| TILT | π/12（+15°） | 傾斜角，與 CSS #blackhole 斜帶同向 |
+| TILT | π/12（+15°） | 傾斜角，與 CSS `#css-starfield::before` 斜帶同向 |
 | 橢圓比 | b/a = 0.38 | 盤面比例 |
 | ROT_BY_TYPE | [0.00060, 0.00032, 0.00017, 0.000075] | 四色群開普勒差速 |
 | BASE_PULL | 0.000010 | 向心拉力 |
@@ -400,9 +335,9 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 
 **目的**：避免 GSAP inline style / CSS animation / Three.js RAF 循環干擾靜態驗收。切回動態只需翻轉 boolean，所有 `init*()` 函式原封保留。
 
-**開關位置**：`assets/js/pages/index.js:13` → `const DESIGN_MODE = true;`
+**開關位置**：`assets/js/pages/index.js:17` → `const DESIGN_MODE = false;`（**現役＝false 動態**，2026-05-07 翻 false 上線；臨時要凍結動畫驗收靜態時改回 true）
 
-**true（當前）凍結範圍**
+**翻 true 時的凍結範圍**（現役 false、動畫全開；下表為臨時翻 true 驗收靜態時的效果）
 
 | 層 | 項目 | 凍結機制 |
 |----|------|---------|
@@ -412,19 +347,22 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | WebGL 緩衝區 | 星場 canvas 單幀保留 | `preserveDrawingBuffer: DESIGN_MODE` |
 | `.js-hidden` | 等待 GSAP 解放的元素 | `body.design-mode .js-hidden { opacity:1 !important; transform:none !important }`（`base.css:183`） |
 
-**true 時保留**：Three.js 星場單幀定格、CSS 星空靜止、`#blackhole` radial-gradient、所有靜態排版。
+**翻 true 時保留**：Three.js 星場單幀定格、CSS 星空靜止、`#css-starfield::before` 黑洞漸層、所有靜態排版。
 
 ---
 
 ### 已存在的頁面檔案
 - `index.html` — 4 sections 完整實作（Hero / 宣言 / Bento 服務 / 終點 CTA「先別點」），site-footer 同步重設計。Section 4 品牌故事於 2026-05-07 移除。`<section class="services-section">` 加 `id="services-section"` 作為 nav 錨點目標（2026-05-07 21:18）。Bento 2026-05-11 從 7 卡縮為 6 卡（F「粉絲與互動買賣」退役），同日重平衡視覺權重：**FEATURED C 卡升格為 row 1 hero**（grid-column `3/4` → `2/4` 跨 2 欄）、A 卡退回單欄 supporting（`1/3` → `1/2`），呼應 FEATURED 標籤的主角 narrative；下半 row 3 E 跨左 2 欄保留為自營平台 anchor、與 C 形成上下兩個 hero 的反 Z 節奏。
-- `growth.html` — F 類 teaser「敬請期待」頁；2026-05-11 F 卡從首頁退役後成為 orphan page（無入口）、檔案保留待 F 類未來上線方式決定再處理。
-- `social.html` / `virtual.html` / `website.html` / `system.html` / `consultant.html` / `tiktok.html` / `growth.html` / `about.html` / `news.html` — 9 頁 teaser「敬請期待」共用 `pages/coming-soon.css`（2026-05-07 21:38）
-- `contact.html` — 極簡聯絡頁（LINE/電話 Liquid Glass 卡片連結 + 地址統編 mono），使用 `pages/coming-soon.css` 大架構 + `pages/contact.css` 補充（2026-05-07 21:38）
-- `maintenance.html` — 真維護備用頁（與 teaser「敬請期待」分開）
+- `about.html` / `news.html` / `growth.html` — 3 個孤兒 teaser「敬請期待」頁（無 nav／首頁入口，刪 6 服務 teaser 時刻意保留待未來決定），共用 `pages/coming-soon.css`。
+- `quick-site.html` — 自有產品「一鍵架站」功能頁（會實際運作、非說明頁；`pages/quick-site.css`）。
+- `showcase.html` — 作品集展示頁（素材在 `demo/`）；**目前無 nav 入口、亦無 noindex**——去留待創辦人決定（見「待辦／決策」）。
+- `contact.html` — 極簡聯絡頁（LINE/電話 Liquid Glass 卡片連結 + 地址統編 mono），使用 `pages/coming-soon.css` 大架構 + `pages/contact.css` 補充（2026-05-07 21:38）。
+- `maintenance.html` — 真維護備用頁（與 teaser「敬請期待」分開）。
 
-### 已退役的頁面檔案（2026-05-07 21:18）
-- `services.html` + `pages/services.css` + `pages/services.js` — 服務總覽中間頁，IA 重構後退役
+### 已退役／已刪除的頁面檔案
+- `services.html` + `pages/services.css` + `pages/services.js` — 服務總覽中間頁，IA 重構後退役（2026-05-07 21:18）。
+- `social.html` / `virtual.html` / `website.html` / `system.html` / `consultant.html` / `tiktok.html` — 6 個服務 teaser，2026-06-15 IA 決策「服務不另開頁」後退役、2026-06-23 清債刪除（commit `99ecba9`）。
+- `index-rain-preview.html` / `index-planets-preview.html` / `preview-accordion-*.html` / `accordion-mobile-sandbox.html` / `test-astronaut-scroll.html` — 整合用預覽/沙盒頁，服務區整進 index.html 後 2026-06-23 刪除（commit `99ecba9`）。
 
 ### 實作偏差備注
 | 項目 | 文件規劃 | 實際實作 |
