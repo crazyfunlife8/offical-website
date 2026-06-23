@@ -191,7 +191,6 @@
             setTimeout(fin,400);                                        /* fallback 防 transitionend 沒觸發 */
           } else { finishCollapse(); }
         }
-        function hint(){ if(reduceMotion||acc.classList.contains('is-open')) return; layout(24); setTimeout(()=>layout(0),440); }
 
         function onDown(e){ if(!deckMode||acc.classList.contains('is-open')) return; sx=e.clientX; sy=e.clientY; dragging=true; decided=false; horiz=false; moved=false; }
         function onMove(e){ if(!dragging) return; const dx=e.clientX-sx, dy=e.clientY-sy;
@@ -226,7 +225,7 @@
           window.removeEventListener('pointerup',onUp);
           acc.removeEventListener('pointercancel',onCancel);
         }
-        return { enter, leave, setActive, expand, hint, get active(){ return active; } };
+        return { enter, leave, setActive, expand, get active(){ return active; } };
       })();
 
       const mqMobile=window.matchMedia('(max-width:820px)');

@@ -298,7 +298,6 @@
 
     let animId = 0;
     let running = false;
-    let apiPaused = false;
 
     function stopLoop() {
         if (animId) {
@@ -392,25 +391,10 @@
     }
 
     function startLoop() {
-        if (running || document.hidden || apiPaused) return;
+        if (running || document.hidden) return;
         running = true;
         animate();
     }
-
-    window.__starfield = {
-        pause() {
-            apiPaused = true;
-            stopLoop();
-        },
-        resume() {
-            apiPaused = false;
-            startLoop();
-        },
-        isRunning() {
-            return running;
-        }
-    };
-    window.dispatchEvent(new CustomEvent('starfield:ready'));
 
     startLoop();
 

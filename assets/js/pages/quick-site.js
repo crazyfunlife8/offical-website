@@ -236,7 +236,6 @@ function sendEmailNotification() {
         mode: 'no-cors',
         body: form
     }).catch(err => console.error('Email webhook failed:', err));
-    console.log('Email notification sent for', pendingEmailData.email, siteUrl);
 }
 
 // ── Toast ─────────────────────────────────────────────────────
