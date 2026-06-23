@@ -350,7 +350,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 - `index.html` — 現役首頁，5 區：Hero／宣言／數位行銷手風琴（`<section id="services-section">`，nav 錨點目標）／軟體開發開放程式碼空間（`<section id="dev">`）／終點 CTA「先別點」。site-footer 由 nav.js 注入。〔舊「Bento 服務星圖」（`.bento-grid` 6 卡＋FEATURED C 卡）2026-06-23 被手風琴取代、已移除；歷史見 `_archive/服務區視覺迭代史`〕
 - `about.html` / `news.html` / `growth.html` — 3 個孤兒 teaser「敬請期待」頁（無 nav／首頁入口，刪 6 服務 teaser 時刻意保留待未來決定），共用 `pages/coming-soon.css`。
 - `quick-site.html` — 自有產品「一鍵架站」功能頁（會實際運作、非說明頁；`pages/quick-site.css`）。
-- `showcase.html` — 作品集展示頁（素材在 `demo/`）；**目前無 nav 入口、亦無 noindex**——去留待創辦人決定（見「待辦／決策」）。
+- `showcase.html` — 「展示作品」作品集頁，陳列 3 個可運作 Demo 站：團購 `demo/group-buy/`（Next.js 匯出）、遊戲 `demo/gaming/`、旅遊 `demo/travel/`（`demo/` 共 ~21MB）。**🟢 創辦人決策（2026-06-24 02:16）：未來要上、現在不動。** 這是有行銷價值的成品（軟體開發本業的「形式即證明」），**非技術債**；現無 nav 入口＝「做好待接」狀態，上線時再補 nav/頁尾入口、OG 圖、sitemap。**清債紅線：`showcase.html` 與 `demo/` 不得當孤兒檔清除或排除部署——它們是待上線功能、不是殘骸。**
 - `contact.html` — 極簡聯絡頁（LINE/電話 Liquid Glass 卡片連結 + 地址統編 mono），使用 `pages/coming-soon.css` 大架構 + `pages/contact.css` 補充（2026-05-07 21:38）。
 - `maintenance.html` — 真維護備用頁（與 teaser「敬請期待」分開）。
 
