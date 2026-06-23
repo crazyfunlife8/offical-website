@@ -4,3 +4,19 @@ _baseline
 _工具參考
 _工具參考_local
 node_modules
+
+# 開發暫存物，不上公開站（2026-06-23 正式上線前補）
+.wrangler
+_imgtest
+demo-liquid
+generated_images
+_nocache_server.py
+# 開發/沙盒/測試 HTML（正式頁與 nav 均無連結）
+index-rain-preview.html
+index-planets-preview.html
+preview-accordion-a.html
+preview-accordion-b.html
+preview-accordion-compare.html
+preview-accordion-e.html
+accordion-mobile-sandbox.html
+test-astronaut-scroll.html
