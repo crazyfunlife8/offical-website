@@ -347,7 +347,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 ---
 
 ### 已存在的頁面檔案
-- `index.html` — 4 sections 完整實作（Hero / 宣言 / Bento 服務 / 終點 CTA「先別點」），site-footer 同步重設計。Section 4 品牌故事於 2026-05-07 移除。`<section class="services-section">` 加 `id="services-section"` 作為 nav 錨點目標（2026-05-07 21:18）。Bento 2026-05-11 從 7 卡縮為 6 卡（F「粉絲與互動買賣」退役），同日重平衡視覺權重：**FEATURED C 卡升格為 row 1 hero**（grid-column `3/4` → `2/4` 跨 2 欄）、A 卡退回單欄 supporting（`1/3` → `1/2`），呼應 FEATURED 標籤的主角 narrative；下半 row 3 E 跨左 2 欄保留為自營平台 anchor、與 C 形成上下兩個 hero 的反 Z 節奏。
+- `index.html` — 現役首頁，5 區：Hero／宣言／數位行銷手風琴（`<section id="services-section">`，nav 錨點目標）／軟體開發開放程式碼空間（`<section id="dev">`）／終點 CTA「先別點」。site-footer 由 nav.js 注入。〔舊「Bento 服務星圖」（`.bento-grid` 6 卡＋FEATURED C 卡）2026-06-23 被手風琴取代、已移除；歷史見 `_archive/服務區視覺迭代史`〕
 - `about.html` / `news.html` / `growth.html` — 3 個孤兒 teaser「敬請期待」頁（無 nav／首頁入口，刪 6 服務 teaser 時刻意保留待未來決定），共用 `pages/coming-soon.css`。
 - `quick-site.html` — 自有產品「一鍵架站」功能頁（會實際運作、非說明頁；`pages/quick-site.css`）。
 - `showcase.html` — 作品集展示頁（素材在 `demo/`）；**目前無 nav 入口、亦無 noindex**——去留待創辦人決定（見「待辦／決策」）。
