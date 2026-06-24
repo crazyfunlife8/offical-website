@@ -1070,9 +1070,8 @@ body {
       }
       @media(min-width:821px){ .svc-deck-dots,.svc-deck-close{ display:none !important; } }
 
-      /* ── 軟體開發區：三服務單卡玻璃（WebGL r0.160，2026-06-22 取代藝術卡/星雨） ──
-         源自 demo-liquid/service-glass-stack.html；全選擇器加 .dev-glass-stack 前綴與全站 CSS 隔離；
-         canvas 鎖在 #dev 一屏區塊內、不 fixed 到全站。 */
+      /* ── 軟體開發區（#dev）：斜卡片 + CSS 3D 多層程式碼隧道落雨（2026-06-24 拔 WebGL 改 CSS 3D） ──
+         卡片由 index-glass-stack.js 動態注入；全選擇器加 .dev-glass-stack 前綴與全站 CSS 隔離。 */
       #dev{ position:relative; min-height:100vh; min-height:100dvh; background:transparent; }
       .dev-glass-stack{ position:relative; z-index:1; width:100%;
         --cardW:min(960px,92vw); --cardH:min(560px,78vh); --cardRadius:28px; --tiltX:9; --tiltY:-16;
@@ -1104,8 +1103,6 @@ body {
       .dev-rain-paused .bar-wrap{ animation-play-state:paused; }
       @keyframes dev-barfall{ from{ transform:translateY(calc(var(--rainBandH) * -0.25));} to{ transform:translateY(calc(var(--rainBandH) * 1.25));} }
       .dev-stack-html-deck{ position:absolute; inset:0; z-index:2; pointer-events:none; }
-      .dev-glass-stack .slot{ position:absolute; left:50%; top:50%; width:var(--cardW); height:var(--cardH);
-        transform:translate(-50%,-50%); visibility:hidden; pointer-events:none; }
       .dev-glass-stack .deck{ position:absolute; inset:0; }
       .dev-glass-stack .html-card{ position:absolute; left:50%; top:50%; width:var(--cardW); height:var(--cardH);
         margin-left:calc(var(--cardW) / -2); margin-top:calc(var(--cardH) / -2);
