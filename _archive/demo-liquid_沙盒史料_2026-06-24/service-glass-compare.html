@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="no-js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>玻璃卡比較沙盒｜深色玻璃 vs 亮玻璃</title>
+<!--
+  探索沙盒（不上 production）— 軟體開發落雨區玻璃卡：甲深色玻璃 vs 乙亮玻璃並排比較
+  背景＝真實深空底 + 程式碼星雨（取自 index-rain-preview.html 同一套）
+  用途：創辦人拉軸用感覺選方向，定案後把數值寫死進正式 index.html
+  建立 2026-06-20
+-->
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Italiana&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  :root{
+    --deep:#050d2e; --star:#e8f0ff; --cyan:#00c8ff; --blue:23,54,245; --gold:255,199,9;
+  }
+  html,body{ height:100%; background:var(--deep); color:var(--star);
+    font-family:"Noto Sans TC",sans-serif; overflow:hidden; }
+  /* 深空底：方向性漸層 + 黑洞斜帶感 */
+  body::before{ content:''; position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(120% 90% at 78% -8%, rgba(40,70,160,.30), transparent 52%),
+      radial-gradient(90% 80% at 12% 108%, rgba(20,40,120,.22), transparent 56%),
+      linear-gradient(160deg, #061036 0%, #050d2e 46%, #03081f 100%); }
+  /* 細星點 */
+  body::after{ content:''; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.5;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, #fff, transparent),
+      radial-gradient(1px 1px at 70% 60%, #cfe0ff, transparent),
+      radial-gradient(1px 1px at 40% 80%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 85% 22%, #fff, transparent),
+      radial-gradient(1px 1px at 55% 12%, #aac4ff, transparent),
+      radial-gradient(1px 1px at 33% 55%, #fff, transparent);
+    background-size:cover; }
+  #rain{ position:fixed; inset:0; width:100%; height:100%; z-index:1; pointer-events:none; }
+
+  /* ───── 比較舞台 ───── */
+  .stage{ position:relative; z-index:2; height:100%; display:flex; align-items:center; justify-content:center;
+    gap:clamp(20px,3vw,52px); padding:88px 268px 20px; }
+  .col{ position:relative; flex:1; max-width:480px; display:flex; flex-direction:column; align-items:center; }
+  .col__tag{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.28em; text-transform:uppercase;
+    color:rgba(0,200,255,.85); margin-bottom:14px; }
+  .col__tag b{ color:rgba(var(--gold),.9); font-weight:500; }
+
+  /* ───── 玻璃卡（所有質感參數走 CSS 變數，沙盒可即時調）───── */
+  .inner{ position:relative; width:100%; aspect-ratio:1/1.18; max-height:62vh; overflow:hidden;
+    border-radius:26px;
+    transform:perspective(1400px) rotateX(calc(var(--tilt,0)*1deg)); transform-origin:center 60%; will-change:transform;
+    border:1px solid rgba(255,255,255, var(--border));
+    background:
+      radial-gradient(150% 110% at 14% 2%, rgba(255,255,255, var(--hi)), rgba(255,255,255, calc(var(--hi)*0.22)) 36%, transparent 58%),
+      linear-gradient(150deg, rgba(150,178,255, var(--bluefilm)), rgba(255,255,255, calc(var(--whitefilm)*0.32)) 48%, rgba(120,150,255, calc(var(--bluefilm)*0.18))),
+      linear-gradient(180deg, rgba(255,255,255, var(--whitefilm)), rgba(255,255,255, calc(var(--whitefilm)*0.7))),
+      linear-gradient(180deg, rgba(8,16,38, var(--darkfill)), rgba(4,9,26, calc(var(--darkfill)*1.15)));
+    backdrop-filter:blur(calc(var(--blur)*1px)) saturate(calc(var(--sat)*1%));
+    -webkit-backdrop-filter:blur(calc(var(--blur)*1px)) saturate(calc(var(--sat)*1%));
+    box-shadow:
+      0 54px 120px rgba(0,0,0, var(--drop)),
+      0 0 90px rgba(var(--blue), var(--glow)),
+      inset 0 2px 0 rgba(255,255,255, var(--edge)),
+      inset 1px 1px 0 rgba(255,255,255, calc(var(--edge)*0.45)),
+      inset 0 -44px 64px rgba(10,20,50, var(--bottominset)),
+      inset 0 0 54px rgba(150,175,255, calc(var(--glow)*0.3)),
+      var(--extrude, 0 0 0 transparent); }
+  /* 玻璃底緣受光亮唇（厚度的下沿） */
+  .inner > .botlip{ content:''; position:absolute; left:6%; right:6%; bottom:0; height:1px; z-index:6; pointer-events:none;
+    background:linear-gradient(90deg, transparent, rgba(190,210,255, calc(var(--thick,0)*0.018)), transparent); }
+  /* 斜向折射掃光 */
+  .inner::after{ content:''; position:absolute; inset:0; z-index:5; pointer-events:none; border-radius:26px;
+    background:linear-gradient(122deg, rgba(255,255,255, var(--refract)) 0%, rgba(255,255,255, calc(var(--refract)*0.25)) 8%, transparent 22%);
+    mix-blend-mode:screen; }
+  /* 頂緣藍金細線 */
+  .inner::before{ content:''; position:absolute; top:0; left:0; right:0; height:1px; z-index:6;
+    background:linear-gradient(90deg, transparent, rgba(var(--blue), var(--goldline)), rgba(var(--gold), calc(var(--goldline)*0.85)), transparent); }
+
+  /* 超大書法浮水印 */
+  .ghost{ position:absolute; right:-6%; bottom:-18%; z-index:1; font-family:"Noto Serif TC",serif; font-weight:700;
+    font-size:min(46vw,340px); line-height:.8; color:rgba(225,235,255,.03);
+    text-shadow:0 2px 1px rgba(225,235,255,.03), 0 -1px 1px rgba(0,0,0,.6);
+    user-select:none; pointer-events:none; letter-spacing:-.02em; }
+  /* 左側程式碼底紋 */
+  .grain{ position:absolute; left:0; top:0; width:34%; height:100%; z-index:2; opacity:.05; pointer-events:none;
+    font-family:"JetBrains Mono",monospace; font-size:11px; line-height:2; color:rgb(var(--blue)); white-space:pre; overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 50%,transparent 100%); mask-image:linear-gradient(90deg,#000 0%,#000 50%,transparent 100%); }
+  /* 頂部 code 索引列 */
+  .codebar{ position:absolute; top:0; left:0; right:0; z-index:4; display:flex; align-items:center;
+    padding:12px 22px; border-bottom:1px solid rgba(225,235,255,.05); opacity:.7; }
+  .codebar .cpath{ font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:rgba(225,235,255,.42); }
+  /* 內容 */
+  .content{ position:relative; z-index:4; width:100%; height:100%; padding:46px 40px 40px; display:flex; flex-direction:column; }
+  .klab{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.26em; color:rgba(var(--gold),.82); }
+  .knum{ position:absolute; top:30px; right:18px; font-family:"Italiana",serif; font-size:52px; color:rgba(var(--gold),.14); line-height:1; }
+  .ztitle{ font-family:"Noto Serif TC",serif; font-weight:700; font-size:clamp(1.9rem,3.4vw,2.7rem); color:rgba(225,235,255,.97); margin:14px 0 6px; line-height:1.12; letter-spacing:.02em; }
+  .zen{ font-family:"Italiana",serif; font-size:1.05rem; color:rgba(210,222,245,.5); letter-spacing:.04em; }
+  .zsub{ margin-top:11px; font-size:.86rem; line-height:1.6; color:rgba(225,235,255,.55); max-width:90%; }
+  .svc{ list-style:none; margin-top:auto; }
+  .svc li{ display:flex; align-items:baseline; gap:12px; padding:11px 2px; border-top:1px solid rgba(225,235,255,.12); }
+  .svc li .sn{ font-family:"Noto Serif TC",serif; font-size:1rem; color:rgba(225,235,255,.95); }
+  .svc li .sd{ margin-left:auto; font-size:.76rem; color:rgba(225,235,255,.56); white-space:nowrap; }
+
+  /* ───── 拉軸面板 ───── */
+  .panel{ position:fixed; top:0; bottom:0; width:248px; z-index:40; overflow-y:auto;
+    background:rgba(6,10,20,.9); backdrop-filter:blur(8px);
+    border-right:1px solid rgba(225,235,255,.1); padding:16px 16px 40px;
+    font-family:"JetBrains Mono",monospace; font-size:10.5px; color:rgba(225,235,255,.8); }
+  .panel.right{ left:auto; right:0; border-right:none; border-left:1px solid rgba(225,235,255,.1); }
+  .panel h4{ font-size:11px; letter-spacing:.16em; margin-bottom:4px; font-weight:500; }
+  .panel .preset-name{ color:rgba(0,200,255,.95); }
+  .panel.right .preset-name{ color:rgba(var(--gold),.95); }
+  .panel .sub{ font-size:9px; color:rgba(225,235,255,.4); letter-spacing:.08em; margin-bottom:14px; line-height:1.5; }
+  .row{ margin:11px 0; }
+  .row label{ display:flex; justify-content:space-between; margin-bottom:4px; }
+  .row label span:first-child{ color:rgba(225,235,255,.62); }
+  .row b{ color:rgba(0,200,255,.95); font-weight:500; }
+  .panel.right .row b{ color:rgba(var(--gold),.95); }
+  .row input[type=range]{ width:100%; accent-color:var(--cyan); height:3px; }
+  .panel.right .row input[type=range]{ accent-color:rgb(var(--gold)); }
+  .ctrl{ display:flex; gap:6px; margin-top:14px; }
+  .ctrl button{ flex:1; cursor:pointer; font-family:inherit; font-size:9.5px; letter-spacing:.06em;
+    background:rgba(225,235,255,.07); color:rgba(225,235,255,.85); border:1px solid rgba(225,235,255,.16);
+    border-radius:6px; padding:7px 4px; transition:.18s; }
+  .ctrl button:hover{ background:rgba(0,200,255,.18); border-color:rgba(0,200,255,.5); }
+  .dump{ margin-top:14px; padding:10px; border-radius:6px; background:rgba(0,0,0,.45);
+    border:1px solid rgba(225,235,255,.1); font-size:9px; line-height:1.55; color:rgba(170,225,255,.85);
+    white-space:pre-wrap; word-break:break-all; max-height:150px; overflow:auto; }
+  .hint{ position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:50;
+    font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.2em; color:rgba(225,235,255,.5);
+    border:1px solid rgba(225,235,255,.14); border-radius:999px; padding:7px 20px; background:rgba(6,10,20,.7); }
+</style>
+</head>
+<body>
+  <canvas id="rain" aria-hidden="true"></canvas>
+  <div class="hint">深色玻璃（甲）　vs　亮玻璃（乙）　·　拉軸用感覺選</div>
+
+  <!-- 左面板：甲 深色玻璃 -->
+  <aside class="panel left" id="panelA">
+    <h4>甲 · <span class="preset-name">深色玻璃</span></h4>
+    <p class="sub">配黑底最和諧 · 玻璃本身偏暗、靠邊緣受光，透出後方碼雨</p>
+    <div class="rows"></div>
+    <div class="ctrl">
+      <button data-act="reset">回預設</button>
+      <button data-act="copyB">套到乙</button>
+    </div>
+    <div class="dump" id="dumpA"></div>
+  </aside>
+
+  <!-- 右面板：乙 亮玻璃 -->
+  <aside class="panel right" id="panelB">
+    <h4>乙 · <span class="preset-name">亮玻璃</span></h4>
+    <p class="sub">像參考截圖的磨砂白玻璃 · 高光白邊強，黑底上會浮白霧</p>
+    <div class="rows"></div>
+    <div class="ctrl">
+      <button data-act="reset">回預設</button>
+      <button data-act="copyA">套到甲</button>
+    </div>
+    <div class="dump" id="dumpB"></div>
+  </aside>
+
+  <!-- 比較舞台 -->
+  <div class="stage">
+    <div class="col">
+      <div class="col__tag">甲 · <b>深色玻璃</b></div>
+      <div class="inner" id="cardA">
+        <div class="ghost">網</div>
+        <div class="grain"></div>
+        <div class="codebar"><span class="cpath">WEB ARCHITECTURE</span></div>
+        <div class="content">
+          <p class="klab">// WEB DEVELOPMENT</p>
+          <span class="knum">01</span>
+          <h3 class="ztitle">網站架設</h3>
+          <p class="zen">Your digital front door.</p>
+          <p class="zsub">從一頁式門面到企業電商，依需求量身打造，不套公版。</p>
+          <ul class="svc">
+            <li><span class="sn">形象 / 一頁式官網</span><span class="sd">乾淨俐落的數位門面</span></li>
+            <li><span class="sn">電商 / 會員整合</span><span class="sd">線上販售與會員經營</span></li>
+            <li><span class="sn">客製整合站</span><span class="sd">特殊流程、活動、訂閱</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="col__tag">乙 · <b>亮玻璃</b></div>
+      <div class="inner" id="cardB">
+        <div class="ghost">網</div>
+        <div class="grain"></div>
+        <div class="codebar"><span class="cpath">WEB ARCHITECTURE</span></div>
+        <div class="content">
+          <p class="klab">// WEB DEVELOPMENT</p>
+          <span class="knum">01</span>
+          <h3 class="ztitle">網站架設</h3>
+          <p class="zen">Your digital front door.</p>
+          <p class="zsub">從一頁式門面到企業電商，依需求量身打造，不套公版。</p>
+          <ul class="svc">
+            <li><span class="sn">形象 / 一頁式官網</span><span class="sd">乾淨俐落的數位門面</span></li>
+            <li><span class="sn">電商 / 會員整合</span><span class="sd">線上販售與會員經營</span></li>
+            <li><span class="sn">客製整合站</span><span class="sd">特殊流程、活動、訂閱</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  /* ── 參數定義（min,max,step,單位說明）── */
+  const PARAMS=[
+    {k:'blur',      name:'背景模糊 blur',  min:0,  max:40, step:1,    suf:'px'},
+    {k:'sat',       name:'飽和 saturate',  min:100,max:220,step:5,    suf:'%'},
+    {k:'darkfill',  name:'深色玻璃底',     min:0,  max:0.9,step:0.02},
+    {k:'whitefilm', name:'白色磨砂膜',     min:0,  max:0.5,step:0.01},
+    {k:'bluefilm',  name:'藍色玻璃膜',     min:0,  max:0.4,step:0.01},
+    {k:'hi',        name:'左上高光',       min:0,  max:0.45,step:0.01},
+    {k:'edge',      name:'頂緣白邊',       min:0,  max:0.9,step:0.02},
+    {k:'border',    name:'外框亮度',       min:0,  max:0.5,step:0.02},
+    {k:'glow',      name:'藍光外暈',       min:0,  max:0.5,step:0.02},
+    {k:'goldline',  name:'頂緣藍金線',     min:0,  max:1,  step:0.05},
+    {k:'refract',   name:'斜向折射掃光',   min:0,  max:1,  step:0.05},
+    {k:'bottominset',name:'底部暗陰影',    min:0,  max:0.5,step:0.02},
+    {k:'drop',      name:'落地陰影',       min:0,  max:0.8,step:0.02},
+    {k:'thick',     name:'厚度',           min:0,  max:40, step:1,    suf:'px'},
+    {k:'tilt',      name:'傾斜仰角',       min:-14,max:24, step:1,    suf:'°'},
+  ];
+  /* ── 預設：甲深色玻璃 / 乙亮玻璃 ── */
+  const PRESET={
+    A:{ blur:24, sat:140, darkfill:0.34, whitefilm:0.04, bluefilm:0.10, hi:0.10, edge:0.30, border:0.16, glow:0.26, goldline:0.7, refract:0.40, bottominset:0.30, drop:0.55, thick:16, tilt:6 },
+    B:{ blur:30, sat:150, darkfill:0.00, whitefilm:0.16, bluefilm:0.17, hi:0.22, edge:0.75, border:0.30, glow:0.20, goldline:0.7, refract:0.85, bottominset:0.22, drop:0.50, thick:12, tilt:6 }
+  };
+  const state={ A:Object.assign({},PRESET.A), B:Object.assign({},PRESET.B) };
+
+  /* 厚度＝向下擠出的玻璃側邊面（漸深藍），靠 box-shadow 堆疊模擬玻璃板厚度 */
+  function extrude(px){
+    if(px<=0) return '0 0 0 transparent';
+    const layers=[]; const n=Math.min(px,40);
+    for(let i=1;i<=n;i++){ const t=i/n; const a=(0.55*(1-t*0.55)).toFixed(3);
+      layers.push('0 '+i+'px 0 rgba(16,26,62,'+a+')'); }
+    return layers.join(', ');
+  }
+  function apply(side){
+    const el=document.getElementById('card'+side), s=state[side];
+    for(const p of PARAMS) el.style.setProperty('--'+p.k, s[p.k]);
+    el.style.setProperty('--extrude', extrude(s.thick));
+    const dump=PARAMS.map(p=>'--'+p.k+': '+s[p.k]+(p.suf||'')+';').join('\n');
+    document.getElementById('dump'+side).textContent=dump;
+  }
+  function buildPanel(side){
+    const wrap=document.querySelector('#panel'+side+' .rows');
+    wrap.innerHTML='';
+    for(const p of PARAMS){
+      const row=document.createElement('div'); row.className='row';
+      row.innerHTML='<label><span>'+p.name+'</span><b id="v'+side+'_'+p.k+'">'+state[side][p.k]+(p.suf||'')+'</b></label>'+
+        '<input type="range" min="'+p.min+'" max="'+p.max+'" step="'+p.step+'" value="'+state[side][p.k]+'" data-k="'+p.k+'">';
+      const inp=row.querySelector('input');
+      inp.oninput=()=>{ const v=parseFloat(inp.value); state[side][p.k]=v;
+        document.getElementById('v'+side+'_'+p.k).textContent=v+(p.suf||''); apply(side); };
+      wrap.appendChild(row);
+    }
+  }
+  function syncSliders(side){
+    for(const p of PARAMS){ const inp=document.querySelector('#panel'+side+' input[data-k="'+p.k+'"]');
+      if(inp){ inp.value=state[side][p.k]; document.getElementById('v'+side+'_'+p.k).textContent=state[side][p.k]+(p.suf||''); } }
+  }
+  ['A','B'].forEach(s=>{ buildPanel(s); apply(s); });
+
+  /* 按鈕 */
+  document.querySelectorAll('.panel').forEach(panel=>{
+    const side=panel.id.endsWith('A')?'A':'B';
+    panel.querySelectorAll('.ctrl button').forEach(btn=>{
+      btn.onclick=()=>{ const act=btn.dataset.act;
+        if(act==='reset'){ state[side]=Object.assign({},PRESET[side]); }
+        else if(act==='copyB'){ state.B=Object.assign({},state.A); syncSliders('B'); apply('B'); return; }
+        else if(act==='copyA'){ state.A=Object.assign({},state.B); syncSliders('A'); apply('A'); return; }
+        syncSliders(side); apply(side);
+      };
+    });
+  });
+
+  /* ── 左側程式碼底紋填字 ── */
+  const GRAIN=['const nest = createStudio()','export default function App(){','return <Section/>','await build(idea)','if(ready) ship()','render(art, code)','while(true){ create() }'].join('\n').repeat(8);
+  document.querySelectorAll('.grain').forEach(el=>el.textContent=GRAIN);
+  ['cardA','cardB'].forEach(id=>{ const lip=document.createElement('div'); lip.className='botlip'; document.getElementById(id).appendChild(lip); });
+
+  /* ── 程式碼星雨（取自正式檔，打到卡頂緣濺火花）── */
+  const cv=document.getElementById('rain'), ctx=cv.getContext('2d');
+  const CODE=['const nest = createStudio()','export default function App() {','<section class="services">','router.get(\'/api/orders\', fn)','await db.clients.findMany()','npm run build && deploy','return <Card {...props} />','useEffect(() => render(), [])','if (user.ready) launch()','SELECT * FROM orders;','transform: translateY(-4px)','git commit -m "ship it"'];
+  let W,H,dpr; function rs(){ dpr=Math.min(devicePixelRatio,2); W=cv.clientWidth=innerWidth; H=cv.clientHeight=innerHeight; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+  rs(); addEventListener('resize',rs);
+  const hash=(a,b)=>{ const x=Math.sin(a*127.1+b*311.7)*43758.5453; return x-Math.floor(x); };
+  const ND=34, D=[]; for(let i=0;i<ND;i++) D.push({ spd:0.09+hash(i,1)*0.10, ph:hash(i,2)*1.8, sz:12+(hash(i,4)*3|0), ye:hash(i,5)<0.12, cy:hash(i,6)<0.30 });
+  function frontRects(){ const out=[]; ['cardA','cardB'].forEach(id=>{ const r=document.getElementById(id).getBoundingClientRect(); out.push({l:r.left,r:r.right,t:r.top}); }); return out; }
+  function draw(t){ ctx.clearRect(0,0,W,H); const rects=frontRects(); ctx.textBaseline='middle';
+    for(let i=0;i<ND;i++){ const d=D[i];
+      const raw=t*d.spd+d.ph, cyc=Math.floor(raw/1.8), prog=raw%1.8-0.25; if(prog<0) continue;
+      const code=CODE[(i*5+cyc)%CODE.length]; ctx.font=d.sz+'px "JetBrains Mono",monospace';
+      const w=ctx.measureText(code).width; const x=16+Math.floor(hash(i,cyc*9+5)*(W-32)); const tipY=prog*H;
+      const base=d.ye?'255,199,9':(d.cy?'96,134,255':'150,170,220');
+      let hitY=Infinity; for(const rc of rects) if(x>=rc.l && x<=rc.r && rc.t<hitY) hitY=rc.t; const hitProg=hitY/H;
+      if(prog<=hitProg){ ctx.save(); ctx.translate(x,tipY); ctx.rotate(-Math.PI/2); ctx.textAlign='left';
+        const grd=ctx.createLinearGradient(0,0,w,0); grd.addColorStop(0,'rgba(240,247,255,0.9)'); grd.addColorStop(0.1,'rgba('+base+',0.8)'); grd.addColorStop(1,'rgba('+base+',0)');
+        ctx.fillStyle=grd; ctx.fillText(code,0,0); ctx.restore();
+      } else if(hitY<Infinity){ const tau=(prog-hitProg)/d.spd;
+        if(tau<0.6){ const fade=1-tau/0.6;
+          const lg=ctx.createRadialGradient(x,hitY,0,x,hitY,52); lg.addColorStop(0,'rgba(160,180,255,'+(0.5*fade)+')'); lg.addColorStop(0.4,'rgba(23,54,245,'+(0.24*fade)+')'); lg.addColorStop(1,'rgba(23,54,245,0)');
+          ctx.fillStyle=lg; ctx.fillRect(x-52,hitY-54,104,56);
+          ctx.fillStyle='rgba(210,245,255,'+(0.9*fade)+')'; ctx.fillRect(x-11,hitY-1.5,22,2);
+          ctx.textAlign='center'; for(let j=0;j<7;j++){ const vx=(hash(i,cyc*13+j)-0.5)*140, vy=-(42+hash(i,cyc*17+j)*110);
+            const px=x+vx*tau, py=hitY+vy*tau+170*tau*tau; if(py>hitY+2) continue;
+            ctx.font=(8+(hash(i,j+9)*4|0))+'px "JetBrains Mono",monospace'; ctx.fillStyle=j%2?'rgba(120,148,255,'+(fade*0.85)+')':'rgba(235,240,255,'+(fade*0.85)+')';
+            ctx.fillText(code[(j*5+cyc)%code.length],px,py); } } } } }
+  const T0=performance.now(); (function loop(){ requestAnimationFrame(loop); draw((performance.now()-T0)/1000); })();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服務水卡輪播（左右滑）｜創巢數位</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+<style>
+  :root{ --cyan:0,200,255; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ min-height:100vh; color:rgba(var(--stellar),.9); font-family:"Noto Sans TC",sans-serif;
+    background:#0a1630; overflow:hidden; }
+  .stage{ position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center; }
+  canvas#cv{ width:min(760px,94vw); aspect-ratio:760/560; display:block; cursor:grab; touch-action:pan-y; }
+  canvas#cv.grabbing{ cursor:grabbing; }
+  /* 左右箭頭 */
+  .arrow{ position:absolute; top:50%; transform:translateY(-50%); z-index:5; width:46px; height:46px; border-radius:50%;
+    background:rgba(10,20,40,.55); border:1px solid rgba(var(--cyan),.4); color:rgba(var(--stellar),.9);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter:blur(6px);
+    font-size:18px; transition:.18s; user-select:none; }
+  .arrow:hover{ background:rgba(var(--cyan),.2); border-color:rgba(var(--cyan),.8); }
+  .arrow.prev{ left:max(2vw,12px); } .arrow.next{ right:max(2vw,12px); }
+  .arrow.dim{ opacity:.25; pointer-events:none; }
+  /* 圓點 */
+  .dots{ position:absolute; bottom:5%; left:50%; transform:translateX(-50%); z-index:5; display:flex; gap:9px; }
+  .dot{ width:8px; height:8px; border-radius:50%; background:rgba(var(--stellar),.28); cursor:pointer; transition:.2s; }
+  .dot.on{ background:rgba(var(--cyan),.95); width:22px; border-radius:4px; }
+  .tag{ position:fixed; top:16px; left:50%; transform:translateX(-50%); font-family:"JetBrains Mono",monospace;
+    font-size:11px; letter-spacing:.06em; color:rgba(var(--stellar),.5); }
+  body.embed{ background:transparent !important; }
+  body.embed .tag{ display:none !important; }
+</style>
+</head>
+<body>
+<span class="tag">// 服務水卡輪播 · 拖曳 / 箭頭 / 圓點切換</span>
+<div class="stage">
+  <div class="arrow prev" id="prev" aria-label="上一個">‹</div>
+  <canvas id="cv"></canvas>
+  <div class="arrow next" id="next" aria-label="下一個">›</div>
+  <div class="dots" id="dots"></div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+// 定稿水卡參數
+const SP={ bead:0.94, amp:0.02, thick:2.0, disp:8.0, dark:0.58, calmW:2.84, calmH:2.02, edgeIrr:0.15 };  // 創辦人原始定稿值（2026-06-15 清透化實驗後依創辦人指示回退）
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)), mix=(a,b,t)=>a+(b-a)*t;
+const sstep=(a,b,x)=>{ const t=clamp((x-a)/(b-a),0,1); return t*t*(3-2*t); };
+const easeIO=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+
+// 三張服務卡
+const SERVICES=[
+  {num:'01',en:'DEVELOP',zh:'開發',sub:'把想法變成會運作的東西。',items:[['網站架設','一頁式到企業電商'],['客製系統開發','說得出來就寫得出來']]},
+  {num:'02',en:'GROWTH',zh:'成長',sub:'讓更多人看見你、記住你。',items:[['社群經營','素材、文案、定位'],['AI 虛擬網紅','永遠不下班的代言人'],['跳動E投放','個人戶也能投 TikTok']]},
+  {num:'03',en:'CONSULT',zh:'顧問',sub:'先想清楚，再動手。',items:[['產業顧問導入','把方向想清楚再決定']]},
+];
+
+const canvas=document.getElementById('cv');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1;
+const scene=new THREE.Scene();
+const group=new THREE.Group(); scene.add(group); group.rotation.set(0.10,0.17,0);
+const cardGroup=new THREE.Group(); group.add(cardGroup);
+const camera=new THREE.PerspectiveCamera(40,1,0.1,100); camera.position.set(0,0,7.4);
+const env=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),0.04).texture; scene.environment=env;
+scene.add(new THREE.DirectionalLight(0xffffff,2.1).translateX(4).translateY(6).translateZ(6));
+const rim=new THREE.DirectionalLight(0x2a6cff,1.25); rim.position.set(-6,-2,3); scene.add(rim);
+
+// 場景星空背景（提亮接近頁面藍、讓水有東西折射）
+function makeBgTex(){
+  const W=1280,H=940,c=document.createElement('canvas'); c.width=W;c.height=H; const g=c.getContext('2d');
+  g.fillStyle='#0a1630'; g.fillRect(0,0,W,H);
+  const rg=g.createRadialGradient(W*0.72,H*0.2,0,W*0.5,H*0.55,W*0.98);
+  rg.addColorStop(0,'rgba(40,72,140,0.7)'); rg.addColorStop(0.5,'rgba(22,40,80,0.45)'); rg.addColorStop(1,'rgba(12,22,46,0.2)');
+  g.fillStyle=rg; g.fillRect(0,0,W,H);
+  g.globalCompositeOperation='lighter';
+  const neb=(x,y,r,col)=>{ const q=g.createRadialGradient(x,y,0,x,y,r); q.addColorStop(0,col); q.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=q; g.fillRect(0,0,W,H); };
+  neb(W*0.78,H*0.2,W*0.55,'rgba(50,100,180,0.28)'); neb(W*0.2,H*0.85,W*0.5,'rgba(80,52,140,0.18)');
+  for(let i=0;i<340;i++){ const x=Math.random()*W,y=Math.random()*H,s=Math.random();
+    g.globalAlpha=0.2+s*0.6; g.fillStyle=s>0.9?'#ffe9c4':(s>0.6?'#bfe0ff':'#fff'); g.beginPath(); g.arc(x,y,s*1.4+0.2,0,7); g.fill(); }
+  g.globalAlpha=1; g.globalCompositeOperation='source-over';
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
+}
+// scene.background=makeBgTex();  // 2026-06-15 拿掉不透明深藍背景方塊：canvas alpha:true 直接透出整站深黑星場，水珠漂浮在宇宙裡、不再像被裝進盒子（makeBgTex 函式保留作回退）
+
+// 內容貼圖（依服務）
+const CW=1200,CH=912;
+function buildTextTexture(svc){
+  const c=document.createElement('canvas'); c.width=CW; c.height=CH; const g=c.getContext('2d'); g.textBaseline='alphabetic';
+  g.font='700 240px "JetBrains Mono",monospace'; g.textAlign='right'; g.fillStyle='rgba(255,255,255,0.20)'; g.fillText(svc.num,CW-90,250);
+  g.textAlign='left'; g.font='500 30px "JetBrains Mono",monospace'; g.fillStyle='rgba(90,210,255,0.95)'; g.fillText(svc.en.split('').join(' '),110,150);
+  g.font='600 150px "Chiron Sung HK","Noto Serif TC",serif'; g.fillStyle='rgba(255,255,255,0.97)'; g.fillText(svc.zh,106,320);
+  g.font='400 40px "Noto Sans TC",sans-serif'; g.fillStyle='rgba(255,255,255,0.62)'; g.fillText(svc.sub,112,402);
+  g.strokeStyle='rgba(255,255,255,0.18)'; g.lineWidth=2; let y=510;
+  for(const [sn,sd] of svc.items){
+    g.beginPath(); g.moveTo(110,y-46); g.lineTo(CW-90,y-46); g.stroke();
+    g.textAlign='left'; g.font='600 52px "Noto Serif TC",serif'; g.fillStyle='rgba(255,255,255,0.95)'; g.fillText(sn,110,y);
+    g.textAlign='right'; g.font='400 32px "Noto Sans TC",sans-serif'; g.fillStyle='rgba(255,255,255,0.5)'; g.fillText(sd,CW-90,y-6);
+    y+=132;
+  }
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=4; return t;
+}
+function makeStarTex(){
+  // 2026-06-15 假星空拿掉、改純背景色（依創辦人指示，放棄水折射主視覺方向）
+  // 保留 roundRect clip + alphaTest 讓圓角外透明（水珠輪廓外露出後方區塊的程式碼雨）
+  const W=1024,H=772,c=document.createElement('canvas'); c.width=W;c.height=H; const g=c.getContext('2d');
+  g.beginPath(); g.roundRect(8,8,W-16,H-16,180); g.clip();
+  g.fillStyle='#0a1630'; g.fillRect(0,0,W,H);
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=4; return t;
+}
+function beadAlpha(){
+  const w=512,h=Math.round(512*4.9/6.5),c=document.createElement('canvas'); c.width=w;c.height=h; const g=c.getContext('2d');
+  g.fillStyle='#000'; g.fillRect(0,0,w,h); g.filter='blur(5px)'; g.fillStyle='#fff';
+  const r=w*0.17; g.beginPath(); g.roundRect(w*0.045,h*0.05,w*0.91,h*0.90,r); g.fill();
+  return new THREE.CanvasTexture(c);
+}
+const starMesh=new THREE.Mesh(new THREE.PlaneGeometry(6.35,4.78), new THREE.MeshBasicMaterial({map:makeStarTex(),transparent:false,alphaTest:0.5})); starMesh.position.z=-0.5; cardGroup.add(starMesh);
+const textMesh=new THREE.Mesh(new THREE.PlaneGeometry(5.4,4.05), new THREE.MeshBasicMaterial({map:buildTextTexture(SERVICES[0]),transparent:false,alphaTest:0.06})); textMesh.position.z=-0.16; cardGroup.add(textMesh);
+
+// 水面
+const PW=6.5,PH=4.9,HW=PW/2,HH=PH/2,RR=1.15,SH=0.9;
+const wgeo=new THREE.PlaneGeometry(PW,PH,150,114); const wbase=wgeo.attributes.position.array.slice();
+function rrSDF(x,y){ const qx=Math.abs(x)-(HW-RR),qy=Math.abs(y)-(HH-RR); return Math.hypot(Math.max(qx,0),Math.max(qy,0))+Math.min(Math.max(qx,qy),0)-RR; }
+const WN=wbase.length/3, shoulder=new Float32Array(WN), interior=new Float32Array(WN), waveFac=new Float32Array(WN), edgeBand=new Float32Array(WN);
+function calmRR(x,y,hw,hh,r){ const qx=Math.abs(x)-(hw-r),qy=Math.abs(y)-(hh-r); return Math.hypot(Math.max(qx,0),Math.max(qy,0))+Math.min(Math.max(qx,qy),0)-r; }
+for(let i=0;i<WN;i++){ const x=wbase[i*3],y=wbase[i*3+1],s=rrSDF(x,y);
+  const tt=Math.min(Math.max(-s,0)/SH,1); shoulder[i]=Math.sqrt(Math.max(0,1-(1-tt)*(1-tt)));
+  interior[i]=Math.min(Math.max(-s/0.55,0),1);
+  const cs=calmRR(x,y,SP.calmW,SP.calmH,0.55); const inCalm=1-sstep(-0.5,0.5,cs);
+  waveFac[i]=0.10+0.90*(1-inCalm); edgeBand[i]=(1-inCalm)*interior[i]; }
+const wmat=new THREE.MeshPhysicalMaterial({ transmission:1, thickness:SP.thick, ior:1.33, roughness:0.04, dispersion:SP.disp,
+  clearcoat:1, clearcoatRoughness:0.0, envMapIntensity:0.95, attenuationColor:new THREE.Color(0x9fe8ff), attenuationDistance:12-SP.dark*9,
+  transparent:true, alphaMap:beadAlpha(), side:THREE.FrontSide });
+const water=new THREE.Mesh(wgeo,wmat); cardGroup.add(water);
+function wwave(x,y,t){ return Math.sin(x*1.7+t)*0.5+Math.sin(y*2.2+t*1.25)*0.45+Math.sin((x+y)*1.15-t*0.8)*0.4+Math.sin((x-y)*2.6+t*0.6)*0.25; }
+function wfine(x,y,t){ return Math.sin(x*6.3+t*1.7)*0.5+Math.sin(y*7.1-t*1.3)*0.45+Math.sin((x*4.2+y*5.1)+t*2.1)*0.4+Math.sin((x*8.4-y*3.3)-t*1.1)*0.32; }
+function updateWater(t){
+  const p=wgeo.attributes.position.array;
+  for(let i=0;i<WN;i++){ const x=wbase[i*3],y=wbase[i*3+1];
+    let z=SP.bead*shoulder[i]+SP.bead*0.16*interior[i];
+    z+=wwave(x,y,t)*SP.amp*interior[i]*waveFac[i];
+    z+=wfine(x,y,t)*SP.edgeIrr*edgeBand[i];
+    p[i*3+2]=z; }
+  wgeo.attributes.position.needsUpdate=true; wgeo.computeVertexNormals();
+}
+
+function resize(){ const r=canvas.getBoundingClientRect(); renderer.setSize(r.width,r.height,false); camera.aspect=r.width/r.height; camera.updateProjectionMatrix(); }
+resize(); addEventListener('resize',resize);
+let t0=performance.now(), slideX=0;
+(function loop(){ requestAnimationFrame(loop); updateWater((performance.now()-t0)/1000); cardGroup.position.x=slideX; renderer.render(scene,camera); })();
+
+/* ── 輪播：拖曳 / 箭頭 / 圓點 ── */
+const SLIDE=7.2;            // 滑出畫面的世界距離
+let cur=0, anim=null;
+function setText(i){ textMesh.material.map.dispose(); textMesh.material.map=buildTextTexture(SERVICES[i]); textMesh.material.needsUpdate=true; }
+function dots(){ const d=document.getElementById('dots'); d.innerHTML=''; SERVICES.forEach((_,i)=>{ const e=document.createElement('div'); e.className='dot'+(i===cur?' on':''); e.onclick=()=>goto(i); d.appendChild(e); }); }
+function syncUI(){ dots(); document.getElementById('prev').classList.toggle('dim',cur===0); document.getElementById('next').classList.toggle('dim',cur===SERVICES.length-1); }
+function tween(from,to,dur,onDone){ if(anim)cancelAnimationFrame(anim); const s=performance.now();
+  (function a(){ const k=Math.min((performance.now()-s)/dur,1); slideX=mix(from,to,easeIO(k)); if(k<1)anim=requestAnimationFrame(a); else{ slideX=to; onDone&&onDone(); } })(); }
+function goto(i){ i=clamp(i,0,SERVICES.length-1); if(i===cur){ tween(slideX,0,260); return; }
+  const dir=i>cur?-1:1;                 // 下一張往左滑出
+  tween(slideX, dir*SLIDE, 240, ()=>{ cur=i; setText(cur); slideX=-dir*SLIDE; syncUI(); tween(slideX,0,300); }); }
+document.getElementById('prev').onclick=()=>goto(cur-1);
+document.getElementById('next').onclick=()=>goto(cur+1);
+
+// 拖曳 / 觸控滑動
+let dragging=false, startX=0, baseX=0, moved=0;
+const px2world=dx=>dx/canvas.clientWidth*PW*1.15;
+canvas.addEventListener('pointerdown',e=>{ if(anim)return; dragging=true; startX=e.clientX; baseX=slideX; moved=0; canvas.classList.add('grabbing'); canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener('pointermove',e=>{ if(!dragging)return; const dx=e.clientX-startX; moved=dx; slideX=clamp(baseX+px2world(dx),-SLIDE*0.6,SLIDE*0.6); });
+function endDrag(){ if(!dragging)return; dragging=false; canvas.classList.remove('grabbing');
+  const th=canvas.clientWidth*0.14;
+  if(moved<-th && cur<SERVICES.length-1) goto(cur+1);
+  else if(moved>th && cur>0) goto(cur-1);
+  else tween(slideX,0,220); }
+canvas.addEventListener('pointerup',endDrag); canvas.addEventListener('pointercancel',endDrag);
+
+syncUI();
+if(new URLSearchParams(location.search).has('embed')) document.body.classList.add('embed');
+</script>
+</body>
+</html>

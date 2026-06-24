@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>卡片／區塊效果 總展示（非液體）｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); }
+  header{ padding:64px 7vw 18px; }
+  header h1{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.9rem; }
+  header p{ margin-top:8px; font-size:.88rem; color:rgba(var(--stellar),.5); }
+  .menu{ position:fixed; left:12px; top:50%; transform:translateY(-50%); z-index:40; display:flex; flex-direction:column; gap:6px; max-height:86vh; overflow:auto; }
+  .menu a{ font-family:"JetBrains Mono",monospace; font-size:10.5px; color:rgba(var(--stellar),.55); text-decoration:none; background:rgba(10,18,38,.78);
+    border:1px solid rgba(var(--cyan),.22); padding:3px 8px; border-radius:5px; backdrop-filter:blur(4px); white-space:nowrap; }
+  .menu a:hover{ color:#06121e; background:rgba(var(--cyan),.85); }
+  .blk{ padding:38px 7vw 8px; }
+  .blk .bar{ display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; border-top:1px solid rgba(var(--stellar),.14); padding-top:16px; }
+  .blk .no{ font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--yellow),.85); letter-spacing:.14em; }
+  .blk h2{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.3rem; }
+  .blk .d{ font-size:.82rem; color:rgba(var(--stellar),.5); }
+  .blk .open{ margin-left:auto; font-family:"JetBrains Mono",monospace; font-size:11.5px; color:rgba(var(--cyan),.9); text-decoration:none; }
+  .blk .open:hover{ text-decoration:underline; }
+  .frame{ margin-top:14px; width:100%; height:86vh; border:1px solid rgba(var(--stellar),.16); border-radius:10px; background:#04060a; }
+  footer{ padding:40px 7vw 70px; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.4); line-height:2; }
+</style>
+</head>
+<body>
+<header>
+  <h1>卡片／區塊效果 總展示</h1>
+  <p>非液體系列全收錄 · 每一段都是活的 demo（可直接拖曳／hover／捲動），右上「開新分頁」可單獨開大看。</p>
+</header>
+
+<nav class="menu">
+  <a href="#k1">01 區塊方向批</a>
+  <a href="#k2">02 方向集合</a>
+  <a href="#k3">03 Flow 批 1</a>
+  <a href="#k4">04 Flow 批 2</a>
+  <a href="#k5">05 Flow 批 3</a>
+  <a href="#k6">06 Flow 批 4</a>
+  <a href="#k7">07 3D 藝術迴廊</a>
+  <a href="#k8">08 手風琴 #23</a>
+  <a href="#k9">09 N1–N5 新方向</a>
+  <a href="#k10">10 C1–C5 程式碼系</a>
+  <a href="#k11">11 A1–A4 碼即藝術</a>
+  <a href="#k12">12 迴廊×字雨（最新）</a>
+</nav>
+
+<section class="blk" id="k1"><div class="bar"><span class="no">01</span><h2>早期區塊方向批</h2><span class="d">第一批服務區塊呈現方向</span><a class="open" href="service-blocks-poc.html" target="_blank">開新分頁 →</a></div>
+  <iframe class="frame" loading="lazy" src="service-blocks-poc.html"></iframe></section>
+
+<section class="blk" id="k2"><div class="bar"><span class="no">02</span><h2>方向集合</h2><span class="d">多種區塊方向合輯</span><a class="open" href="service-directions-poc.html" target="_blank">開新分頁 →</a></div>
+  <iframe class="frame" loading="lazy" src="service-directions-poc.html"></iframe></section>
+
+<section class="blk" id="k3"><div class="bar"><span class="no">03</span><h2>Flow 批 1</h2><span class="d">流動感區塊第一批</span><a class="open" href="service-flow-poc.html" target="_blank">開新分頁 →</a></div>
+  <iframe class="frame" loading="lazy" src="service-flow-poc.html"></iframe></section>
+
+<section class="blk" id="k4"><div class="bar"><span class="no">04</span><h2>Flow 批 2</h2><span class="d">流動感區塊第二批</span><a class="open" href="service-flow2-poc.html" target="_blank">開新分頁 →</a></div>
+  <iframe class="frame" loading="lazy" src="service-flow2-poc.html"></iframe></section>
+
+<section class="blk" id="k5"><div class="bar"><span class="no">05</span><h2>Flow 批 3</h2><span class="d">流動感區塊第三批</span><a class="open" href="service-flow3-poc.html" target="_blank">開新分頁 →</a></div>
+  <iframe class="frame" loading="lazy" src="service-flow3-poc.html"></iframe></section>
+
+<section class="blk" id="k6"><div class="bar"><span class="no">06</span><h2>Flow 批 4</h2><span class="d">流動感區塊第四批（#23 手風琴出處）</span><a class="open" href="service-flow4-poc.html" target="_blank">開新分頁 →</a></div>
+  <iframe class="frame" loading="lazy" src="service-flow4-poc.html"></iframe></section>
+
+<section class="blk" id="k7"><div class="bar"><span class="no">07</span><h2>3D 藝術迴廊（原版）</h2><span class="d">環形旋轉畫廊 · 拖曳／箭頭／圓點</span><a class="open" href="service-3d-gallery-poc.html" target="_blank">開新分頁 →</a></div>
+  <iframe class="frame" loading="lazy" src="service-3d-gallery-poc.html"></iframe></section>
+
+<section class="blk" id="k8"><div class="bar"><span class="no">08</span><h2>手風琴圖條 #23</h2><span class="d">hover 展開直書轉橫書 · 已定為社群經營類</span><a class="open" href="service-accordion-embed.html" target="_blank">開新分頁 →</a></div>
+  <iframe class="frame" loading="lazy" src="service-accordion-embed.html"></iframe></section>
+
+<section class="blk" id="k9"><div class="bar"><span class="no">09</span><h2>N1–N5 全新方向</h2><span class="d">大字索引／輪廓字／聚光網格／堆疊卡／水平推軌</span><a class="open" href="service-newdirections-poc.html" target="_blank">開新分頁 →</a></div>
+  <iframe class="frame" loading="lazy" src="service-newdirections-poc.html"></iframe></section>
+
+<section class="blk" id="k10"><div class="bar"><span class="no">10</span><h2>C1–C5 程式碼系（存參）</h2><span class="d">終端機／碼→成品／Git 圖／巨型碼／API — 偏工程師、已被碼即藝術取代</span><a class="open" href="service-codeblocks-poc.html" target="_blank">開新分頁 →</a></div>
+  <iframe class="frame" loading="lazy" src="service-codeblocks-poc.html"></iframe></section>
+
+<section class="blk" id="k11"><div class="bar"><span class="no">11</span><h2>A1–A4 碼即藝術</h2><span class="d">字符星河／聚字成形／光之織線／流星字雨</span><a class="open" href="service-codeart-poc.html" target="_blank">開新分頁 →</a></div>
+  <iframe class="frame" loading="lazy" src="service-codeart-poc.html"></iframe></section>
+
+<section class="blk" id="k12"><div class="bar"><span class="no">12</span><h2>迴廊 × 流星字雨撞擊（最新合體）</h2><span class="d">開發區塊現行方案 · 墨黑覆蓋 + 雨打卡頂火花</span><a class="open" href="service-devrain-poc.html#dev" target="_blank">開新分頁 →</a></div>
+  <iframe class="frame" loading="lazy" src="service-devrain-poc.html"></iframe></section>
+
+<footer>
+  排除（液體系列）：3D 液體 D1–D8 ／ 液態金屬卡 fusion ／ 液態卡 F1–F8 ／ 滴落變體 V1–V5 ／ 水珠・水流・波浪邊・droplets ／ Apple 液態玻璃 card-poc<br>
+  另：星球畫廊（已否決）未列入。以上全部仍保留在 _index.html 總索引可隨時回看。
+</footer>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D 液體 D4–D6｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --blue:23,54,245; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); overflow-x:hidden; }
+  body::before{ content:''; position:fixed; inset:0; z-index:-2; background:radial-gradient(circle at 50% 30%, #14213f 0%, #0a1226 50%, #05070f 100%); }
+  .sec{ position:relative; height:100vh; overflow:hidden; }
+  .sec canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:0; }
+  .sectag{ position:absolute; top:24px; left:50%; transform:translateX(-50%); z-index:9; font-family:"JetBrains Mono",monospace;
+    font-size:12px; letter-spacing:.14em; color:#06121e; background:rgba(var(--cyan),.85); padding:5px 14px; border-radius:5px; white-space:nowrap; }
+  .cap{ position:absolute; left:0; right:0; bottom:70px; text-align:center; z-index:5; pointer-events:none; }
+  .cap .t{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.5rem,3vw,2.2rem); color:rgba(var(--stellar),.97); }
+  .cap .s{ font-size:.85rem; color:rgba(var(--stellar),.5); margin-top:8px; }
+  .nav{ position:fixed; right:16px; bottom:14px; z-index:30; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.5); }
+</style>
+</head>
+<body>
+<section class="sec"><canvas id="cv4"></canvas><span class="sectag">D4 WebGL 流體模擬 · 攪動畫面</span><div class="cap"><div class="t">跳動E投放</div><div class="s">顏料在水裡被游標攪動漩渦擴散（Navier-Stokes）</div></div></section>
+<section class="sec"><canvas id="cv5"></canvas><span class="sectag">D5 3D 注水水晶球</span><div class="cap"><div class="t">產業顧問</div><div class="s">透光水晶球、內部焦散水光晃動 + 折射</div></div></section>
+<section class="sec"><canvas id="cv6"></canvas><span class="sectag">D6 Marching Cubes 3D 熔融</span><div class="cap"><div class="t">AI 虛擬網紅</div><div class="s">多顆 3D 球體在空間中融合分裂（立體熔岩燈）· 移動滑鼠</div></div></section>
+<div class="nav">3D 液體 D4–D6（第二波）· <b>WebGL · 偏重</b></div>
+
+<script type="importmap">
+{ "imports": { "three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+function setup(canvas){
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1;
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(42,1,0.1,100); camera.position.set(0,0,7.5);
+  scene.environment=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),0.04).texture;
+  function resize(){ const r=canvas.getBoundingClientRect(); renderer.setSize(r.width,r.height,false); camera.aspect=r.width/r.height; camera.updateProjectionMatrix(); }
+  resize(); addEventListener('resize',resize);
+  let on=false; new IntersectionObserver(es=>es.forEach(e=>on=e.isIntersecting),{threshold:.05}).observe(canvas);
+  const mouse={x:0,y:0}; addEventListener('pointermove',e=>{ mouse.x=(e.clientX/innerWidth-0.5)*2; mouse.y=-(e.clientY/innerHeight-0.5)*2; });
+  return { renderer, scene, camera, isOn:()=>on, mouse };
+}
+const key=()=>{ const l=new THREE.DirectionalLight(0xffffff,2.2); l.position.set(4,6,6); return l; };
+const rim=()=>{ const l=new THREE.DirectionalLight(0x2a6cff,1.3); l.position.set(-6,-2,3); return l; };
+
+// ── D4 WebGL 流體模擬 ──
+(async function(){ try{
+  const mod=await import('https://esm.sh/webgl-fluid@0.3.6'); const WebGLFluid=mod.default||mod;
+  WebGLFluid(document.getElementById('cv4'), { TRANSPARENT:false, BACK_COLOR:{r:8,g:14,b:26}, SPLAT_RADIUS:0.4, SPLAT_FORCE:8000,
+    DENSITY_DISSIPATION:0.5, VELOCITY_DISSIPATION:0.7, PRESSURE:0.8, CURL:34, COLOR_UPDATE_SPEED:6, SHADING:true });
+  console.log('D4 fluid loaded');
+}catch(e){ console.warn('D4 fluid failed:', e); document.getElementById('cv4').style.background='radial-gradient(circle,#13315a,#0a1426)'; } })();
+
+// ── D5 注水水晶球 ──
+(function(){ const S=setup(document.getElementById('cv5')); S.scene.add(key(),rim());
+  // 焦散貼圖（程序生成、可平移動畫）
+  const cc=document.createElement('canvas'); cc.width=cc.height=512; const cg=cc.getContext('2d');
+  cg.fillStyle='#062436'; cg.fillRect(0,0,512,512);
+  for(let i=0;i<60;i++){ cg.globalAlpha=.1+Math.random()*.25; cg.fillStyle=Math.random()>.4?'#bdf3ff':'#1ea0ff';
+    const x=Math.random()*512,y=Math.random()*512,r=20+Math.random()*70; cg.beginPath(); cg.ellipse(x,y,r,r*.4,Math.random()*3,0,6.28); cg.fill(); }
+  const ctex=new THREE.CanvasTexture(cc); ctex.colorSpace=THREE.SRGBColorSpace; ctex.wrapS=ctex.wrapT=THREE.RepeatWrapping; ctex.repeat.set(2,2);
+  const inner=new THREE.Mesh(new THREE.SphereGeometry(1.45,64,64), new THREE.MeshBasicMaterial({map:ctex}));
+  S.scene.add(inner);
+  const glass=new THREE.Mesh(new THREE.SphereGeometry(1.7,128,128),
+    new THREE.MeshPhysicalMaterial({transmission:1,thickness:1.4,ior:1.34,roughness:0.02,clearcoat:1,clearcoatRoughness:0.04,attenuationColor:new THREE.Color(0x9fe8ff),attenuationDistance:6,envMapIntensity:1.4,transparent:true}));
+  S.scene.add(glass);
+  (function loop(){ requestAnimationFrame(loop); if(!S.isOn()) return; ctex.offset.x+=0.0008; ctex.offset.y+=0.0005; inner.rotation.y+=0.002;
+    glass.rotation.y=S.mouse.x*0.4; glass.rotation.x=S.mouse.y*0.3; S.renderer.render(S.scene,S.camera); })();
+})();
+
+// ── D6 marching cubes 熔融 ──
+(function(){ const S=setup(document.getElementById('cv6')); S.scene.add(key(),rim());
+  const mat=new THREE.MeshStandardMaterial({color:0x0a86ff,emissive:0x0a3aff,emissiveIntensity:0.35,roughness:0.28,metalness:0.15,envMapIntensity:1.2});
+  const mc=new MarchingCubes(64,mat,false,false,120000); mc.scale.set(3.0,3.0,3.0); mc.isolation=80; S.scene.add(mc);
+  let t=0; (function loop(){ requestAnimationFrame(loop); if(!S.isOn()) return; t+=0.012;
+    mc.reset(); const sub=14;
+    for(let i=0;i<5;i++){ mc.addBall(0.5+Math.sin(t*0.6+i*1.3)*0.22, 0.5+Math.cos(t*0.8+i*1.1)*0.22, 0.5+Math.sin(t*0.7+i*1.7)*0.22, 1.0/Math.sqrt(5), sub); }
+    mc.addBall(0.5+S.mouse.x*0.3, 0.5+S.mouse.y*0.3, 0.5, 0.8, sub); mc.update();
+    mc.rotation.y+=0.002; S.renderer.render(S.scene,S.camera); })();
+})();
+</script>
+</body>
+</html>

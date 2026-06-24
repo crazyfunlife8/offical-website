@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服務區設計方向 5 選｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --blue:23,54,245; --cyan:0,200,255; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ background:#05070f; color:rgba(var(--stellar),.92); font-family:"Noto Sans TC",sans-serif; }
+  body::before{ content:''; position:fixed; inset:0; z-index:-2;
+    background:radial-gradient(circle at 50% 25%, #131f3c 0%, #0a1226 48%, #05070f 100%); }
+  body::after{ content:''; position:fixed; inset:0; z-index:-1; opacity:.45; pointer-events:none;
+    background-image:radial-gradient(1.3px 1.3px at 18% 22%,#fff,transparent),
+      radial-gradient(1.1px 1.1px at 72% 38%,#bfe6ff,transparent),
+      radial-gradient(1px 1px at 42% 72%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 86% 62%,#fff,transparent); }
+  .wrap{ max-width:1160px; margin:0 auto; padding:0 40px; }
+  .demo{ padding:90px 0; border-top:1px dashed rgba(var(--stellar),.12); }
+  .demo:first-of-type{ border-top:none; }
+  .tag{ display:inline-block; font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.16em;
+    color:#06121e; background:rgba(var(--cyan),.85); padding:5px 12px; border-radius:4px; margin-bottom:6px; }
+  .tag__desc{ font-size:13px; color:rgba(var(--stellar),.5); margin-bottom:40px; line-height:1.7; }
+
+  /* ════ A. Editorial Index ════ */
+  .ed__row{ display:grid; grid-template-columns:80px 1fr auto; align-items:center; gap:28px;
+    padding:30px 12px; border-bottom:1px solid rgba(var(--stellar),.14); cursor:pointer;
+    transition:background .35s, padding-left .35s; }
+  .ed__row:hover{ background:linear-gradient(90deg, rgba(var(--cyan),.07), transparent); padding-left:24px; }
+  .ed__no{ font-family:"JetBrains Mono",monospace; font-size:14px; color:rgba(var(--cyan),.7); }
+  .ed__name{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.6rem,3vw,2.4rem); color:rgba(var(--stellar),.98); }
+  .ed__name small{ display:block; font-family:"Noto Sans TC"; font-weight:300; font-size:.92rem; color:rgba(var(--stellar),.55); margin-top:8px; }
+  .ed__cta{ font-family:"JetBrains Mono",monospace; font-size:13px; color:rgba(var(--yellow),.85); white-space:nowrap; }
+
+  /* ════ B. Brutalist / Terminal ════ */
+  .br{ background:#070b14; border:2px solid rgba(var(--stellar),.85); }
+  .br__grid{ display:grid; grid-template-columns:1fr 1fr; }
+  .br__cell{ padding:30px 28px; border-right:2px solid rgba(var(--stellar),.85); border-bottom:2px solid rgba(var(--stellar),.85); }
+  .br__cell:nth-child(2n){ border-right:none; }
+  .br__idx{ font-family:"JetBrains Mono",monospace; font-size:12px; color:rgba(var(--yellow),.9); }
+  .br__name{ font-family:"JetBrains Mono",monospace; font-weight:700; font-size:1.7rem; letter-spacing:-.01em;
+    color:#fff; margin:14px 0 12px; text-transform:uppercase; }
+  .br__name span{ font-family:"Noto Sans TC"; display:block; font-size:1.1rem; letter-spacing:0; text-transform:none; }
+  .br__desc{ font-family:"JetBrains Mono",monospace; font-size:13px; line-height:1.8; color:rgba(var(--stellar),.65); }
+  .br__cell:hover{ background:rgba(var(--cyan),.1); }
+
+  /* ════ C. Kinetic Big-Type ════ */
+  .kt__item{ padding:18px 0; border-bottom:1px solid rgba(var(--stellar),.1); }
+  .kt__name{ font-family:"Noto Serif TC",serif; font-weight:900; font-size:clamp(3rem,9vw,7rem); line-height:1;
+    color:transparent; -webkit-text-stroke:1.4px rgba(var(--stellar),.55); transition:.4s; cursor:pointer; }
+  .kt__item:hover .kt__name{ -webkit-text-stroke:1.4px rgba(var(--cyan),.9); color:rgba(var(--cyan),.12); }
+  .kt__meta{ display:flex; gap:24px; margin-top:10px; font-family:"JetBrains Mono",monospace; font-size:12px;
+    letter-spacing:.12em; color:rgba(var(--stellar),.5); }
+
+  /* ════ D. Outlined line-cards ════ */
+  .ol{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .ol__card{ border:1px solid rgba(var(--cyan),.35); border-radius:6px; padding:34px 30px; min-height:240px;
+    display:flex; flex-direction:column; transition:.4s; }
+  .ol__card:hover{ border-color:rgba(var(--cyan),.9); background:rgba(var(--cyan),.05); transform:translateY(-5px); }
+  .ol__no{ font-family:"JetBrains Mono",monospace; font-size:13px; color:rgba(var(--cyan),.7); }
+  .ol__name{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.5rem; margin:16px 0 12px; color:rgba(var(--stellar),.98); }
+  .ol__desc{ font-size:.9rem; line-height:1.8; color:rgba(var(--stellar),.7); margin-top:auto; }
+
+  /* ════ E. Tinted solid tiles (bento, non-glass) ════ */
+  .ti{ display:grid; grid-template-columns:1.4fr 1fr 1fr; grid-auto-rows:200px; gap:16px; }
+  .ti__tile{ border-radius:14px; padding:28px 30px; display:flex; flex-direction:column; justify-content:space-between;
+    position:relative; overflow:hidden; cursor:pointer; transition:transform .4s; }
+  .ti__tile:hover{ transform:scale(1.02); }
+  .ti__tile.big{ grid-row:span 2; }
+  .t1{ background:linear-gradient(150deg,#10233f,#0a3a5c); }
+  .t2{ background:linear-gradient(150deg,#1a1640,#3a2a6e); }
+  .t3{ background:linear-gradient(150deg,#0d2e2a,#10564a); }
+  .t4{ background:linear-gradient(150deg,#2e1420,#5c1f33); }
+  .ti__name{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.5rem; color:#fff; }
+  .ti__lab{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.14em; color:rgba(255,255,255,.6); }
+  .ti__desc{ font-size:.85rem; line-height:1.7; color:rgba(255,255,255,.78); max-width:30ch; }
+</style>
+</head>
+<body>
+
+<!-- A -->
+<div class="demo"><div class="wrap">
+  <span class="tag">A · 編輯索引 Editorial Index</span>
+  <p class="tag__desc">無卡片，靠大宋體 + 編號 + 細線分隔 + hover 推移。最克制、最有電影/雜誌的高級感，留白為王。</p>
+  <div class="ed">
+    <div class="ed__row"><span class="ed__no">01</span><div class="ed__name">社群經營<small>你不是缺一個會發文的人，是缺有人替你想清楚要說什麼。</small></div><span class="ed__cta">了解更多 →</span></div>
+    <div class="ed__row"><span class="ed__no">02</span><div class="ed__name">網站架設<small>網站不是技術問題，是你能不能在 3 秒內讓人記住你。</small></div><span class="ed__cta">了解更多 →</span></div>
+    <div class="ed__row"><span class="ed__no">03</span><div class="ed__name">AI 虛擬網紅<small>為品牌打造一個只屬於你的虛擬代言人。</small></div><span class="ed__cta">了解更多 →</span></div>
+  </div>
+</div></div>
+
+<!-- B -->
+<div class="demo"><div class="wrap">
+  <span class="tag">B · 粗獷終端 Brutalist</span>
+  <p class="tag__desc">等寬字 + 硬框 + 高對比 + 黃/青點綴。叛逆、工程感、「非常規思維」人格化。跟你品牌的反差性格最合。</p>
+  <div class="br"><div class="br__grid">
+    <div class="br__cell"><div class="br__idx">[ 01 / SOCIAL ]</div><div class="br__name">SHEQUN<span>社群經營</span></div><div class="br__desc">&gt; 素材設計、文案發想、帳號定位<br>&gt; 從靈魂出發</div></div>
+    <div class="br__cell"><div class="br__idx">[ 02 / DEV ]</div><div class="br__name">WANGZHAN<span>網站架設</span></div><div class="br__desc">&gt; 一頁式到企業電商<br>&gt; 先解決「你想說什麼」</div></div>
+    <div class="br__cell"><div class="br__idx">[ 03 / AI ]</div><div class="br__name">XUNI<span>AI 虛擬網紅</span></div><div class="br__desc">&gt; 不會出包、不會漲價、不會休假<br>&gt; 只跟你站同一邊</div></div>
+    <div class="br__cell"><div class="br__idx">[ 04 / PLATFORM ]</div><div class="br__name">TIAODONG<span>跳動E投放</span></div><div class="br__desc">&gt; 台灣個人戶也能投 TikTok<br>&gt; 最快 24 小時開通</div></div>
+  </div></div>
+</div></div>
+
+<!-- C -->
+<div class="demo"><div class="wrap">
+  <span class="tag">C · 動態大字 Kinetic Big-Type</span>
+  <p class="tag__desc">服務名本身就是主視覺：超大描邊字，hover 才上色。字即介面，最大膽、記憶點最強，呼應你 hero 的大字語言。</p>
+  <div class="kt">
+    <div class="kt__item"><div class="kt__name">社群經營</div><div class="kt__meta"><span>SOCIAL SERVICE</span><span>內容 · 文案 · 定位</span></div></div>
+    <div class="kt__item"><div class="kt__name">網站架設</div><div class="kt__meta"><span>WEB DEVELOPMENT</span><span>一頁式 · 企業電商</span></div></div>
+    <div class="kt__item"><div class="kt__name">AI 虛擬網紅</div><div class="kt__meta"><span>AI VIRTUAL TALENT</span><span>永不下班的代言人</span></div></div>
+  </div>
+</div></div>
+
+<!-- D -->
+<div class="demo"><div class="wrap">
+  <span class="tag">D · 線框極簡 Outlined</span>
+  <p class="tag__desc">只有細描邊、無填色、大留白，hover 才微微亮起填光。乾淨、現代、Linear 風的暗色極簡，俐落但不冷冰。</p>
+  <div class="ol">
+    <div class="ol__card"><span class="ol__no">01</span><div class="ol__name">社群經營</div><p class="ol__desc">素材設計、文案發想、帳號定位，從靈魂出發。</p></div>
+    <div class="ol__card"><span class="ol__no">02</span><div class="ol__name">網站架設</div><p class="ol__desc">從一頁式起步站到企業電商，先解決「你想說什麼」。</p></div>
+    <div class="ol__card"><span class="ol__no">03</span><div class="ol__name">AI 虛擬網紅</div><p class="ol__desc">為品牌打造一個只屬於你的虛擬代言人。</p></div>
+  </div>
+</div></div>
+
+<!-- E -->
+<div class="demo"><div class="wrap">
+  <span class="tag">E · 實色色塊 Tinted Tiles</span>
+  <p class="tag__desc">不透明色塊（每塊不同深色漸層），不是毛玻璃。bento 大小錯落、用色彩分服務，飽滿有重量、視覺最豐富。</p>
+  <div class="ti">
+    <div class="ti__tile t1 big"><span class="ti__lab">SOCIAL</span><div><div class="ti__name">社群經營</div><p class="ti__desc">你不是缺一個會發文的人，是缺有人替你想清楚要說什麼。</p></div></div>
+    <div class="ti__tile t2"><span class="ti__lab">AI TALENT</span><div class="ti__name">AI 虛擬網紅</div></div>
+    <div class="ti__tile t3"><span class="ti__lab">DEVELOPMENT</span><div class="ti__name">網站架設</div></div>
+    <div class="ti__tile t4"><span class="ti__lab">PLATFORM</span><div class="ti__name">跳動E投放</div></div>
+    <div class="ti__tile t2"><span class="ti__lab">CONSULTANCY</span><div class="ti__name">產業顧問</div></div>
+  </div>
+</div></div>
+
+<div style="height:60px"></div>
+</body>
+</html>

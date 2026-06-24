@@ -1,67 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
-
-
-<url>
-  <loc>https://www.nestxmedia.com/</loc>
-  <lastmod>2026-03-11T03:59:44+00:00</lastmod>
-  <priority>1.00</priority>
-</url>
-<url>
-  <loc>https://www.nestxmedia.com/social.html</loc>
-  <lastmod>2026-03-11T03:59:44+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://www.nestxmedia.com/virtual.html</loc>
-  <lastmod>2026-03-11T03:59:44+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://www.nestxmedia.com/website.html</loc>
-  <lastmod>2026-03-11T03:59:44+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://www.nestxmedia.com/system.html</loc>
-  <lastmod>2026-03-11T03:59:44+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://www.nestxmedia.com/about.html</loc>
-  <lastmod>2026-03-11T03:59:44+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://www.nestxmedia.com/index.html</loc>
-  <lastmod>2026-03-11T03:59:44+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://www.nestxmedia.com/news.html</loc>
-  <lastmod>2026-03-11T03:59:44+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://www.nestxmedia.com/contact.html</loc>
-  <lastmod>2026-03-11T03:59:44+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://www.nestxmedia.com/traffic.html</loc>
-  <lastmod>2026-03-11T03:59:44+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://www.nestxmedia.com/news-collaboration.html</loc>
-  <lastmod>2026-03-11T03:59:44+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-
-
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://nestdigitalai.com/</loc>
+    <lastmod>2026-06-23</lastmod>
+    <priority>1.00</priority>
+  </url>
+  <url>
+    <loc>https://nestdigitalai.com/blog.html</loc>
+    <lastmod>2026-06-23</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://nestdigitalai.com/contact.html</loc>
+    <lastmod>2026-06-23</lastmod>
+    <priority>0.64</priority>
+  </url>
 </urlset>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D 液體 D7–D8｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); overflow-x:hidden; }
+  body::before{ content:''; position:fixed; inset:0; z-index:-2; background:radial-gradient(circle at 50% 30%, #14213f 0%, #0a1226 50%, #05070f 100%); }
+  .sec{ position:relative; height:100vh; overflow:hidden; }
+  .sec canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:0; }
+  .sectag{ position:absolute; top:24px; left:50%; transform:translateX(-50%); z-index:9; font-family:"JetBrains Mono",monospace;
+    font-size:12px; letter-spacing:.14em; color:#06121e; background:rgba(var(--cyan),.85); padding:5px 14px; border-radius:5px; white-space:nowrap; }
+  .cap{ position:absolute; left:0; right:0; bottom:70px; text-align:center; z-index:5; pointer-events:none; }
+  .cap .t{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.5rem,3vw,2.2rem); color:rgba(var(--stellar),.97); }
+  .cap .s{ font-size:.85rem; color:rgba(var(--stellar),.5); margin-top:8px; }
+  .nav{ position:fixed; right:16px; bottom:14px; z-index:30; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.5); }
+</style>
+</head>
+<body>
+<section class="sec"><canvas id="cv7"></canvas><span class="sectag">D7 3D 黏稠拉絲水珠 · 跟著游標拉伸</span><div class="cap"><div class="t">客製系統</div><div class="s">立體水珠跟游標拉出黏絲、彈性回彈 · 移動滑鼠</div></div></section>
+<section class="sec"><canvas id="cv8"></canvas><span class="sectag">D8 3D 液面波紋 · 反光水面</span><div class="cap"><div class="t">產業顧問</div><div class="s">一整片會起伏反光的 3D 水面 · 移動滑鼠激起漣漪</div></div></section>
+<div class="nav">3D 液體 D7–D8（第三波）· <b>WebGL · 偏重</b></div>
+
+<script type="importmap">
+{ "imports": { "three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+function setup(canvas){
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1;
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(42,1,0.1,100); camera.position.set(0,0,7.5);
+  scene.environment=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),0.04).texture;
+  function resize(){ const r=canvas.getBoundingClientRect(); renderer.setSize(r.width,r.height,false); camera.aspect=r.width/r.height; camera.updateProjectionMatrix(); }
+  resize(); addEventListener('resize',resize);
+  let on=false; new IntersectionObserver(es=>es.forEach(e=>on=e.isIntersecting),{threshold:.05}).observe(canvas);
+  const mouse={x:0,y:0,px:0.5,py:0.5}; addEventListener('pointermove',e=>{ mouse.x=(e.clientX/innerWidth-0.5)*2; mouse.y=-(e.clientY/innerHeight-0.5)*2; mouse.px=e.clientX/innerWidth; mouse.py=1-e.clientY/innerHeight; });
+  return { renderer, scene, camera, isOn:()=>on, mouse };
+}
+const key=()=>{ const l=new THREE.DirectionalLight(0xffffff,2.2); l.position.set(4,6,6); return l; };
+const rim=()=>{ const l=new THREE.DirectionalLight(0x2a6cff,1.3); l.position.set(-6,-2,3); return l; };
+
+// ── D7 黏稠拉絲水珠（跟游標）──
+(function(){ const S=setup(document.getElementById('cv7')); S.scene.add(key(),rim());
+  const mat=new THREE.MeshPhysicalMaterial({transmission:1,thickness:0.9,ior:1.34,roughness:0.04,dispersion:2.6,clearcoat:1,attenuationColor:new THREE.Color(0x9fe8ff),attenuationDistance:5,envMapIntensity:1.5,transparent:true});
+  const mc=new MarchingCubes(64,mat,false,false,120000); mc.scale.set(3.2,3.2,2.4); mc.isolation=80; S.scene.add(mc);
+  let hx=0.5,hy=0.5; // 平滑頭部（落後游標 → 快速移動時拉長）
+  (function loop(){ requestAnimationFrame(loop); if(!S.isOn()) return;
+    const tx=0.5+S.mouse.x*0.3, ty=0.5+S.mouse.y*0.3; hx+=(tx-hx)*0.12; hy+=(ty-hy)*0.12;
+    mc.reset(); const sub=14, N=6;
+    for(let i=0;i<N;i++){ const u=i/(N-1); const x=hx+(tx-hx)*u, y=hy+(ty-hy)*u; mc.addBall(x,y,0.5, 0.62/Math.sqrt(N)*1.7, sub); }
+    mc.addBall(0.5,0.5,0.5,0.55,sub); mc.update();
+    S.renderer.render(S.scene,S.camera); })();
+})();
+
+// ── D8 液面波紋（反光水面）──
+(function(){ const S=setup(document.getElementById('cv8')); S.scene.add(key(),rim());
+  S.camera.position.set(0,2.7,5.6); S.camera.lookAt(0,-0.2,0);
+  const geo=new THREE.PlaneGeometry(11,11,150,150); const base=geo.attributes.position.array.slice();
+  const mat=new THREE.MeshPhysicalMaterial({color:0x0d2c54,metalness:0.55,roughness:0.08,clearcoat:1,clearcoatRoughness:0.06,envMapIntensity:1.7});
+  const water=new THREE.Mesh(geo,mat); water.rotation.x=-Math.PI*0.5; S.scene.add(water);
+  let t=0, rx=0.5, ry=0.5;
+  (function loop(){ requestAnimationFrame(loop); if(!S.isOn()) return; t+=0.03;
+    rx+=((S.mouse.px)-rx)*0.08; ry+=((S.mouse.py)-ry)*0.08;
+    const p=geo.attributes.position.array;
+    const cx=(rx-0.5)*11, cy=(ry-0.5)*11;
+    for(let i=0;i<p.length;i+=3){ const x=base[i], y=base[i+1];
+      let z=Math.sin(x*1.1+t)*0.16 + Math.sin(y*1.3+t*0.8)*0.16 + Math.sin((x+y)*0.8+t*1.2)*0.1;
+      const d=Math.hypot(x-cx,y-cy); z+=Math.sin(d*2.2-t*2.4)*0.28/(1+d*1.1); // 游標漣漪
+      p[i+2]=z; }
+    geo.attributes.position.needsUpdate=true; geo.computeVertexNormals();
+    S.renderer.render(S.scene,S.camera); })();
+})();
+</script>
+</body>
+</html>

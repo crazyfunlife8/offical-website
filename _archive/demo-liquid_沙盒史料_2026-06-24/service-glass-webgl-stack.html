@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>玻璃卡 上下對照｜沉穩版 vs 水晶 pop 版</title>
+<!--
+  探索沙盒（不上 production）— 軟體開發玻璃卡「上下對照」
+  上：沉穩版 service-glass-webgl-real.html（無 pop、頂緣乾淨）
+  下：水晶 pop 版 service-glass-webgl-pop.html（亮邊 pop、頂緣亦乾淨）
+  往下捲動查看 pop 版。建立 2026-06-20
+-->
+<style>
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ background:#03081f; }
+  .wrap{ position:relative; width:100%; height:100vh; display:block; overflow:hidden; }
+  .wrap + .wrap{ border-top:1px solid rgba(225,235,255,.12); }
+  .tag{ position:absolute; top:16px; left:18px; z-index:10;
+    font-family:"JetBrains Mono","Courier New",monospace; font-size:12px; letter-spacing:.18em;
+    color:rgba(0,200,255,.92); background:rgba(6,10,20,.72); border:1px solid rgba(0,200,255,.32);
+    border-radius:999px; padding:7px 16px; backdrop-filter:blur(6px); pointer-events:none; }
+  .tag b{ color:rgba(245,166,35,.95); font-weight:500; }
+  iframe{ width:100%; height:100%; border:0; display:block; }
+  .hint{ position:fixed; right:18px; bottom:16px; z-index:20;
+    font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.14em; color:rgba(225,235,255,.5);
+    background:rgba(6,10,20,.7); border:1px solid rgba(225,235,255,.14); border-radius:999px; padding:6px 14px; pointer-events:none; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="tag">① 沉穩版（現在）</span>
+    <iframe src="service-glass-webgl-real.html" title="沉穩版" loading="eager"></iframe>
+  </div>
+  <div class="wrap">
+    <span class="tag">② <b>水晶 pop 版</b></span>
+    <iframe src="service-glass-webgl-pop.html" title="水晶 pop 版" loading="eager"></iframe>
+  </div>
+  <div class="hint">往下捲動看 pop 版　·　各區內按 H 可隱藏拉軸</div>
+</body>
+</html>

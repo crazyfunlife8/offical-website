@@ -1,6 +1,15 @@
 .git
 .claude
 _baseline
+_archive
 _工具參考
 _工具參考_local
 node_modules
+
+# 開發暫存物，不上公開站（2026-06-23 正式上線前補）
+.wrangler
+_imgtest
+demo-liquid
+generated_images
+_nocache_server.py
+# 開發/沙盒/測試 HTML（2026-06-23 清債已刪除實體檔，此處不再列舉）

@@ -296,8 +296,19 @@
         }
     })();
 
-    let animId;
+    let animId = 0;
+    let running = false;
+
+    function stopLoop() {
+        if (animId) {
+            cancelAnimationFrame(animId);
+            animId = 0;
+        }
+        running = false;
+    }
+
     function animate() {
+        if (!running) return;
         if (!DESIGN_MODE) animId = requestAnimationFrame(animate);
         const t = Date.now() * 0.001;
 
@@ -378,7 +389,14 @@
 
         renderer.render(scene, camera);
     }
-    animate();
+
+    function startLoop() {
+        if (running || document.hidden) return;
+        running = true;
+        animate();
+    }
+
+    startLoop();
 
     window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -387,7 +405,7 @@
     });
 
     document.addEventListener('visibilitychange', () => {
-        if (document.hidden) cancelAnimationFrame(animId);
-        else animate();
+        if (document.hidden) stopLoop();
+        else startLoop();
     });
 })();

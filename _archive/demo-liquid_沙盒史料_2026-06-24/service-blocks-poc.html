@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服務三大類區塊 POC｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:23,54,245; --cyan:0,200,255; --yellow:255,199,9; --stellar:225,235,255;
+    --radius:18px;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background:#05070f; color:rgba(var(--stellar),.92);
+    font-family:"Noto Sans TC",sans-serif; overflow-x:hidden;
+  }
+  /* deep-space backdrop */
+  body::before{ content:''; position:fixed; inset:0; z-index:-2;
+    background:radial-gradient(circle at 50% 30%, #14213f 0%, #0a1226 45%, #05070f 100%); }
+  body::after{ content:''; position:fixed; inset:0; z-index:-1; opacity:.5; pointer-events:none;
+    background-image:radial-gradient(1.4px 1.4px at 15% 20%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 70% 35%,#bfe6ff,transparent),
+      radial-gradient(1px 1px at 40% 70%,#fff,transparent),
+      radial-gradient(1.3px 1.3px at 85% 60%,#fff,transparent),
+      radial-gradient(1px 1px at 25% 85%,#bfe6ff,transparent),
+      radial-gradient(1.1px 1.1px at 60% 90%,#fff,transparent); }
+
+  .wrap{ max-width:1240px; margin:0 auto; padding:0 32px; }
+  section{ padding:120px 0; position:relative; }
+
+  /* category heading */
+  .cat{ display:flex; align-items:baseline; gap:18px; margin-bottom:48px; }
+  .cat__no{ font-family:"JetBrains Mono",monospace; font-size:13px; letter-spacing:.2em;
+    color:rgba(var(--cyan),.7); }
+  .cat__name{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(2rem,4vw,3.1rem);
+    color:rgba(var(--stellar),.98); }
+  .cat__en{ font-family:"JetBrains Mono",monospace; font-size:13px; letter-spacing:.16em;
+    color:rgba(var(--stellar),.4); margin-left:auto; }
+
+  /* shared glass card */
+  .glass{
+    background:linear-gradient(135deg, rgba(var(--blue),.10), rgba(var(--blue),.20)) padding-box,
+      linear-gradient(135deg, rgba(var(--cyan),.5), rgba(var(--cyan),.06) 40%, rgba(var(--blue),.12) 70%, rgba(var(--cyan),.32)) border-box;
+    border:1.5px solid transparent; border-radius:var(--radius);
+    box-shadow:inset 0 1px 0 rgba(var(--cyan),.22), inset 0 -1px 0 rgba(0,0,0,.4),
+      inset 0 40px 60px -44px rgba(var(--cyan),.14), 0 14px 40px rgba(0,0,0,.4);
+    backdrop-filter:blur(14px);
+  }
+  .lab{ font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.16em;
+    color:rgba(var(--yellow),.92); display:inline-block; border-top:1.5px solid rgba(var(--yellow),.6);
+    padding-top:8px; }
+  .ttl{ font-family:"Noto Serif TC",serif; font-weight:500; font-size:1.9rem; margin:18px 0 14px;
+    color:rgba(var(--stellar),.98); }
+  .desc{ font-size:.95rem; line-height:1.9; color:rgba(var(--stellar),.8); }
+  .more{ margin-top:26px; font-style:italic; font-family:Georgia,serif; color:rgba(var(--cyan),.92);
+    display:inline-flex; align-items:center; gap:12px; }
+  .more::after{ content:''; width:40px; height:1px; background:rgba(var(--cyan),.7); transition:width .35s; }
+  .more:hover::after{ width:64px; }
+
+  /* ───── BLOCK 1 開發：Coverflow ───── */
+  .cf{ position:relative; height:440px; display:flex; align-items:center; justify-content:center; }
+  .cf__card{ position:absolute; width:380px; height:380px; padding:38px 40px; cursor:pointer;
+    transition:transform .55s cubic-bezier(.16,1,.3,1), opacity .55s, filter .55s;
+    display:flex; flex-direction:column; }
+  .cf__card .desc{ margin-top:auto; }
+  .cf__arrow{ position:absolute; top:50%; transform:translateY(-50%); z-index:5;
+    width:54px; height:54px; border-radius:50%; cursor:pointer; background:rgba(10,18,34,.6);
+    border:1px solid rgba(var(--cyan),.35); color:rgba(var(--cyan),.9); font-size:22px;
+    display:flex; align-items:center; justify-content:center; transition:.3s; backdrop-filter:blur(8px); }
+  .cf__arrow:hover{ background:rgba(var(--cyan),.18); transform:translateY(-50%) scale(1.08); }
+  .cf__prev{ left:2%; } .cf__next{ right:2%; }
+  .cf__ghost{ align-items:center; justify-content:center; text-align:center; }
+  .cf__ghost .g{ font-family:"Noto Serif TC",serif; color:rgba(var(--stellar),.4); font-size:1.3rem; }
+
+  /* ───── BLOCK 2 成長：horizontal scroll cards ───── */
+  .scroller{ display:flex; gap:24px; overflow-x:auto; scroll-snap-type:x mandatory;
+    padding:6px 0 26px; scrollbar-width:thin; scrollbar-color:rgba(var(--cyan),.4) transparent; }
+  .scroller::-webkit-scrollbar{ height:6px; }
+  .scroller::-webkit-scrollbar-thumb{ background:rgba(var(--cyan),.4); border-radius:3px; }
+  .scroller__card{ scroll-snap-align:center; flex:0 0 360px; min-height:380px; padding:36px 38px;
+    display:flex; flex-direction:column; transition:transform .4s; }
+  .scroller__card:hover{ transform:translateY(-6px); }
+  .scroller__card .desc{ margin-top:auto; }
+  .hint{ font-family:"JetBrains Mono",monospace; font-size:12px; color:rgba(var(--stellar),.4);
+    letter-spacing:.1em; margin-top:6px; }
+
+  /* ───── BLOCK 3 顧問：centered statement ───── */
+  .consult{ text-align:center; max-width:780px; margin:0 auto; }
+  .consult__line{ width:120px; height:1px; margin:0 auto 36px;
+    background:linear-gradient(90deg,transparent,rgba(var(--cyan),.8),transparent); }
+  .consult__big{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.8rem,4vw,2.9rem);
+    line-height:1.5; color:rgba(var(--stellar),.98); }
+  .consult__big b{ color:rgba(var(--yellow),.95); font-weight:600; }
+  .consult__sub{ margin:28px auto 0; max-width:560px; line-height:1.9; color:rgba(var(--stellar),.7); }
+  .btn{ margin-top:40px; display:inline-flex; align-items:center; gap:10px; padding:15px 34px;
+    border-radius:12px; font-weight:500; letter-spacing:.04em; cursor:pointer; text-decoration:none;
+    color:#06121e; background:linear-gradient(180deg, rgba(var(--yellow),1), rgba(245,170,8,.95));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.55), 0 8px 28px rgba(var(--yellow),.3);
+    transition:transform .3s, box-shadow .3s; }
+  .btn:hover{ transform:translateY(-2px); box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 12px 38px rgba(var(--yellow),.4); }
+
+  .note{ position:fixed; left:18px; bottom:14px; z-index:30; font-family:"JetBrains Mono",monospace;
+    font-size:11px; color:rgba(var(--stellar),.45); }
+  .note b{ color:rgba(var(--cyan),.85); }
+
+  @media (max-width:780px){
+    .cf__card,.scroller__card{ width:300px; flex-basis:300px; }
+    .cat__en{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ BLOCK 1 開發 ══ -->
+<section class="wrap">
+  <div class="cat"><span class="cat__no">01</span><h2 class="cat__name">開發</h2><span class="cat__en">DEVELOPMENT</span></div>
+  <div class="cf" id="cf">
+    <div class="cf__arrow cf__prev" onclick="cfMove(-1)">‹</div>
+    <div class="cf__arrow cf__next" onclick="cfMove(1)">›</div>
+    <a class="cf__card glass" href="#"><span class="lab">WEBSITE</span><h3 class="ttl">網站架設</h3><p class="desc">網站不是技術問題，是你能不能在 3 秒內讓人記住你。從一頁式起步站到企業電商，先解決「你想說什麼」再寫一行 code。</p><span class="more">了解更多</span></a>
+    <a class="cf__card glass" href="#"><span class="lab">CUSTOM SYSTEM</span><h3 class="ttl">客製系統開發</h3><p class="desc">說得出來的就寫得出來，沒說全的我們替你想到、想更好。任何想法都能在網路上替你具現化。</p><span class="more">了解更多</span></a>
+    <div class="cf__card glass cf__ghost"><span class="g">自動化採集<br><span style="font-size:.85rem;opacity:.6">即將推出</span></span></div>
+  </div>
+</section>
+
+<!-- ══ BLOCK 2 成長 ══ -->
+<section class="wrap">
+  <div class="cat"><span class="cat__no">02</span><h2 class="cat__name">成長</h2><span class="cat__en">GROWTH</span></div>
+  <div class="scroller">
+    <a class="scroller__card glass" href="#"><span class="lab">SOCIAL</span><h3 class="ttl">社群經營</h3><p class="desc">你不是缺一個會發文的人，是缺有人替你想清楚要說什麼。素材設計、文案發想、帳號定位，從靈魂出發。</p><span class="more">了解更多</span></a>
+    <a class="scroller__card glass" href="#"><span class="lab">AI VIRTUAL TALENT</span><h3 class="ttl">AI 虛擬網紅</h3><p class="desc">為品牌打造一個只屬於你的虛擬代言人。不會出包、不會漲價、不會休假，只跟你站同一邊。</p><span class="more">了解更多</span></a>
+    <a class="scroller__card glass" href="#"><span class="lab">OWNED PLATFORM</span><h3 class="ttl">跳動E投放</h3><p class="desc">台灣個人戶也能投 TikTok 廣告。我們發現市場缺口，直接做了一個平台解決它。免營業登記，最快 24 小時開通。</p><span class="more">前往平台</span></a>
+  </div>
+  <div class="hint">← 滑動看更多 →</div>
+</section>
+
+<!-- ══ BLOCK 3 顧問 ══ -->
+<section class="wrap">
+  <div class="cat"><span class="cat__no">03</span><h2 class="cat__name">顧問</h2><span class="cat__en">CONSULTANCY</span></div>
+  <div class="consult">
+    <div class="consult__line"></div>
+    <p class="consult__big">大部分公司的問題，<br>不在執行力，在<b>診斷</b>。</p>
+    <p class="consult__sub">跨產業歷練 ＋ AI 輔助，帶你找到卡關在哪。先把問題看清楚，再決定要走開發還是成長。</p>
+    <a class="btn" href="#">先聊聊你的卡點 →</a>
+  </div>
+</section>
+
+<div class="note">服務三大類區塊 POC · 開發=coverflow / 成長=橫向滑卡 / 顧問=聚焦聲明 · <b>不影響正式網站</b></div>
+
+<script>
+// ── Coverflow（開發區塊）──
+const cf = document.getElementById('cf');
+const cards = [...cf.querySelectorAll('.cf__card')];
+let active = 0;
+function cfRender(){
+  cards.forEach((c,i)=>{
+    const off = i - active;
+    const abs = Math.abs(off);
+    const x = off * 300;
+    const scale = off===0 ? 1 : 0.8;
+    const rotY = off===0 ? 0 : (off<0 ? 28 : -28);
+    c.style.transform = `translateX(${x}px) scale(${scale}) perspective(1200px) rotateY(${rotY}deg)`;
+    c.style.opacity = abs>1 ? 0 : (off===0 ? 1 : 0.55);
+    c.style.zIndex = 10 - abs;
+    c.style.filter = off===0 ? 'none' : 'brightness(.7)';
+    c.style.pointerEvents = abs>1 ? 'none' : 'auto';
+  });
+}
+function cfMove(d){ active = Math.max(0, Math.min(cards.length-1, active+d)); cfRender(); }
+cards.forEach((c,i)=> c.addEventListener('click', e=>{ if(i!==active){ e.preventDefault(); active=i; cfRender(); } }));
+cfRender();
+</script>
+</body>
+</html>

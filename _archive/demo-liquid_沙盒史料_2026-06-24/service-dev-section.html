@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>軟體開發區 · 程式碼星雨 + code 視窗（原型／無水卡）｜創巢數位（探索）</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+<style>
+  :root{ --cyan:0,200,255; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ min-height:100vh; color:rgba(var(--stellar),.9); font-family:"Noto Sans TC",sans-serif;
+    background:#020b1e; overflow-x:hidden; display:flex; align-items:center; justify-content:center; }
+  .dev-section{ position:relative; width:100vw; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:80px 5vw; }
+  #dev-rain{ position:absolute; inset:0; width:100%; height:100%; z-index:1; pointer-events:none; }
+
+  /* code 編輯器視窗（呼應「軟體開發」；浮在程式碼雨中） */
+  .dev-panel{ position:relative; z-index:2; width:min(720px,92vw);
+    background:rgba(8,14,28,.72); backdrop-filter:blur(3px);
+    border:1px solid rgba(var(--cyan),.18); border-radius:14px; overflow:hidden;
+    box-shadow:0 34px 90px rgba(0,0,0,.55); }
+  .dev-panel__bar{ display:flex; align-items:center; gap:8px; padding:13px 18px;
+    border-bottom:1px solid rgba(var(--stellar),.08); }
+  .dev-panel__bar .dot{ width:11px; height:11px; border-radius:50%; }
+  .dev-panel__bar .d1{ background:rgba(255,95,86,.7); } .dev-panel__bar .d2{ background:rgba(255,189,46,.7); } .dev-panel__bar .d3{ background:rgba(39,201,63,.7); }
+  .dev-panel__bar .path{ margin-left:10px; font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.04em; color:rgba(var(--stellar),.4); }
+  .dev-panel__body{ padding:42px 48px 46px; }
+  .eyebrow{ font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.18em; color:rgba(var(--cyan),.85); }
+  .dev-title{ font-family:"Chiron Sung HK","Noto Serif TC",serif; font-weight:600; font-size:clamp(2.3rem,5vw,3.4rem);
+    color:rgba(var(--stellar),.96); margin:14px 0 6px; line-height:1.1; }
+  .dev-title .accent{ color:rgba(var(--cyan),.95); }
+  .dev-sub{ font-size:.95rem; color:rgba(var(--stellar),.5); margin-bottom:34px; }
+  .svc{ list-style:none; }
+  .svc li{ display:flex; align-items:baseline; gap:20px; padding:20px 2px; border-top:1px solid rgba(var(--stellar),.1); }
+  .svc li .num{ font-family:"JetBrains Mono",monospace; font-size:13px; color:rgba(var(--cyan),.7); padding-top:4px; }
+  .svc li .name{ font-family:"Chiron Sung HK","Noto Serif TC",serif; font-size:1.3rem; color:rgba(var(--stellar),.95); }
+  .svc li .desc{ margin-left:auto; font-size:.86rem; color:rgba(var(--stellar),.45); white-space:nowrap; }
+  .tag{ position:fixed; top:16px; left:50%; transform:translateX(-50%); font-family:"JetBrains Mono",monospace;
+    font-size:11px; letter-spacing:.06em; color:rgba(var(--stellar),.45); z-index:9; }
+  @media(max-width:560px){ .dev-panel__body{ padding:32px 26px 34px; } .svc li{ flex-wrap:wrap; gap:6px 16px; } .svc li .desc{ margin-left:34px; } }
+</style>
+</head>
+<body>
+<span class="tag">// 原型 · 軟體開發區（程式碼星雨 + code 視窗，無水卡）</span>
+<section class="dev-section" id="devSection">
+  <canvas id="dev-rain"></canvas>
+  <div class="dev-panel" id="devPanel">
+    <div class="dev-panel__bar">
+      <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
+      <span class="path">~/nest-digital/develop</span>
+    </div>
+    <div class="dev-panel__body">
+      <p class="eyebrow">// SOFTWARE DEVELOPMENT</p>
+      <h2 class="dev-title">把想法變成<span class="accent">會運作的東西</span></h2>
+      <p class="dev-sub">說得出來，就寫得出來。</p>
+      <ul class="svc">
+        <li><span class="num">01</span><span class="name">網站架設</span><span class="desc">一頁式到企業電商</span></li>
+        <li><span class="num">02</span><span class="name">客製系統開發</span><span class="desc">說得出來就寫得出來</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+/* 程式碼星雨（Canvas2D，取自 service-n4rain-poc）+ 打到 code 視窗頂緣濺火花 */
+(function(){
+  const cv=document.getElementById('dev-rain'), ctx=cv.getContext('2d');
+  const panel=document.getElementById('devPanel');
+  const CODE=[`const nest = createStudio()`,`export default function App() {`,`<section class="services">`,`router.get('/api/orders', fn)`,`await db.clients.findMany()`,`npm run build && deploy`,`return <Card {...props} />`,`background: #020b1e;`,`useEffect(() => render(), [])`,`if (user.ready) launch()`,`SELECT * FROM orders;`,`transform: translateY(-4px)`,`addEventListener('scroll', fx)`,`git commit -m "ship it"`,`} else { retry() }`,`func main() { serve() }`];
+  let W=0,H=0,dpr=1;
+  function rs(){ dpr=Math.min(devicePixelRatio,2); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+  const hash=(a,b)=>{ const x=Math.sin(a*127.1+b*311.7)*43758.5453; return x-Math.floor(x); };
+  const ND=46, D=[];
+  for(let i=0;i<ND;i++) D.push({ spd:0.09+hash(i,1)*0.10, ph:hash(i,2)*1.8, sz:13+(hash(i,4)*3|0), ye:hash(i,5)<0.12, cy:hash(i,6)<0.30 });
+  function panelRect(){
+    const cr=cv.getBoundingClientRect(), r=panel.getBoundingClientRect();
+    return { l:r.left-cr.left, r:r.right-cr.left, t:r.top-cr.top };
+  }
+  function drawRain(t){
+    ctx.clearRect(0,0,W,H); ctx.textBaseline='middle';
+    const P=panelRect();
+    for(let i=0;i<ND;i++){ const d=D[i];
+      const raw=t*d.spd+d.ph, cyc=Math.floor(raw/1.8), prog=raw%1.8-0.25;
+      if(prog<0) continue;
+      const code=CODE[(i*5+cyc)%CODE.length];
+      ctx.font=`${d.sz}px "JetBrains Mono",monospace`;
+      const w=ctx.measureText(code).width;
+      const x=16+Math.floor(hash(i,cyc*9+5)*(W-32));
+      const tipY=prog*H;
+      const base=d.ye?'255,199,9':(d.cy?'90,205,255':'150,180,220');
+      let hitY=Infinity;
+      if(x>=P.l && x<=P.r && P.t>20 && P.t<H-20) hitY=P.t;
+      const hitProg=hitY/H;
+      if(prog<=hitProg){
+        ctx.save(); ctx.translate(x,tipY); ctx.rotate(-Math.PI/2); ctx.textAlign='left';
+        const grd=ctx.createLinearGradient(0,0,w,0);
+        grd.addColorStop(0,`rgba(240,247,255,0.92)`); grd.addColorStop(0.10,`rgba(${base},0.82)`); grd.addColorStop(1,`rgba(${base},0)`);
+        ctx.fillStyle=grd; ctx.fillText(code,0,0); ctx.restore();
+      } else if(hitY<Infinity){
+        const tau=(prog-hitProg)/d.spd;
+        if(tau<0.6){
+          const fade=1-tau/0.6;
+          const lg=ctx.createRadialGradient(x,hitY,0,x,hitY,58);
+          lg.addColorStop(0,`rgba(170,240,255,${0.6*fade})`); lg.addColorStop(0.4,`rgba(0,200,255,${0.26*fade})`); lg.addColorStop(1,'rgba(0,200,255,0)');
+          ctx.fillStyle=lg; ctx.fillRect(x-58,hitY-60,116,62);
+          ctx.fillStyle=`rgba(210,245,255,${0.9*fade})`; ctx.fillRect(x-12,hitY-1.5,24,2);
+          ctx.textAlign='center';
+          for(let j=0;j<9;j++){
+            const vx=(hash(i,cyc*13+j)-0.5)*150, vy=-(45+hash(i,cyc*17+j)*120);
+            const px=x+vx*tau, py=hitY+vy*tau+175*tau*tau;
+            if(py>hitY+2) continue;
+            ctx.font=`${8+(hash(i,j+9)*4|0)}px "JetBrains Mono",monospace`;
+            ctx.fillStyle=j%2?`rgba(120,225,255,${fade*0.85})`:`rgba(235,242,255,${fade*0.85})`;
+            ctx.fillText(code[(j*5+cyc)%code.length],px,py);
+          }
+        }
+      }
+    }
+  }
+  const T0=performance.now();
+  (function loop(){ requestAnimationFrame(loop); if(!W||cv.clientWidth!==W) rs(); drawRain((performance.now()-T0)/1000); })();
+  addEventListener('resize',rs); rs();
+})();
+</script>
+</body>
+</html>

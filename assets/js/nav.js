@@ -17,13 +17,14 @@
     </a>
 
     <ul class="nav__links" role="list">
-        <li><a href="about.html">關於</a></li>
         <li><a href="index.html#services-section">服務</a></li>
-        <li><a href="news.html">消息</a></li>
+        <li><a href="blog.html">不正常觀點</a></li>
         <li class="nav__links-cta-mobile">
             <a href="contact.html">聯絡我們 <span aria-hidden="true">→</span></a>
         </li>
     </ul>
+
+    <span class="nav__divider" aria-hidden="true"></span>
 
     <a href="contact.html" class="nav__cta">
         <span class="nav__cta-label">聯絡我們</span>
@@ -109,10 +110,13 @@
     // 流程：① body 加 has-threejs class（隱藏 CSS 螺旋臂，避免雙重）
     //       ② 注入 <canvas id="starfield-canvas"> 給 Three.js renderer 用
     //       ③ 動態 load Three.js CDN（已 load 跳過）→ load starfield.js
-    if (!document.body.classList.contains('has-threejs')) {
+    // 開發用輕量模式：網址帶 ?lite 時關閉最耗 GPU 的 Three.js 黑洞星場，改用輕量 CSS 星空，
+    // 避免本機開 F12 協作時 WebGL 連續重繪佔滿 GPU、拖累其他分頁（影片卡頓）。正式訪客不會帶 ?lite。
+    const LITE = /[?&]lite\b/.test(location.search);
+    if (!LITE && !document.body.classList.contains('has-threejs')) {
         document.body.classList.add('has-threejs');
     }
-    if (!document.getElementById('starfield-canvas')) {
+    if (!LITE && !document.getElementById('starfield-canvas')) {
         const sfCanvas = document.createElement('canvas');
         sfCanvas.id = 'starfield-canvas';
         sfCanvas.setAttribute('aria-hidden', 'true');
@@ -139,7 +143,9 @@
         });
     }
 
-    if (typeof THREE === 'undefined') {
+    if (LITE) {
+        console.info('[nav.js] ?lite 模式 — 跳過 Three.js 星場（CSS 星空接手，省 GPU）');
+    } else if (typeof THREE === 'undefined') {
         loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js')
             .then(bootStarfield)
             .catch((e) => {

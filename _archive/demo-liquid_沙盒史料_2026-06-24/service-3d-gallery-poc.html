@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服務 3D 畫廊 POC｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --blue:23,54,245; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ height:100%; overflow:hidden; font-family:"Noto Sans TC",sans-serif; background:#05070f; }
+  body::before{ content:''; position:fixed; inset:0; z-index:-2;
+    background:radial-gradient(circle at 50% 42%, #14213f 0%, #0a1226 46%, #05070f 100%); }
+  body::after{ content:''; position:fixed; inset:0; z-index:-1; opacity:.5; pointer-events:none;
+    background-image:radial-gradient(1.4px 1.4px at 18% 22%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 72% 35%,#bfe6ff,transparent),
+      radial-gradient(1px 1px at 42% 72%,#fff,transparent),
+      radial-gradient(1.3px 1.3px at 86% 60%,#fff,transparent),
+      radial-gradient(1px 1px at 30% 88%,#bfe6ff,transparent); }
+
+  .head{ position:fixed; top:46px; left:0; right:0; text-align:center; z-index:5; pointer-events:none; }
+  .head .ey{ font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.28em; color:rgba(var(--yellow),.9); }
+  .head h1{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.8rem,3.4vw,2.6rem);
+    color:rgba(var(--stellar),.98); margin-top:10px; }
+
+  .glow{ position:fixed; left:50%; top:53%; width:920px; height:360px; transform:translate(-50%,-50%);
+    background:radial-gradient(ellipse at center, rgba(var(--cyan),.16), rgba(var(--blue),.06) 45%, transparent 70%);
+    z-index:-1; pointer-events:none; filter:blur(12px); }
+  .stage{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    perspective:1500px; cursor:grab; }
+  .stage:active{ cursor:grabbing; }
+  .ring{ position:relative; width:300px; height:380px; transform-style:preserve-3d; will-change:transform; }
+
+  .card{ position:absolute; inset:0; padding:34px 32px; display:flex; flex-direction:column;
+    border-radius:14px; backface-visibility:hidden; transition:opacity .15s, filter .15s;
+    background:linear-gradient(160deg, rgba(12,24,46,.92), rgba(7,16,32,.94));
+    border:1.5px solid rgba(var(--cyan),.4);
+    box-shadow:inset 0 1px 0 rgba(var(--cyan),.22), 0 24px 60px rgba(0,0,0,.5);
+  }
+  .card::before{ content:''; position:absolute; left:0; right:0; top:0; height:42%; border-radius:14px 14px 0 0;
+    background:linear-gradient(180deg, rgba(var(--cyan),.08), transparent); pointer-events:none; }
+  .card .lab{ font-family:"JetBrains Mono",monospace; font-size:11.5px; letter-spacing:.16em;
+    color:rgba(var(--yellow),.92); border-top:1.5px solid rgba(var(--yellow),.6); padding-top:9px; align-self:flex-start; }
+  .card .ttl{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.7rem; margin:18px 0 14px;
+    color:rgba(var(--stellar),.98); }
+  .card .desc{ font-size:.92rem; line-height:1.85; color:rgba(var(--stellar),.78); }
+  .card .more{ margin-top:auto; font-family:"JetBrains Mono",monospace; font-size:12.5px;
+    color:rgba(var(--cyan),.9); letter-spacing:.06em; }
+
+  .arrow{ position:fixed; top:50%; transform:translateY(-50%); z-index:6; width:56px; height:56px;
+    border-radius:50%; background:rgba(10,18,34,.55); border:1px solid rgba(var(--cyan),.35);
+    color:rgba(var(--cyan),.9); font-size:24px; cursor:pointer; backdrop-filter:blur(8px);
+    display:flex; align-items:center; justify-content:center; transition:.3s; }
+  .arrow:hover{ background:rgba(var(--cyan),.18); transform:translateY(-50%) scale(1.08); }
+  .prev{ left:5%; } .next{ right:5%; }
+
+  .dots{ position:fixed; bottom:60px; left:0; right:0; display:flex; justify-content:center; gap:12px; z-index:6; }
+  .dot{ width:8px; height:8px; border-radius:50%; background:rgba(var(--stellar),.25); cursor:pointer; transition:.3s; }
+  .dot.on{ background:rgba(var(--cyan),.95); transform:scale(1.4); }
+
+  .hint{ position:fixed; left:24px; bottom:20px; z-index:6; font-family:"JetBrains Mono",monospace;
+    font-size:12px; color:rgba(var(--stellar),.45); }
+  .hint b{ color:rgba(var(--cyan),.85); }
+</style>
+</head>
+<body>
+  <div class="head"><div class="ey">OUR SERVICES</div><h1>我們能做的，比你想的更多</h1></div>
+
+  <div class="glow"></div>
+  <div class="stage" id="stage">
+    <div class="ring" id="ring"></div>
+  </div>
+
+  <div class="arrow prev" onclick="step(1)">‹</div>
+  <div class="arrow next" onclick="step(-1)">›</div>
+  <div class="dots" id="dots"></div>
+  <div class="hint">拖曳旋轉環 · 箭頭/圓點切換 · 放手自動吸附 · <b>純 CSS 3D · 零 WebGL</b></div>
+
+<script>
+const SERVICES = [
+  { lab:'SOCIAL',       ttl:'社群經營',     desc:'你不是缺一個會發文的人，是缺有人替你想清楚要說什麼。', more:'了解更多 →' },
+  { lab:'AI TALENT',    ttl:'AI 虛擬網紅',  desc:'為品牌打造一個只屬於你的虛擬代言人。不出包、不漲價、不休假。', more:'了解更多 →' },
+  { lab:'WEBSITE',      ttl:'網站架設',     desc:'網站不是技術問題，是你能不能在 3 秒內讓人記住你。', more:'了解更多 →' },
+  { lab:'SYSTEM',       ttl:'客製系統開發', desc:'說得出來的就寫得出來，沒說全的我們替你想到、想更好。', more:'了解更多 →' },
+  { lab:'PLATFORM',     ttl:'跳動E投放',    desc:'台灣個人戶也能投 TikTok 廣告。免營業登記，最快 24 小時開通。', more:'前往平台 →' },
+  { lab:'CONSULTANCY',  ttl:'產業顧問',     desc:'大部分公司的問題不在執行力，在診斷。帶你找到卡關在哪。', more:'了解更多 →' },
+];
+const N = SERVICES.length;
+const STEP = 360 / N;
+const RADIUS = 430;
+
+const ring = document.getElementById('ring');
+const dotsWrap = document.getElementById('dots');
+const cards = SERVICES.map((s,i)=>{
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.style.transform = `rotateY(${i*STEP}deg) translateZ(${RADIUS}px)`;
+  el.innerHTML = `<span class="lab">${s.lab}</span><h3 class="ttl">${s.ttl}</h3><p class="desc">${s.desc}</p><span class="more">${s.more}</span>`;
+  ring.appendChild(el);
+  const d = document.createElement('div'); d.className='dot'; d.onclick=()=>goto(i); dotsWrap.appendChild(d);
+  return el;
+});
+const dots = [...dotsWrap.children];
+
+let rotation = 0, target = 0;
+let dragging = false, startX = 0, startRot = 0, autoOn = true, idleTimer;
+
+function frontIndex(){ return ((Math.round(-target/STEP) % N) + N) % N; }
+function goto(i){ target = -i*STEP; pauseAuto(); }
+function step(dir){ target += dir*STEP; pauseAuto(); }
+function pauseAuto(){ autoOn=false; clearTimeout(idleTimer); idleTimer=setTimeout(()=>autoOn=true, 3500); }
+
+const stage = document.getElementById('stage');
+stage.addEventListener('pointerdown', e=>{ dragging=true; startX=e.clientX; startRot=target; pauseAuto(); stage.setPointerCapture(e.pointerId); });
+stage.addEventListener('pointermove', e=>{ if(dragging) target = startRot + (e.clientX-startX)*0.35; });
+stage.addEventListener('pointerup', ()=>{ dragging=false; target = Math.round(target/STEP)*STEP; });
+
+function tick(){
+  requestAnimationFrame(tick);
+  if(autoOn && !dragging) target -= 0.12;          // slow idle auto-rotate
+  rotation += (target - rotation) * 0.1;
+  ring.style.transform = `translateZ(-${RADIUS}px) rotateY(${rotation}deg)`;
+  // depth-based opacity / brightness per card
+  cards.forEach((c,i)=>{
+    const ang = (rotation + i*STEP) * Math.PI/180;
+    const facing = Math.cos(ang);                   // 1=front, -1=back
+    const t = facing*0.5 + 0.5;                      // 0..1
+    const s = 0.8 + 0.26*t;                          // back .80 → front 1.06：前方放大聚焦
+    c.style.transform = `rotateY(${i*STEP}deg) translateZ(${RADIUS}px) scale(${s.toFixed(3)})`;
+    c.style.opacity = (0.14 + 0.86*t).toFixed(3);
+    c.style.filter = `brightness(${(0.5+0.5*t).toFixed(3)})`;
+    c.style.pointerEvents = facing > 0.3 ? 'auto' : 'none';
+    c.style.zIndex = Math.round(t*100);
+  });
+  const fi = frontIndex();
+  dots.forEach((d,i)=> d.classList.toggle('on', i===fi));
+}
+tick();
+</script>
+</body>
+</html>

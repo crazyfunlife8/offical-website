@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>玻璃懸浮質感探索（沙盒）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Italiana&family=Noto+Sans+TC:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+<style>
+:root{
+  --blue:#1736F5; --gold:#FFC709; --blue-rgb:23,54,245; --gold-rgb:255,199,9;
+  --cjk:"Chiron Sung HK","Noto Serif TC",serif; --hair:"Italiana",serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{ background:#04081a; color:#fff; font-family:var(--mono); min-height:100vh; padding:96px 5vw 80px; overflow-x:hidden; }
+
+/* 背景：流光 + 模糊色塊（讓玻璃 frost 透出顏色）+ 細落碼 */
+.bg{ position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(900px 600px at 20% 18%, rgba(var(--blue-rgb),.32), transparent 60%),
+    radial-gradient(800px 560px at 82% 30%, rgba(var(--gold-rgb),.12), transparent 60%),
+    radial-gradient(900px 700px at 60% 100%, rgba(11,26,122,.5), transparent 60%),
+    linear-gradient(160deg,#050b22,#04081a 60%,#02050f); }
+.bg .blob{ position:absolute; border-radius:50%; filter:blur(60px); opacity:.5; }
+.bg .b1{ width:380px; height:380px; left:8%; top:30%; background:rgba(var(--blue-rgb),.6); }
+.bg .b2{ width:300px; height:300px; right:12%; top:18%; background:rgba(var(--gold-rgb),.32); }
+.bg .b3{ width:340px; height:340px; left:46%; bottom:6%; background:rgba(20,150,130,.4); }
+.bg::after{ content:""; position:absolute; inset:0; opacity:.05; font-family:var(--mono); font-size:12px;
+  line-height:2; color:#9fb4ff; white-space:pre; overflow:hidden;
+  content:""; }
+
+.bar{ position:fixed; top:0; left:0; right:0; z-index:50; display:flex; gap:14px; align-items:center;
+  padding:12px 22px; background:rgba(4,8,24,.7); backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(var(--gold-rgb),.18); font-size:12px; letter-spacing:.05em; }
+.bar b{ color:var(--gold); font-weight:500; letter-spacing:.12em; }
+.bar span{ color:rgba(255,255,255,.55); }
+
+h2.sec{ position:relative; z-index:2; font-family:var(--mono); font-size:12px; letter-spacing:.24em;
+  color:rgba(var(--gold-rgb),.8); margin:34px 0 18px; }
+.row{ position:relative; z-index:2; display:grid; grid-template-columns:repeat(3,1fr); gap:26px; max-width:1180px; }
+
+/* ── 共用玻璃面板 ── */
+.glass{ position:relative; border-radius:24px; padding:30px 28px 26px; min-height:320px;
+  display:flex; flex-direction:column;
+  background:linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.045) 60%, rgba(255,255,255,.02));
+  backdrop-filter:blur(20px) saturate(135%); -webkit-backdrop-filter:blur(20px) saturate(135%);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.45),
+    inset 0 0 22px rgba(255,255,255,.05);
+  transition:transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s; }
+/* 左上亮邊掃光 */
+.glass::before{ content:""; position:absolute; inset:0; border-radius:24px; pointer-events:none;
+  background:linear-gradient(135deg, rgba(255,255,255,.5), rgba(255,255,255,0) 28%);
+  mask:linear-gradient(#000,#000) content-box, linear-gradient(#000,#000);
+  -webkit-mask:linear-gradient(135deg,#000,transparent 30%); mask:linear-gradient(135deg,#000,transparent 30%);
+  opacity:.5; mix-blend-mode:screen; }
+.glass:hover{ transform:translateY(-8px); }
+
+/* 染色變體（外光暈 + 邊緣 tint） */
+.glass.brand{ box-shadow:0 24px 60px rgba(0,0,0,.5), 0 0 50px rgba(var(--blue-rgb),.28), inset 0 1px 0 rgba(255,255,255,.45), inset 0 0 22px rgba(var(--blue-rgb),.08); border-color:rgba(150,175,255,.28); }
+.glass.brand:hover{ box-shadow:0 30px 70px rgba(0,0,0,.55), 0 0 70px rgba(var(--blue-rgb),.42), inset 0 1px 0 rgba(255,255,255,.5); }
+.glass.jade{ background:linear-gradient(135deg, rgba(180,235,220,.16), rgba(120,200,180,.05) 60%, rgba(120,200,180,.02)); box-shadow:0 24px 60px rgba(0,0,0,.5), 0 0 50px rgba(40,170,140,.3), inset 0 1px 0 rgba(220,255,245,.5), inset 0 0 22px rgba(120,210,185,.1); border-color:rgba(170,230,210,.32); }
+.glass.frost{ box-shadow:0 24px 60px rgba(0,0,0,.5), 0 0 44px rgba(255,255,255,.14), inset 0 1px 0 rgba(255,255,255,.55), inset 0 0 22px rgba(255,255,255,.06); border-color:rgba(255,255,255,.3); }
+
+/* 數字徽章（玻璃圓） */
+.badge{ position:absolute; top:20px; left:20px; width:40px; height:40px; border-radius:50%;
+  display:grid; place-items:center; font-family:var(--hair); font-size:17px; color:#fff;
+  background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.3);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 4px 12px rgba(0,0,0,.35); backdrop-filter:blur(6px); }
+.jade .badge{ color:#eafff7; }
+
+/* 中央玻璃物件（CSS 佔位——正式版用兄弟生成的 3D glass 圖） */
+.objwrap{ position:relative; height:128px; display:grid; place-items:center; margin:18px 0 8px; }
+.gobj{ width:92px; height:92px; border-radius:22px; position:relative;
+  background:linear-gradient(150deg, rgba(255,255,255,.5), rgba(255,255,255,.08) 55%, rgba(255,255,255,.18));
+  border:1px solid rgba(255,255,255,.5);
+  box-shadow:inset 0 2px 6px rgba(255,255,255,.7), inset 0 -8px 16px rgba(0,0,0,.25), 0 14px 30px rgba(0,0,0,.4);
+  display:grid; place-items:center; font-family:var(--cjk); font-size:46px; color:rgba(255,255,255,.85);
+  text-shadow:0 1px 1px rgba(255,255,255,.6), 0 -1px 2px rgba(0,0,0,.3); }
+.brand .gobj{ box-shadow:inset 0 2px 6px rgba(255,255,255,.7), inset 0 -8px 16px rgba(var(--blue-rgb),.3), 0 14px 30px rgba(0,0,0,.4), 0 0 24px rgba(var(--blue-rgb),.3); }
+.jade .gobj{ background:linear-gradient(150deg, rgba(225,255,245,.55), rgba(140,215,190,.12) 55%, rgba(150,220,195,.22)); box-shadow:inset 0 2px 6px rgba(240,255,250,.75), inset 0 -8px 16px rgba(30,140,115,.35), 0 14px 30px rgba(0,0,0,.4), 0 0 24px rgba(40,180,150,.35); }
+.objtag{ position:absolute; bottom:-2px; font-family:var(--mono); font-size:8.5px; letter-spacing:.16em; color:rgba(255,255,255,.4); }
+
+.gtitle{ font-family:var(--cjk); font-weight:600; font-size:1.6rem; letter-spacing:.02em; color:#fff; margin-top:auto; }
+.brand .gtitle b{ color:var(--gold); font-weight:600; }
+.gsub{ font-family:"Noto Sans TC",sans-serif; font-weight:300; font-size:.82rem; color:rgba(255,255,255,.62); margin-top:7px; line-height:1.5; }
+
+.note{ position:relative; z-index:2; max-width:1180px; margin:30px 0 0; font-family:var(--mono); font-size:12px;
+  line-height:1.8; color:rgba(255,255,255,.5); border-left:2px solid rgba(var(--gold-rgb),.4); padding-left:14px; }
+.note em{ color:rgba(255,255,255,.8); font-style:normal; }
+</style>
+</head>
+<body>
+<div class="bg"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
+
+<div class="bar"><b>玻璃懸浮質感</b><span>三種染色比一比 · 滑鼠移上去看懸浮 · 沙盒（不影響正式檔）</span></div>
+
+<h2 class="sec">A · 品牌藍金玻璃（建議：跟全站藍金黑一致）</h2>
+<div class="row">
+  <div class="glass brand"><span class="badge">01</span>
+    <div class="objwrap"><div class="gobj">網</div><span class="objtag">正式版＝3D 玻璃物件（生成圖）</span></div>
+    <div class="gtitle">網站架設</div><div class="gsub">從一頁式門面到企業電商，依需求量身打造。</div></div>
+  <div class="glass brand"><span class="badge">02</span>
+    <div class="objwrap"><div class="gobj">統</div><span class="objtag">正式版＝3D 玻璃物件（生成圖）</span></div>
+    <div class="gtitle">客製化系統開發</div><div class="gsub">腦袋裡有想法，我們就能把它具現化。</div></div>
+  <div class="glass brand"><span class="badge">03</span>
+    <div class="objwrap"><div class="gobj">轉</div><span class="objtag">正式版＝3D 玻璃物件（生成圖）</span></div>
+    <div class="gtitle">數位轉型顧問</div><div class="gsub">天天用 AI 在跑整間公司的實踐者。</div></div>
+</div>
+
+<h2 class="sec">B · 玉綠玻璃（最接近你的截圖，但可能跟全站藍金打架）</h2>
+<div class="row">
+  <div class="glass jade"><span class="badge">01</span>
+    <div class="objwrap"><div class="gobj">網</div><span class="objtag">正式版＝3D 玻璃物件（生成圖）</span></div>
+    <div class="gtitle">網站架設</div><div class="gsub">從一頁式門面到企業電商，依需求量身打造。</div></div>
+  <div class="glass jade"><span class="badge">02</span>
+    <div class="objwrap"><div class="gobj">統</div><span class="objtag">正式版＝3D 玻璃物件（生成圖）</span></div>
+    <div class="gtitle">客製化系統開發</div><div class="gsub">腦袋裡有想法，我們就能把它具現化。</div></div>
+  <div class="glass jade"><span class="badge">03</span>
+    <div class="objwrap"><div class="gobj">轉</div><span class="objtag">正式版＝3D 玻璃物件（生成圖）</span></div>
+    <div class="gtitle">數位轉型顧問</div><div class="gsub">天天用 AI 在跑整間公司的實踐者。</div></div>
+</div>
+
+<h2 class="sec">C · 純白霜玻璃（最中性）</h2>
+<div class="row">
+  <div class="glass frost"><span class="badge">01</span>
+    <div class="objwrap"><div class="gobj">網</div><span class="objtag">正式版＝3D 玻璃物件（生成圖）</span></div>
+    <div class="gtitle">網站架設</div><div class="gsub">從一頁式門面到企業電商，依需求量身打造。</div></div>
+  <div class="glass frost"><span class="badge">02</span>
+    <div class="objwrap"><div class="gobj">統</div><span class="objtag">正式版＝3D 玻璃物件（生成圖）</span></div>
+    <div class="gtitle">客製化系統開發</div><div class="gsub">腦袋裡有想法，我們就能把它具現化。</div></div>
+  <div class="glass frost"><span class="badge">03</span>
+    <div class="objwrap"><div class="gobj">轉</div><span class="objtag">正式版＝3D 玻璃物件（生成圖）</span></div>
+    <div class="gtitle">數位轉型顧問</div><div class="gsub">天天用 AI 在跑整間公司的實踐者。</div></div>
+</div>
+
+<p class="note"><em>這只是玻璃「板子」的質感 demo。</em>中央那個玻璃大字是 CSS 佔位——正式版會換成兄弟生成的 3D 玻璃物件（像你截圖的玻璃 T／拼圖／地球）。<br><em>要你決定：</em>① 染哪個色（A 藍金 / B 玉綠 / C 白霜）② 這個玻璃要不要套到落雨區那三張卡（取代現在的深色終端機卡）。</p>
+</body>
+</html>

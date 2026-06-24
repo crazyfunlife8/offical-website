@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>數位行銷手風琴｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&family=Italiana&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+<style>
+:root{
+  --cyan:0,200,255; --blue:23,54,245; --yellow:245,166,35; --stellar:225,235,255;
+  --ink:5,12,26;
+  /* 展開白底用：深色字 + 沉穩青藍小點綴（不死冷的深teal）+ 暖黃保留品牌 */
+  --dk:26,32,44; --dk2:54,62,76; --teal:14,108,128;
+  --f-cjk:"Chiron Sung HK","Noto Serif TC",serif;
+  --f-en:"Italiana",serif;
+  --f-mono:"JetBrains Mono",monospace;
+  --f-body:"Noto Sans TC",sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+/* iframe 嵌入：背景透明，貼在主頁深空星場上 */
+html,body{background:transparent;font-family:var(--f-body);color:rgba(var(--stellar),.9);overflow:hidden;height:100%}
+body{display:flex;align-items:center;justify-content:center;padding:clamp(14px,2.5vh,28px) clamp(10px,2vw,28px)}
+
+.acc{
+  position:relative;
+  display:flex; gap:8px;
+  /* 鎖 1.55:1：每格＝圖的 1/4（0.3875:1 窄碑），background-size 才不會壓縮圖 */
+  width:min(1240px,100%,124vh); aspect-ratio:1.55/1;
+}
+/* 整組外光暈：四碑像一整組被冷光罩著，不是各自發光的板子（取代單卡大外光） */
+.acc::before{ content:''; position:absolute; inset:-26px -32px; z-index:0; pointer-events:none;
+  border-radius:36px;
+  background:radial-gradient(ellipse at 50% 48%, rgba(255,255,255,.2), rgba(220,230,238,.09) 42%, transparent 72%);
+  filter:blur(16px); opacity:.7; }
+.panel{
+  position:relative; z-index:1; flex:1 1 0; min-width:0;
+  border-radius:16px; overflow:hidden; cursor:pointer;
+  border:1px solid rgba(var(--stellar),.14);
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(var(--blue),.18), transparent 60%),
+    linear-gradient(180deg, rgba(12,22,46,.55), rgba(5,12,26,.78));
+  /* 保留碑緣斜掠硬光（左上亮/右下暗），大外光暈移到 .acc 整組（避免各自發光成斷層） */
+  box-shadow:-1px -1px 0 rgba(255,255,255,.6), 1px 1px 0 rgba(255,255,255,.18),
+             0 0 8px rgba(255,255,255,.1),
+             0 10px 22px rgba(0,0,0,.34);
+  transition:flex .62s var(--ease), transform .62s var(--ease), border-color .5s var(--ease), background .5s var(--ease), box-shadow .5s var(--ease);
+}
+.panel:not(.open):hover{ border-color:rgba(var(--cyan),.40);
+  box-shadow:-1px -1px 0 rgba(255,255,255,.9), 1px 1px 0 rgba(255,255,255,.28),
+             0 0 22px rgba(255,255,255,.78), 0 0 46px 2px rgba(238,246,255,.34),
+             0 10px 24px rgba(0,0,0,.34); }
+.panel.open{
+  flex:4 1 0; cursor:default;
+  transform:translateY(-3px);
+  border-color:rgba(255,255,255,.5);
+  /* 白卡浮起：暖白光暈，像被打光的展品 */
+  box-shadow:0 0 0 1px rgba(255,255,255,.6), 0 18px 44px rgba(0,0,0,.45), 0 0 60px rgba(240,247,255,.12);
+}
+/* 開啟卡左緣：細暖金光，取代原本的冷青neon（白底配青neon太刺） */
+.panel.open::before{
+  content:''; position:absolute; left:0; top:14%; bottom:14%; width:2px; z-index:5;
+  background:linear-gradient(180deg,transparent,rgba(var(--yellow),.85),transparent);
+  box-shadow:0 0 12px rgba(var(--yellow),.4);
+}
+
+/* ─── 月面碑刻背景（收合態）＝定案，不動 ─── */
+.bgimg{ position:absolute; inset:0; background-size:cover; background-position:center;
+  /* 凹刻浮雕：上/左內陰影 + 下/右內高光 → 卡片像從月面切出來的一塊石板 */
+  box-shadow:inset 0 3px 7px rgba(0,0,0,.30), inset 0 -3px 6px rgba(255,255,255,.42),
+             inset 3px 0 7px rgba(0,0,0,.16), inset -3px 0 6px rgba(255,255,255,.22);
+  transition:opacity .5s var(--ease), filter .55s var(--ease); }
+/* 碑刻邊框：刻進石面的一圈凹槽線（cartouche） */
+.bgimg::after{ content:''; position:absolute; inset:13px; border-radius:9px;
+  border:1px solid rgba(18,24,34,.20);
+  box-shadow:0 1px 0 rgba(255,255,255,.48), 0 -1px 0 rgba(0,0,0,.10),
+             inset 0 1px 1px rgba(255,255,255,.38), inset 0 -1px 1px rgba(0,0,0,.18),
+             inset 1px 0 0 rgba(255,255,255,.18), inset -1px 0 0 rgba(0,0,0,.10); }
+/* ★ 關鍵的「跳」：展開時深黑月面石板淡出 → 換成白色系藝術空間 */
+.panel.open .bgimg{ opacity:0; }
+.acc:has(.panel.open) .panel:not(.open) .bgimg{ filter:brightness(.84) contrast(.95) saturate(.88); }
+.acc:has(.panel.open) .panel:not(.open){
+  box-shadow:-1px -1px 0 rgba(255,255,255,.4), 0 0 10px rgba(255,255,255,.34),
+             0 0 22px rgba(240,247,255,.14), 0 8px 20px rgba(0,0,0,.32); }
+
+/* ─── 收合脊柱：碑刻服務名（1.55:1 高碑重新平衡 2026-06-18） ─── */
+.spine{ position:absolute; inset:0; z-index:3;
+  opacity:1; transition:opacity .35s var(--ease); }
+.panel.open .spine{ opacity:0; pointer-events:none; }
+/* 編號：右上、降存在感（窄碑上大編號太搶） */
+.spine .num{ position:absolute; top:7%; right:12%; font-family:var(--f-en);
+  font-size:clamp(2.15rem,2.2vw,2.55rem); line-height:.75; color:rgba(58,64,78,.12);
+  text-shadow:0 1.5px 0 rgba(255,255,255,.4), 0 -1px 1px rgba(0,0,0,.16); }
+/* 碑文：左上「碑面落款」尺度感（小字＋留白＝高級；創辦人＋兄弟校準 2026-06-18） */
+.spine__cols{ position:absolute; top:11%; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:row; align-items:flex-start; gap:8px; }
+/* 不墊底塊（會像貼紙）：靠強化「刻進石面」的浮雕——字周圍一圈接近白的亮邊（提離月面＋當刻痕受光的凸緣）＋上暗下亮凹槽 */
+.spine .v{ writing-mode:vertical-rl; font-family:var(--f-cjk); font-weight:600;
+  font-size:clamp(1.55rem,1.45vw,1.82rem); letter-spacing:.18em; line-height:1.18; color:rgba(22,24,27,.9);
+  -webkit-text-stroke:.15px rgba(248,250,255,.45);
+  text-shadow:0 0 2px rgba(250,252,255,.95), 0 1.4px .2px rgba(255,255,255,.85),
+              -.9px -.9px .8px rgba(0,0,0,.52), 0 -1.3px 1.7px rgba(0,0,0,.44);
+  transition:color .4s var(--ease), text-shadow .4s var(--ease); }
+.spine .ven{ writing-mode:vertical-rl; font-family:var(--f-mono); font-size:8.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:rgba(62,68,82,.38);
+  text-shadow:0 1px 0 rgba(255,255,255,.4);
+  padding-left:7px; border-left:1px solid rgba(22,28,40,.12); }
+/* hover：刻文稍微清晰，不位移、不放大 */
+.panel:not(.open):hover .v{ color:rgba(18,19,20,.84);
+  text-shadow:0 .7px 0 rgba(255,255,255,.3), 0 -.8px 1px rgba(0,0,0,.4); }
+
+/* ─── 展開內容容器（白底） ─── */
+.body{
+  position:absolute; inset:0; z-index:2; padding:clamp(22px,3vh,40px) clamp(24px,3vw,48px);
+  opacity:0; visibility:hidden; transition:opacity .45s var(--ease) .12s, visibility 0s .6s;
+  display:grid; grid-template-rows:auto 1fr; overflow:hidden;
+}
+.panel.open .body{ opacity:1; visibility:visible; transition:opacity .55s var(--ease) .2s; }
+
+/* 每張卡各自的白色系背景圖（JS 注入 inline background-image） */
+.bgart{ position:absolute; inset:0; z-index:-2; background:#f3f1ec center/cover no-repeat; }
+/* 左重右輕的「提亮」柔遮罩：保住左側深色文字的對比，右側讓藝術元素透出 */
+.body::before{ content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:linear-gradient(100deg, rgba(248,247,243,.72) 0%, rgba(248,247,243,.44) 38%, rgba(248,247,243,.08) 64%, rgba(248,247,243,0) 100%); }
+/* social 卡專屬（不動其他三卡）：原始彩度不壓（壓了發死），左側 copy 區可讀性交給加厚的閱讀霧面遮罩到 ~58% */
+.body:has(.sbody)::before{
+  background:linear-gradient(100deg, rgba(248,247,243,.9) 0%, rgba(248,247,243,.84) 38%, rgba(248,247,243,.52) 56%, rgba(248,247,243,.14) 74%, rgba(248,247,243,0) 90%); }
+/* blog 卡專屬：重新取景把右上「燈塔＋逆光天空」帶回來，太空人隊伍退成下緣肌理（解 busy）；夕陽降一點彩度/亮度接暖白調 */
+.panel[data-key="blog"] .bgart{ background-position:82% 22%; background-size:auto 134%; filter:saturate(.82) brightness(.99); }
+/* 夕陽高亮天空會吃掉深色字：左側暖白遮罩比一般卡更厚 */
+.panel[data-key="blog"] .body::before{
+  background:linear-gradient(100deg, rgba(248,247,243,.93) 0%, rgba(248,247,243,.85) 40%, rgba(248,247,243,.5) 60%, rgba(248,247,243,.12) 78%, rgba(248,247,243,0) 92%); }
+/* ads 卡：靶心在右，左半的金字（CTR/Conversions）會蹭文字 → 左側暖白遮罩加厚保可讀 */
+.panel[data-key="ads"] .body::before{
+  background:linear-gradient(100deg, rgba(250,248,243,.94) 0%, rgba(250,248,243,.86) 40%, rgba(250,248,243,.5) 60%, rgba(250,248,243,.12) 78%, rgba(250,248,243,0) 92%); }
+/* ai 卡：真人主體偏中左、會壓文字 → 背景往左定位把人物推到右側當主視覺＋左側暖白遮罩加厚 */
+.panel[data-key="ai"] .bgart{ background-position:14% center; }
+/* 文字區收窄，跟右側真人拉開乾淨間距（避免字壓在臉上） */
+.panel[data-key="ai"] .copy{ max-width:min(50%,22em); }
+.panel[data-key="ai"] .proof,.panel[data-key="ai"] .priceline{ max-width:min(56%,24em); }
+.panel[data-key="ai"] .body::before{
+  background:linear-gradient(100deg, rgba(250,247,242,.95) 0%, rgba(250,247,242,.87) 40%, rgba(250,247,242,.5) 60%, rgba(250,247,242,.1) 78%, rgba(250,247,242,0) 92%); }
+
+/* ─── 展開內文：深色字（白底版） ─── */
+.head{ display:flex; align-items:flex-start; justify-content:space-between; gap:20px; position:relative; }
+.kicker{ font-family:var(--f-mono); font-size:11px; letter-spacing:.26em; text-transform:uppercase;
+  color:rgba(var(--dk2),.85); padding-top:6px; border-top:1px solid rgba(var(--yellow),.7);
+  display:inline-block; align-self:flex-start; }
+.bignum{ font-family:var(--f-en); font-size:clamp(2.6rem,5vw,4.2rem); line-height:.8;
+  color:rgba(var(--dk),.10); }
+.title{ font-family:var(--f-cjk); font-weight:600; font-size:clamp(2rem,3.4vw,2.9rem);
+  color:rgba(var(--dk),.97); letter-spacing:.04em; margin-top:clamp(10px,2vh,22px);
+  text-shadow:0 1px 0 rgba(255,255,255,.6); }
+.en{ font-family:var(--f-en); font-size:clamp(1rem,1.6vw,1.35rem); color:rgba(var(--teal),.85);
+  letter-spacing:.03em; margin-top:4px; }
+.lead{ font-size:clamp(.86rem,1.05vw,.98rem); line-height:1.7; color:rgba(var(--dk2),.86);
+  max-width:34em; margin-top:clamp(10px,1.5vh,16px); }
+/* social：上半說明（copy，限左側可讀區）＋下半成交區（deal，固定卡片下緣帶） */
+.sbody{ display:flex; flex-direction:column; min-height:0; height:100%; }
+.copy{ max-width:min(56%,29em); }
+@media(max-width:760px){ .copy{ max-width:100%; } }
+/* 成交區帶：固定卡片下緣，鋪極淡白漸層保深色字可讀（不是卡片） */
+.deal{ margin-top:auto; padding-top:clamp(8px,1.2vh,12px);
+  background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,.66) 26%, rgba(255,255,255,.82)); }
+.deal .cta{ margin-top:10px; }
+.meta{ margin-top:13px; }
+.meta + .meta{ margin-top:14px; }
+.meta .ml{ font-family:var(--f-mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase;
+  color:rgba(var(--dk2),.5); margin-bottom:8px; }
+.chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.chip{ font-size:.8rem; padding:5px 12px; border-radius:999px; color:rgba(var(--dk),.82);
+  border:1px solid rgba(var(--teal),.38); background:rgba(var(--teal),.06); }
+.acts{ font-size:.84rem; line-height:1.6; color:rgba(var(--dk2),.78); }
+.acts b{ color:rgba(var(--dk),.92); font-weight:600; }
+/* 編輯式價格帳：可點擊的方案列（非方塊、非促銷貼紙） */
+.offer{ display:flex; flex-direction:column; max-width:min(88%,44em); }
+.offer-row{ position:relative; display:grid;
+  grid-template-columns:minmax(4.5em,auto) minmax(0,1fr) max-content; align-items:baseline; gap:14px;
+  min-height:38px; padding:6px 2px; border-top:1px solid rgba(20,24,28,.12);
+  text-decoration:none; cursor:pointer; transition:background .25s var(--ease); }
+.offer-row:last-of-type{ border-bottom:1px solid rgba(20,24,28,.12); }
+.offer-row:hover{ background:rgba(255,255,255,.42); }
+.offer-name{ font-family:var(--f-cjk); font-weight:600; font-size:1rem; color:rgba(var(--dk),.96); white-space:nowrap; }
+.offer-name .rec{ font-family:var(--f-mono); font-size:8.5px; letter-spacing:.14em; color:#8a6d2e;
+  margin-left:7px; vertical-align:1px; }
+.offer-note{ font-size:.78rem; line-height:1.35; color:rgba(var(--dk2),.7);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.offer-price{ font-family:var(--f-mono); font-size:.86rem; font-variant-numeric:tabular-nums;
+  color:rgba(var(--dk),.92); white-space:nowrap; }
+.offer-price small{ font-size:.64rem; color:rgba(var(--dk2),.55); letter-spacing:.04em; }
+.offer-price .ar{ color:rgba(160,110,30,.95); margin-left:5px; }
+/* 推薦：左緣一道舊金細線（編輯標註，不整列上色） */
+.offer-row.feat::before{ content:''; position:absolute; left:-10px; top:9px; bottom:9px; width:2px; background:#b99a52; }
+@media(max-width:760px){ .offer{ max-width:100%; } }
+/* 主 CTA＝活潑亮膠囊（variant D）：唯一像按鈕的東西，與價格表同寬、全圓角實心品牌青＋光澤循環掃過＋白底圓箭頭 */
+.cta{ position:relative; overflow:hidden;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  width:min(88%,44em); height:46px; padding:0 8px 0 22px; margin-top:16px;
+  font-family:var(--f-body); font-size:.94rem; font-weight:700; letter-spacing:.06em;
+  color:#fff; text-shadow:0 1px 2px rgba(0,40,50,.45); text-decoration:none; border-radius:999px;
+  background:linear-gradient(180deg,#0e93ab,#0a5d70);
+  box-shadow:0 8px 22px rgba(12,108,128,.42), inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .25s var(--ease), box-shadow .3s var(--ease); }
+.cta::after{ content:''; position:absolute; top:0; left:-60%; width:45%; height:100%; pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);
+  transform:skewX(-18deg); animation:cta-sheen 3.2s ease-in-out infinite; }
+.cta .ar{ width:32px; height:32px; display:grid; place-items:center; border-radius:50%;
+  font-family:var(--f-mono); font-weight:700; background:#fff; color:#0e7e94; z-index:1;
+  transition:transform .3s var(--ease); }
+.cta:hover{ transform:translateY(-2px) scale(1.012);
+  box-shadow:0 12px 28px rgba(14,126,148,.5), inset 0 1px 0 rgba(255,255,255,.4); }
+.cta:hover .ar{ transform:translateX(3px); }
+@keyframes cta-sheen{ 0%{left:-60%} 38%,100%{left:130%} }
+@media(prefers-reduced-motion:reduce){ .cta::after{ animation:none; } }
+@media(max-width:760px){ .cta{ width:100%; } }
+.priceline{ font-family:var(--f-mono); font-size:.82rem; color:rgba(160,110,30,.95);
+  letter-spacing:.04em; margin-top:18px; }
+/* 護城河數字（部落格卡「證據層」＝社群卡方案表的等價說服）：Italiana 大數字＋mono 標籤 */
+.proof{ display:flex; gap:clamp(18px,2.6vw,34px); margin-bottom:6px; }
+.stat{ display:flex; flex-direction:column; line-height:1; }
+.stat b{ font-family:var(--f-en); font-weight:400; font-size:clamp(1.7rem,2.5vw,2.2rem); color:rgba(var(--teal),.96); }
+.stat span{ font-family:var(--f-mono); font-size:9.5px; letter-spacing:.08em; color:rgba(var(--dk2),.72); margin-top:6px; white-space:nowrap; }
+.deal .priceline{ margin-top:0; }
+/* 部落格右上大編號淡掉，讓位給燈塔（避免 02 疊在燈塔上變髒） */
+.panel[data-key="blog"] .bignum{ color:rgba(var(--dk),.05); }
+
+/* ─── 手機：垂直堆疊 ─── */
+@media(max-width:820px){
+  body{overflow:auto;align-items:flex-start}
+  .acc{ flex-direction:column; height:auto; aspect-ratio:auto; gap:10px; }
+  .panel{ flex:0 0 auto; min-height:62px; }
+  .panel.open{ min-height:auto; }
+  .spine{ flex-direction:row; padding:0 20px; height:62px; justify-content:flex-start; gap:16px; }
+  .spine .v,.spine .ven{ writing-mode:horizontal-tb; }
+  .spine .ven{ border-left:none; padding-left:0; }
+  .spine .num{ position:static; font-size:1.1rem; }
+  .spine__cols{ position:static; transform:none; padding:0; background:none; box-shadow:none; backdrop-filter:none; }
+  .body{ position:relative; inset:auto; min-height:520px; }
+  .grid{ grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div class="acc" id="acc"></div>
+<script>
+const DATA=[
+  {
+    key:'social', n:'01', cjk:'社群經營', en:'SOCIAL', echo:'Your brand, always on.',
+    lead:'不只是代發文。策略、內容、發布、互動、數據，一條龍把帳號養成會自己長大的品牌資產。',
+    social:true, art:'../_imgtest/social-mix-a2.png',
+    platforms:['LINE','Instagram','Threads','Facebook','TikTok'],
+    acts:'<b>海巡漲粉</b> · <b>內容製作</b>（圖文/短影音）· <b>互動經營</b> · <b>數據追蹤</b>',
+    plans:[
+      {n:'基礎行銷', p:'NT$3,800', u:'/月', d:'4 篇圖文 · 維持品牌曝光'},
+      {n:'成長推廣', p:'NT$8,500', u:'/月', d:'8 篇圖文 · 數據分析＋方向建議', feat:true},
+      {n:'整合行銷', p:'NT$21,000', u:'/月', d:'12 篇圖文 · 完整數據＋活動企劃'},
+    ],
+  },
+  {
+    key:'blog', n:'02', cjk:'部落格代營運', en:'SEO CONTENT', echo:'Traffic that compounds.',
+    lead:'用自動化內容產線，為你建立並長期經營 SEO 部落格，讓搜尋與 AI 都找得到你，把網站養成會自己長流量的引流資產。',
+    art:'../_imgtest/blog4-b.png',
+    flow:'<b>選題對準搜尋意圖</b> · <b>AI 輔助產文</b> · <b>SEO/GEO 結構化</b> · <b>自動發布＋收錄追蹤</b>',
+    proof:[{n:'16',l:'專責 AI 代理'},{n:'60+',l:'道品質把關'},{n:'5',l:'站自有實證'}],
+    price:'依規模規劃 · 訂閱式長期經營',
+  },
+  {
+    key:'ads', n:'03', cjk:'廣告投放', en:'PAID ADS', echo:'Spend that performs.',
+    lead:'跨 FB/IG/TikTok 代客操盤，含影片與短影音廣告，把每一塊投放預算都盯成看得見的成效。',
+    art:'../_imgtest/ads2-a.png',
+    flow:'<b>素材企劃</b>（含影片/短影音）· <b>帳號設定</b> · <b>出價優化</b> · <b>成效回報</b>',
+    flowLabel:'操盤流程',
+    proof:[{n:'3',l:'平台同步代操'},{n:'10–25%',l:'成效抽成'},{n:'4',l:'步驟全包'}],
+    bgx:65,
+  },
+  {
+    key:'ai', n:'04', cjk:'AI 形象網紅', en:'AI TALENT', echo:'A face that never tires.',
+    lead:'為企業打造可長期經營的專屬虛擬代言人，無出鏡包袱、形象完全可控。標準只有一個：做到沒有 AI 感。',
+    art:'../_imgtest/ai-particle-a-sq.png',
+    flow:'<b>人設與世界觀</b> · <b>視覺形象</b> · <b>長期內容經營</b> · <b>角色版權歸品牌</b>',
+    flowLabel:'角色系統',
+    proof:[{n:'3',l:'倍互動率勝真人'},{n:'100%',l:'形象可控'},{n:'0',l:'真人翻車風險'}],
+    price:'詢價制', bgs:400,
+  },
+];
+
+const MURAL = new URLSearchParams(location.search).get('mural') || 'mural-j.png';
+const acc=document.getElementById('acc');
+DATA.forEach((s,i)=>{
+  const p=document.createElement('div');
+  p.className='panel';
+  if(s.key) p.dataset.key=s.key;
+  p.tabIndex=0; p.setAttribute('role','button');
+  p.setAttribute('aria-expanded','false');
+  p.setAttribute('aria-label', s.cjk);
+
+  let body='';
+  if(s.social){
+    body=`
+      <div class="head"><span class="kicker">數位行銷 / ${s.en}</span><span class="bignum">${s.n}</span></div>
+      <div class="sbody">
+        <div class="copy">
+          <h3 class="title">${s.cjk}</h3>
+          <p class="en">${s.echo}</p>
+          <p class="lead">${s.lead}</p>
+        </div>
+        <div class="deal">
+          <div class="meta"><div class="ml">日常動作</div><div class="acts">${s.acts}</div></div>
+          <div class="offer">
+            ${s.plans.map(pl=>`
+              <a class="offer-row${pl.feat?' feat':''}" href="../contact.html" target="_top">
+                <span class="offer-name">${pl.n}${pl.feat?'<span class="rec">推薦</span>':''}</span>
+                <span class="offer-note">${pl.d}</span>
+                <span class="offer-price">${pl.p}<small>${pl.u}</small>${pl.feat?'<span class="ar">→</span>':''}</span>
+              </a>`).join('')}
+          </div>
+          <a class="cta" href="../contact.html" target="_top">想開始經營 <span class="ar">→</span></a>
+        </div>
+      </div>`;
+  }else if(s.flow){
+    body=`
+      <div class="head"><span class="kicker">數位行銷 / ${s.en}</span><span class="bignum">${s.n}</span></div>
+      <div class="sbody">
+        <div class="copy">
+          <h3 class="title">${s.cjk}</h3>
+          <p class="en">${s.echo}</p>
+          <p class="lead">${s.lead}</p>
+          <div class="meta"><div class="ml">${s.flowLabel||'內容產線'}</div><div class="acts">${s.flow}</div></div>
+        </div>
+        <div class="deal">
+          <div class="proof">
+            ${s.proof.map(p=>`<div class="stat"><b>${p.n}</b><span>${p.l}</span></div>`).join('')}
+          </div>
+          ${s.price?`<p class="priceline">${s.price}</p>`:''}
+          <a class="cta" href="../contact.html" target="_top">想了解更多 <span class="ar">→</span></a>
+        </div>
+      </div>`;
+  }else{
+    body=`
+      <div class="head"><span class="kicker">數位行銷 / ${s.en}</span><span class="bignum">${s.n}</span></div>
+      <div>
+        <h3 class="title">${s.cjk}</h3>
+        <p class="en">${s.echo}</p>
+        <p class="lead">${s.lead}</p>
+        <p class="priceline">${s.price}</p>
+        <a class="cta" href="../contact.html" target="_top">想了解更多 <span class="ar">→</span></a>
+      </div>`;
+  }
+
+  // mural 整幅切四份：每條取對應的四分之一（background-position 依序 0/33/67/100%）
+  // background-size 放大到 440%（>400%）：每格往內裁約 2-3%，把 mural 四格接縫推出卡片外
+  // bgx：個別卡可覆寫水平位置（降低 % = 內容右移）；廣告投放卡需右移
+  // bgs：個別卡可覆寫放大倍率（中間卡 440% 推掉接縫；最右卡回 400% 不裁太空人）
+  const px = (s.bgx != null ? s.bgx : i/3*100);
+  const bgs = (s.bgs != null ? s.bgs : 440);
+  const bg = `<div class="bgimg" style="background-image:url('../_imgtest/${MURAL}'); background-size:${bgs}% 100%; background-position:${px.toFixed(2)}% center;"></div>`;
+  p.innerHTML=`${bg}
+    <div class="spine"><span class="num">${s.n}</span><div class="spine__cols"><span class="v">${s.cjk}</span><span class="ven">${s.en}</span></div></div>
+    <div class="body"><div class="bgart" style="background-image:url('${s.art}')"></div>${body}</div>`;
+  acc.appendChild(p);
+});
+
+const panels=[...document.querySelectorAll('.panel')];
+function open(idx){
+  panels.forEach((p,i)=>{ const on=i===idx; p.classList.toggle('open',on); p.setAttribute('aria-expanded',on?'true':'false'); });
+}
+function toggle(p,i){
+  if(p.classList.contains('open')){ p.classList.remove('open'); p.setAttribute('aria-expanded','false'); }
+  else { open(i); }
+}
+panels.forEach((p,i)=>{
+  p.addEventListener('click',()=>toggle(p,i));
+  p.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(p,i); } });
+});
+</script>
+</body>
+</html>

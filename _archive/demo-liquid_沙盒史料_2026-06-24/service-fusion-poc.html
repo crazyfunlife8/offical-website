@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>液態金屬卡 流動版｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); overflow:hidden; height:100vh; }
+  body::before{ content:''; position:fixed; inset:0; z-index:-2; background:radial-gradient(circle at 50% 35%, #14213f 0%, #0a1226 50%, #05070f 100%); }
+  #cv{ position:fixed; inset:0; width:100%; height:100%; z-index:0; }
+  .sectag{ position:fixed; top:24px; left:50%; transform:translateX(-50%); z-index:9; font-family:"JetBrains Mono",monospace;
+    font-size:12px; letter-spacing:.12em; color:#06121e; background:rgba(var(--cyan),.85); padding:5px 14px; border-radius:5px; white-space:nowrap; }
+  .content{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:5; width:280px; min-height:360px;
+    padding:36px 32px; display:flex; flex-direction:column; pointer-events:none; color:#06141f;
+    text-shadow:0 1px 2px rgba(255,255,255,.35); }
+  .lab{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.18em; color:#0a3050;
+    border-top:1.5px solid rgba(10,48,80,.8); padding-top:9px; align-self:flex-start; }
+  .ttl{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.85rem; margin:20px 0 16px; color:#08263f; }
+  .desc{ font-size:.95rem; line-height:1.9; color:#0a2c47; }
+  .more{ margin-top:auto; font-family:"JetBrains Mono",monospace; font-size:13px; color:#0a3a5a; }
+  .toggle{ position:fixed; left:16px; bottom:14px; z-index:30; display:flex; gap:8px; }
+  .toggle button{ font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.8); background:rgba(13,24,46,.7);
+    border:1px solid rgba(var(--cyan),.3); padding:5px 11px; border-radius:6px; cursor:pointer; }
+  .toggle button.on{ background:rgba(var(--cyan),.85); color:#06121e; }
+  .nav{ position:fixed; right:16px; bottom:14px; z-index:30; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.5); }
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<span class="sectag">流動的液態金屬卡 · 持續翻騰 + 滴落</span>
+<div class="content">
+  <span class="lab">SYSTEM</span>
+  <h3 class="ttl">客製系統</h3>
+  <p class="desc">說得出來就寫得出來，<br>沒說全的，替你想到。</p>
+  <span class="more">了解更多 →</span>
+</div>
+<div class="toggle">
+  <button id="bMetal" class="on">液態金屬</button>
+  <button id="bGlass">玻璃折射</button>
+</div>
+<div class="nav">流動液態卡 · <b>WebGL · 移動滑鼠攪動</b></div>
+
+<script type="importmap">
+{ "imports": { "three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const canvas=document.getElementById('cv');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.15;
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(40,innerWidth/innerHeight,0.1,100); camera.position.set(0,0,8);
+scene.environment=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),0.04).texture;
+const kL=new THREE.DirectionalLight(0xffffff,2.4); kL.position.set(4,6,6); scene.add(kL);
+const rL=new THREE.DirectionalLight(0x2a6cff,1.4); rL.position.set(-6,-2,3); scene.add(rL);
+function resize(){ renderer.setSize(innerWidth,innerHeight); camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); }
+resize(); addEventListener('resize',resize);
+const mouse={x:0,y:0}; addEventListener('pointermove',e=>{ mouse.x=(e.clientX/innerWidth-0.5)*2; mouse.y=-(e.clientY/innerHeight-0.5)*2; });
+
+// 液態流動法線貼圖：把鏡面反光打碎成不規則水銀紋、並持續往下爬（輪廓不動、表面在流）
+function makeFlowNormalMap(){
+  const S=256;
+  const c=document.createElement('canvas'); c.width=c.height=S; const g=c.getContext('2d');
+  g.fillStyle='#808080'; g.fillRect(0,0,S,S);
+  for(let i=0;i<150;i++){
+    const x=Math.random()*S, y=Math.random()*S, r=6+Math.random()*26, a=0.05+Math.random()*0.11;
+    const v=Math.random()>0.5?255:0;
+    for(const ox of [-S,0,S]) for(const oy of [-S,0,S]){
+      const gr=g.createRadialGradient(x+ox,y+oy,0,x+ox,y+oy,r);
+      gr.addColorStop(0,`rgba(${v},${v},${v},${a})`); gr.addColorStop(1,`rgba(${v},${v},${v},0)`);
+      g.fillStyle=gr; g.beginPath(); g.arc(x+ox,y+oy,r,0,6.283); g.fill();
+    }
+  }
+  const img=g.getImageData(0,0,S,S).data;
+  const n=document.createElement('canvas'); n.width=n.height=S; const ng=n.getContext('2d');
+  const out=ng.createImageData(S,S);
+  const H=(x,y)=>img[(((y+S)%S)*S+((x+S)%S))*4]/255;
+  for(let y=0;y<S;y++)for(let x=0;x<S;x++){
+    const dx=(H(x+1,y)-H(x-1,y))*2.4, dy=(H(x,y+1)-H(x,y-1))*2.4;
+    const inv=1/Math.sqrt(dx*dx+dy*dy+1), o=(y*S+x)*4;
+    out.data[o]=(-dx*inv*0.5+0.5)*255; out.data[o+1]=(-dy*inv*0.5+0.5)*255;
+    out.data[o+2]=(inv*0.5+0.5)*255; out.data[o+3]=255;
+  }
+  ng.putImageData(out,0,0);
+  const t=new THREE.CanvasTexture(n); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(2.4,2.4);
+  return t;
+}
+const flowTex=makeFlowNormalMap();
+const metalMat=new THREE.MeshStandardMaterial({metalness:1,roughness:0.05,color:0xeaf2ff,envMapIntensity:2.1,
+  normalMap:flowTex, normalScale:new THREE.Vector2(0.7,0.7)});
+const glassMat=new THREE.MeshPhysicalMaterial({transmission:1,thickness:1.0,ior:1.4,roughness:0.04,dispersion:5,clearcoat:1,iridescence:1,iridescenceIOR:1.5,attenuationColor:new THREE.Color(0xbfe6ff),attenuationDistance:4,envMapIntensity:1.6,transparent:true});
+const mc=new MarchingCubes(88,metalMat,true,false,360000); mc.scale.set(2.16,2.32,0.88); mc.isolation=80; scene.add(mc);
+
+
+// 卡片填充網格（密 → 融成實心卡身；各自微擺 → 表面翻騰流動）
+const cols=[0.26,0.38,0.50,0.62,0.74], rows=[0.27,0.38,0.49,0.60,0.71];
+const cells=[]; cols.forEach(cx=>rows.forEach(cy=>cells.push({x:cx,y:cy,ph:cx*7+cy*13,delay:(0.71-cy)/0.44*0.42})));
+const dripX=[0.34,0.46,0.56,0.66];
+
+const T0=performance.now();
+// 無進場：卡片一開始就成形、持續水銀微動 + 底部滴落
+(function loop(){ requestAnimationFrame(loop);
+  const sec=(performance.now()-T0)/1000;
+  mc.reset(); const sub=8;
+  cells.forEach(c=>{                                     // 卡身：輪廓乾淨、表面微動
+    const y=c.y+Math.cos(sec*1.8+c.ph)*0.009;
+    const x=c.x+Math.sin(sec*2.2+c.ph)*0.007;
+    mc.addBall(x,y,0.5,0.62,sub);
+  });
+  for(let k=0;k<18;k++){                                 // 內緣一圈小幅不規則凸點 → 邊緣反光/折射多點碎化（幅度小、不變大波浪）
+    const ang=k/18*6.2832;
+    const n=Math.sin(sec*2.4+k*1.7)*0.5+Math.sin(sec*4.1+k*2.7)*0.5;     // -1..1 不規則
+    const ex=0.5+Math.cos(ang)*0.235, ey=0.49+Math.sin(ang)*0.205;
+    const s=0.05+0.06*(n*0.5+0.5);                                       // 0.05..0.11 小凸點
+    mc.addBall(ex, ey, 0.5, s, sub);
+  }
+  dripX.forEach((dx,i)=>{                                // 底部持續滴落
+    const loc=((sec*0.32+i*0.27)%1); const yy=0.27-loc*0.34; const sd=0.5*(1-loc)*(1-loc);
+    if(sd>0.03) mc.addBall(dx+Math.sin(sec+i)*0.008,yy,0.5,sd,sub);
+  });
+  [0.38,0.5,0.62].forEach((tx,i)=>{                      // 上緣：小滴從上方落入、匯進頂邊（小幅、不破壞輪廓）
+    const loc=((sec*0.3+i*0.33)%1); const ty=1.02-loc*0.30; const ts=0.28*Math.min(1,loc*2.2);
+    if(ty>0.70&&ts>0.04) mc.addBall(tx+Math.sin(sec*1.3+i*2.1)*0.01, ty, 0.5, ts, sub);
+  });
+  flowTex.offset.y-=0.0016; flowTex.offset.x=Math.sin(sec*0.35)*0.025;   // 表面反光持續往下爬
+  mc.addBall(0.5+mouse.x*0.14, 0.5+mouse.y*0.2, 0.5, 0.3, sub);
+  mc.update();
+  mc.rotation.y=mouse.x*0.16; mc.rotation.x=mouse.y*0.1;
+  renderer.render(scene,camera);
+})();
+
+// 質感切換
+const bM=document.getElementById('bMetal'), bG=document.getElementById('bGlass');
+bM.onclick=()=>{ mc.material=metalMat; bM.classList.add('on'); bG.classList.remove('on'); setTextDark(true); };
+bG.onclick=()=>{ mc.material=glassMat; bG.classList.add('on'); bM.classList.remove('on'); setTextDark(false); };
+function setTextDark(dark){ const c=document.querySelector('.content');
+  if(dark){ c.style.color='#06141f'; c.style.textShadow='0 1px 2px rgba(255,255,255,.35)';
+    c.querySelector('.lab').style.color='#0a3050'; c.querySelector('.ttl').style.color='#08263f'; c.querySelector('.desc').style.color='#0a2c47'; c.querySelector('.more').style.color='#0a3a5a';
+    c.querySelector('.lab').style.borderTopColor='rgba(10,48,80,.8)'; }
+  else { c.style.color='#fff'; c.style.textShadow='1px 1px 0 rgba(0,0,0,.5), 0 0 14px rgba(0,0,0,.6)';
+    c.querySelector('.lab').style.color='#fff'; c.querySelector('.ttl').style.color='#fff'; c.querySelector('.desc').style.color='rgba(255,255,255,.92)'; c.querySelector('.more').style.color='rgba(0,200,255,1)';
+    c.querySelector('.lab').style.borderTopColor='rgba(0,200,255,.9)'; }
+}
+</script>
+</body>
+</html>

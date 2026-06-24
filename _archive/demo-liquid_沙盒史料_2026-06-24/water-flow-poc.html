@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>流動輪廓卡片 POC｜創巢數位</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body{ height:100%; overflow:hidden; font-family:"Microsoft JhengHei","PingFang TC",sans-serif;
+    background:radial-gradient(circle at 50% 38%, #13203f 0%, #0a1226 45%, #05070f 100%); }
+  body::before{ content:''; position:fixed; inset:0; pointer-events:none; opacity:.5;
+    background-image:radial-gradient(1px 1px at 20% 30%,#fff,transparent),
+      radial-gradient(1px 1px at 70% 60%,#bfe6ff,transparent),
+      radial-gradient(1px 1px at 40% 80%,#fff,transparent),
+      radial-gradient(1px 1px at 85% 25%,#fff,transparent); }
+  .stage{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; gap:60px; }
+
+  .card{ position:relative; width:380px; height:480px; }
+  .card canvas{ position:absolute; inset:0; }
+  .card__content{ position:absolute; inset:0; padding:56px 54px; color:#eaf4ff; z-index:2; pointer-events:none; }
+  .l{ width:64px; height:2px; background:rgba(255,199,9,.9); margin-bottom:12px; }
+  .lab{ font:600 13px/1 Consolas,monospace; letter-spacing:.18em; color:rgba(255,199,9,.92); }
+  .ttl{ font:500 40px/1.2 "Microsoft JhengHei",serif; margin:22px 0 16px; color:#f2f8ff; }
+  .desc{ font:400 15px/1.9 "Microsoft JhengHei",sans-serif; color:rgba(210,228,250,.9); }
+  .more{ position:absolute; left:54px; bottom:54px; font:italic 18px/1 Georgia,serif;
+    color:rgba(0,200,255,.92); display:flex; align-items:center; gap:12px; }
+  .more::after{ content:''; width:44px; height:1px; background:rgba(0,200,255,.7); }
+
+  .panel{ position:fixed; right:18px; top:18px; z-index:20; background:rgba(10,16,30,.78);
+    border:1px solid rgba(0,200,255,.25); border-radius:12px; padding:14px 16px; color:#cfe3ff; font-size:12px; width:230px; }
+  .panel h4{ font-size:11px; letter-spacing:.16em; color:rgba(0,200,255,.85); margin-bottom:10px; }
+  .prow{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:10px 0; }
+  .prow input[type=range]{ flex:1; accent-color:#00c8ff; }
+  .prow input[type=checkbox]{ accent-color:#00c8ff; }
+  .prow span{ flex:0 0 40px; text-align:right; opacity:.7; font-variant-numeric:tabular-nums; }
+  .hud{ position:fixed; left:20px; bottom:16px; z-index:20; color:rgba(200,225,255,.5); font-size:12px; }
+  .hud b{ color:rgba(0,200,255,.9); }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="card">
+    <canvas data-seed="1.0"></canvas>
+    <div class="card__content">
+      <div class="l"></div><div class="lab">SOCIAL&nbsp;&nbsp;SERVICE</div>
+      <div class="ttl">社群經營</div>
+      <div class="desc">你不是缺一個會發文的人，是缺有人替你想清楚要說什麼。素材設計、文案發想、帳號定位，從靈魂出發。</div>
+      <div class="more">Read more</div>
+    </div>
+  </div>
+  <div class="card">
+    <canvas data-seed="5.3"></canvas>
+    <div class="card__content">
+      <div class="l"></div><div class="lab">DEVELOPMENT</div>
+      <div class="ttl">網站架設</div>
+      <div class="desc">網站不是技術問題，是你能不能在 3 秒內讓人記住你。從一頁式到企業電商，先解決「你想說什麼」。</div>
+      <div class="more">Read more</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <h4>流動輪廓</h4>
+  <div class="prow"><label>流動幅度</label><input id="amp" type="range" min="0" max="34" step="1" value="14"><span id="vamp">14</span></div>
+  <div class="prow"><label>流動速度</label><input id="spd" type="range" min="0" max="0.03" step="0.001" value="0.011"><span id="vspd">.011</span></div>
+  <div class="prow"><label>柔順度</label><input id="smo" type="range" min="1" max="4" step="1" value="2"><span id="vsmo">2</span></div>
+  <div class="prow"><label>流動 animate</label><input id="anim" type="checkbox" checked><span></span></div>
+</div>
+<div class="hud">外框那條線在<b>流動</b> · 面平、文字清晰 · 2D canvas 零 WebGL · 取消勾選＝凍結（零負擔）</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let amp=14, speed=0.011, smooth=2, flow=true;
+
+function makeCard(canvas){
+  const seed=parseFloat(canvas.dataset.seed)||0;
+  const dpr=Math.min(devicePixelRatio,2);
+  const W=380,H=480; canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const cx=W/2, cy=H/2, a=W/2-26, b=H/2-26, n=4;  // 圓角矩形基底（superellipse）
+  return { ctx, W, H, cx, cy, a, b, n, seed };
+}
+
+// 平滑、低頻、不對稱的流動 noise（少數大起伏 → 流動感，非機械鼓包）
+function flowNoise(t, time, seed){
+  return (
+    Math.sin(t*1 + time + seed) * 0.55 +
+    Math.sin(t*2 - time*0.7 + seed*1.7) * 0.3 +
+    Math.sin(t*3 + time*0.5 + seed*0.5) * 0.18
+  );
+}
+
+function drawCard(C, time){
+  const { ctx,W,H,cx,cy,a,b,n,seed }=C;
+  ctx.clearRect(0,0,W,H);
+  const N=72, pts=[];
+  for(let i=0;i<N;i++){
+    const t=i/N*Math.PI*2, ct=Math.cos(t), st=Math.sin(t);
+    const ex=Math.sign(ct)*Math.pow(Math.abs(ct),2/n);
+    const ey=Math.sign(st)*Math.pow(Math.abs(st),2/n);
+    let x=cx+a*ex, y=cy+b*ey;
+    const d=flowNoise(t, time, seed)*amp;
+    const nl=Math.hypot(ex,ey)||1;
+    x+=ex/nl*d; y+=ey/nl*d;
+    pts.push([x,y]);
+  }
+  // 經過中點的二次曲線 → 平滑連續流動輪廓
+  ctx.beginPath();
+  ctx.moveTo((pts[0][0]+pts[N-1][0])/2,(pts[0][1]+pts[N-1][1])/2);
+  for(let i=0;i<N;i++){ const p=pts[i], q=pts[(i+1)%N]; ctx.quadraticCurveTo(p[0],p[1],(p[0]+q[0])/2,(p[1]+q[1])/2); }
+  ctx.closePath();
+  // 玻璃填色
+  const g=ctx.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,'rgba(12,30,58,.95)'); g.addColorStop(0.5,'rgba(9,32,56,.95)'); g.addColorStop(1,'rgba(6,20,40,.96)');
+  ctx.save(); ctx.shadowColor='rgba(0,140,255,.35)'; ctx.shadowBlur=26; ctx.fillStyle=g; ctx.fill(); ctx.restore();
+  // 頂部水面光
+  ctx.save(); ctx.clip();
+  const sh=ctx.createLinearGradient(0,0,0,H*0.5);
+  sh.addColorStop(0,'rgba(120,200,255,.14)'); sh.addColorStop(1,'rgba(120,200,255,0)');
+  ctx.fillStyle=sh; ctx.fillRect(0,0,W,H*0.5); ctx.restore();
+  // cyan 冷光邊
+  ctx.lineWidth=1.6; ctx.strokeStyle='rgba(0,200,255,.62)';
+  ctx.save(); ctx.shadowColor='rgba(0,200,255,.55)'; ctx.shadowBlur=10; ctx.stroke(); ctx.restore();
+}
+
+const cards=[...document.querySelectorAll('.card canvas')].map(makeCard);
+// smooth 影響 n（柔順度越高→邊越圓潤），這裡用 n 控制
+function setSmooth(v){ cards.forEach(c=>c.n = 2 + v); }
+setSmooth(smooth);
+
+let time=0;
+function loop(){ requestAnimationFrame(loop); if(flow) time+=speed; cards.forEach(c=>drawCard(c,time)); }
+loop();
+
+const bind=(id,vid,fn,fmt)=>{ const el=$(id),v=$(vid); el.addEventListener('input',()=>{ fn(+el.value); v.textContent=fmt?fmt(el.value):el.value; }); };
+bind('amp','vamp', x=>amp=x);
+bind('spd','vspd', x=>speed=x, x=>(+x).toFixed(3).replace(/^0/,''));
+bind('smo','vsmo', x=>{ smooth=x|0; setSmooth(smooth); });
+$('anim').addEventListener('change', e=>flow=e.target.checked);
+</script>
+</body>
+</html>

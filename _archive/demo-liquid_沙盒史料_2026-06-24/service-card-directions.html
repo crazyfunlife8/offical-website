@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服務卡片設計方向比較｜創巢數位（探索）</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700;900&family=Italiana&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
+<style>
+  :root{
+    --yellow:255,199,9; --cyan:0,200,255; --stellar:225,235,255; --blue:23,54,245;
+    --f-cjk:"Chiron Sung HK","Noto Serif TC",serif; --f-serif:"Noto Serif TC",serif;
+    --f-mono:"JetBrains Mono",monospace; --f-sans:"Noto Sans TC",sans-serif; --f-en:"Italiana",serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{background:#04060a;color:rgba(var(--stellar),.92);font-family:var(--f-sans);min-height:100%;}
+  /* 仿主視覺深空底 + 微星點 */
+  body{
+    background:
+      radial-gradient(120% 80% at 78% 8%, rgba(20,40,80,.30), transparent 55%),
+      radial-gradient(90% 70% at 12% 92%, rgba(40,20,70,.22), transparent 60%),
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1px 1px at 70% 20%, rgba(255,255,255,.4), transparent),
+      radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,.35), transparent),
+      radial-gradient(1.5px 1.5px at 85% 60%, rgba(255,255,255,.45), transparent),
+      radial-gradient(1px 1px at 55% 85%, rgba(255,255,255,.3), transparent),
+      #04060a;
+    background-repeat:no-repeat;
+  }
+  .page{max-width:1280px;margin:0 auto;padding:72px 5vw 120px;}
+  .page-head{margin-bottom:14px;}
+  .page-head .ey{font-family:var(--f-mono);font-size:12px;letter-spacing:.26em;color:rgba(var(--yellow),.9);}
+  .page-head h1{font-family:var(--f-cjk);font-weight:600;font-size:clamp(1.6rem,3vw,2.4rem);margin-top:10px;color:rgba(var(--stellar),.98);}
+  .page-head p{margin-top:12px;max-width:640px;font-size:.92rem;line-height:1.8;color:rgba(var(--stellar),.55);}
+  .hint{margin-top:10px;font-family:var(--f-mono);font-size:11px;letter-spacing:.04em;color:rgba(var(--cyan),.7);}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:46px 40px;margin-top:54px;}
+  .cell{display:flex;flex-direction:column;gap:16px;}
+  .cap{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.04em;color:rgba(var(--stellar),.5);line-height:1.7;}
+  .cap b{color:rgba(var(--stellar),.9);font-weight:500;letter-spacing:.12em;}
+  .cap .tag{color:rgba(var(--yellow),.85);}
+
+  /* 共用卡片外框尺寸 */
+  .card{position:relative;min-height:440px;padding:48px 46px;overflow:hidden;}
+  .card ul{list-style:none;}
+
+  /* ───────── A 電影感分層光 ───────── */
+  .a{border-radius:18px;
+    background:linear-gradient(158deg, rgba(16,28,52,.96), rgba(8,13,26,.97));
+    border:1px solid rgba(var(--stellar),.10);
+    box-shadow:0 34px 90px rgba(0,0,0,.55), inset 0 1px 0 rgba(var(--stellar),.06);}
+  .a::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,rgba(var(--cyan),.95),transparent);
+    box-shadow:0 0 22px 2px rgba(var(--cyan),.45);}
+  .a::after{content:'';position:absolute;top:-40px;left:-40px;width:280px;height:200px;
+    background:radial-gradient(circle, rgba(var(--cyan),.16), transparent 70%);filter:blur(6px);pointer-events:none;}
+  .a .knum{position:absolute;right:34px;top:24px;font-family:var(--f-mono);font-size:96px;line-height:1;
+    color:transparent;background:linear-gradient(180deg,rgba(var(--stellar),.14),rgba(var(--stellar),.02));-webkit-background-clip:text;background-clip:text;}
+  .a .klab{position:relative;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.24em;color:rgba(var(--cyan),.9);}
+  .a h3{position:relative;font-family:var(--f-cjk);font-weight:600;font-size:2.6rem;margin:16px 0 6px;color:rgba(var(--stellar),.98);}
+  .a .sub{position:relative;color:rgba(var(--stellar),.5);font-size:.95rem;margin-bottom:30px;}
+  .a li{position:relative;display:flex;align-items:baseline;gap:16px;padding:15px 2px;border-top:1px solid rgba(var(--stellar),.10);}
+  .a .sn{font-family:var(--f-serif);font-size:1.15rem;color:rgba(var(--stellar),.93);}
+  .a .sd{margin-left:auto;font-size:.82rem;color:rgba(var(--stellar),.42);}
+
+  /* ───────── B 編輯雜誌排版 ───────── */
+  .b{border-radius:4px;background:rgba(6,10,20,.72);border:1px solid rgba(var(--stellar),.08);
+    display:grid;grid-template-columns:96px 1fr;gap:0 28px;}
+  .b .lead{border-right:1px solid rgba(var(--stellar),.14);padding-right:24px;}
+  .b .lead .fig{font-family:var(--f-serif);font-weight:900;font-size:5.4rem;line-height:.9;color:rgba(var(--stellar),.92);}
+  .b .lead .klab{margin-top:14px;font-family:var(--f-mono);font-size:10px;letter-spacing:.2em;color:rgba(var(--yellow),.85);writing-mode:vertical-rl;}
+  .b .body{}
+  .b h3{font-family:var(--f-cjk);font-weight:600;font-size:2.4rem;color:rgba(var(--stellar),.98);}
+  .b .en{font-family:var(--f-en);font-size:1.1rem;letter-spacing:.04em;color:rgba(var(--cyan),.6);margin-top:2px;}
+  .b .pull{margin:20px 0 26px;padding-left:16px;border-left:2px solid rgba(var(--yellow),.7);
+    font-family:var(--f-serif);font-size:1.05rem;line-height:1.7;color:rgba(var(--stellar),.7);}
+  .b li{display:flex;align-items:baseline;gap:14px;padding:13px 0;border-top:1px solid rgba(var(--stellar),.1);}
+  .b .sn{font-family:var(--f-serif);font-weight:600;font-size:1.1rem;color:rgba(var(--stellar),.94);}
+  .b .sd{margin-left:auto;font-family:var(--f-mono);font-size:.74rem;letter-spacing:.02em;color:rgba(var(--stellar),.4);}
+
+  /* ───────── C 爆亮紙卡 ───────── */
+  .c{border-radius:6px;background:#f3efe6;color:#15110a;
+    box-shadow:0 40px 80px rgba(0,0,0,.5);
+    background-image:radial-gradient(rgba(0,0,0,.025) 1px,transparent 1px);background-size:4px 4px;}
+  .c .klab{display:inline-block;font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;
+    background:#15110a;color:#f3efe6;padding:5px 10px;}
+  .c .knum{position:absolute;right:30px;top:18px;font-family:var(--f-serif);font-weight:900;font-size:88px;line-height:1;color:rgba(21,17,10,.10);}
+  .c h3{font-family:var(--f-cjk);font-weight:700;font-size:2.7rem;margin:18px 0 6px;color:#15110a;}
+  .c .sub{color:rgba(21,17,10,.6);font-size:.95rem;margin-bottom:30px;}
+  .c li{display:flex;align-items:baseline;gap:16px;padding:15px 2px;border-top:1px solid rgba(21,17,10,.16);}
+  .c .sn{font-family:var(--f-serif);font-weight:600;font-size:1.15rem;color:#15110a;}
+  .c .sd{margin-left:auto;font-size:.82rem;color:rgba(21,17,10,.5);}
+  .c li:first-of-type{border-top:2px solid #15110a;}
+
+  /* ───────── D 酸黃反白卡（當前=亮起狀態） ───────── */
+  .d{border-radius:0;background:#FFC709;color:#0a0800;border:2px solid #0a0800;}
+  .d .knum{position:absolute;right:30px;top:18px;font-family:var(--f-mono);font-weight:700;font-size:92px;line-height:1;color:rgba(10,8,0,.12);}
+  .d .klab{font-family:var(--f-mono);font-weight:700;font-size:11.5px;letter-spacing:.2em;color:#0a0800;}
+  .d h3{font-family:var(--f-cjk);font-weight:700;font-size:2.7rem;margin:14px 0 6px;color:#0a0800;}
+  .d .sub{color:rgba(10,8,0,.72);font-size:.95rem;margin-bottom:30px;}
+  .d li{display:flex;align-items:baseline;gap:16px;padding:15px 2px;border-top:1.5px solid rgba(10,8,0,.4);}
+  .d .sn{font-family:var(--f-cjk);font-weight:600;font-size:1.2rem;color:#0a0800;}
+  .d .sd{margin-left:auto;font-family:var(--f-mono);font-size:.78rem;color:rgba(10,8,0,.62);}
+  .d .state{position:absolute;left:46px;bottom:22px;font-family:var(--f-mono);font-size:10px;letter-spacing:.16em;color:rgba(10,8,0,.55);}
+
+  /* ───────── E 粗獷硬殼卡 ───────── */
+  .e{border-radius:2px;background:#0c1320;color:rgba(var(--stellar),.95);
+    border:3px solid rgba(var(--stellar),.92);transform:rotate(-1.4deg);
+    box-shadow:12px 12px 0 0 rgba(var(--cyan),.85);}
+  .e .ktag{display:inline-block;font-family:var(--f-mono);font-weight:700;font-size:11px;letter-spacing:.16em;
+    background:#FFC709;color:#0a0800;padding:5px 11px;transform:rotate(.8deg);}
+  .e .knum{position:absolute;right:26px;top:16px;font-family:var(--f-mono);font-weight:700;font-size:84px;line-height:1;color:rgba(var(--stellar),.10);}
+  .e h3{font-family:var(--f-cjk);font-weight:700;font-size:2.6rem;margin:16px 0 6px;}
+  .e .sub{color:rgba(var(--stellar),.5);font-size:.95rem;margin-bottom:28px;}
+  .e li{display:flex;align-items:baseline;gap:16px;padding:14px 2px;border-top:2px solid rgba(var(--stellar),.16);}
+  .e .sn{font-family:var(--f-serif);font-weight:600;font-size:1.15rem;}
+  .e .sd{margin-left:auto;font-family:var(--f-mono);font-size:.76rem;color:rgba(var(--stellar),.42);}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-head">
+    <div class="ey">CARD DESIGN · EXPLORATION</div>
+    <h1>服務卡片設計方向　五選一（可混）</h1>
+    <p>同一份內容（開發類 · 01）套五種卡片設計處理，全部放在仿主視覺的深空星場上。重點看「卡片本身」——層次、光影、邊緣、排版、個性。挑你對味的，或指出想從哪幾個各取一塊。</p>
+    <div class="hint">// 探索檔 · 不上 production · 字雨/捲動堆疊未套，純看靜態卡片質感</div>
+  </div>
+
+  <div class="grid">
+
+    <!-- A -->
+    <div class="cell">
+      <div class="card a">
+        <span class="knum">01</span>
+        <span class="klab">DEVELOP</span>
+        <h3>開發</h3>
+        <p class="sub">把想法變成會運作的東西。</p>
+        <ul>
+          <li><span class="sn">網站架設</span><span class="sd">一頁式到企業電商</span></li>
+          <li><span class="sn">客製系統開發</span><span class="sd">說得出來就寫得出來</span></li>
+        </ul>
+      </div>
+      <div class="cap"><b>A ── 電影感分層光</b><br>最融合主視覺。深色分層底 + 頂緣青色光帶（字雨打這條）+ 角落 ambient 光暈 + 漸層半透明序號。<span class="tag">穩、高級、不搶 Hero。</span></div>
+    </div>
+
+    <!-- B -->
+    <div class="cell">
+      <div class="card b">
+        <div class="lead"><div class="fig">01</div><div class="klab">DEVELOP</div></div>
+        <div class="body">
+          <h3>開發</h3>
+          <div class="en">Develop.</div>
+          <p class="pull">把想法變成會運作的東西。</p>
+          <ul>
+            <li><span class="sn">網站架設</span><span class="sd">一頁式到企業電商</span></li>
+            <li><span class="sn">客製系統開發</span><span class="sd">說得出來就寫得出來</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="cap"><b>B ── 編輯雜誌排版</b><br>不靠特效靠版面。巨大襯線序號獨立成欄 + 直書標籤 + pull-quote 引文 + 帳本式清單。<span class="tag">沉穩、有編輯品味、記憶點在排版。</span></div>
+    </div>
+
+    <!-- C -->
+    <div class="cell">
+      <div class="card c">
+        <span class="knum">01</span>
+        <span class="klab">DEVELOP</span>
+        <h3>開發</h3>
+        <p class="sub">把想法變成會運作的東西。</p>
+        <ul>
+          <li><span class="sn">網站架設</span><span class="sd">一頁式到企業電商</span></li>
+          <li><span class="sn">客製系統開發</span><span class="sd">說得出來就寫得出來</span></li>
+        </ul>
+      </div>
+      <div class="cap"><b>C ── 爆亮紙卡</b><br>近白紙質卡浮在深空，黑字、紙紋、單一黑色標籤塊。最大反差。<span class="tag">俐落的人走進荒野——最「跳」。</span></div>
+    </div>
+
+    <!-- D -->
+    <div class="cell">
+      <div class="card d">
+        <span class="knum">01</span>
+        <span class="klab">DEVELOP</span>
+        <h3>開發</h3>
+        <p class="sub">把想法變成會運作的東西。</p>
+        <ul>
+          <li><span class="sn">網站架設</span><span class="sd">一頁式到企業電商</span></li>
+          <li><span class="sn">客製系統開發</span><span class="sd">說得出來就寫得出來</span></li>
+        </ul>
+        <span class="state">// ACTIVE — 捲到當前卡才整片亮起黃</span>
+      </div>
+      <div class="cap"><b>D ── 酸黃反白卡</b><br>接字雨的黃。當前卡整片刷成 #FFC709、黑字，呼應火花顏色；非當前卡是暗殼，捲到才亮。<span class="tag">捲動堆疊的天生搭檔。</span></div>
+    </div>
+
+    <!-- E -->
+    <div class="cell">
+      <div class="card e">
+        <span class="knum">01</span>
+        <span class="ktag">DEVELOP</span>
+        <h3>開發</h3>
+        <p class="sub">把想法變成會運作的東西。</p>
+        <ul>
+          <li><span class="sn">網站架設</span><span class="sd">一頁式到企業電商</span></li>
+          <li><span class="sn">客製系統開發</span><span class="sd">說得出來就寫得出來</span></li>
+        </ul>
+      </div>
+      <div class="cap"><b>E ── 粗獷硬殼卡</b><br>硬白框 3px + 實心位移陰影（青）+ 微歪斜 + 黃標籤塊。反設計、不修邊幅。<span class="tag">最貼「不正常」的性格。</span></div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

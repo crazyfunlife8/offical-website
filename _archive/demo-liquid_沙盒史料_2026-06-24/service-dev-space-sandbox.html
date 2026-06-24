@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>軟體開發｜深邃空間沙盒</title>
+<style>
+  :root{
+    --bg:#000003;
+    --blue:#7fb6ff; --blue-deep:#2c5790; --white:#eaf3ff; --gold:#e8c66a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:var(--bg);overflow:hidden;
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;color:#dfe8f5}
+
+  /* 整個區塊：滿版、左右貼齊瀏覽器最寬，不被內容欄框住 */
+  .space-section{position:fixed;inset:0;background:var(--bg);overflow:hidden}
+  #field{position:absolute;inset:0;display:block;width:100%;height:100%}
+
+  /* 中央非矩形開口輝光（絕不是方框） */
+  .aperture{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:140vw;height:80vh;pointer-events:none;
+    background:radial-gradient(ellipse 42% 48% at 50% 50%,
+        rgba(70,120,200,.20), rgba(40,80,150,.08) 38%, rgba(0,0,5,0) 70%);
+    mix-blend-mode:screen;opacity:1}
+
+  /* 上下淡出（章節過渡）；左右刻意不做暗角，讓空間流出畫面 */
+  .edge-fade{position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(to bottom, var(--bg) 0%, rgba(0,0,5,0) 14%,
+        rgba(0,0,5,0) 86%, var(--bg) 100%)}
+
+  /* 前景：可讀內容欄（背景無邊、前景聚焦） */
+  .fg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(1100px,92vw);pointer-events:none;text-align:left;
+    padding:0 24px;transition:opacity .4s ease}
+  .fg .kick{font-family:"Courier New",monospace;letter-spacing:.42em;
+    font-size:12px;color:#6f8fb8;margin-bottom:14px}
+  .fg h2{font-family:"Noto Serif TC",serif;font-weight:600;
+    font-size:clamp(34px,5vw,68px);line-height:1.06;letter-spacing:.02em;
+    color:#f2f7ff;text-shadow:0 2px 40px rgba(20,40,80,.9)}
+  .fg .en{font-family:"Italiana",serif;font-style:italic;
+    font-size:clamp(15px,1.5vw,20px);color:#9fb6d6;margin-top:10px;opacity:.85}
+  .fg .lead{margin-top:20px;max-width:30em;font-size:15px;line-height:1.9;color:#b9c8dd}
+  .fg .scrim{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:120%;height:150%;z-index:-1;
+    background:radial-gradient(ellipse 55% 60% at 38% 50%,
+        rgba(0,2,8,.62), rgba(0,2,8,0) 70%)}
+
+  /* 內容欄參考線：看舊的 1200px 框在哪、空間怎麼衝出去 */
+  .colguide{position:absolute;left:50%;top:0;bottom:0;width:1200px;
+    transform:translateX(-50%);pointer-events:none;display:none;
+    border-left:1px dashed rgba(232,198,106,.5);border-right:1px dashed rgba(232,198,106,.5)}
+  .colguide::after{content:"舊內容欄 1200px";position:absolute;top:12px;left:8px;
+    font-size:11px;color:rgba(232,198,106,.75);letter-spacing:.1em}
+  body.show-col .colguide{display:block}
+
+  /* 控制面板 */
+  .panel{position:fixed;right:14px;bottom:14px;z-index:50;width:248px;
+    background:rgba(8,12,20,.82);backdrop-filter:blur(8px);
+    border:1px solid rgba(120,160,220,.18);border-radius:12px;padding:14px 14px 12px;
+    font-size:12px;color:#c4d2e6;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+  .panel h3{font-size:12px;letter-spacing:.18em;color:#7f9cc4;margin-bottom:10px;font-weight:600}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0}
+  .row label{flex:0 0 78px;color:#9fb2cc}
+  .row input[type=range]{flex:1;accent-color:#7fb6ff;height:3px}
+  .row .val{flex:0 0 34px;text-align:right;font-family:monospace;color:#e8c66a}
+  .toggles{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .toggles button{flex:1 1 46%;background:rgba(40,70,120,.28);border:1px solid rgba(120,160,220,.22);
+    color:#cfe0f5;border-radius:8px;padding:7px 4px;cursor:pointer;font-size:11px;transition:.15s}
+  .toggles button:hover{background:rgba(60,100,170,.4)}
+  .toggles button.on{background:rgba(127,182,255,.32);border-color:rgba(127,182,255,.6);color:#fff}
+  .panel .hint{margin-top:10px;font-size:10.5px;line-height:1.5;color:#6d7f99}
+  .collapse{position:absolute;right:10px;top:10px;cursor:pointer;color:#6d7f99;font-size:14px}
+  body.panel-min .panel>*:not(h3):not(.collapse){display:none}
+  body.panel-min .panel{width:auto}
+</style>
+</head>
+<body>
+  <section class="space-section">
+    <canvas id="field"></canvas>
+    <div class="aperture" id="aperture"></div>
+    <div class="edge-fade"></div>
+    <div class="colguide"></div>
+    <div class="fg" id="fg">
+      <div class="scrim"></div>
+      <div class="kick">// WEB DEVELOPMENT</div>
+      <h2>軟體開發</h2>
+      <div class="en">We build the systems behind the idea.</div>
+      <p class="lead">從一頁式門面到企業級系統，我們把想法寫進可運作的程式。<br>（這只是前景文字示意——對齊的重點是它身後這片無邊空間。）</p>
+    </div>
+  </section>
+
+  <div class="panel">
+    <h3>深空沙盒</h3>
+    <span class="collapse" id="collapse">—</span>
+    <div class="row"><label>密度</label><input type="range" id="s-density" min="20" max="180" value="95"><span class="val" id="v-density">95</span></div>
+    <div class="row"><label>速度</label><input type="range" id="s-speed" min="0" max="200" value="100"><span class="val" id="v-speed">1.0</span></div>
+    <div class="row"><label>深度</label><input type="range" id="s-depth" min="20" max="100" value="60"><span class="val" id="v-depth">60</span></div>
+    <div class="row"><label>霧濃度</label><input type="range" id="s-fog" min="0" max="100" value="58"><span class="val" id="v-fog">58</span></div>
+    <div class="row"><label>左右出血</label><input type="range" id="s-bleed" min="0" max="100" value="55"><span class="val" id="v-bleed">55</span></div>
+    <div class="row"><label>中心輝光</label><input type="range" id="s-glow" min="0" max="160" value="100"><span class="val" id="v-glow">100</span></div>
+    <div class="row"><label>金色頻率</label><input type="range" id="s-gold" min="0" max="100" value="22"><span class="val" id="v-gold">22</span></div>
+    <div class="toggles">
+      <button id="t-fg" class="on">前景文字</button>
+      <button id="t-col">內容欄參考線</button>
+      <button id="t-replay">重播開場</button>
+      <button id="t-flow">流向</button>
+    </div>
+    <div class="hint">調到你滿意的「深邃 + 左右出血」感，再跟我說要更滿/更深/收一點。</div>
+  </div>
+
+<script>
+(function(){
+  const cv = document.getElementById('field');
+  const ctx = cv.getContext('2d');
+  let W=0,H=0,DPR=Math.min(window.devicePixelRatio||1,2);
+
+  // 字符集：偏程式碼但混入幾何符號，求「未來感」非 IDE/Matrix
+  const GLYPHS = "01{}()[]<>/=;:+-*.λƒ∑∆◇✦∂≈→".split("");
+
+  const cfg = {
+    density:95, speed:1.0, depth:60, fog:0.58, bleed:0.55,
+    glow:1.0, gold:0.22, flow:0   // flow:0 橫向, 1 斜向下
+  };
+
+  let streams=[];
+  function rand(a,b){return a+Math.random()*(b-a);}
+  function pick(a){return a[(Math.random()*a.length)|0];}
+
+  function makeStream(fromEntry){
+    // 世界座標：x 範圍依「出血」放寬到畫面外，z 為深度
+    const zNear=1, zFar=1+cfg.depth/14;     // depth 20→2.4, 100→8.1
+    const z = rand(zNear, zFar);
+    const spanX = W*(0.6 + cfg.bleed*0.9);  // 越大→越往畫面外延伸
+    const x = fromEntry ? (spanX*0.62) : rand(-spanX*0.62, spanX*0.62);
+    const y = rand(-H*0.62, H*0.62);
+    const len = (4 + Math.round(rand(4,16)) ) ;
+    const baseSpeed = rand(0.5,1.25);
+    const ang = cfg.flow ? rand(-0.22,-0.05) : rand(-0.05,0.05); // 斜向下 or 近水平
+    const goldStream = Math.random() < cfg.gold*0.06;            // 整串金：極少
+    const chars=[];
+    for(let i=0;i<len;i++) chars.push(pick(GLYPHS));
+    return {x,y,z,len,chars,goldStream,
+      vx:-(baseSpeed),                 // 世界速度（往左流→流出左緣）
+      vy:Math.sin(ang)*baseSpeed,
+      fontW: rand(15,24), entry:fromEntry,
+      mut: rand(0,1) };
+  }
+
+  function rebuild(){
+    const n=cfg.density;
+    streams=[];
+    for(let i=0;i<n;i++) streams.push(makeStream(false));
+  }
+
+  function resize(){
+    W=window.innerWidth; H=window.innerHeight;
+    cv.width=W*DPR; cv.height=H*DPR;
+    cv.style.width=W+'px'; cv.style.height=H+'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    rebuild();
+  }
+  window.addEventListener('resize', resize);
+
+  // 開場動畫：宇宙被打開（push-in + 輝光綻放 + 淡入）
+  let introStart=performance.now(), introDur=1000;
+  function replay(){ introStart=performance.now(); }
+
+  const focal=1.0;
+  function project(s){
+    const scale=focal/s.z;
+    return { sx: W/2 + s.x*scale, sy: H/2 + s.y*scale, scale };
+  }
+
+  const aperture=document.getElementById('aperture');
+
+  function frame(now){
+    const t=Math.min(1,(now-introStart)/introDur);
+    const ease=1-Math.pow(1-t,3);
+    const introScale = 1.06 - 0.06*ease;      // 微微 push-in
+    const introAlpha = ease;                   // 整體淡入
+    const flash = Math.max(0, Math.sin(Math.min(t,1)*Math.PI)) ; // 中心一閃
+
+    // 清底（純黑，留極淡冷藍中心由 aperture 處理）
+    ctx.globalCompositeOperation='source-over';
+    ctx.fillStyle='rgba(0,0,3,1)';
+    ctx.fillRect(0,0,W,H);
+
+    aperture.style.opacity = (0.5 + 0.5*ease) * (0.4 + 0.6*cfg.glow);
+
+    ctx.save();
+    ctx.translate(W/2,H/2); ctx.scale(introScale,introScale); ctx.translate(-W/2,-H/2);
+    ctx.globalCompositeOperation='lighter';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+
+    const zNear=1, zFar=1+cfg.depth/14;
+    for(const s of streams){
+      // 更新世界位置
+      s.x += s.vx*cfg.speed*1.5;
+      s.y += s.vy*cfg.speed*1.5;
+      // 偶爾突變字符（活著的感覺）
+      if(Math.random()<0.01){ s.chars[(Math.random()*s.len)|0]=pick(GLYPHS); }
+
+      const {sx,sy,scale}=project(s);
+      // 出界回收（流出左緣 → 從右緣重生）
+      const spanX = W*(0.6 + cfg.bleed*0.9);
+      if(sx < -W*0.15){ Object.assign(s, makeStream(true)); continue; }
+
+      // 深度→霧：越遠越暗、越偏底色、字越小
+      const depthN=(s.z-zNear)/(zFar-zNear+1e-3);
+      const fogA = 1 - cfg.fog*Math.pow(depthN,1.1)*0.92;
+      const fsize = s.fontW*scale;
+      if(fsize<2) continue;
+      ctx.font = fsize.toFixed(1)+'px "Courier New",monospace';
+
+      // 螢幕方向（含視差：近的位移快）
+      let dx=s.vx*scale, dy=s.vy*scale;
+      const dl=Math.hypot(dx,dy)||1; dx/=dl; dy/=dl;
+      const spacing=fsize*1.18;
+
+      for(let i=0;i<s.len;i++){
+        const cx=sx - dx*i*spacing;
+        const cy=sy - dy*i*spacing;
+        if(cx<-60||cx>W+60||cy<-40||cy>H+40) continue;
+        const trail=Math.pow(1-i/s.len,1.25);
+        let a=introAlpha*fogA*trail;
+        if(a<=0.02) continue;
+        if(i===0){
+          // 頭：白亮
+          ctx.fillStyle='rgba(234,243,255,'+Math.min(1,a*1.2)+')';
+          ctx.shadowColor='rgba(127,182,255,'+(a*0.9)+')';
+          ctx.shadowBlur=8*scale+2;
+        } else if(s.goldStream){
+          ctx.fillStyle='rgba(232,198,106,'+(a*0.9)+')';
+          ctx.shadowBlur=0;
+        } else {
+          // 尾：冷藍，越遠越沉
+          const g=120+ (1-depthN)*90;
+          ctx.fillStyle='rgba('+(90+ (1-depthN)*40)+','+g+',255,'+a+')';
+          ctx.shadowBlur=0;
+        }
+        ctx.fillText(s.chars[i], cx, cy);
+      }
+      ctx.shadowBlur=0;
+    }
+    ctx.restore();
+
+    // 開場中心一閃
+    if(t<1){
+      ctx.globalCompositeOperation='lighter';
+      const r=Math.max(W,H)*0.5*(0.5+ease);
+      const g=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,r);
+      g.addColorStop(0,'rgba(150,190,255,'+(flash*0.18)+')');
+      g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  // ---- 控制 ----
+  function bind(id,vid,fn,fmt){
+    const el=document.getElementById(id), v=document.getElementById(vid);
+    el.addEventListener('input',()=>{ fn(+el.value); v.textContent=fmt?fmt(+el.value):el.value; });
+  }
+  bind('s-density','v-density',x=>{cfg.density=x; rebuild();});
+  bind('s-speed','v-speed',x=>{cfg.speed=x/100;}, x=>(x/100).toFixed(1));
+  bind('s-depth','v-depth',x=>{cfg.depth=x; rebuild();});
+  bind('s-fog','v-fog',x=>{cfg.fog=x/100;});
+  bind('s-bleed','v-bleed',x=>{cfg.bleed=x/100; rebuild();});
+  bind('s-glow','v-glow',x=>{cfg.glow=x/100;}, x=>x);
+  bind('s-gold','v-gold',x=>{cfg.gold=x/100; rebuild();});
+
+  function tog(id,cls,fn){const b=document.getElementById(id);
+    b.addEventListener('click',()=>{const on=b.classList.toggle('on'); fn(on);});}
+  tog('t-fg',null,on=>{document.getElementById('fg').style.opacity=on?1:0;});
+  document.getElementById('t-fg').classList.add('on');
+  tog('t-col',null,on=>{document.body.classList.toggle('show-col',on);});
+  document.getElementById('t-flow').addEventListener('click',()=>{
+    const b=document.getElementById('t-flow'); const on=b.classList.toggle('on');
+    cfg.flow=on?1:0; rebuild();
+  });
+  document.getElementById('t-replay').addEventListener('click',replay);
+  document.getElementById('collapse').addEventListener('click',()=>{
+    document.body.classList.toggle('panel-min');
+  });
+
+  resize();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

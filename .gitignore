@@ -28,3 +28,15 @@ assets/images/astronaut/V2後製去背版.mp4
 
 # 本機工具腳本（資產處理用、不進 production）
 _工具參考_local/
+
+# codex image_gen 落檔／中介產物（手風琴月面圖在這生、複製進 _imgtest 後不需 commit 原始落檔）
+generated_images/
+_imgtest/_preview_b64.txt
+
+# 本機開發暫存（2026-06-23 清債補；不進版控）
+.claude/launch.json
+_nocache_server.py
+_imgtest/_*.py
+
+# _imgtest 整目錄（.assetsignore 已排除不上站；純 repo 體積債，2026-06-24 git rm --cached）
+_imgtest/

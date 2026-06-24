@@ -1,0 +1,1263 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebGL 玻璃卡 · 雨在玻璃裡（卡內程式碼落雨）</title>
+<!--
+  ?Ｙ揣瘝?嚗?銝?production嚗? 頠???餌??～???????
+  ?箏?嚗ervice-glass-webgl-real.html嚗颲虫犖摰阮??嚗lass engine ??靽?嚗?
+  ?祆?撌桃嚗?摰銝剖亢??????銝撐 DOM ?∴?蝬脩??嗉身嚗恥鋆賢?蝟餌絞?嚗雿??“??
+  ?冽????聆????霈??????拙蝮桀?憯??嗅???摨艾?
+  ?桃?嚗??菔齒鈭箸?銝皛?閬箏???憟??喃?????踹?單?隤踵???
+-->
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Italiana&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  :root{
+    --deep:#050d2e; --star:#e8f0ff; --cyan:#00c8ff; --blue:23,54,245; --gold:245,166,35;
+    --tiltX:7; --tiltY:-7; --cardW:min(960px,92vw); --cardH:min(560px,78vh); --cardRadius:28px;
+  }
+  html{ scroll-behavior:auto; }
+  body{ background:#e8edf4; color:var(--star); font-family:"Noto Sans TC",sans-serif; overflow-x:hidden; }
+  body::before{ content:''; position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(120% 90% at 78% -8%, rgba(205,218,238,.55), transparent 52%),
+      radial-gradient(90% 80% at 12% 108%, rgba(196,210,232,.45), transparent 56%),
+      linear-gradient(160deg, #eef2f8 0%, #e8edf4 46%, #dde4ee 100%);
+  }
+  #webgl{ position:fixed; inset:0; width:100%; height:100%; z-index:1; display:block; }
+  .badge{ position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:30;
+    font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.22em; color:rgba(0,200,255,.85);
+    border:1px solid rgba(0,200,255,.3); border-radius:999px; padding:7px 18px; background:rgba(6,10,20,.6);
+  }
+  /* ?脣?頠?嚗?摨?= ?脣漲?瑕漲嚗???嚗ticky-stage ??恍銝准?鋆⊿???券?*/
+  .scroll-track{ position:relative; z-index:2; width:100%; min-height:100vh; }
+  .sticky-stage{ position:relative; height:100vh; width:100%; }
+  /* slot嚗敶ａ?撠綽??芰靘?閮?WebGL ?餌???????芥?憭改??箏?蝵桐葉???冽?宏?? */
+  .slot{ position:absolute; left:50%; top:50%; width:var(--cardW); height:var(--cardH);
+    transform:translate(-50%,-50%); visibility:hidden; pointer-events:none; }
+  .deck{ position:absolute; inset:0; }
+  .html-card{ position:absolute; left:50%; top:50%; width:var(--cardW); height:var(--cardH);
+    margin-left:calc(var(--cardW) / -2); margin-top:calc(var(--cardH) / -2);
+    border-radius:var(--cardRadius); overflow:hidden; pointer-events:none;
+    transform-origin:center center; will-change:transform,opacity; backface-visibility:hidden;
+    background:transparent;
+  }
+  .html-card .content,.html-card .codebar,.html-card .ghost,.html-card .grain{ transition:none; }
+  .html-card{ background:transparent; box-shadow:none; }
+  /* .html-card::before 撌脩宏?歹?瘥?銝??脩?鈭箏極??嚗椰銝/?喃????喃????胯?閫芥?靘?嚗?
+     銝?HTML 擃?????WebGL ?餌??憟??臭???閫?蝯曹?鈭斤策?餌? Fresnel + envMap??*/
+  .topline{ display:none; }
+  .ghost{ position:absolute; right:-4%; bottom:-22%; z-index:2; font-family:"Noto Serif TC",serif; font-weight:700;
+    font-size:min(38vw,420px); line-height:.8; color:rgba(225,235,255,.032); user-select:none; pointer-events:none; letter-spacing:-.02em;
+  }
+  .grain{ position:absolute; left:0; top:0; width:32%; height:100%; z-index:3; opacity:.055; pointer-events:none;
+    font-family:"JetBrains Mono",monospace; font-size:12px; line-height:2; color:rgb(var(--blue)); white-space:pre; overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 50%,transparent 100%); mask-image:linear-gradient(90deg,#000 0%,#000 50%,transparent 100%);
+  }
+  .codebar{ position:absolute; top:0; left:0; right:0; z-index:5; padding:13px 26px; border-bottom:1px solid rgba(225,235,255,.05); opacity:.72; }
+  .codebar .cpath{ font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:rgba(225,235,255,.42); }
+  .content{ position:relative; z-index:5; width:100%; height:100%; padding:54px 56px 50px; display:flex; flex-direction:row; align-items:center; gap:clamp(28px,3.8vw,52px); }
+  .content::before{ content:''; position:absolute; left:0; top:28px; bottom:26px; width:54%; z-index:-1; pointer-events:none;
+    background:linear-gradient(90deg, rgba(5,13,46,.26), rgba(5,13,46,.12) 52%, transparent 100%);
+  }
+  .lead{ flex:1 1 46%; min-width:0; }
+  .klab{ font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.26em; color:rgba(var(--gold),.82); }
+  .knum{ position:absolute; top:36px; right:58px; font-family:"Italiana",serif; font-size:54px; color:rgba(var(--gold),.15); line-height:1; }
+  .ztitle{ font-family:"Noto Serif TC",serif; font-weight:700; font-size:clamp(2.1rem,4vw,3.2rem); color:rgba(225,235,255,.97); margin:16px 0 8px; line-height:1.12; letter-spacing:.02em; text-shadow:0 2px 18px rgba(0,0,0,.35); }
+  .zen{ font-family:"Italiana",serif; font-size:1.18rem; color:rgba(210,222,245,.5); letter-spacing:.04em; text-shadow:0 1px 1px rgba(2,8,22,.75); }
+  .zsub{ margin-top:14px; font-size:.92rem; line-height:1.65; color:rgba(225,235,255,.6); max-width:34ch; text-shadow:0 1px 1px rgba(2,8,22,.72); }
+  .svccol{ position:relative; z-index:0; flex:0 0 44%; }
+  .svccol::before{ content:''; position:absolute; inset:-28px -22px -30px -24px; z-index:-1; pointer-events:none;
+    background:
+      radial-gradient(ellipse at 48% 46%, rgba(0,0,0,.30) 0%, rgba(1,5,18,.18) 42%, rgba(1,5,18,0) 72%);
+  }
+  .svc-head{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:rgba(var(--gold),.72); margin-bottom:26px; }
+  .svc{ list-style:none; margin:0; }
+  .svc li{ position:relative; margin-bottom:26px; }
+  .svc li:last-child{ margin-bottom:0; }
+  .svc li::before{ content:''; display:block; width:22px; height:1px; background:rgba(var(--gold),.5); margin-bottom:12px; }
+  .svc li .sn{ display:block; font-family:"Noto Serif TC",serif; font-size:1.12rem; color:rgba(225,235,255,.97); letter-spacing:.01em; }
+  .svc li .sd{ display:block; margin-top:5px; font-size:.8rem; line-height:1.55; color:rgba(225,235,255,.76); white-space:normal; text-shadow:0 1px 2px rgba(0,3,14,.92), 0 0 14px rgba(0,0,0,.58); }
+
+  .panel{ position:fixed; right:0; top:0; bottom:0; width:230px; z-index:40; overflow-y:auto;
+    background:rgba(6,10,20,.9); backdrop-filter:blur(8px); border-left:1px solid rgba(225,235,255,.1);
+    padding:16px 16px 40px; font-family:"JetBrains Mono",monospace; font-size:10.5px; color:rgba(225,235,255,.8);
+  }
+  .panel h4{ font-size:11px; letter-spacing:.16em; margin-bottom:14px; color:rgba(0,200,255,.95); font-weight:500; }
+  .row{ margin:12px 0; }
+  .row label{ display:flex; justify-content:space-between; margin-bottom:4px; gap:10px; }
+  .row b{ color:rgba(0,200,255,.95); font-weight:500; }
+  .row input{ width:100%; accent-color:var(--cyan); }
+  .dump{ margin-top:14px; padding:10px; border-radius:6px; background:rgba(0,0,0,.45); border:1px solid rgba(225,235,255,.1);
+    font-size:9px; line-height:1.55; color:rgba(170,225,255,.85); white-space:pre-wrap;
+  }
+  @media (max-width:760px){
+    .panel{ width:100%; height:188px; top:auto; left:0; border-left:0; border-top:1px solid rgba(225,235,255,.1); }
+    .stage{ align-items:flex-start; padding-top:80px; }
+    .svc li{ display:block; }
+    .svc li .sd{ display:block; margin:4px 0 0; white-space:normal; }
+  }
+</style>
+</head>
+<body>
+  <canvas id="webgl" aria-hidden="true"></canvas>
+  <div class="badge">雨在玻璃裡　·　卡內程式碼落雨　·　單張靜態　·　按 H 隱藏面板</div>
+
+  <div class="scroll-track" id="scrollTrack">
+    <div class="sticky-stage">
+      <div class="slot" id="htmlCard"></div>
+      <div class="deck" id="deck"></div>
+    </div>
+  </div>
+
+  <aside class="panel">
+    <h4>WebGL ???繚 ?遘</h4>
+    <div class="rows"></div>
+    <div class="dump" id="dump"></div>
+  </aside>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
+import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+
+const urlParams=new URLSearchParams(window.location.search);
+const QA_MODE=urlParams.get('qa')==='1';
+const PARAMS=[
+  {k:'thickness', name:'thickness', min:0.2, max:4.5, step:0.05},
+  {k:'ior', name:'ior', min:1.05, max:2.2, step:0.01},
+  {k:'roughness', name:'roughness', min:0, max:0.3, step:0.005},
+  {k:'transmission', name:'transmission', min:0, max:1, step:0.01},
+  {k:'bevelPx', name:'bevel px', min:4, max:40, step:1, suf:'px'},
+  {k:'fresnelPower', name:'fresnel power', min:1.2, max:6.0, step:0.05},
+  {k:'envMapIntensity', name:'env map intensity', min:0, max:5, step:0.05},
+  {k:'bloomStrength', name:'bloom strength', min:0, max:2.4, step:0.02},
+  {k:'tiltX', name:'tilt X', min:-24, max:24, step:1, suf:'deg'},
+  {k:'tiltY', name:'tilt Y', min:-24, max:24, step:1, suf:'deg'}
+];
+const LIGHTS=[
+  {id:'key', name:'key', color:0xf6fbff, size:2.4, defaults:{azimuth:13,elevation:80,distance:6.05,intensity:32}},
+  {id:'top', name:'top', color:0xdfeaff, size:1.45, defaults:{azimuth:65,elevation:8,distance:8,intensity:134}},
+  {id:'rim', name:'rim', color:0x9edcff, size:1.75, defaults:{azimuth:70,elevation:34,distance:6,intensity:157}},
+  {id:'back', name:'back', color:0xb8ccff, size:2.1, defaults:{azimuth:270,elevation:35,distance:4.7,intensity:39}}
+];
+const LIGHT_CONTROLS=[
+  {prop:'azimuth', label:'azimuth', min:0, max:360, step:1, suf:'deg'},
+  {prop:'elevation', label:'elevation', min:-80, max:80, step:1, suf:'deg'},
+  {prop:'distance', label:'distance', min:2, max:8, step:0.05},
+  {prop:'intensity', label:'intensity', min:0, max:360, step:1}
+];
+const state={ thickness:1.55, ior:1.05, roughness:0.06, dispersion:0.26, tiltX:9, tiltY:-12, transmission:1, envMapIntensity:1.2, bloomStrength:0, fresnelPower:2.25, bevelPx:16 };
+for(const spec of LIGHTS){
+  for(const prop in spec.defaults) state[spec.id+'_'+prop]=spec.defaults[prop];
+}
+const STAR_RAIN_GLOW=0.9;
+const root=document.documentElement;
+const dump=document.getElementById('dump');
+const htmlCard=document.getElementById('htmlCard');
+const wrap=document.querySelector('.panel .rows');
+const GRAIN=['const nest = createStudio()','export default function App(){','return <Section/>','await build(idea)','if(ready) ship()','render(art, code)','while(true){ create() }'].join('\n').repeat(8);
+
+/* 銝撐???∪摰對?撠? CLAUDE.md B 憿鞈迎?頠???祆平嚗恥鋆賜頂蝯望?餈圈??蝔???颲准???G 憿?毽瘛? */
+const CARDS=[
+  { i:'01', cpath:'WEB ARCHITECTURE', klab:'// WEB DEVELOPMENT', title:'網站架設', en:'Your digital front door.',
+    sub:'從一頁式門面到企業電商，依需求量身打造，不套公版。', ghost:'網',
+    svc:[['形象 / 一頁式官網','乾淨俐落的數位門面'],['電商 / 會員整合','線上販售與會員經營'],['客製整合站','特殊流程、活動、訂閱']] }
+];
+const deck=document.getElementById('deck');
+const cardEls=CARDS.map((c,idx)=>{
+  const el=document.createElement('article');
+  el.className='html-card';
+  el.dataset.i=idx;
+  el.innerHTML=
+    '<div class="ghost">'+c.ghost+'</div>'+
+    '<div class="grain"></div>'+
+    '<div class="codebar"><span class="cpath">'+c.cpath+'</span></div>'+
+    '<div class="content">'+
+      '<span class="knum">'+c.i+'</span>'+
+      '<div class="lead">'+
+        '<p class="klab">'+c.klab+'</p>'+
+        '<h3 class="ztitle">'+c.title+'</h3>'+
+        '<p class="zen">'+c.en+'</p>'+
+        '<p class="zsub">'+c.sub+'</p>'+
+      '</div>'+
+      '<div class="svccol">'+
+        '<p class="svc-head">服務範疇</p>'+
+        '<ul class="svc">'+c.svc.map(s=>'<li><span class="sn">'+s[0]+'</span><span class="sd">'+s[1]+'</span></li>').join('')+'</ul>'+
+      '</div>'+
+    '</div>';
+  el.querySelector('.grain').textContent=GRAIN;
+  deck.appendChild(el);
+  return el;
+});
+
+function getLightPosition(spec){
+  const az=THREE.MathUtils.degToRad(((state[spec.id+'_azimuth']%360)+360)%360);
+  const el=THREE.MathUtils.degToRad(state[spec.id+'_elevation']);
+  const distance=state[spec.id+'_distance'];
+  const horizontal=Math.cos(el)*distance;
+  return {
+    x:Math.sin(az)*horizontal,
+    y:Math.sin(el)*distance,
+    z:Math.cos(az)*horizontal
+  };
+}
+
+for(const p of PARAMS){
+  const row=document.createElement('div');
+  row.className='row';
+  row.innerHTML='<label><span>'+p.name+'</span><b id="v_'+p.k+'">'+state[p.k]+(p.suf||'')+'</b></label>'+
+    '<input type="range" min="'+p.min+'" max="'+p.max+'" step="'+p.step+'" value="'+state[p.k]+'" data-k="'+p.k+'">';
+  const inp=row.querySelector('input');
+  inp.oninput=()=>{
+    const v=parseFloat(inp.value);
+    state[p.k]=v;
+    document.getElementById('v_'+p.k).textContent=v+(p.suf||'');
+    applyState();
+  };
+  wrap.appendChild(row);
+}
+
+for(const spec of LIGHTS){
+  const title=document.createElement('h4');
+  title.textContent=spec.name;
+  title.style.marginTop='18px';
+  wrap.appendChild(title);
+  for(const ctrl of LIGHT_CONTROLS){
+    const k=spec.id+'_'+ctrl.prop;
+    const row=document.createElement('div');
+    row.className='row';
+    row.innerHTML='<label><span>'+spec.name+'-'+ctrl.label+'</span><b id="v_'+k+'">'+state[k]+(ctrl.suf||'')+'</b></label>'+
+      '<input type="range" min="'+ctrl.min+'" max="'+ctrl.max+'" step="'+ctrl.step+'" value="'+state[k]+'" data-k="'+k+'">';
+    const inp=row.querySelector('input');
+    inp.oninput=()=>{
+      const v=parseFloat(inp.value);
+      state[k]=v;
+      document.getElementById('v_'+k).textContent=v+(ctrl.suf||'');
+      applyState();
+      refreshStudioEnvMap();
+    };
+    wrap.appendChild(row);
+  }
+}
+
+const canvas=document.getElementById('webgl');
+const renderer=new THREE.WebGLRenderer({ canvas, antialias:true, alpha:false, powerPreference:'high-performance' });
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=0.62;
+renderer.useLegacyLights=false;
+RectAreaLightUniformsLib.init();
+const STAR_CANVAS_MAX_WIDTH=1280;
+const STAR_CANVAS_MAX_HEIGHT=900;
+const BLOOM_RESOLUTION_SCALE=0.5;
+const TARGET_FRAME_MS=1000/30;
+const IS_MOBILE=window.matchMedia('(max-width: 760px), (pointer: coarse)').matches;
+const PREFERS_REDUCED_MOTION=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FX={
+  bloom:!IS_MOBILE && !PREFERS_REDUCED_MOTION,
+  codeScale:IS_MOBILE ? 0.58 : 1,
+  codeFrameMs:IS_MOBILE ? 1000/14 : TARGET_FRAME_MS,
+  pixelRatioMax:IS_MOBILE ? 1.5 : 2
+};
+const BLOOM_SCENE=1;
+const fxTuning={ heroEdgeGlow:1.45, bloomStrength:0.26, bloomThreshold:0.985, bloomRadius:0.035, rearFrost:1, codeGlow:0.05 };
+const CRYSTAL_BLOOM={ strength:fxTuning.bloomStrength, radius:fxTuning.bloomRadius, threshold:fxTuning.bloomThreshold };
+const CRYSTAL_FRONT={ edgeEnv:2.85, edgeOpacity:0.105, fresnelStrength:fxTuning.heroEdgeGlow, clearcoat:1, clearcoatRoughness:0.012 };
+const REAR_FROST={ roughness:0.66, transmission:0.058, env:0.095, fresnel:0.028 };
+const DARK_FACE={
+  color:new THREE.Color(0x061126),
+  transmission:0.004,
+  env:0,
+  roughness:0.18,
+  opacity:0.48,
+  thickness:0.78,
+  ior:1.08,
+  clearcoat:0.04,
+  clearcoatRoughness:0.72,
+  attenuationDistance:1.15,
+  edgeEnv:0.018,
+  edgeOpacity:0.010,
+  fresnel:0.010,
+  depthOpacity:0.006
+};
+const FRONT_FACE_COLOR=new THREE.Color(0xeaf3ff);
+const FRONT_FACE={ clearcoat:0.72, clearcoatRoughness:0.08, attenuationDistance:6.5 };
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0xe8edf4);
+const camera=new THREE.PerspectiveCamera(34, 1, 0.1, 100);
+camera.position.set(0,0,8.1);
+
+const pmremGenerator=new THREE.PMREMGenerator(renderer);
+let studioEnvRT=null;
+let edgeStudioEnvRT=null;
+function buildStudioEnvMap(includeEdgeStrips){
+  const envCanvas=document.createElement('canvas');
+  envCanvas.width=1024;
+  envCanvas.height=512;
+  const ctx=envCanvas.getContext('2d');
+  const base=ctx.createLinearGradient(0,0,0,512);
+  base.addColorStop(0,'#071331');
+  base.addColorStop(0.45,'#050d2e');
+  base.addColorStop(1,'#01030b');
+  ctx.fillStyle=base;
+  ctx.fillRect(0,0,1024,512);
+
+  ctx.globalCompositeOperation='screen';
+  for(const spec of LIGHTS){
+    const pos=getLightPosition(spec);
+    const size=THREE.MathUtils.clamp(spec.size,0.55,4.2);
+    const strength=THREE.MathUtils.clamp(state[spec.id+'_intensity']/180,0,1);
+    const x=512+pos.x*82;
+    const y=260-pos.y*86+pos.z*-14;
+    const w=120+size*92;
+    const h=70+size*48;
+    const radius=Math.max(w,h)*0.95;
+    const cg=ctx.createRadialGradient(x,y,0,x,y,radius);
+    cg.addColorStop(0,'rgba(255,255,255,'+(0.018+strength*0.055)+')');
+    cg.addColorStop(0.34,'rgba(232,244,255,'+(0.012+strength*0.038)+')');
+    cg.addColorStop(0.72,'rgba(120,190,255,'+(strength*0.018)+')');
+    cg.addColorStop(1,'rgba(0,200,255,0)');
+    ctx.fillStyle=cg;
+    ctx.fillRect(x-radius,y-radius,radius*2,radius*2);
+
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate(spec.id==='rim' ? -0.1 : spec.id==='back' ? 0.16 : 0);
+    ctx.scale(1, h/w);
+    const soft=ctx.createRadialGradient(0,0,0,0,0,w*0.54);
+    soft.addColorStop(0,'rgba(255,255,255,'+(0.016+strength*0.050)+')');
+    soft.addColorStop(0.30,'rgba(232,244,255,'+(0.011+strength*0.034)+')');
+    soft.addColorStop(0.68,'rgba(120,190,255,'+(strength*0.014)+')');
+    soft.addColorStop(1,'rgba(0,200,255,0)');
+    ctx.fillStyle=soft;
+    ctx.beginPath();
+    ctx.arc(0,0,w*0.54,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+  if(includeEdgeStrips){
+    const strips=[
+      {x:180,y:112,w:300,h:6,r:-0.10,a:0.030,c:'230,248,255'},
+      {x:620,y:86,w:220,h:5,r:0.08,a:0.024,c:'150,220,255'},
+      {x:710,y:334,w:260,h:5,r:-0.16,a:0.022,c:'0,200,255'},
+      {x:108,y:404,w:190,h:4,r:0.14,a:0.016,c:'120,205,255'}
+    ];
+    for(const strip of strips){
+      ctx.save();
+      ctx.translate(strip.x,strip.y);
+      ctx.rotate(strip.r);
+      const lg=ctx.createLinearGradient(-strip.w*0.5,0,strip.w*0.5,0);
+      lg.addColorStop(0,'rgba('+strip.c+',0)');
+      lg.addColorStop(0.18,'rgba('+strip.c+','+(strip.a*0.46)+')');
+      lg.addColorStop(0.48,'rgba(255,255,255,'+strip.a+')');
+      lg.addColorStop(0.72,'rgba('+strip.c+','+(strip.a*0.58)+')');
+      lg.addColorStop(1,'rgba('+strip.c+',0)');
+      ctx.fillStyle=lg;
+      ctx.shadowColor='rgba(0,200,255,'+(strip.a*0.45)+')';
+      ctx.shadowBlur=8;
+      ctx.fillRect(-strip.w*0.5,-strip.h*0.5,strip.w,strip.h);
+      ctx.restore();
+    }
+  }
+  ctx.globalCompositeOperation='source-over';
+
+  const envTex=new THREE.CanvasTexture(envCanvas);
+  envTex.mapping=THREE.EquirectangularReflectionMapping;
+  envTex.colorSpace=THREE.SRGBColorSpace;
+  const rt=pmremGenerator.fromEquirectangular(envTex);
+  envTex.dispose();
+  return rt;
+}
+function rebuildStudioEnvMaps(){
+  if(studioEnvRT) studioEnvRT.dispose();
+  if(edgeStudioEnvRT) edgeStudioEnvRT.dispose();
+  studioEnvRT=buildStudioEnvMap(false);
+  edgeStudioEnvRT=buildStudioEnvMap(true);
+  scene.environment=studioEnvRT.texture;
+}
+function edgeEnvironmentMap(){
+  return edgeStudioEnvRT ? edgeStudioEnvRT.texture : null;
+}
+rebuildStudioEnvMaps();
+function refreshStudioEnvMap(){
+  rebuildStudioEnvMaps();
+  if(typeof glassMat!=='undefined') glassMat.needsUpdate=true;
+  if(typeof edgeMat!=='undefined'){
+    edgeMat.envMap=edgeEnvironmentMap();
+    edgeMat.needsUpdate=true;
+  }
+  if(typeof glassCards!=='undefined'){
+    for(const card of glassCards){
+      card.body.material.envMap=null;
+      card.edgeGlow.material.envMap=edgeEnvironmentMap();
+      card.body.material.needsUpdate=true;
+      card.edgeGlow.material.needsUpdate=true;
+    }
+  }
+  requestSceneRender();
+}
+
+const bloomComposer=new EffectComposer(renderer);
+bloomComposer.renderToScreen=false;
+bloomComposer.addPass(new RenderPass(scene,camera));
+const bloomPass=new UnrealBloomPass(new THREE.Vector2(window.innerWidth*BLOOM_RESOLUTION_SCALE, window.innerHeight*BLOOM_RESOLUTION_SCALE), 0, CRYSTAL_BLOOM.radius, CRYSTAL_BLOOM.threshold);
+bloomComposer.addPass(bloomPass);
+
+const composer=new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene,camera));
+const finalPass=new ShaderPass(
+  new THREE.ShaderMaterial({
+    uniforms:{
+      baseTexture:{ value:null },
+      bloomTexture:{ value:bloomComposer.renderTarget2.texture }
+    },
+    vertexShader:`
+      varying vec2 vUv;
+      void main(){
+        vUv=uv;
+        gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);
+      }
+    `,
+    fragmentShader:`
+      uniform sampler2D baseTexture;
+      uniform sampler2D bloomTexture;
+      varying vec2 vUv;
+      void main(){
+        gl_FragColor=texture2D(baseTexture,vUv)+texture2D(bloomTexture,vUv);
+      }
+    `
+  }),
+  'baseTexture'
+);
+composer.addPass(finalPass);
+const smaaPass=new SMAAPass(window.innerWidth*renderer.getPixelRatio(), window.innerHeight*renderer.getPixelRatio());
+composer.addPass(smaaPass);
+
+const codeCanvas=document.createElement('canvas');
+const codeCtx=codeCanvas.getContext('2d');
+const codeTexture=new THREE.CanvasTexture(codeCanvas);
+codeTexture.colorSpace=THREE.SRGBColorSpace;
+codeTexture.wrapS=THREE.ClampToEdgeWrapping;
+codeTexture.wrapT=THREE.ClampToEdgeWrapping;
+codeTexture.minFilter=THREE.LinearFilter;
+codeTexture.magFilter=THREE.LinearFilter;
+
+const bgMat=new THREE.MeshBasicMaterial({ color:0x2a6cff, toneMapped:false });
+const bgPlane=new THREE.Mesh(new THREE.PlaneGeometry(9.6, 10.8, 1, 1), bgMat);
+bgPlane.position.z=-2.18;
+scene.add(bgPlane);
+
+const studioGroup=new THREE.Group();
+scene.add(studioGroup);
+const wallMat=new THREE.MeshBasicMaterial({ color:0x2ee06a, side:THREE.DoubleSide, transparent:true, opacity:0.88, toneMapped:false });
+const floorMat=new THREE.MeshBasicMaterial({ color:0xff4466, transparent:true, opacity:0.92, toneMapped:false });
+function addStudioPlane(w,h,mat,pos,rot){
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,h,1,1),mat);
+  mesh.position.set(pos.x,pos.y,pos.z);
+  mesh.rotation.set(rot.x,rot.y,rot.z);
+  studioGroup.add(mesh);
+  return mesh;
+}
+addStudioPlane(10.5,7.2,floorMat,{x:0,y:-2.05,z:0.05},{x:-Math.PI/2,y:0,z:0});
+addStudioPlane(10.5,5.8,wallMat,{x:0,y:0.35,z:-2.55},{x:0,y:0,z:0});
+addStudioPlane(5.8,5.4,wallMat,{x:-4.4,y:0.22,z:-0.05},{x:0,y:Math.PI/2,z:0});
+addStudioPlane(5.8,5.4,wallMat,{x:4.4,y:0.22,z:-0.05},{x:0,y:-Math.PI/2,z:0});
+
+const glassDeckGroup=new THREE.Group();
+scene.add(glassDeckGroup);
+const glassGroup=new THREE.Group();
+glassDeckGroup.add(glassGroup);
+const studioLights={};
+function createStudioLight(spec){
+  const softboxSize=Math.max(0.55,spec.size);
+  const light=new THREE.RectAreaLight(spec.color, spec.defaults.intensity, softboxSize, softboxSize);
+  studioGroup.add(light);
+  studioLights[spec.id]={light,spec};
+}
+function aimAtCard(obj){
+  obj.lookAt(0,0,0);
+}
+for(const spec of LIGHTS) createStudioLight(spec);
+
+const GLASS_BEVEL_SEGMENTS=64;
+let GLASS_BEVEL_PX=16;
+
+function smoothRoundedBoxGeometry(width,height,depth,segments,radius){
+  const geo=new RoundedBoxGeometry(width,height,depth,segments,radius);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+let glassGeo=smoothRoundedBoxGeometry(1, 1, 0.1, GLASS_BEVEL_SEGMENTS, 0.05);
+const glassMat=new THREE.MeshPhysicalMaterial({
+  color:0xeaf3ff,
+  metalness:0,
+  roughness:state.roughness,
+  transmission:state.transmission,
+  thickness:state.thickness,
+  ior:state.ior,
+  dispersion:state.dispersion,
+  clearcoat:0.72,
+  clearcoatRoughness:0.08,
+  envMapIntensity:state.envMapIntensity,
+  envMap:null,
+  attenuationColor:new THREE.Color(0xacc6ff),
+  attenuationDistance:6.5,
+  transparent:true,
+  depthWrite:false,
+  opacity:1
+});
+const glass=new THREE.Mesh(glassGeo, glassMat);
+glassGroup.add(glass);
+
+let edgeGeo=smoothRoundedBoxGeometry(1, 1, 0.1, GLASS_BEVEL_SEGMENTS, 0.05);
+const edgeMat=new THREE.MeshPhysicalMaterial({
+  color:0xf8fbff,
+  roughness:0.006,
+  transmission:0.66,
+  thickness:1.25,
+  ior:1.62,
+  dispersion:0.62,
+  clearcoat:1,
+  clearcoatRoughness:CRYSTAL_FRONT.clearcoatRoughness,
+  envMap:edgeEnvironmentMap(),
+  envMapIntensity:CRYSTAL_FRONT.edgeEnv,
+  transparent:true,
+  depthWrite:false,
+  opacity:CRYSTAL_FRONT.edgeOpacity,
+  side:THREE.FrontSide
+});
+const edgeGlow=new THREE.Mesh(edgeGeo, edgeMat);
+edgeGlow.scale.set(1.004,1.004,1.004);
+glassGroup.add(edgeGlow);
+
+let fresnelGeo=smoothRoundedBoxGeometry(1, 1, 0.1, GLASS_BEVEL_SEGMENTS, 0.05);
+const fresnelMat=new THREE.ShaderMaterial({
+  uniforms:{
+    uPower:{ value:state.fresnelPower },
+    uStrength:{ value:CRYSTAL_FRONT.fresnelStrength },
+    uCornerBoost:{ value:2.4 },
+    uHalfSize:{ value:new THREE.Vector2(0.5,0.5) },
+    uColorA:{ value:new THREE.Color(0xe8f0ff) },
+    uColorB:{ value:new THREE.Color(0x00c8ff) }
+  },
+  vertexShader:`
+    varying vec3 vLocalPosition;
+    varying vec3 vWorldNormal;
+    varying vec3 vWorldPosition;
+    void main(){
+      vLocalPosition=position;
+      vec4 worldPosition=modelMatrix*vec4(position,1.0);
+      vWorldPosition=worldPosition.xyz;
+      vWorldNormal=normalize(mat3(modelMatrix)*normal);
+      gl_Position=projectionMatrix*viewMatrix*worldPosition;
+    }
+  `,
+  fragmentShader:`
+    uniform float uPower;
+    uniform float uStrength;
+    uniform float uCornerBoost;
+    uniform vec2 uHalfSize;
+    uniform vec3 uColorA;
+    uniform vec3 uColorB;
+    varying vec3 vLocalPosition;
+    varying vec3 vWorldNormal;
+    varying vec3 vWorldPosition;
+    void main(){
+      vec3 viewDir=normalize(cameraPosition-vWorldPosition);
+      float fresnel=pow(1.0-max(dot(normalize(vWorldNormal),viewDir),0.0),uPower);
+      vec2 edge=abs(vLocalPosition.xy)/max(uHalfSize,vec2(0.001));
+      float corner=smoothstep(0.82,1.0,edge.x)*smoothstep(0.82,1.0,edge.y);
+      vec3 color=mix(uColorA,uColorB,0.22+corner*0.10);
+      gl_FragColor=vec4(color,fresnel*uStrength*(1.0+corner*(uCornerBoost-1.0)*0.7));
+    }
+  `,
+  transparent:true,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false,
+  toneMapped:false
+});
+const fresnelShell=new THREE.Mesh(fresnelGeo,fresnelMat);
+fresnelShell.scale.set(1.004,1.004,1.004);
+glassGroup.add(fresnelShell);
+
+const highlightGroup=new THREE.Group();
+glassGroup.add(highlightGroup);
+const nearSideMat=new THREE.ShaderMaterial({
+  uniforms:{ uColor:{ value:new THREE.Color(0xe8f0ff) }, uAccent:{ value:new THREE.Color(0x00c8ff) }, uOpacity:{ value:0.26 } },
+  vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader:`
+    uniform vec3 uColor;
+    uniform vec3 uAccent;
+    uniform float uOpacity;
+    varying vec2 vUv;
+    void main(){
+      float edgeFade=smoothstep(0.0,0.35,vUv.x)*(1.0-smoothstep(0.72,1.0,vUv.x));
+      float endFade=smoothstep(0.0,0.08,vUv.y)*(1.0-smoothstep(0.92,1.0,vUv.y));
+      float core=smoothstep(0.22,0.58,vUv.x);
+      vec3 color=mix(uColor,uAccent,core*0.18);
+      gl_FragColor=vec4(color,edgeFade*endFade*uOpacity);
+    }
+  `,
+  transparent:true,
+  blending:THREE.AdditiveBlending,
+  depthWrite:false,
+  toneMapped:false
+});
+const farSideMat=nearSideMat.clone();
+farSideMat.uniforms.uOpacity={ value:0.06 };
+const depthPoolMat=new THREE.ShaderMaterial({
+  uniforms:{
+    uColor:{ value:new THREE.Color(0x020816) },
+    uCool:{ value:new THREE.Color(0x07183e) },
+    uOpacity:{ value:0.055 }
+  },
+  vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader:`
+    uniform vec3 uColor;
+    uniform vec3 uCool;
+    uniform float uOpacity;
+    varying vec2 vUv;
+    void main(){
+      vec2 p=vUv-0.5;
+      float oval=1.0-smoothstep(0.20,0.86,length(p*vec2(0.92,1.18)));
+      float edgeDist=min(min(vUv.x,1.0-vUv.x),min(vUv.y,1.0-vUv.y));
+      float edgeRelease=smoothstep(0.03,0.24,edgeDist);
+      float nearSideRelease=smoothstep(0.38,0.98,vUv.x)*smoothstep(0.38,0.98,1.0-vUv.y);
+      float absorption=oval*edgeRelease*(1.0-nearSideRelease*0.18);
+      vec3 color=mix(uColor,uCool,smoothstep(0.25,0.72,vUv.y)*0.22);
+      gl_FragColor=vec4(color,absorption*uOpacity);
+    }
+  `,
+  transparent:true,
+  depthWrite:false,
+  toneMapped:false
+});
+
+function rebuildHighlightLayer(w,h,r,d,unit){
+  while(highlightGroup.children.length){
+    const child=highlightGroup.children.pop();
+    child.geometry.dispose();
+  }
+  const z=d/2+unit*2;
+  const nearStrip=Math.max(unit*18, d*0.36);
+  const farStrip=Math.max(unit*9, d*0.16);
+
+  /* 蝘駁 nearSide(??銝? / farSide(撌?銝? ??????選?????質?之???鈭箏極鞎潛?嚗?
+     ???鈭斤策?餌?撟曆??? + Fresnel + envMap ???芰? */
+
+  const pool=new THREE.Mesh(new THREE.PlaneGeometry(w*0.94,h*0.90,1,1),depthPoolMat);
+  pool.position.set(0,0,z+unit*0.8);
+  highlightGroup.add(pool);
+
+  /* ?楠???芯漱蝯?Fresnel shell + ?餌??釭?芰?嚗?雿輻??????*/
+}
+
+/* ?湔暺?/?孵????典?閫? facet 銝??箸挾? specular嚗??撠?梢?? envMap ?踵???*/
+
+const glassCards=[
+  { group:glassGroup, body:glass, edgeGlow, fresnelShell, depthPool:null, highlightGroup, rearLayer:0 }
+];
+
+const CODE=[
+  'const nest = createStudio()','export default function App() {','<section class="services">',
+  'router.get("/api/orders", fn)','await db.clients.findMany()','npm run build && deploy',
+  'return <Card {...props} />','useEffect(() => render(), [])','if (user.ready) launch()',
+  'SELECT * FROM orders;','transform: translateY(-4px)','git commit -m "ship it"'
+];
+const hash=(a,b)=>{ const x=Math.sin(a*127.1+b*311.7)*43758.5453; return x-Math.floor(x); };
+const smoothstep=(a,b,x)=>{ const t=Math.max(0,Math.min(1,(x-a)/(b-a))); return t*t*(3-2*t); };
+const drops=Array.from({length:34},(_,i)=>({
+  spd:0.085+hash(i,1)*0.11,
+  ph:hash(i,2)*1.8,
+  sz:18+(hash(i,4)*7|0),
+  ye:hash(i,5)<0.12,
+  cy:hash(i,6)<0.32
+}));
+/* ===== 卡內程式碼落雨：雨在玻璃裡 =====
+   一片不透明深底+落雨碼的 plane 置於玻璃 slab 內（front 面之後）、parented 到卡 group，
+   被前玻璃 transmission 折射 → 程式碼像下在水晶內部。只在聚光主卡顯示。 */
+const RAIN={ glow:0.9, density:36, speed:1.0, depth:0.45, spread:1.0, lead:0.0 };
+const rainCanvas=document.createElement('canvas');
+rainCanvas.width=1024; rainCanvas.height=600;
+const rainCtx=rainCanvas.getContext('2d');
+const rainTexture=new THREE.CanvasTexture(rainCanvas);
+rainTexture.colorSpace=THREE.SRGBColorSpace;
+rainTexture.minFilter=THREE.LinearFilter; rainTexture.magFilter=THREE.LinearFilter;
+const rainCols=Array.from({length:96},(_,i)=>({
+  spd:0.085+hash(i,21)*0.11, ph:hash(i,22)*1.8, fs:18+(hash(i,23)*8|0), cyan:hash(i,24)<0.30, ye:hash(i,25)<0.12
+}));
+/* 沿用既有程式碼落雨「先前的參數」：spd 0.085–0.195（慢）、字級 18–26px、cyc/1.8 週期、白頭+藍/青/金尾漸層（同 #dev-rain / n4rain）。 */
+function drawInnerRain(time){
+  const W=rainCanvas.width, H=rainCanvas.height, ctx=rainCtx;
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,W,H);
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#040a1e'); bg.addColorStop(0.52,'#050d2a'); bg.addColorStop(1,'#02060f');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+  const glow=THREE.MathUtils.clamp(RAIN.glow,0,1.6);
+  const cols=Math.max(6, Math.round(RAIN.density));
+  ctx.textBaseline='middle';
+  for(let c=0;c<cols;c++){
+    const col=rainCols[c % rainCols.length];
+    const codeInset=W*0.08;
+    const codeW=W*0.84;
+    const x=codeInset + codeW*(RAIN.lead + ((c+0.5)/cols)*RAIN.spread);
+    const raw=time*col.spd*RAIN.speed + col.ph;
+    const cyc=Math.floor(raw/1.8);
+    const prog=raw%1.8-0.25;
+    if(prog<0) continue;
+    const code=CODE[(c*5+cyc)%CODE.length];
+    ctx.font=col.fs+'px "JetBrains Mono",monospace';
+    const w=ctx.measureText(code).width;
+    const tipY=prog*H;
+    ctx.save();
+    ctx.translate(x,tipY);
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign='left';
+    const base=col.ye?'255,199,9':col.cyan?'0,200,255':'150,180,235';
+    const g=ctx.createLinearGradient(0,0,w,0);
+    g.addColorStop(0,'rgba(232,244,255,'+(0.92*glow*0.52)+')');
+    g.addColorStop(0.12,'rgba('+base+','+(0.78*glow*0.52)+')');
+    g.addColorStop(1,'rgba('+base+',0)');
+    ctx.fillStyle=g;
+    ctx.fillText(code,0,0);
+    ctx.restore();
+  }
+  ctx.save();
+  ctx.globalCompositeOperation='destination-in';
+  const featherX=W*0.045;
+  const featherY=H*0.052;
+  const edgeMask=ctx.createLinearGradient(0,0,W,0);
+  edgeMask.addColorStop(0,'rgba(0,0,0,0)');
+  edgeMask.addColorStop(featherX/W,'rgba(0,0,0,1)');
+  edgeMask.addColorStop(1-featherX/W,'rgba(0,0,0,1)');
+  edgeMask.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=edgeMask;
+  ctx.fillRect(0,0,W,H);
+  const verticalMask=ctx.createLinearGradient(0,0,0,H);
+  verticalMask.addColorStop(0,'rgba(0,0,0,0)');
+  verticalMask.addColorStop(featherY/H,'rgba(0,0,0,1)');
+  verticalMask.addColorStop(1-featherY/H,'rgba(0,0,0,1)');
+  verticalMask.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=verticalMask;
+  ctx.fillRect(0,0,W,H);
+  ctx.restore();
+  rainTexture.needsUpdate=true;
+}
+function sizeInnerRain(card,w,h,depth){
+  if(!card.innerRain) return;
+  card.innerRain.geometry.dispose();
+  card.innerRain.geometry=new THREE.PlaneGeometry(w*1.08,h*1.08,1,1);
+  card.innerRain.position.set(0,0, THREE.MathUtils.clamp(RAIN.depth,0,0.98)*depth*0.5);
+}
+for(const card of glassCards){
+  const mat=new THREE.MeshBasicMaterial({ map:rainTexture, toneMapped:false, transparent:true, depthWrite:true });
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(1,1,1,1), mat);
+  mesh.renderOrder=-1; mesh.visible=false;
+  card.group.add(mesh);
+  card.innerRain=mesh;
+}
+let starW=1, starH=1, viewW=1, viewH=1, cardRect={left:0,right:0,top:0,bottom:0};
+let rafId=0;
+let lastFrameTime=0;
+let lastCodeFrameTime=0;
+let needsRender=true;
+let qaFramesRemaining=QA_MODE ? 8 : 0;
+
+function requestSceneRender(){
+  needsRender=true;
+  if((QA_MODE || !document.hidden) && !rafId){
+    rafId=requestAnimationFrame(loop);
+  }
+}
+
+function rebuildGlassGeometry(){
+  const rect=htmlCard.getBoundingClientRect();
+  if(!rect.width || !rect.height || !viewH) return;
+  const cameraDist=Math.abs(camera.position.z-glassGroup.position.z);
+  const fovRad=THREE.MathUtils.degToRad(camera.fov);
+  const unitsPerPx=(2*cameraDist*Math.tan(fovRad/2))/viewH;
+  const w=rect.width*unitsPerPx;
+  const h=rect.height*unitsPerPx;
+  const r=GLASS_BEVEL_PX*unitsPerPx;
+  const d=112*unitsPerPx;
+  const edgePad=2.4*unitsPerPx;
+  const nextGlassGeo=smoothRoundedBoxGeometry(w, h, d, GLASS_BEVEL_SEGMENTS, r);
+  const nextEdgeGeo=smoothRoundedBoxGeometry(w+edgePad, h+edgePad, d+(1.8*unitsPerPx), GLASS_BEVEL_SEGMENTS, r+unitsPerPx*0.85);
+  const nextFresnelGeo=smoothRoundedBoxGeometry(w+edgePad*0.45, h+edgePad*0.45, d+(unitsPerPx*1.15), GLASS_BEVEL_SEGMENTS, r+unitsPerPx*0.65);
+  fresnelMat.uniforms.uHalfSize.value.set((w+edgePad*0.45)*0.5,(h+edgePad*0.45)*0.5);
+  rebuildHighlightLayer(w,h,r,d,unitsPerPx);
+
+  glass.geometry.dispose();
+  edgeGlow.geometry.dispose();
+  fresnelShell.geometry.dispose();
+  glass.geometry=nextGlassGeo;
+  edgeGlow.geometry=nextEdgeGeo;
+  fresnelShell.geometry=nextFresnelGeo;
+  glassGeo=nextGlassGeo;
+  edgeGeo=nextEdgeGeo;
+  fresnelGeo=nextFresnelGeo;
+  sizeInnerRain(glassCards[0], w, h, d);
+}
+
+function resize(){
+  const dpr=Math.min(window.devicePixelRatio || 1, FX.pixelRatioMax);
+  viewW=window.innerWidth;
+  viewH=window.innerHeight;
+  renderer.setPixelRatio(dpr);
+  renderer.setSize(viewW, viewH, false);
+  composer.setPixelRatio(dpr);
+  composer.setSize(viewW, viewH);
+  bloomComposer.setPixelRatio(dpr);
+  bloomComposer.setSize(viewW, viewH);
+  bloomPass.setSize(Math.max(1,Math.floor(viewW*BLOOM_RESOLUTION_SCALE)), Math.max(1,Math.floor(viewH*BLOOM_RESOLUTION_SCALE)));
+  finalPass.material.uniforms.bloomTexture.value=bloomComposer.renderTarget2.texture;
+  smaaPass.setSize(viewW*dpr, viewH*dpr);
+  camera.aspect=viewW/viewH;
+  camera.updateProjectionMatrix();
+  const starScale=Math.min(FX.codeScale, STAR_CANVAS_MAX_WIDTH/viewW, STAR_CANVAS_MAX_HEIGHT/viewH);
+  starW=Math.max(IS_MOBILE ? 320 : 640, Math.floor(viewW*starScale));
+  starH=Math.max(IS_MOBILE ? 260 : 480, Math.floor(viewH*starScale));
+  codeCanvas.width=starW;
+  codeCanvas.height=starH;
+  cardRect=htmlCard.getBoundingClientRect();
+  const planeDist=Math.abs(camera.position.z-bgPlane.position.z);
+  const fovRad=THREE.MathUtils.degToRad(camera.fov);
+  const planeH=2*planeDist*Math.tan(fovRad/2);
+  const planeW=planeH*camera.aspect;
+  bgPlane.geometry.dispose();
+  bgPlane.geometry=new THREE.PlaneGeometry(planeW*1.04,planeH*1.04,1,1);
+  rebuildGlassGeometry();
+  requestSceneRender();
+}
+window.addEventListener('resize', resize);
+window.addEventListener('keydown', e=>{ if(e.key==='h'||e.key==='H'){ const p=document.querySelector('.panel'); if(p) p.style.display=(p.style.display==='none'?'':'none'); } });
+
+function drawCodeTexture(time){
+  const sx=starW/viewW, sy=starH/viewH;
+  const ctx=codeCtx;
+  const codeGlow=THREE.MathUtils.clamp(fxTuning.codeGlow, 0, 1.2);
+  ctx.setTransform(1,0,0,1,0,0);
+  const bg=ctx.createLinearGradient(0,0,starW,starH);
+  bg.addColorStop(0,'#050d24');
+  bg.addColorStop(0.46,'#050d2e');
+  bg.addColorStop(1,'#020613');
+  ctx.fillStyle=bg;
+  ctx.fillRect(0,0,starW,starH);
+
+  let rg=ctx.createRadialGradient(starW*.78, -starH*.08, 0, starW*.78, -starH*.08, starW*.64);
+  rg.addColorStop(0,'rgba(44,72,170,'+(0.10+0.12*codeGlow)+')');
+  rg.addColorStop(.52,'rgba(24,48,130,'+(0.055+0.065*codeGlow)+')');
+  rg.addColorStop(1,'rgba(40,70,160,0)');
+  ctx.fillStyle=rg;
+  ctx.fillRect(0,0,starW,starH);
+  rg=ctx.createRadialGradient(starW*.12, starH*1.08, 0, starW*.12, starH*1.08, starW*.56);
+  rg.addColorStop(0,'rgba(24,52,135,'+(0.07+0.09*codeGlow)+')');
+  rg.addColorStop(1,'rgba(35,60,150,0)');
+  ctx.fillStyle=rg;
+  ctx.fillRect(0,0,starW,starH);
+
+  const rcPx=cardRect;
+  if(rcPx.width && rcPx.height){
+    const shadowCx=(rcPx.left+rcPx.width*.56)*sx;
+    const shadowCy=(rcPx.bottom+16)*sy;
+    const shadowW=rcPx.width*sx*.42;
+    const shadowH=Math.max(18*sy,rcPx.height*sy*.075);
+    const shadow=ctx.createRadialGradient(shadowCx,shadowCy,0,shadowCx,shadowCy,shadowW);
+    shadow.addColorStop(0,'rgba(0,0,0,0.30)');
+    shadow.addColorStop(0.42,'rgba(1,6,20,0.22)');
+    shadow.addColorStop(1,'rgba(1,6,20,0)');
+    ctx.save();
+    ctx.fillStyle=shadow;
+    ctx.beginPath();
+    ctx.ellipse(shadowCx,shadowCy,shadowW,shadowH,0,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    const reflect=ctx.createRadialGradient(shadowCx,shadowCy-8*sy,0,shadowCx,shadowCy-8*sy,shadowW*.74);
+    reflect.addColorStop(0,'rgba(0,200,255,'+(0.006+0.020*codeGlow)+')');
+    reflect.addColorStop(0.48,'rgba(170,220,255,'+(0.004+0.014*codeGlow)+')');
+    reflect.addColorStop(1,'rgba(0,200,255,0)');
+    ctx.save();
+    ctx.fillStyle=reflect;
+    ctx.beginPath();
+    ctx.ellipse(shadowCx,shadowCy-8*sy,shadowW*.74,shadowH*.72,0,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  if(rcPx.width && rcPx.height && codeGlow>0){
+    const cx=(rcPx.left+rcPx.width*.55)*sx;
+    const cy=(rcPx.top+rcPx.height*.46)*sy;
+    const pocket=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(rcPx.width*sx*.38, rcPx.height*sy*.56));
+    pocket.addColorStop(0,'rgba(100,185,245,'+(0.020*codeGlow)+')');
+    pocket.addColorStop(0.30,'rgba(45,145,220,'+(0.012*codeGlow)+')');
+    pocket.addColorStop(0.62,'rgba(0,190,245,'+(0.006*codeGlow)+')');
+    pocket.addColorStop(1,'rgba(0,200,255,0)');
+    ctx.fillStyle=pocket;
+    /* ??憭曉?∠?蝭??扼?交滯?粹?蝺??銝?敺銝?????*/
+    ctx.fillRect((rcPx.left-40)*sx,(rcPx.top-45)*sy,(rcPx.width+80)*sx,(rcPx.height+80)*sy);
+  }
+
+  if(rcPx.width && rcPx.height){
+    ctx.save();
+    const rawLeft=rcPx.left*sx, rawTop=rcPx.top*sy, rawRight=rcPx.right*sx, rawBottom=rcPx.bottom*sy;
+    const safeInsetX=Math.max(34*sx,rcPx.width*sx*.075);
+    const safeInsetTop=Math.max(34*sy,rcPx.height*sy*.085);
+    const safeInsetBottom=Math.max(28*sy,rcPx.height*sy*.065);
+    const safeLeft=rawLeft+safeInsetX;
+    const safeTop=rawTop+safeInsetTop;
+    const safeRight=rawRight-safeInsetX*1.18;
+    const safeBottom=rawBottom-safeInsetBottom;
+    const safeW=safeRight-safeLeft;
+    const safeH=safeBottom-safeTop;
+    if(safeW>0 && safeH>0){
+      ctx.beginPath();
+      if(ctx.roundRect){
+        ctx.roundRect(safeLeft,safeTop,safeW,safeH,Math.max(18*sx,22));
+      }else{
+        ctx.rect(safeLeft,safeTop,safeW,safeH);
+      }
+      ctx.clip();
+
+      const left=safeLeft, top=safeTop, right=safeRight, bottom=safeBottom;
+      const organicCode=[
+        'const view = render(glass)',
+        'shader.uniforms.ior',
+        'await deploy(site)',
+        'return <ServiceCard />',
+        'route.post("/lead")',
+        'cms.render(page)',
+        'build: production',
+        'db.sync(client)'
+      ];
+      ctx.font=Math.max(9,10.5*sx)+'px "JetBrains Mono",monospace';
+      ctx.textAlign='left';
+      ctx.textBaseline='middle';
+      for(let i=0;i<(IS_MOBILE ? 12 : 22);i++){
+        const px=left+safeW*(0.08+hash(i,31)*0.84);
+        const py=top+safeH*(0.08+hash(i,47)*0.84);
+        const len=0.45+hash(i,59)*0.55;
+        const alpha=(0.018+hash(i,71)*0.036)*codeGlow;
+        const cyan=hash(i,83)>0.58;
+        ctx.save();
+        ctx.translate(px,py);
+        ctx.rotate((-0.14+hash(i,97)*0.28));
+        ctx.fillStyle=cyan?'rgba(0,200,255,'+alpha+')':'rgba(232,240,255,'+alpha+')';
+        ctx.fillText(organicCode[(i*3)%organicCode.length].slice(0,Math.floor(10+len*16)),0,0);
+        ctx.restore();
+      }
+    }
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.scale(sx, sy);
+  ctx.textBaseline='middle';
+  const rc=cardRect;
+  const streamCount=IS_MOBILE ? 10 : 18;
+  for(let i=0;i<streamCount;i++){
+    const d=drops[i];
+    const raw=time*d.spd+d.ph;
+    const cyc=Math.floor(raw/1.8);
+    const prog=raw%1.8-0.25;
+    if(prog<0) continue;
+    const code=CODE[(i*5+cyc)%CODE.length];
+    ctx.font=d.sz+'px "JetBrains Mono",monospace';
+    const w=ctx.measureText(code).width;
+    const streamLeft=rc.width ? Math.max(12, rc.left-rc.width*0.34) : 16;
+    const streamRight=rc.width ? Math.min(viewW-12, rc.right+rc.width*0.28) : viewW-16;
+    const x=streamLeft+Math.floor(hash(i,cyc*9+5)*(streamRight-streamLeft));
+    const tipY=prog*viewH;
+    const inside=x>=rc.left && x<=rc.right && tipY>=rc.top && tipY<=rc.bottom;
+    const base=d.ye?'232,240,255':(d.cy || inside?'0,200,255':'150,170,220');
+    const topEdgeFade=inside ? smoothstep(0, 54, tipY-rc.top) : 1;
+    ctx.save();
+    ctx.translate(x,tipY);
+    ctx.rotate(-Math.PI/2 + (-0.09+hash(i,cyc+17)*0.18));
+    ctx.textAlign='left';
+    const g=ctx.createLinearGradient(0,0,w,0);
+    const hotAlpha=(inside?0.15:0.020)*codeGlow*topEdgeFade;
+    const trailAlpha=(inside?0.10:0.014)*codeGlow*topEdgeFade;
+    g.addColorStop(0,'rgba(232,240,255,'+hotAlpha+')');
+    g.addColorStop(0.1,'rgba('+base+','+trailAlpha+')');
+    g.addColorStop(1,'rgba('+base+',0)');
+    ctx.fillStyle=g;
+    ctx.fillText(code,0,0);
+    ctx.restore();
+  }
+  ctx.restore();
+  codeTexture.needsUpdate=true;
+}
+
+function applyGlassCardMaterial(card){
+  card.body.material.color.copy(FRONT_FACE_COLOR);
+  card.body.material.transmission=state.transmission;
+  card.body.material.thickness=state.thickness;
+  card.body.material.ior=state.ior;
+  card.body.material.roughness=state.roughness;
+  card.body.material.clearcoat=FRONT_FACE.clearcoat;
+  card.body.material.clearcoatRoughness=FRONT_FACE.clearcoatRoughness;
+  card.body.material.envMapIntensity=state.envMapIntensity;
+  card.body.material.opacity=1;
+  card.body.material.emissive.set(0x000000);
+  card.body.material.emissiveIntensity=0;
+  card.body.material.attenuationDistance=FRONT_FACE.attenuationDistance;
+  card.body.material.needsUpdate=true;
+
+  card.edgeGlow.material.transmission=0.66;
+  card.edgeGlow.material.thickness=1.25;
+  card.edgeGlow.material.ior=1.62;
+  card.edgeGlow.material.roughness=0.006;
+  card.edgeGlow.material.clearcoat=CRYSTAL_FRONT.clearcoat;
+  card.edgeGlow.material.clearcoatRoughness=CRYSTAL_FRONT.clearcoatRoughness;
+  card.edgeGlow.material.envMapIntensity=CRYSTAL_FRONT.edgeEnv;
+  card.edgeGlow.material.opacity=CRYSTAL_FRONT.edgeOpacity;
+  card.edgeGlow.material.needsUpdate=true;
+
+  card.fresnelShell.material.uniforms.uPower.value=state.fresnelPower;
+  card.fresnelShell.material.uniforms.uStrength.value=CRYSTAL_FRONT.fresnelStrength;
+  card.fresnelShell.material.uniforms.uCornerBoost.value=2.0;
+  depthPoolMat.uniforms.uOpacity.value=0.055;
+}
+
+function applyState(){
+  root.style.setProperty('--tiltX', state.tiltX);
+  root.style.setProperty('--tiltY', state.tiltY);
+  glassMat.thickness=state.thickness;
+  glassMat.ior=state.ior;
+  glassMat.roughness=state.roughness;
+  glassMat.dispersion=state.dispersion;
+  glassMat.transmission=state.transmission;
+  glassMat.color.copy(FRONT_FACE_COLOR);
+  glassMat.envMap=null;
+  glassMat.envMapIntensity=state.envMapIntensity;
+  glassMat.clearcoat=FRONT_FACE.clearcoat;
+  glassMat.clearcoatRoughness=FRONT_FACE.clearcoatRoughness;
+  glassMat.attenuationDistance=FRONT_FACE.attenuationDistance;
+  edgeMat.envMap=edgeEnvironmentMap();
+  edgeMat.envMapIntensity=CRYSTAL_FRONT.edgeEnv;
+  edgeMat.opacity=CRYSTAL_FRONT.edgeOpacity;
+  edgeMat.roughness=0.006;
+  edgeMat.clearcoat=CRYSTAL_FRONT.clearcoat;
+  edgeMat.clearcoatRoughness=CRYSTAL_FRONT.clearcoatRoughness;
+  edgeMat.dispersion=0.62;
+  for(const spec of LIGHTS){
+    const kit=studioLights[spec.id];
+    const pos=getLightPosition(spec);
+    const size=Math.max(0.55,spec.size);
+    const intensity=state[spec.id+'_intensity'];
+    kit.light.position.set(pos.x,pos.y,pos.z);
+    kit.light.width=size;
+    kit.light.height=size;
+    kit.light.intensity=intensity;
+    aimAtCard(kit.light);
+  }
+  bloomPass.strength=FX.bloom ? CRYSTAL_BLOOM.strength : Math.min(state.bloomStrength, 0.08);
+  bloomPass.radius=FX.bloom ? CRYSTAL_BLOOM.radius : 0.08;
+  bloomPass.threshold=FX.bloom ? CRYSTAL_BLOOM.threshold : 0.96;
+  fresnelMat.uniforms.uPower.value=state.fresnelPower;
+  fresnelMat.uniforms.uStrength.value=CRYSTAL_FRONT.fresnelStrength;
+  fresnelMat.uniforms.uCornerBoost.value=2.4;
+  glassMat.needsUpdate=true;
+  edgeMat.needsUpdate=true;
+  glassGroup.rotation.x=THREE.MathUtils.degToRad(-state.tiltX);
+  glassGroup.rotation.y=THREE.MathUtils.degToRad(state.tiltY);
+  if(GLASS_BEVEL_PX!==state.bevelPx){ GLASS_BEVEL_PX=state.bevelPx; rebuildGlassGeometry(); }
+  applyGlassCardMaterial(glassCards[0]);
+  dump.textContent=PARAMS.map(p=>p.k+': '+state[p.k]+(p.suf||'')).join('\n')+
+    '\n\n'+LIGHTS.map(spec=>spec.name+': azimuth '+state[spec.id+'_azimuth']+'deg, elevation '+state[spec.id+'_elevation']+'deg, distance '+state[spec.id+'_distance']+', intensity '+state[spec.id+'_intensity']).join('\n')+
+    '\n\nmode: single static card'+
+    '\n\nmaterial: 1x MeshPhysicalMaterial slab\ntexture: codeTexture CanvasTexture -> glass rear plane\npost: UnrealBloomPass '+(FX.bloom?'desktop edge bloom':'mobile/reduced low bloom')+'\nthree: 0.160.0';
+  requestSceneRender();
+}
+
+const FX_CTRL=[
+  {k:'heroEdgeGlow', name:'hero edge glow', min:0, max:1.8, step:0.01},
+  {k:'bloomStrength', name:'bloom strength', min:0, max:0.8, step:0.005},
+  {k:'bloomThreshold', name:'bloom threshold', min:0.82, max:1.2, step:0.001},
+  {k:'bloomRadius', name:'bloom radius', min:0, max:0.18, step:0.001},
+  {k:'rearFrost', name:'rear frost', min:0.5, max:1.8, step:0.01},
+  {k:'codeGlow', name:'code glow', min:0, max:1.2, step:0.01}
+];
+const fxInputs={};
+function clampFxValue(ctrl,value){
+  return THREE.MathUtils.clamp(Number(value), ctrl.min, ctrl.max);
+}
+function syncFxControls(){
+  for(const ctrl of FX_CTRL){
+    const input=fxInputs[ctrl.k];
+    const label=document.getElementById('fx_'+ctrl.k);
+    if(input) input.value=fxTuning[ctrl.k];
+    if(label) label.textContent=Number(fxTuning[ctrl.k]).toFixed(ctrl.step<0.01 ? 3 : 2);
+  }
+}
+function applyFxTuning(){
+  CRYSTAL_BLOOM.strength=fxTuning.bloomStrength;
+  CRYSTAL_BLOOM.threshold=fxTuning.bloomThreshold;
+  CRYSTAL_BLOOM.radius=fxTuning.bloomRadius;
+  CRYSTAL_FRONT.fresnelStrength=fxTuning.heroEdgeGlow;
+  CRYSTAL_FRONT.edgeOpacity=0.052 + fxTuning.heroEdgeGlow*0.072;
+  CRYSTAL_FRONT.edgeEnv=1.45 + fxTuning.heroEdgeGlow*1.90;
+  bloomPass.strength=FX.bloom ? CRYSTAL_BLOOM.strength : Math.min(CRYSTAL_BLOOM.strength, 0.05);
+  bloomPass.threshold=FX.bloom ? CRYSTAL_BLOOM.threshold : Math.max(0.98, CRYSTAL_BLOOM.threshold);
+  bloomPass.radius=FX.bloom ? CRYSTAL_BLOOM.radius : Math.min(CRYSTAL_BLOOM.radius, 0.04);
+  lastCodeFrameTime=0;
+  syncFxControls();
+  applyState();
+  updateStaticCard();
+}
+const fxApi={};
+for(const ctrl of FX_CTRL){
+  Object.defineProperty(fxApi, ctrl.k, {
+    enumerable:true,
+    get(){ return fxTuning[ctrl.k]; },
+    set(value){
+      fxTuning[ctrl.k]=clampFxValue(ctrl,value);
+      applyFxTuning();
+    }
+  });
+}
+fxApi.set=(key,value)=>{
+  const ctrl=FX_CTRL.find(item=>item.k===key);
+  if(!ctrl) return false;
+  fxTuning[key]=clampFxValue(ctrl,value);
+  applyFxTuning();
+  return true;
+};
+fxApi.values=()=>Object.assign({},fxTuning);
+window.__fx=fxApi;
+
+const fxTitle=document.createElement('h4');
+fxTitle.textContent='FX';
+fxTitle.style.marginTop='20px';
+wrap.appendChild(fxTitle);
+for(const ctrl of FX_CTRL){
+  const row=document.createElement('div');
+  row.className='row';
+  row.innerHTML='<label><span>'+ctrl.name+'</span><b id="fx_'+ctrl.k+'">'+fxTuning[ctrl.k]+'</b></label>'+
+    '<input type="range" min="'+ctrl.min+'" max="'+ctrl.max+'" step="'+ctrl.step+'" value="'+fxTuning[ctrl.k]+'">';
+  const input=row.querySelector('input');
+  fxInputs[ctrl.k]=input;
+  input.oninput=()=>{
+    fxTuning[ctrl.k]=clampFxValue(ctrl,input.value);
+    applyFxTuning();
+  };
+  wrap.appendChild(row);
+}
+syncFxControls();
+
+/* ===== RAIN 拉軸：雨在玻璃裡 ===== */
+const RAIN_CTRL=[
+  {k:'glow', name:'rain glow', min:0, max:1.6, step:0.02},
+  {k:'density', name:'rain density', min:8, max:72, step:1},
+  {k:'speed', name:'rain speed', min:0.1, max:1.5, step:0.01},
+  {k:'depth', name:'rain depth (玻璃內)', min:0, max:0.95, step:0.01},
+  {k:'spread', name:'rain spread', min:0.2, max:1, step:0.01},
+  {k:'lead', name:'rain x start', min:0, max:0.5, step:0.01}
+];
+const rainTitle=document.createElement('h4'); rainTitle.textContent='RAIN（雨在玻璃裡）'; rainTitle.style.marginTop='20px'; wrap.appendChild(rainTitle);
+for(const p of RAIN_CTRL){
+  const row=document.createElement('div'); row.className='row';
+  row.innerHTML='<label><span>'+p.name+'</span><b id="rn_'+p.k+'">'+RAIN[p.k]+'</b></label>'+
+    '<input type="range" min="'+p.min+'" max="'+p.max+'" step="'+p.step+'" value="'+RAIN[p.k]+'">';
+  const inp=row.querySelector('input');
+  inp.oninput=()=>{ const v=parseFloat(inp.value); RAIN[p.k]=v; document.getElementById('rn_'+p.k).textContent=v;
+    if(p.k==='depth') rebuildGlassGeometry();
+    lastCodeFrameTime=0; requestSceneRender(); };
+  wrap.appendChild(row);
+}
+window.__rain=RAIN;
+
+/* =====???券莎??餌??箏?銝剖亢??雿?銝撐 DOM ?⊿?脣??脤 ===== */
+function updateStaticCard(){
+  const el=cardEls[0];
+  if(el){
+    el.style.transform='perspective(1700px) translateY(0px) scale(1) rotateX(calc(var(--tiltX)*1deg)) rotateY(calc(var(--tiltY)*1deg))';
+    el.style.opacity='1';
+    el.style.filter='none';
+    el.style.zIndex='230';
+    el.classList.add('is-front');
+  }
+  const card=glassCards[0];
+  card.group.position.set(0,0,0);
+  card.group.scale.setScalar(1);
+  card.group.rotation.x=THREE.MathUtils.degToRad(-state.tiltX);
+  card.group.rotation.y=THREE.MathUtils.degToRad(state.tiltY);
+  card.group.visible=true;
+  if(card.innerRain) card.innerRain.visible=true;
+  card.edgeGlow.layers.enable(BLOOM_SCENE);
+  card.fresnelShell.layers.enable(BLOOM_SCENE);
+  applyGlassCardMaterial(card);
+  requestSceneRender();
+}
+
+resize();
+applyState();
+updateStaticCard();
+
+const t0=performance.now();
+function loop(now){
+  rafId=requestAnimationFrame(loop);
+  if(!QA_MODE && document.hidden){
+    cancelAnimationFrame(rafId);
+    rafId=0;
+    return;
+  }
+  const elapsed=now-lastFrameTime;
+  const forceQaFrame=QA_MODE && qaFramesRemaining>0;
+  if(elapsed<TARGET_FRAME_MS && !needsRender && !forceQaFrame) return;
+  lastFrameTime=now-(elapsed%TARGET_FRAME_MS);
+  cardRect=htmlCard.getBoundingClientRect();
+  const t=QA_MODE ? 0.75 : (performance.now()-t0)/1000;
+  if(forceQaFrame || now-lastCodeFrameTime>=FX.codeFrameMs){
+    drawCodeTexture(t);
+    drawInnerRain(t);
+    lastCodeFrameTime=now;
+  }
+  const previousBackground=scene.background;
+  scene.background=new THREE.Color(0x000000);
+  camera.layers.set(BLOOM_SCENE);
+  bloomComposer.render();
+  camera.layers.set(0);
+  scene.background=previousBackground;
+  composer.render();
+  needsRender=false;
+  if(forceQaFrame){
+    qaFramesRemaining--;
+    needsRender=qaFramesRemaining>0;
+  }
+}
+document.addEventListener('visibilitychange',()=>{
+  if(!QA_MODE && document.hidden){
+    if(rafId){
+      cancelAnimationFrame(rafId);
+      rafId=0;
+    }
+  }else{
+    lastFrameTime=0;
+    requestSceneRender();
+  }
+});
+requestSceneRender();
+</script>
+</body>
+</html>

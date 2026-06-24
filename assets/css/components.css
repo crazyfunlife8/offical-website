@@ -99,7 +99,9 @@
    y 範圍 ~ nav y=-2 to y=61：上方略出 nav 頂、下方 5px 微超出 nav 底緣 hairline
    gradient peak 在 50%（線條中心 ≈ brand 文字高度），向兩端漸隱
    下半段 75-92% 保留可見 alpha 讓過 hairline 後仍有 0.23 → 0 漸隱尾段 */
-.nav__brand-divider {
+/* .nav__divider 共用同款：連結組與「聯絡我們」之間（2026-06-16） */
+.nav__brand-divider,
+.nav__divider {
     width: 1px;
     height: 1em;
     align-self: center;
@@ -107,7 +109,8 @@
     position: relative;
 }
 
-.nav__brand-divider::before {
+.nav__brand-divider::before,
+.nav__divider::before {
     content: '';
     position: absolute;
     top: -22px;
@@ -125,11 +128,10 @@
     box-shadow: 0 0 4px rgba(var(--c-cyan-rgb), 0.30);
 }
 
-/* ─── 連結區：絕對置中，CTA 靠右（margin-left: auto） ──── */
+/* ─── 連結區：靠右成組（margin-left:auto 推到右側、貼 CTA）2026-06-16
+   原為絕對置中（無視鄰居、窄螢幕易疊）；nav 選項收斂後改靠右流式群組 ──── */
 .nav__links {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    margin-left: auto;
     display: flex;
     align-items: center;
     gap: clamp(24px, 3vw, 44px);
@@ -192,7 +194,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin-left: auto;  /* 強制推到右側 */
+    /* 右側群組由 .nav__links margin-left:auto 統一推動（2026-06-16；原 cta 自帶 auto 已移除避免雙 auto） */
     font-family: var(--f-serif-cjk);
     font-size: 14px;
     font-weight: 500;
@@ -284,6 +286,7 @@
 @media (max-width: 900px) {
     /* 桌機 nav__links / nav__cta 隱藏；mobile 改用 hamburger 抽屜 */
     .site-nav .nav__links,
+    .site-nav .nav__divider,
     .site-nav .nav__cta {
         display: none;
     }
@@ -590,149 +593,40 @@
     color: var(--c-muted);
 }
 
-.tag--yellow {
-    border-color: rgba(var(--c-yellow-rgb), 0.4);
-    background: rgba(var(--c-yellow-rgb), 0.08);
-    color: var(--c-yellow);
-}
-
-/* Size modifier — 卡片內標籤縮小變體 */
-.tag--xs {
-    font-size: 0.65rem;
-    padding: 0.22rem 0.6rem;
-}
-
 
 /* ════════════════════════════════════════════════════════════
    5. Section 標題區塊
    ════════════════════════════════════════════════════════════ */
 
+/* 2026-06-23 標題碑銘式精修（由 index-rain-preview 併入）：
+   主標換品牌明朝 Chiron Sung、字重降至 600、字距開為 +0.05em，
+   避免誤吃全站 h2 的 Noto Sans 900 黑體變呆版。 */
 .section-header {
-    margin-bottom: var(--sp-lg);
+    margin-bottom: 2.6rem;
 }
 
 .section-header__eyebrow {
     font-family: var(--f-serif);
-    font-size: var(--fs-xs);
-    font-weight: 700;
-    letter-spacing: 0.2em;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.32em;
     text-transform: uppercase;
-    color: var(--c-yellow);
-    margin-bottom: var(--sp-sm);
+    color: rgba(var(--c-yellow-rgb), 0.72);
+    margin-bottom: 0.9rem;
 }
 
 .section-header__title {
-    color: var(--c-white);
+    font-family: var(--f-serif-cjk);
+    font-weight: 600;
+    font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+    line-height: 1.15;
+    letter-spacing: 0.05em;
+    color: rgba(var(--c-stellar-rgb), 0.96);
 }
 
 .section-header__title .accent {
     color: var(--c-yellow);
-}
-
-
-/* ════════════════════════════════════════════════════════════
-   6. 服務卡片 (Service Card — 2026-05-07 極簡編輯陳列)
-   結構：[head: label] → [body: title + desc + tag] → [arrow]
-   設計判斷：移除編號 / icon 等視覺主錨，靠 Liquid Glass 質感 + 字型對位 +
-            留白建立品牌識別。服務區是「陳列、選擇」性質，不該爆破。
-   字型對位：
-     - label = JetBrains Mono 黃色 + 上方冷光分隔線（呼應全站冷光線語言）
-     - title = Chiron Sung HK 中文（呼應 Hero h1 主標）
-     - desc = Noto Sans TC（內文）
-     - arrow = Italiana italic「Read more」+ 線條延展
-   ════════════════════════════════════════════════════════════ */
-
-.service-card {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-md);
-    cursor: pointer;
-    text-decoration: none;
-    color: var(--c-white);
-}
-
-/* 內容推到 .card ::before/::after 之上（Liquid Glass 折射層在底） */
-.service-card > * {
-    position: relative;
-    z-index: 1;
-}
-
-.service-card__head {
-    display: flex;
-}
-
-/* label：上方冷光分隔線 + mono uppercase 黃色（取代「左 border」用「上 border」） */
-.service-card__label {
-    font-family: var(--f-mono);
-    font-size: var(--fs-xs);
-    color: var(--c-yellow);
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    padding-top: var(--sp-xs);
-    border-top: 1px solid rgba(var(--c-yellow-rgb), 0.45);
-    line-height: 1.4;
-    align-self: flex-start;  /* 限制寬度貼齊文字、避免上分隔線拉滿整列 */
-}
-
-/* 中段：title + desc 緊湊群組 */
-.service-card__body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-xs);
-}
-
-.service-card__title {
-    font-family: var(--f-serif-cjk);
-    font-size: var(--fs-xl);
-    font-weight: 500;
-    line-height: 1.3;
-    letter-spacing: -0.005em;
-    color: var(--c-stellar);
-}
-
-.service-card__desc {
-    font-size: var(--fs-sm);
-    color: var(--c-muted);
-    line-height: 1.7;
-}
-
-/* 底部 arrow：Italiana italic 「Read more」+ 線條延展（hover 時拉長變黃） */
-.service-card__arrow {
-    margin-top: auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.7rem;
-    font-family: var(--f-display-en);
-    font-style: italic;
-    font-size: var(--fs-md);
-    color: rgba(var(--c-stellar-rgb), 0.85);
-    letter-spacing: 0.02em;
-    transition: color var(--t-fast);
-}
-
-.service-card__arrow-line {
-    display: inline-block;
-    width: 28px;
-    height: 1px;
-    background: rgba(var(--c-stellar-rgb), 0.55);
-    transition: width var(--t-base), background var(--t-base);
-}
-
-.card:hover .service-card__arrow {
-    color: var(--c-yellow);
-}
-
-.card:hover .service-card__arrow-line {
-    width: 56px;
-    background: rgba(var(--c-yellow-rgb), 0.8);
-}
-
-/* D 顧問卡的 tag row（「詢價制」黃 tag 容器） */
-.service-card__tag-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    margin: var(--sp-xs) 0;
+    font-weight: 700;
 }
 
 

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服務效果第二批 13–18｜創巢數位</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --cyan:0,200,255; --blue:23,54,245; --yellow:255,199,9; --stellar:225,235,255; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:"Noto Sans TC",sans-serif; background:#05070f; color:rgba(var(--stellar),.92); overflow-x:hidden; }
+  body::before{ content:''; position:fixed; inset:0; z-index:-2; background:radial-gradient(circle at 50% 30%, #14213f 0%, #0a1226 50%, #05070f 100%); }
+  body::after{ content:''; position:fixed; inset:0; z-index:-1; opacity:.4; pointer-events:none;
+    background-image:radial-gradient(1.3px 1.3px at 18% 22%,#fff,transparent),radial-gradient(1.1px 1.1px at 72% 35%,#bfe6ff,transparent),
+      radial-gradient(1px 1px at 42% 72%,#fff,transparent),radial-gradient(1.2px 1.2px at 86% 60%,#fff,transparent); }
+  section{ position:relative; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:90px 20px; overflow:hidden; }
+  .sectag{ position:absolute; top:24px; left:50%; transform:translateX(-50%); z-index:9; font-family:"JetBrains Mono",monospace;
+    font-size:12px; letter-spacing:.14em; color:#06121e; background:rgba(var(--cyan),.85); padding:5px 14px; border-radius:5px; white-space:nowrap; }
+  .stitle{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.5rem,3vw,2.2rem); text-align:center; margin-bottom:6px; }
+  .ssub{ font-size:.9rem; color:rgba(var(--stellar),.55); text-align:center; margin-bottom:42px; }
+
+  /* 13 */
+  #c13{ position:absolute; inset:0; width:100%; height:100%; z-index:0; }
+  .s13 .stitle,.s13 .ssub{ position:relative; z-index:2; }
+  .s13 .ey{ position:relative; z-index:2; font-family:"JetBrains Mono",monospace; letter-spacing:.28em; font-size:12px; color:rgba(var(--yellow),.9); margin-bottom:12px; }
+
+  /* 14 */
+  #rcv{ width:min(340px,80vw); aspect-ratio:200/260; border-radius:12px; border:1px solid rgba(var(--cyan),.35); cursor:crosshair; image-rendering:auto; box-shadow:0 20px 50px rgba(0,0,0,.5); }
+
+  /* 15 */
+  .scr{ display:flex; flex-direction:column; gap:18px; align-items:center; }
+  .scr b{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:clamp(1.8rem,4vw,3rem); color:rgba(var(--stellar),.97); letter-spacing:.02em; }
+  .scr .en{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.2em; color:rgba(var(--cyan),.7); }
+
+  /* 16 */
+  .tilt-row{ display:flex; gap:30px; flex-wrap:wrap; justify-content:center; perspective:1000px; }
+  .tilt{ width:280px; height:360px; border-radius:16px; position:relative; transform-style:preserve-3d; transition:transform .15s ease-out;
+    background:linear-gradient(160deg, rgba(14,28,52,.95), rgba(8,18,36,.96)); border:1.5px solid rgba(var(--cyan),.4); padding:32px; cursor:pointer;
+    box-shadow:0 24px 50px rgba(0,0,0,.5); }
+  .tilt .glare{ position:absolute; inset:0; border-radius:16px; pointer-events:none; opacity:0; transition:opacity .2s;
+    background:radial-gradient(circle at var(--gx,50%) var(--gy,50%), rgba(var(--cyan),.4), transparent 45%); }
+  .tilt:hover .glare{ opacity:1; }
+  .tilt .lab{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.16em; color:rgba(var(--yellow),.9); }
+  .tilt .t{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.7rem; margin-top:20px; color:#fff; }
+  .tilt .d{ font-size:.88rem; line-height:1.8; color:rgba(var(--stellar),.75); margin-top:14px; }
+
+  /* 17 */
+  .s17{ cursor:grab; } .s17:active{ cursor:grabbing; }
+  .canvas-wrap{ position:absolute; inset:0; overflow:hidden; }
+  .plane{ position:absolute; left:50%; top:50%; width:0; height:0; will-change:transform; }
+  .pnode{ position:absolute; transform:translate(-50%,-50%); padding:20px 30px; border-radius:14px; white-space:nowrap;
+    background:linear-gradient(135deg, rgba(var(--cyan),.14), rgba(var(--blue),.24)); border:1.5px solid rgba(var(--cyan),.45);
+    font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.3rem; color:rgba(var(--stellar),.96); box-shadow:0 10px 30px rgba(0,0,0,.4); }
+  .pnode span{ display:block; font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.14em; color:rgba(var(--cyan),.7); margin-top:4px; }
+  .s17 .hint17{ position:absolute; bottom:40px; z-index:5; font-family:"JetBrains Mono",monospace; font-size:12px; color:rgba(var(--stellar),.5); }
+
+  /* 18 */
+  .spot-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; width:min(1020px,94vw); }
+  .spot{ position:relative; border-radius:16px; padding:36px 32px; min-height:300px; display:flex; flex-direction:column;
+    background:rgba(10,18,34,.6); border:1px solid rgba(var(--stellar),.1); overflow:hidden; }
+  .spot::before{ content:''; position:absolute; inset:0; border-radius:16px; padding:1.5px;
+    background:radial-gradient(280px circle at var(--mx,-100px) var(--my,-100px), rgba(var(--cyan),.9), transparent 60%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; opacity:.9; }
+  .spot::after{ content:''; position:absolute; inset:0; border-radius:16px;
+    background:radial-gradient(240px circle at var(--mx,-100px) var(--my,-100px), rgba(var(--cyan),.08), transparent 60%); }
+  .spot .lab{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.16em; color:rgba(var(--yellow),.9); position:relative; z-index:2; }
+  .spot .t{ font-family:"Noto Serif TC",serif; font-weight:600; font-size:1.6rem; margin-top:16px; color:rgba(var(--stellar),.98); position:relative; z-index:2; }
+  .spot .d{ font-size:.88rem; line-height:1.8; color:rgba(var(--stellar),.72); margin-top:auto; position:relative; z-index:2; }
+
+  .nav{ position:fixed; right:16px; bottom:14px; z-index:30; font-family:"JetBrains Mono",monospace; font-size:11px; color:rgba(var(--stellar),.5); }
+</style>
+</head>
+<body>
+
+<section class="s13"><span class="sectag">#13 3D 玻璃/鉻金材質場景 · WebGL</span>
+  <canvas id="c13"></canvas>
+  <div class="ey">OUR SERVICES</div>
+  <h2 class="stitle">把有質感的東西，放進宇宙裡</h2>
+  <p class="ssub">透明玻璃與鏡面鉻金幾何體漂浮折射（Three.js transmission + chrome）</p>
+</section>
+
+<section><span class="sectag">#14 滑鼠水波漣漪 · 戳一下水面</span>
+  <h2 class="stitle">每個服務都是一池水</h2>
+  <p class="ssub">滑鼠移過畫面 → 漣漪擴散、折射扭曲（canvas 2D 波場模擬）</p>
+  <canvas id="rcv"></canvas>
+</section>
+
+<section><span class="sectag">#15 文字解碼 scramble · 進視野解碼</span>
+  <h2 class="stitle">服務名，從亂碼解出來</h2>
+  <p class="ssub">進入視野時像終端機跳字、settle 成服務名</p>
+  <div class="scr" id="scrWrap"></div>
+</section>
+
+<section><span class="sectag">#16 3D 傾斜視差卡 · 滑鼠移上去</span>
+  <h2 class="stitle">卡片跟著你的視線傾斜</h2>
+  <p class="ssub">隨滑鼠 3D 傾斜 + 表面全像光澤</p>
+  <div class="tilt-row" id="tiltRow"></div>
+</section>
+
+<section class="s17"><span class="sectag">#17 無限拖曳畫布 · 拖曳漫遊</span>
+  <div class="canvas-wrap"><div class="plane" id="plane"></div></div>
+  <div class="hint17">在宇宙裡拖曳漫遊，找你要的服務 →</div>
+</section>
+
+<section><span class="sectag">#18 聚光燈邊框 · 暗場精緻</span>
+  <h2 class="stitle">服務藏在暗處，光到才現形</h2>
+  <p class="ssub">卡片邊框只在游標附近被點亮（Linear/Vercel 風）</p>
+  <div class="spot-row" id="spotRow"></div>
+</section>
+
+<div class="nav">第二批 13–18 · <b>13/14 偏重、15–18 輕量</b></div>
+
+<script type="importmap">
+{ "imports": { "three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const SERVICES=[
+  {t:'社群經營',e:'SOCIAL',d:'替你想清楚要說什麼。'},
+  {t:'網站架設',e:'WEBSITE',d:'3 秒內讓人記住你。'},
+  {t:'AI 虛擬網紅',e:'AI TALENT',d:'永遠不下班的代言人。'},
+  {t:'客製系統',e:'SYSTEM',d:'說得出來就寫得出來。'},
+  {t:'跳動E投放',e:'PLATFORM',d:'最快 24 小時開通。'},
+  {t:'產業顧問',e:'CONSULT',d:'先診斷，再決定方向。'},
+];
+const visible=(el,cb)=>new IntersectionObserver(es=>es.forEach(e=>cb(e.isIntersecting)),{threshold:.15}).observe(el);
+
+// ── #13 Three.js 玻璃/鉻金 ──
+(function(){
+  const canvas=document.getElementById('c13');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1;
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(42,1,0.1,100); camera.position.set(0,0,9);
+  const pmrem=new THREE.PMREMGenerator(renderer); scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
+  const glass=new THREE.MeshPhysicalMaterial({transmission:1,thickness:1.5,ior:1.4,roughness:.05,metalness:0,dispersion:2.5,
+    attenuationColor:new THREE.Color(0x9fe8ff),attenuationDistance:6,clearcoat:1,envMapIntensity:1.3,transparent:true});
+  const chrome=new THREE.MeshStandardMaterial({metalness:1,roughness:.06,color:0xcfeaff,envMapIntensity:1.6});
+  const objs=[
+    new THREE.Mesh(new THREE.TorusKnotGeometry(1,.34,160,32),glass),
+    new THREE.Mesh(new THREE.IcosahedronGeometry(1.15,0),chrome),
+    new THREE.Mesh(new THREE.SphereGeometry(.95,48,48),glass),
+  ];
+  objs[0].position.set(-3.1,.6,0); objs[1].position.set(3.0,-.4,-1); objs[2].position.set(.2,1.4,-.5);
+  objs.forEach(o=>scene.add(o));
+  const key=new THREE.DirectionalLight(0xffffff,2.2); key.position.set(5,6,5); scene.add(key);
+  const rim=new THREE.DirectionalLight(0x2a6cff,1.4); rim.position.set(-6,-2,3); scene.add(rim);
+  let on=true; visible(canvas,v=>on=v);
+  function resize(){ const r=canvas.getBoundingClientRect(); renderer.setSize(r.width,r.height,false); camera.aspect=r.width/r.height; camera.updateProjectionMatrix(); }
+  resize(); addEventListener('resize',resize);
+  let mx=0,my=0; addEventListener('pointermove',e=>{ mx=(e.clientX/innerWidth-.5); my=(e.clientY/innerHeight-.5); });
+  let t=0; (function loop(){ requestAnimationFrame(loop); if(!on) return; t+=.01;
+    objs.forEach((o,i)=>{ o.rotation.x+=.004+i*.001; o.rotation.y+=.006; o.position.y+=Math.sin(t+i*2)*.003; });
+    camera.position.x+=((mx*1.4)-camera.position.x)*.05; camera.position.y+=((-my*1)-camera.position.y)*.05; camera.lookAt(0,0,0);
+    renderer.render(scene,camera); })();
+})();
+
+// ── #14 canvas 水波漣漪 ──
+(function(){
+  const cv=document.getElementById('rcv'); const RW=220,RH=286; cv.width=RW; cv.height=RH;
+  const ctx=cv.getContext('2d',{willReadFrequently:true});
+  let src=null,ready=false; const img=new Image(); img.crossOrigin='anonymous'; img.src='https://picsum.photos/seed/rippleNest/220/286';
+  img.onload=()=>{ ctx.drawImage(img,0,0,RW,RH); src=ctx.getImageData(0,0,RW,RH); ready=true; };
+  let cur=new Float32Array(RW*RH), prev=new Float32Array(RW*RH), on=true; visible(cv,v=>on=v);
+  cv.addEventListener('pointermove',e=>{ const r=cv.getBoundingClientRect(); const x=((e.clientX-r.left)/r.width*RW)|0, y=((e.clientY-r.top)/r.height*RH)|0;
+    for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){ const xx=x+dx,yy=y+dy; if(xx>1&&xx<RW-1&&yy>1&&yy<RH-1) prev[yy*RW+xx]+=120; } });
+  (function loop(){ requestAnimationFrame(loop); if(!ready||!on) return;
+    const out=ctx.createImageData(RW,RH), o=out.data, s=src.data;
+    for(let y=1;y<RH-1;y++) for(let x=1;x<RW-1;x++){ const i=y*RW+x;
+      let v=(prev[i-1]+prev[i+1]+prev[i-RW]+prev[i+RW])*.5 - cur[i]; v*=.96; cur[i]=v;
+      const xo=((prev[i-1]-prev[i+1]))|0, yo=((prev[i-RW]-prev[i+RW]))|0;
+      let sx=x+xo, sy=y+yo; sx=sx<0?0:sx>=RW?RW-1:sx; sy=sy<0?0:sy>=RH?RH-1:sy;
+      const si=(sy*RW+sx)<<2, di=i<<2; o[di]=s[si]; o[di+1]=s[si+1]; o[di+2]=s[si+2]; o[di+3]=255; }
+    ctx.putImageData(out,0,0); const tmp=cur; cur=prev; prev=tmp; })();
+})();
+
+// ── #15 scramble ──
+(function(){
+  const wrap=document.getElementById('scrWrap'); const CH='アイウ◇△□01ZXCV#@$%&';
+  const rows=SERVICES.slice(0,4).map(s=>{ const d=document.createElement('div'); d.innerHTML=`<b data-final="${s.t}">${s.t}</b><div class="en">${s.e}</div>`; wrap.appendChild(d); return d.querySelector('b'); });
+  let done=false;
+  function run(){ if(done) return; done=true; rows.forEach((b,k)=>{ const fin=b.dataset.final; let f=0;
+    const iv=setInterval(()=>{ b.textContent=fin.split('').map((c,i)=> i< (f-k*6)/3 ? c : CH[(Math.random()*CH.length)|0]).join('');
+      f++; if(f> fin.length*3+k*6){ b.textContent=fin; clearInterval(iv); } },45); }); }
+  visible(wrap,v=>{ if(v) run(); });
+})();
+
+// ── #16 tilt ──
+(function(){
+  const row=document.getElementById('tiltRow');
+  SERVICES.slice(0,3).forEach(s=>{ const c=document.createElement('div'); c.className='tilt';
+    c.innerHTML=`<div class="glare"></div><div class="lab">${s.e}</div><div class="t">${s.t}</div><div class="d">${s.d}</div>`;
+    c.addEventListener('pointermove',e=>{ const r=c.getBoundingClientRect(); const px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+      c.style.transform=`rotateY(${(px-.5)*18}deg) rotateX(${-(py-.5)*18}deg)`;
+      c.querySelector('.glare').style.setProperty('--gx',px*100+'%'); c.querySelector('.glare').style.setProperty('--gy',py*100+'%'); });
+    c.addEventListener('pointerleave',()=>c.style.transform='rotateY(0) rotateX(0)'); row.appendChild(c); });
+})();
+
+// ── #17 無限拖曳畫布 ──
+(function(){
+  const sec=document.querySelector('.s17'), plane=document.getElementById('plane');
+  const positions=[[-360,-160],[180,-240],[420,40],[-180,200],[80,120],[-440,60],[300,-60],[-60,-300],[460,260],[-300,-280],[140,320],[-480,-120]];
+  positions.forEach((p,i)=>{ const s=SERVICES[i%SERVICES.length]; const n=document.createElement('div'); n.className='pnode';
+    n.innerHTML=`${s.t}<span>${s.e}</span>`; n.style.left=p[0]+'px'; n.style.top=p[1]+'px'; plane.appendChild(n); });
+  let x=0,y=0,vx=0,vy=0,dragging=false,sx=0,sy=0,ox=0,oy=0;
+  sec.addEventListener('pointerdown',e=>{ dragging=true; sx=e.clientX; sy=e.clientY; ox=x; oy=y; sec.setPointerCapture(e.pointerId); });
+  sec.addEventListener('pointermove',e=>{ if(!dragging) return; const nx=ox+(e.clientX-sx), ny=oy+(e.clientY-sy); vx=nx-x; vy=ny-y; x=nx; y=ny; });
+  sec.addEventListener('pointerup',()=>dragging=false);
+  let on=true; visible(sec,v=>on=v);
+  (function loop(){ requestAnimationFrame(loop); if(!on) return; if(!dragging){ x+=vx; y+=vy; vx*=.93; vy*=.93; }
+    plane.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`; })();
+})();
+
+// ── #18 spotlight border ──
+(function(){
+  const row=document.getElementById('spotRow');
+  SERVICES.slice(0,3).forEach(s=>{ const c=document.createElement('div'); c.className='spot';
+    c.innerHTML=`<div class="lab">${s.e}</div><div class="t">${s.t}</div><div class="d">${s.d}</div>`;
+    c.addEventListener('pointermove',e=>{ const r=c.getBoundingClientRect(); c.style.setProperty('--mx',(e.clientX-r.left)+'px'); c.style.setProperty('--my',(e.clientY-r.top)+'px'); });
+    row.appendChild(c); });
+})();
+</script>
+</body>
+</html>
