@@ -8,7 +8,7 @@
       const DATA=[
         { key:'social', n:'01', cjk:'社群經營', en:'SOCIAL', echo:'Your brand, always on.',
           lead:'不只是代發文。策略、內容、發布、互動、數據，一條龍把帳號養成會自己長大的品牌資產。',
-          social:true, art:'assets/images/services/social-mix-a2.png',
+          social:true, art:'assets/images/services/social-mix-a2.webp',
           acts:'<b>海巡漲粉</b> · <b>內容製作</b>（圖文/短影音）· <b>互動經營</b> · <b>數據追蹤</b>',
           plans:[
             {n:'基礎行銷', p:'NT$3,800', u:'/月', d:'4 篇圖文 · 維持品牌曝光'},
@@ -18,14 +18,14 @@
         },
         { key:'blog', n:'02', cjk:'部落格代營運', en:'SEO CONTENT', echo:'Traffic that compounds.',
           lead:'用自動化內容產線，為你建立並長期經營 SEO 部落格，讓搜尋與 AI 都找得到你，把網站養成會自己長流量的引流資產。',
-          art:'assets/images/services/blog4-b.png',
+          art:'assets/images/services/blog4-b.webp',
           flow:'<b>選題對準搜尋意圖</b> · <b>AI 輔助產文</b> · <b>SEO/GEO 結構化</b> · <b>自動發布＋收錄追蹤</b>',
           proof:[{n:'16',l:'專責 AI 代理'},{n:'60+',l:'道品質把關'},{n:'5',l:'站自有實證'}],
           price:'依規模規劃 · 訂閱式長期經營',
         },
         { key:'ads', n:'03', cjk:'廣告投放', en:'PAID ADS', echo:'Spend that performs.',
           lead:'跨 FB/IG/TikTok 代客操盤，含影片與短影音廣告，把每一塊投放預算都盯成看得見的成效。',
-          art:'assets/images/services/ads2-a.png',
+          art:'assets/images/services/ads2-a.webp',
           flow:'<b>素材企劃</b>（含影片/短影音）· <b>帳號設定</b> · <b>出價優化</b> · <b>成效回報</b>',
           flowLabel:'操盤流程',
           proof:[{n:'3',l:'平台同步代操'},{n:'10–25%',l:'成效抽成'},{n:'4',l:'步驟全包'}],
@@ -33,14 +33,14 @@
         },
         { key:'ai', n:'04', cjk:'AI 形象網紅', en:'AI TALENT', echo:'A face that never tires.',
           lead:'為企業打造可長期經營的專屬虛擬代言人，無出鏡包袱、形象完全可控。標準只有一個：做到沒有 AI 感。',
-          art:'assets/images/services/ai-particle-a-sq.png',
+          art:'assets/images/services/ai-particle-a-sq.webp',
           flow:'<b>人設與世界觀</b> · <b>視覺形象</b> · <b>長期內容經營</b> · <b>角色版權歸品牌</b>',
           flowLabel:'角色系統',
           proof:[{n:'3',l:'倍互動率勝真人'},{n:'100%',l:'形象可控'},{n:'0',l:'真人翻車風險'}],
           price:'詢價制', bgs:400,
         },
       ];
-      const MURAL='mural-j.png';
+      const MURAL='mural-j.webp';
       const acc=root.querySelector('.acc');
       DATA.forEach((s,i)=>{
         const p=document.createElement('div');
