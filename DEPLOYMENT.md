@@ -87,7 +87,9 @@ npx --yes wrangler@latest pages deploy . --project-name=nestdigitalai --branch=m
 - NEW創巢官網 本地 `.claude/secrets.local.env` **不存在也不該建**，避免 token 散落多處增加洩漏風險
 - 此規範同步寫進 `~/.claude/projects/.../memory/project_nestdigital.md`，未來 session 自動知道
 
-## 五、自動部署（2026-05-12 啟用：GitHub Actions + wrangler）
+## 五、自動部署（2026-05-12 建立 workflow；2026-06-24 22:30 首次成功上線：GitHub Actions + wrangler）
+
+> **⚠ 重要校正**：workflow 檔 2026-05-12 就建好，但**兩個 repo secret 一直沒實際設定**，故 2026-05～06 期間每次 push main 的 GHA deploy job **全部失敗**（`CLOUDFLARE_API_TOKEN not set`）、線上一直靠手動部署。**2026-06-24 22:30 才補上 secret、首次 GHA 自動部署成功**（改版＋部落格上線）。教訓：GitHub secret 是 per-repo、不跟著帳號或其他 repo 走，新 repo 必須各自設一次（見 memory [[project_nestdigital_deploy]]）。
 
 **為什麼不走 Cloudflare 原生 Git Integration**：`nestdigitalai` project 當初用 Direct Upload mode 建立、官方規定 Direct Upload 與 Git Integration mode **不可互轉**（[Cloudflare docs](https://developers.cloudflare.com/pages/get-started/direct-upload/)）。若要 Git Integration 必須砍掉重建 project + 移轉自訂網域 + 失去現有 8 個 deployment 快照（a25dbace 等永久 URL 全失效）—— 切換代價過大。
 

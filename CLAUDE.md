@@ -141,9 +141,11 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 | 12b | ~~7 個服務頁正式內容填充（取代 teaser）~~ | ❌ 退役（2026-06-15 20:49 IA 決策：服務不另開頁，見下方「資訊架構（IA）決策」） |
 | 13 | 內容填充（作品截圖、角色圖等素材） | 🔲 待完成（等素材提供） |
 | 14 | SEO / sitemap / Schema 更新 | 🔲 待完成 |
-| 15 | 測試與部署上線 | 🔲 待完成 |
+| 15 | 測試與部署上線 | ✅ 完成（2026-06-24 22:30 改版＋部落格已部署上線 nestdigitalai.com；push main 自動部署） |
 | 16 | 太空人角色敘事實作 | ✅ 完成（beat01-04 全上線 2026-05-10） |
 
+> **🟢 現況（2026-06-24 22:30）：改版＋部落格已部署上線 nestdigitalai.com。** 服務區（手風琴＋#dev CSS 3D 落雨）＋部落格暖紙檔案室皆 live；部署＝push `main` → GitHub Actions → Cloudflare Pages 自動部署（repo secret `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` 已設、首次成功上線）；quick-site 一鍵架站維持「未掛 nav、dormant」待後端就緒。服務圖已 PNG→WebP（見下「服務區現役狀態」）。**⚠ 下方各 banner（①–⑦）凡提到「未 push／未併 main／未部署／等 quick-site 才部署」均為當時狀態、已被本現況取代。** 部署細節見 `DEPLOYMENT.md`、memory [[project_nestdigital_deploy]]。
+>
 > **2026-06-23 17:43 整合＋手機 RWD 狀態更新（修正下方多處「未進正式 index.html」舊敘述）：**
 > ① **整合已完成**：數位行銷手風琴（3a）＋軟體開發三服務堆疊玻璃＋落雨（3b）皆已從 `index-rain-preview.html` 整進**正式 `index.html`** 的 5 層架構（commit `3d60a1b`/`5b77624`）。服務區各小節已於 2026-06-24 對齊現況、迭代史移入 `_archive/`（見下方「服務區現役狀態」）。
 > ② **數位行銷手風琴(3a) 手機 RWD 已完成**（`@media(max-width:820px)`）：單卡滑動牌組（取代橫向手風琴）＋點卡**全螢幕接管**（含 nav、z-9000、用 `:has(.acc.is-open)` 把 `.services-section`(z-1)＋`.accordion-wrap`(z-2) 抬出堆疊牢籠才蓋得掉 nav）＋宇宙天體導引點（星/月/日/土星 SVG）＋展開背景改全幅直式（`.bgart::after` 垂直遮罩＋各卡 `background-position`：social56/blog88露燈塔/ads72/ai46，4 張背景不重生）＋三行標題左緣對齊 Hero(補 1.5rem)＋外圈藍光 `--svc-halo` 加強。**桌機完全未動。** 完整脈絡見 memory `project_nestdigital_services_mobile_rwd`。
@@ -156,7 +158,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 > ① **部落格升正式頁**：暖紙「異常觀察檔案」從原型 `blog-archive.html` 升為**正式 `blog.html`＋`pages/blog.css`**（13 張 `arc-*` 卷宗素材從 `_imgtest/` 搬進版控 `assets/images/blog/`、CSS 9 處＋HTML 10 處路徑改寫；舊深色 editorial 版 `blog.html`/`blog.css` 退役；`coming-soon.css` 保留＝另 10 頁共用；nav.js 本就指 `blog.html` 不用改）。commit `e861c72`。**⚠ 下方 §「資訊架構（IA）決策」與「已存在的頁面檔案」中「`blog.html` ＝ coming-soon teaser（commit 63dcce6）」敘述已過時**——blog.html 現為正式部落格暖紙檔案室。內容層待辦：真連結（卡片仍 `#`）、OPEN FILE 內頁、遮蔽字 hover。
 > ② **導覽列跨頁對齊**：部落格 `.arc-nav` 幾何對齊首頁 `.site-nav`——同左右 inset `clamp(1.25rem,3vw,2.5rem)`＋同高 56px（部落格未載 base.css 故 scoped 補 `box-sizing:border-box`）＋連結間距/字距 0.1em＋右側群組改鏡像結構「連結組 │ 分隔線 │ 加寬 CTA」（聯絡我們獨立加寬、分隔線用 `--pen-blue` 部落格自有冷電藍校樣線）。創辦人決定：巢洞圖徽保留、按鈕落點對到首頁 ±10px（殘差＝部落格字型較窄，接受）。commit `b4376a3`。視覺風格各自保留（首頁深黑星空／部落格暖紙）。
 > ③ **改版已推 GitHub、仍未上線**：服務區改版＋部落格＋nav 對齊已 push 到 `origin/feature/water-card-native-integration`（HEAD `0650432`，純快進）。新增 `.assetsignore` 排除 `_imgtest`(167MB)／`demo-liquid`／dev preview 頁（commit `0650432`）供未來乾淨部署。**未併 main、未部署，線上 nestdigitalai.com 仍舊版。**
-> ④ **跨 session 狀況（重要）**：`origin/main` 比 feature 多 4 個 commit＝別處在做的 **quick-site 一鍵架站 AI 後端**（Cloudflare Pages Functions `functions/api/enhance.js`＋`submit.js` 用 Anthropic SDK＋committed node_modules）。**與本改版零檔案衝突**（feature 沒碰 quick-site/functions），可乾淨合併。創辦人決定：quick-site 後端**還在設計中**，這次**只推改版分支、不併 main、不部署**；待 quick-site 就緒＋Cloudflare 設好 API 金鑰後再「合併 main＋wrangler 部署」。完整脈絡見 memory [[project_nestdigital_blog]]、[[project_nestdigital_service_integration]]。
+> ④ **跨 session 狀況（重要）**：`origin/main` 比 feature 多 4 個 commit＝別處在做的 **quick-site 一鍵架站 AI 後端**（Cloudflare Pages Functions `functions/api/enhance.js`＋`submit.js` 用 Anthropic SDK＋committed node_modules）。**與本改版零檔案衝突**（feature 沒碰 quick-site/functions），可乾淨合併。創辦人決定：quick-site 後端**還在設計中**，這次**只推改版分支、不併 main、不部署**；待 quick-site 就緒＋Cloudflare 設好 API 金鑰後再「合併 main＋wrangler 部署」。完整脈絡見 memory [[project_nestdigital_blog]]、[[project_nestdigital_service_integration]]。〔2026-06-24 22:30 更新：此 gate 已解除——創辦人改為先部署改版＋部落格（quick-site 仍 dormant、未掛 nav）；Cloudflare repo secret 已設、feature 已併 main 並成功自動部署上線，quick-site 後端 Functions 隨 main 一起在但無入口。〕
 >
 > ⑦ **2026-06-24 18:49 軟體開發區 #dev 落雨拔 WebGL、改 CSS 3D 隧道（定版）**：#dev 程式碼落雨由 WebGL（Three.js r0.160）整套退場、改純 **CSS 3D 多層 DOM 隧道**（commit `30bfe6c` 機制換軌＋`18a0561` 碼字級隨視窗等比縮放）。`index-glass-stack.js` 再瘦身 **428→268 行**（移除 renderer/scene/camera/render loop/`QA_MODE`/`drawInnerRain`，僅保留切卡用的一次性 `requestAnimationFrame`；#dev 專用 three importmap 一併移除、星空全域 three r128 不動）。雨收成置中橫帶（高 ≈ 卡片高 ×1.08、非滿版）＋遠層依透視反向加寬「落雨廣度」＋定值柱數（傾斜時兩側遠景不變稀疏）＋背景 bgDim 壓暗求深邃＋L2 文字襯底由硬邊矩形改羽化暗暈（消可見直角）＋knum 數字實心金；切卡/傾斜/ghost 浮水印/grain/codebar 全保留。可即時調參沙盒＝`demo-liquid/dev-rain-css3d-sandbox.html`（與正式站同步定版）。**⚠ 上方 ⑤、下方「服務區現役狀態 3b」與現役紅線「驗證／落雨」皆已對齊本次**；任何「WebGL 落雨／`?qa=1`／`service-glass-codeRain.html` 羽化遮罩」敘述都是 WebGL 時期史料、勿再依循。commit 狀態：本地 `feature/water-card-native-integration`、**未 push／未併 main／未部署**（沿用等 quick-site 後端 gate）。完整參數脈絡見 commit `30bfe6c` body。
 
@@ -166,7 +168,7 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 
 對應任務 11b。服務區三塊已全整合進**正式 `index.html`**（5 層架構，commit `3d60a1b`/`5b77624`/`65582e4`）：
 
-- **3a 數位行銷手風琴**（`.svc-accordion`）：收合卡＝「月面碑刻」石板（背景 `assets/images/services/mural-j.png`、`.acc` 鎖 `aspect-ratio:1.55/1`）；展開態＝白底藝術背景＋深色字，四卡各綁背景圖（社群 `social-mix-a2`／部落格 `blog4-b`／廣告 `ads2-a`／AI `ai-particle-a-sq`，皆在 `assets/images/services/`）。手機 RWD＝單卡滑動牌組＋點卡全螢幕接管。
+- **3a 數位行銷手風琴**（`.svc-accordion`）：收合卡＝「月面碑刻」石板（背景 `assets/images/services/mural-j.webp`、`.acc` 鎖 `aspect-ratio:1.55/1`）；展開態＝白底藝術背景＋深色字，四卡各綁背景圖（社群 `social-mix-a2`／部落格 `blog4-b`／廣告 `ads2-a`／AI `ai-particle-a-sq`，皆 `.webp` 於 `assets/images/services/`）。手機 RWD＝單卡滑動牌組＋點卡全螢幕接管。〔2026-06-24 22:30 這 5 張圖由 PNG→WebP：11.9MB→1.1MB(-91%、PSNR≥35dB 視覺無損)；引用在 `index-accordion.js`、PNG 母檔已 git rm（git 歷史可還原）。動機＝手機載入卡頓、圖片量達業界中位數約 19×。〕
 - **3b 軟體開發**（`#dev`）：**斜卡片浮在深空程式碼雨前、無進場動畫**——切卡（左右滑/鍵盤/導引點）＋透視傾斜（−12°）。〔2026-06-24 18:49〕落雨機制已由 **WebGL（Three.js）整套退場、改純 CSS 3D 多層 DOM 隧道**（commit `30bfe6c`/`18a0561`）；`index-glass-stack.js` 再瘦身 **428→268 行**（移除 renderer/render loop/`QA_MODE`/`drawInnerRain`，僅留切卡用的一次性 rAF）。雨＝置中橫帶（高 ≈ 卡片高 ×1.08，非滿版）＋遠層透視反向加寬「落雨廣度」＋背景 bgDim 壓暗＋L2 文字襯底羽化暗暈＋碼字級隨視窗等比縮放（夾 0.66–1.2）。可調沙盒＝`demo-liquid/dev-rain-css3d-sandbox.html`（與正式站同步定版）。WebGL 玻璃/落雨版還原點＝git `442b261`/`93e3db4`/`65582e4`/`a7414dc`（純歷史、勿再依其做 WebGL）。**先前曾試 2D 落雨省效能→丟深邃感、又試全新 WebGL 進場動畫→否決**（脈絡見 memory [[project_nestdigital_dev_glass_card]]）。
 - **自有產品（跳動E／一鍵架站）**：🔲 待做（容器形式未選；避開「自動跑馬燈＋小圖示」公版味，用真截圖／影片）。
 
