@@ -13,3 +13,6 @@ demo-liquid
 generated_images
 _nocache_server.py
 # 開發/沙盒/測試 HTML（2026-06-23 清債已刪除實體檔，此處不再列舉）
+
+# 內部文件不對外部署（CLAUDE.md/DEPLOYMENT.md 含 Account/Zone ID、內部決策）2026-06-24
+*.md
