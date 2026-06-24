@@ -150,13 +150,15 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 > ③ **開發工具**：`?lite` URL 開關（`nav.js` 跳過 Three.js 星場、`index.js` 跳過太空人偵序列，省 GPU＋32MB；正式訪客不帶）；本機預覽 `_nocache_server.py`（選擇性 no-cache：只 css/js/html 不快取）。
 > ④ **commit 狀態（2026-06-23 20:37）**：3a 整合＋手機 RWD 已 commit（`3d60a1b`/`5b77624`/`55e42ec`）；軟體開發區玻璃退場已 commit（`65582e4`，見 ⑤）。全在 branch `feature/water-card-native-integration`、**未 push／未併 main／未部署**（線上仍舊玻璃版）。**剩**：自有產品區塊（跳動E／一鍵架站，容器形式未選）、對外推送/部署。
 >
-> ⑤ **2026-06-23 20:37 軟體開發區「玻璃」退場（創辦人拍板）**：拿掉 WebGL 玻璃面板（創辦人「被框架住、手機像冰箱展示櫃」），改服務文字浮**開放深色空間**＋程式碼雨在身後流動並**左右出血超過畫面邊界（順原傾角 −12°）**。做法＝`assets/js/pages/index-glass-stack.js` 加 `REMOVE_GLASS` 旗標隱藏 glass/edge/fresnel/back-pool/shadow/highlight（引擎保留、一旗標可還原）＋雨平面推後＋文字後方暗 pocket（求景深非純變暗）＋雨平面加寬 ~1.4×viewport 出血、去水平羽化留垂直；出血隨 resize 即時重算（RWD 彈性、欄數固定）。完整做法/雨參數見 commit `65582e4` body 與 memory [[project_nestdigital_dev_glass_card]] 頂 banner。**下方「軟體開發卡＝玻璃」各小節（攝影棚容器／三片堆疊玻璃／落雨對齊）皆成歷史紀錄、勿再依其做玻璃。** **驗證紅線：WebGL 驗收必用 `?qa=1` 強制繪製**（背景/非前景分頁 `document.hidden` 凍結 render loop、靜態截圖誤判「雨沒出來」——本輪最大時間黑洞）；**`?lite` 會把捲動卡在半路**（跳太空人序列時夾住 ScrollTrigger）、驗服務區別用 lite。
+> ⑤ **2026-06-23 20:37 軟體開發區「玻璃」退場（創辦人拍板）**：拿掉 WebGL 玻璃面板（創辦人「被框架住、手機像冰箱展示櫃」），改服務文字浮**開放深色空間**＋程式碼雨在身後流動並**左右出血超過畫面邊界（順原傾角 −12°）**。做法＝`assets/js/pages/index-glass-stack.js` 加 `REMOVE_GLASS` 旗標隱藏 glass/edge/fresnel/back-pool/shadow/highlight（引擎保留、一旗標可還原）＋雨平面推後＋文字後方暗 pocket（求景深非純變暗）＋雨平面加寬 ~1.4×viewport 出血、去水平羽化留垂直；出血隨 resize 即時重算（RWD 彈性、欄數固定）。完整做法/雨參數見 commit `65582e4` body 與 memory [[project_nestdigital_dev_glass_card]] 頂 banner。**下方「軟體開發卡＝玻璃」各小節（攝影棚容器／三片堆疊玻璃／落雨對齊）皆成歷史紀錄、勿再依其做玻璃。** **驗證紅線：WebGL 驗收必用 `?qa=1` 強制繪製**（背景/非前景分頁 `document.hidden` 凍結 render loop、靜態截圖誤判「雨沒出來」——本輪最大時間黑洞）；**`?lite` 會把捲動卡在半路**（跳太空人序列時夾住 ScrollTrigger）、驗服務區別用 lite。〔2026-06-24 18:49 更新：#dev 落雨此後已**拔 WebGL 改 CSS 3D 隧道**（見下方 ⑦），本則「WebGL／`?qa=1`」部分為當時史料、現役驗證紅線以下方為準。〕
 >
 > ⑥ **2026-06-23 22:15 部落格設計併入正式頁＋導覽列跨頁對齊＋改版已推 GitHub（仍未上線）**：
 > ① **部落格升正式頁**：暖紙「異常觀察檔案」從原型 `blog-archive.html` 升為**正式 `blog.html`＋`pages/blog.css`**（13 張 `arc-*` 卷宗素材從 `_imgtest/` 搬進版控 `assets/images/blog/`、CSS 9 處＋HTML 10 處路徑改寫；舊深色 editorial 版 `blog.html`/`blog.css` 退役；`coming-soon.css` 保留＝另 10 頁共用；nav.js 本就指 `blog.html` 不用改）。commit `e861c72`。**⚠ 下方 §「資訊架構（IA）決策」與「已存在的頁面檔案」中「`blog.html` ＝ coming-soon teaser（commit 63dcce6）」敘述已過時**——blog.html 現為正式部落格暖紙檔案室。內容層待辦：真連結（卡片仍 `#`）、OPEN FILE 內頁、遮蔽字 hover。
 > ② **導覽列跨頁對齊**：部落格 `.arc-nav` 幾何對齊首頁 `.site-nav`——同左右 inset `clamp(1.25rem,3vw,2.5rem)`＋同高 56px（部落格未載 base.css 故 scoped 補 `box-sizing:border-box`）＋連結間距/字距 0.1em＋右側群組改鏡像結構「連結組 │ 分隔線 │ 加寬 CTA」（聯絡我們獨立加寬、分隔線用 `--pen-blue` 部落格自有冷電藍校樣線）。創辦人決定：巢洞圖徽保留、按鈕落點對到首頁 ±10px（殘差＝部落格字型較窄，接受）。commit `b4376a3`。視覺風格各自保留（首頁深黑星空／部落格暖紙）。
 > ③ **改版已推 GitHub、仍未上線**：服務區改版＋部落格＋nav 對齊已 push 到 `origin/feature/water-card-native-integration`（HEAD `0650432`，純快進）。新增 `.assetsignore` 排除 `_imgtest`(167MB)／`demo-liquid`／dev preview 頁（commit `0650432`）供未來乾淨部署。**未併 main、未部署，線上 nestdigitalai.com 仍舊版。**
 > ④ **跨 session 狀況（重要）**：`origin/main` 比 feature 多 4 個 commit＝別處在做的 **quick-site 一鍵架站 AI 後端**（Cloudflare Pages Functions `functions/api/enhance.js`＋`submit.js` 用 Anthropic SDK＋committed node_modules）。**與本改版零檔案衝突**（feature 沒碰 quick-site/functions），可乾淨合併。創辦人決定：quick-site 後端**還在設計中**，這次**只推改版分支、不併 main、不部署**；待 quick-site 就緒＋Cloudflare 設好 API 金鑰後再「合併 main＋wrangler 部署」。完整脈絡見 memory [[project_nestdigital_blog]]、[[project_nestdigital_service_integration]]。
+>
+> ⑦ **2026-06-24 18:49 軟體開發區 #dev 落雨拔 WebGL、改 CSS 3D 隧道（定版）**：#dev 程式碼落雨由 WebGL（Three.js r0.160）整套退場、改純 **CSS 3D 多層 DOM 隧道**（commit `30bfe6c` 機制換軌＋`18a0561` 碼字級隨視窗等比縮放）。`index-glass-stack.js` 再瘦身 **428→268 行**（移除 renderer/scene/camera/render loop/`QA_MODE`/`drawInnerRain`，僅保留切卡用的一次性 `requestAnimationFrame`；#dev 專用 three importmap 一併移除、星空全域 three r128 不動）。雨收成置中橫帶（高 ≈ 卡片高 ×1.08、非滿版）＋遠層依透視反向加寬「落雨廣度」＋定值柱數（傾斜時兩側遠景不變稀疏）＋背景 bgDim 壓暗求深邃＋L2 文字襯底由硬邊矩形改羽化暗暈（消可見直角）＋knum 數字實心金；切卡/傾斜/ghost 浮水印/grain/codebar 全保留。可即時調參沙盒＝`demo-liquid/dev-rain-css3d-sandbox.html`（與正式站同步定版）。**⚠ 上方 ⑤、下方「服務區現役狀態 3b」與現役紅線「驗證／落雨」皆已對齊本次**；任何「WebGL 落雨／`?qa=1`／`service-glass-codeRain.html` 羽化遮罩」敘述都是 WebGL 時期史料、勿再依循。commit 狀態：本地 `feature/water-card-native-integration`、**未 push／未併 main／未部署**（沿用等 quick-site 後端 gate）。完整參數脈絡見 commit `30bfe6c` body。
 
 ---
 
@@ -165,18 +167,18 @@ Three.js (首頁) → GSAP + ScrollTrigger → core.js → nav.js → pages/[pag
 對應任務 11b。服務區三塊已全整合進**正式 `index.html`**（5 層架構，commit `3d60a1b`/`5b77624`/`65582e4`）：
 
 - **3a 數位行銷手風琴**（`.svc-accordion`）：收合卡＝「月面碑刻」石板（背景 `assets/images/services/mural-j.png`、`.acc` 鎖 `aspect-ratio:1.55/1`）；展開態＝白底藝術背景＋深色字，四卡各綁背景圖（社群 `social-mix-a2`／部落格 `blog4-b`／廣告 `ads2-a`／AI `ai-particle-a-sq`，皆在 `assets/images/services/`）。手機 RWD＝單卡滑動牌組＋點卡全螢幕接管。
-- **3b 軟體開發**（`#dev`）：**斜卡片浮在深空程式碼雨前、無進場動畫**——程式碼落雨左右出血（順傾角 −12°）＋切卡（左右滑/鍵盤/導引點）。〔2026-06-24 05:43〕玻璃機制原為 `REMOVE_GLASS=true` 藏而不刪，已確認永久退場後**整批刪除死碼**（隱藏 mesh/4 燈/bloom-SMAA/env map/`drawCodeTexture`），`index-glass-stack.js` **1221→428 行**（commit `a7414dc`），render loop 簡化為 `renderer.render`；落雨+切卡現役路徑零改動、`?qa=1` 驗證畫面一致。玻璃版還原靠 git 歷史（見下行）。**曾試把落雨改 2D 省效能→丟深邃感、又試全新 WebGL 進場動畫→否決，最後退回此原版**（脈絡見 memory [[project_nestdigital_dev_glass_card]]）。
+- **3b 軟體開發**（`#dev`）：**斜卡片浮在深空程式碼雨前、無進場動畫**——切卡（左右滑/鍵盤/導引點）＋透視傾斜（−12°）。〔2026-06-24 18:49〕落雨機制已由 **WebGL（Three.js）整套退場、改純 CSS 3D 多層 DOM 隧道**（commit `30bfe6c`/`18a0561`）；`index-glass-stack.js` 再瘦身 **428→268 行**（移除 renderer/render loop/`QA_MODE`/`drawInnerRain`，僅留切卡用的一次性 rAF）。雨＝置中橫帶（高 ≈ 卡片高 ×1.08，非滿版）＋遠層透視反向加寬「落雨廣度」＋背景 bgDim 壓暗＋L2 文字襯底羽化暗暈＋碼字級隨視窗等比縮放（夾 0.66–1.2）。可調沙盒＝`demo-liquid/dev-rain-css3d-sandbox.html`（與正式站同步定版）。WebGL 玻璃/落雨版還原點＝git `442b261`/`93e3db4`/`65582e4`/`a7414dc`（純歷史、勿再依其做 WebGL）。**先前曾試 2D 落雨省效能→丟深邃感、又試全新 WebGL 進場動畫→否決**（脈絡見 memory [[project_nestdigital_dev_glass_card]]）。
 - **自有產品（跳動E／一鍵架站）**：🔲 待做（容器形式未選；避開「自動跑馬燈＋小圖示」公版味，用真截圖／影片）。
 
 **現役紅線（務必守）：**
 - **形式即證明**：每個服務區塊用形式本身證明該服務能力（手風琴藝術感證明設計力、開發區程式碼藝術證明開發力）。
 - **受眾是一般大眾、非工程師**：技術素材要「藝術化」不是「IDE 工具化」（連犯兩次工程師向錯，見 memory [[feedback_audience_general_public]]）。
-- **WebGL 驗收必用 `?qa=1`**（背景分頁 `document.hidden` 凍結 render loop、靜態截圖誤判；`?lite` 會把捲動卡在半路，驗服務區別用 lite）。
-- **落雨**：別拿掉邊緣羽化遮罩（`destination-in` featherX 0.045／featherY 0.052）、別把 innerRain 改不透明／加 opaque 暗底；要改先對齊 `demo-liquid/service-glass-codeRain.html`，別憑空改參數（見 memory [[feedback_match_reference_dont_patch_diverged]]）。
+- **驗證**：#dev 落雨已 CSS 3D 化（無 render loop、`QA_MODE` 已移除、背景分頁不再凍結畫面，**不需也不再支援 `?qa=1`**）；但 **`?lite` 仍會把捲動卡在半路**（跳太空人序列時夾住 ScrollTrigger）、驗服務區別用 lite。星空背景仍是 WebGL（three r128）、與 #dev 落雨各自獨立。
+- **落雨**（CSS 3D 版）：別把置中橫帶改回滿版、別把 L2 文字襯底改回硬邊矩形（已否決、會露可見直角）、別拔掉「落雨廣度」遠層加寬（傾斜時兩側會變稀疏）；要改先對齊 `demo-liquid/dev-rain-css3d-sandbox.html`，別憑空改參數（見 memory [[feedback_match_reference_dont_patch_diverged]]）。〔WebGL 時期的 `destination-in` 羽化遮罩 featherX/featherY、`service-glass-codeRain.html` 對齊法已隨拔 WebGL 失效〕
 - **收合卡**：禁改回 2:1 或固定 height（會把 mural-j 橫向壓扁）；碑文別放大置中、別用墊底色塊（已否決）。太空人面癱不可愛、月坑要立體不要塑膠白。
 - **展開態**：人物一律台灣人；社群卡＝編輯式價格帳（細線條列、非促銷貼紙）；背景別塞滿保藝術感。
 
-> 完整視覺迭代脈絡（攝影棚→堆疊玻璃→玻璃退場、落雨怎麼壞怎麼修、收合卡碑文重校、展開態）見 `_archive/服務區視覺迭代史_2026-05~06.md` 與 commit body（`93e3db4`/`442b261`/`65582e4`）。WebGL 還原點：玻璃定稿打光值在 commit `93e3db4`、堆疊玻璃在 `442b261`、玻璃退場在 `65582e4`。
+> 完整視覺迭代脈絡（攝影棚→堆疊玻璃→玻璃退場→拔 WebGL 改 CSS 3D 隧道、落雨怎麼壞怎麼修、收合卡碑文重校、展開態）見 `_archive/服務區視覺迭代史_2026-05~06.md` 與 commit body（`93e3db4`/`442b261`/`65582e4`/`30bfe6c`）。**現役 #dev＝CSS 3D 隧道（commit `30bfe6c`/`18a0561`）。** WebGL 時期還原點（純歷史、勿再依其做 WebGL）：玻璃定稿打光 `93e3db4`、堆疊玻璃 `442b261`、玻璃退場 `65582e4`、玻璃死碼實刪 `a7414dc`。
 
 ---
 
