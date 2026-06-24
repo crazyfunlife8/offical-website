@@ -13,6 +13,3 @@ demo-liquid
 generated_images
 _nocache_server.py
 # 開發/沙盒/測試 HTML（2026-06-23 清債已刪除實體檔，此處不再列舉）
-
-# 服務手風琴圖的 PNG 母檔（2026-06-24 已轉 WebP 上線、現役引用 .webp）；保留母版於版控但不部署
-assets/images/services/*.png
