@@ -250,6 +250,8 @@
     const breadth=getNum('--breadth')||1.5;
     const barsPerCol=Math.max(1, Math.round(getNum('--barsPerCol'))||2);
     const dens=Math.round(getNum('--density'));
+    /* 落雨字級隨視窗等比縮放：取寬/高較小比例（參考 1440×820），夾在 0.66–1.2 */
+    const vScale=Math.min(1.2, Math.max(0.66, Math.min(window.innerWidth/1440, window.innerHeight/820)));
 
     for(let i=0;i<N;i++){
       const t = N>1 ? i/(N-1) : 0;          // 0=近 1=遠
@@ -267,7 +269,7 @@
       layer.style.filter=`brightness(${bright.toFixed(2)}) saturate(${sat.toFixed(2)}) blur(${blur.toFixed(2)}px)`;
       layer.style.zIndex = String(100 - i);
 
-      const fontPx = (15 - t*3).toFixed(1);
+      const fontPx = ((15 - t*3)*vScale).toFixed(1);   // 隨視窗等比縮放
       const dur = fall*(1 + par*i);          // 遠層更慢 = 視差
       /* 落雨廣度：遠層透視下縮小→橫向變窄，依視覺縮放反向加寬鋪設＋定值柱數，傾斜時兩側不空 */
       const apparentScale = comp * (persp/(persp + gap*i));   // ≤1，遠層更小

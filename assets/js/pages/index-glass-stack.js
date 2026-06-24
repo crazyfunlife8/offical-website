@@ -91,6 +91,8 @@
       const fall=getNum('--fall');
       const par=getNum('--parallax');
       const breadth=getNum('--breadth')||1.5;
+      /* 落雨字級隨視窗等比縮放：取寬/高較小比例（參考 1440×820），夾在 0.66–1.2 */
+      const vScale=Math.min(1.2, Math.max(0.66, Math.min(window.innerWidth/1440, window.innerHeight/820)));
       const isMobile=window.matchMedia('(max-width: 760px), (pointer: coarse)').matches;
       let dens=Math.round(getNum('--density'));
       if(isMobile) dens=Math.max(5, Math.round(dens*0.6));   // 手機降密度省效能
@@ -107,7 +109,7 @@
         layer.style.opacity=(1-t*0.18).toFixed(2);
         layer.style.filter=`brightness(${bright.toFixed(2)}) saturate(${sat.toFixed(2)}) blur(${blur.toFixed(2)}px)`;
         layer.style.zIndex=String(100-i);
-        const fontPx=(15-t*3).toFixed(1);
+        const fontPx=((15-t*3)*vScale).toFixed(1);            // 隨視窗等比縮放
         const dur=fall*(1+par*i);                             // 遠層更慢=視差
         /* 落雨廣度：遠層透視下縮小→橫向覆蓋變窄，依視覺縮放反向加寬 own-space 鋪設，
            讓每層在畫面上都覆蓋 breadth×視窗寬（>1 留邊，傾斜時兩側仍有遠景雨、不空）*/
