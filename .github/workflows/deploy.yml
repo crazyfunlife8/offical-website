@@ -17,6 +17,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 內部文件不對外部署：在 runner checkout 上移除（repo 保留；.assetsignore 對 pages deploy 無效，故在此 rm）
+      - name: Strip internal docs from deploy
+        run: rm -f *.md
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
