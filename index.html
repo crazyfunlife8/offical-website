@@ -185,13 +185,13 @@
 
 
         <!-- ════════════════════════════════════════════════
-             Section 3b｜服務 · 軟體開發（三服務堆疊玻璃 · WebGL r0.160）
-             內容由 index-glass-stack.js 動態注入；canvas 鎖在 #dev 一屏內
+             Section 3b｜服務 · 軟體開發（程式碼隧道 · CSS 3D 多層落雨，無 WebGL）
+             內容由 index-glass-stack.js 動態注入；雨層 DOM 鎖在 #dev 一屏內
         ════════════════════════════════════════════════ -->
         <section id="dev" aria-label="軟體開發服務">
             <div class="dev-glass-stack" id="devGlassStack">
                 <div class="dev-stack-stage" id="devCardStage">
-                    <canvas class="dev-stack-webgl" id="devStackWebgl" aria-hidden="true"></canvas>
+                    <div class="dev-rain3d" aria-hidden="true"><div class="dev-rain-scene" id="devRainScene"></div></div>
                     <div class="dev-stack-html-deck">
                         <div class="slot" id="devStackSlot"></div>
                         <div class="deck" id="devStackDeck"></div>
@@ -251,15 +251,7 @@
     <!-- Section 3a 數位行銷手風琴（classic IIFE，動態注入 4 卡） -->
     <script src="assets/js/pages/index-accordion.js"></script>
 
-    <!-- Section 3b 軟體開發堆疊玻璃（Three.js r0.160 ESM module；importmap 須在 module 前） -->
-    <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-      }
-    }
-    </script>
+    <!-- Section 3b 軟體開發 · 程式碼隧道（CSS 3D，無 WebGL；type=module 保留模組作用域隔離） -->
     <script type="module" src="assets/js/pages/index-glass-stack.js"></script>
 
 </body>

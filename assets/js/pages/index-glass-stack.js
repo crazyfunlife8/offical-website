@@ -1,22 +1,20 @@
 /* ============================================================
-   pages/index-glass-stack.js — 軟體開發開放程式碼空間（WebGL r0.160 module）
-   來源 index-rain-preview.html module（commit 442b261 引擎）。
-   2026-06-24 玻璃時代死碼整批移除：只留「程式碼落雨（2D canvas → WebGL 平面 innerRain）
-   + HTML 卡片切換（左右滑 / 鍵盤 / 導引點）」。玻璃版還原點見 git commit 442b261/93e3db4/65582e4。
-   保留 QA_MODE（URL gated、production 永為 false）。r0.160 走 importmap module、不碰 window.THREE。
+   pages/index-glass-stack.js — 軟體開發 · 程式碼隧道（CSS 3D，無 WebGL）
+   2026-06-24 WebGL 落雨退場 → CSS 3D 多層 DOM 落雨（demo-liquid/dev-rain-css3d-sandbox.html 定版）。
+   保留：3 服務卡切換（左右滑 / 鍵盤 / 導引點）、卡片透視傾斜、ghost/grain/codebar/knum/L2 襯底。
+   移除：整套 Three.js（renderer/scene/camera/glassGroup/drawInnerRain/render loop/QA_MODE）。
+   雨參數（persp/layers/gap/comp/fog/dof/fall/parallax/density）由 .dev-glass-stack CSS 變數帶入。
+   WebGL 玻璃/落雨版還原點：git commit 442b261 / 93e3db4 / 65582e4 / a7414dc。
+   type=module 載入：保留模組作用域，避免 top-level const 與 index.js 全域衝突（如 scene）。
    ============================================================ */
-    import * as THREE from 'three';
-
-    const urlParams=new URLSearchParams(window.location.search);
-    const QA_MODE=urlParams.get('qa')==='1';
-    /* 卡片傾角（CSS --tiltX/--tiltY 與 WebGL 落雨平面群組共用） */
-    const state={ tiltX:9, tiltY:-12 };
     const cssRoot=document.getElementById('devGlassStack');
-    const htmlCard=document.getElementById('devStackSlot');
     const devStage=document.getElementById('devCardStage');
+    const rainScene=document.getElementById('devRainScene');
     const prevBtn=document.getElementById('devCardPrev');
     const nextBtn=document.getElementById('devCardNext');
     const dotsWrap=document.getElementById('devCardDots');
+    const deck=document.getElementById('devStackDeck');
+
     const GRAIN=['const nest = createStudio()','export default function App(){','return <Section/>','await build(idea)','if(ready) ship()','render(art, code)','while(true){ create() }'].join('\n').repeat(8);
 
     /* 三服務內容（取自服務知識庫定稿；客製系統避用「流程自動化」措辭，免與 G 類採集混淆） */
@@ -31,7 +29,19 @@
         sub:'不急著買工具，先把數位這條路怎麼走想清楚。', ghost:'轉',
         svc:[['數位策略診斷','盤點現況、找出卡點'],['工具導入規劃','選對工具、不花冤枉錢'],['團隊數位賦能','讓人跟得上系統']] }
     ];
-    const deck=document.getElementById('devStackDeck');
+
+    /* 落雨碼字庫（沿用 #dev-rain / n4rain 血統） */
+    const CODE=[
+      'const nest = createStudio()','export default function App() {','<section class="services">',
+      'router.get("/api/orders", fn)','await db.clients.findMany()','npm run build && deploy',
+      'return <Card {...props} />','useEffect(() => render(), [])','if (user.ready) launch()',
+      'SELECT * FROM orders;','transform: translateY(-4px)','git commit -m "ship it"'
+    ];
+
+    const hash=(a,b)=>{ const x=Math.sin(a*127.1+b*311.7)*43758.5453; return x-Math.floor(x); };
+    const getNum=(k)=>parseFloat(getComputedStyle(cssRoot).getPropertyValue(k))||0;
+
+    /* ===== 建 3 張服務卡（ghost 浮水印 / grain / codebar / content：knum + lead + svccol）===== */
     const cardEls=CARDS.map((c,idx)=>{
       const el=document.createElement('article');
       el.className='html-card';
@@ -69,199 +79,65 @@
       return btn;
     });
 
-    const canvas=document.getElementById('devStackWebgl');
-    const renderer=new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true, powerPreference:'high-performance' });
-    renderer.outputColorSpace=THREE.SRGBColorSpace;
-    renderer.toneMapping=THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure=0.62;
-    renderer.useLegacyLights=false;
-    renderer.setClearColor(0x000000,0);
-    renderer.setClearAlpha(0);
-    const TARGET_FRAME_MS=1000/30;
-    const IS_MOBILE=window.matchMedia('(max-width: 760px), (pointer: coarse)').matches;
-    const PREFERS_REDUCED_MOTION=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const FX={
-      codeScale:IS_MOBILE ? 0.58 : 1,
-      codeFrameMs:IS_MOBILE ? 1000/14 : TARGET_FRAME_MS,
-      pixelRatioMax:IS_MOBILE ? 1.5 : 2
-    };
-
-    const scene=new THREE.Scene();
-    scene.background=null;
-    const camera=new THREE.PerspectiveCamera(34, 1, 0.1, 100);
-    camera.position.set(0,0,8.1);
-
-    /* 落雨平面群組（玻璃退場後保留：承載 innerRain 平面、套用卡片傾角） */
-    const glassDeckGroup=new THREE.Group();
-    scene.add(glassDeckGroup);
-    const glassGroup=new THREE.Group();
-    glassDeckGroup.add(glassGroup);
-
-    const hash=(a,b)=>{ const x=Math.sin(a*127.1+b*311.7)*43758.5453; return x-Math.floor(x); };
-
-    const CODE=[
-      'const nest = createStudio()','export default function App() {','<section class="services">',
-      'router.get("/api/orders", fn)','await db.clients.findMany()','npm run build && deploy',
-      'return <Card {...props} />','useEffect(() => render(), [])','if (user.ready) launch()',
-      'SELECT * FROM orders;','transform: translateY(-4px)','git commit -m "ship it"'
-    ];
-    /* ===== 卡內程式碼落雨：雨在深色空間流動（不透明深底+落雨碼 plane）
-       參數沿用既有程式碼落雨：spd 0.085–0.195（慢）、字級 18–26px、cyc/1.8、白頭+藍/青/金尾漸層（#dev-rain / n4rain 血統）。 */
-    const RAIN={ glow:0.84, density:40, speed:0.62, depth:0.78, spread:0.92, lead:0.04, pocket:0.52, pocketR:0.19, bleedX:1.4 };
-    const rainCanvas=document.createElement('canvas');
-    rainCanvas.width=1792; rainCanvas.height=600;
-    const rainCtx=rainCanvas.getContext('2d');
-    const rainTexture=new THREE.CanvasTexture(rainCanvas);
-    rainTexture.colorSpace=THREE.SRGBColorSpace;
-    rainTexture.minFilter=THREE.LinearFilter; rainTexture.magFilter=THREE.LinearFilter;
-    const rainCols=Array.from({length:96},(_,i)=>({
-      spd:0.085+hash(i,21)*0.11, ph:hash(i,22)*1.8, fs:18+(hash(i,23)*8|0), cyan:hash(i,24)<0.30, ye:hash(i,25)<0.12
-    }));
-    function drawInnerRain(time){
-      const W=rainCanvas.width, H=rainCanvas.height, ctx=rainCtx;
-      ctx.setTransform(1,0,0,1,0,0);
-      ctx.clearRect(0,0,W,H);
-      const bg=ctx.createLinearGradient(0,0,0,H);
-      bg.addColorStop(0,'#040a1e'); bg.addColorStop(0.52,'#050d2a'); bg.addColorStop(1,'#02060f');
-      ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
-      const glow=THREE.MathUtils.clamp(RAIN.glow,0,1.6);
-      const cols=Math.max(6, Math.round(RAIN.density * (W/1024)));
-      ctx.textBaseline='middle';
-      for(let c=0;c<cols;c++){
-        const col=rainCols[c % rainCols.length];
-        const codeInset=0;
-        const codeW=W;
-        const x=codeInset + codeW*(RAIN.lead + ((c+0.5)/cols)*RAIN.spread);
-        const raw=time*col.spd*RAIN.speed + col.ph;
-        const cyc=Math.floor(raw/1.8);
-        const prog=raw%1.8-0.25;
-        if(prog<0) continue;
-        const code=CODE[(c*5+cyc)%CODE.length];
-        ctx.font=col.fs+'px "JetBrains Mono",monospace';
-        const w=ctx.measureText(code).width;
-        const tipY=prog*H;
-        ctx.save();
-        ctx.translate(x,tipY);
-        ctx.rotate(-Math.PI/2);
-        ctx.textAlign='left';
-        const base=col.ye?'255,199,9':col.cyan?'0,200,255':'150,180,235';
-        const g=ctx.createLinearGradient(0,0,w,0);
-        g.addColorStop(0,'rgba(232,244,255,'+(0.92*glow*0.62)+')');
-        g.addColorStop(0.12,'rgba('+base+','+(0.78*glow*0.58)+')');
-        g.addColorStop(1,'rgba('+base+',0)');
-        ctx.fillStyle=g;
-        ctx.fillText(code,0,0);
-        ctx.restore();
-      }
-      /* 文字後方壓一塊暗 pocket，讓雨退到深處、前景文字坐在安靜深底上 */
-      ctx.save();
-      ctx.globalCompositeOperation='source-over';
-      const pk=RAIN.pocket, pkR=RAIN.pocketR;
-      const pocket=ctx.createRadialGradient(W*0.50,H*0.50,0,W*0.50,H*0.50,W*pkR);
-      pocket.addColorStop(0,'rgba(0,3,12,'+pk+')');
-      pocket.addColorStop(0.46,'rgba(1,7,22,'+(pk*0.66)+')');
-      pocket.addColorStop(0.78,'rgba(2,10,30,'+(pk*0.21)+')');
-      pocket.addColorStop(1,'rgba(2,10,30,0)');
-      ctx.fillStyle=pocket;
-      ctx.fillRect(0,0,W,H);
-      ctx.restore();
-      ctx.save();
-      ctx.globalCompositeOperation='destination-in';
-      const featherY=H*0.052;
-      /* 左右出血：不做水平羽化，讓程式碼流出畫面左右緣（仍保留上下羽化） */
-      const verticalMask=ctx.createLinearGradient(0,0,0,H);
-      verticalMask.addColorStop(0,'rgba(0,0,0,0)');
-      verticalMask.addColorStop(featherY/H,'rgba(0,0,0,1)');
-      verticalMask.addColorStop(1-featherY/H,'rgba(0,0,0,1)');
-      verticalMask.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=verticalMask;
-      ctx.fillRect(0,0,W,H);
-      ctx.restore();
-      rainTexture.needsUpdate=true;
-    }
-    function sizeInnerRain(card,w,h,depth){
-      if(!card.innerRain) return;
-      card.innerRain.geometry.dispose();
-      const rainDepth=THREE.MathUtils.clamp(RAIN.depth,0,0.98);
-      const z=-rainDepth*depth*0.86;
-      let planeW=w*1.08, planeH=h*1.08;
-      /* 左右延伸超過畫面邊界：依平面實際 z 算可視寬度再乘 bleedX；高度維持卡片高（只往左右延） */
-      const camDist=Math.abs(camera.position.z - z);
-      const fovRad=THREE.MathUtils.degToRad(camera.fov);
-      const visW=2*Math.tan(fovRad/2)*camDist*camera.aspect;
-      planeW=visW*(RAIN.bleedX||1.4);
-      card.innerRain.geometry=new THREE.PlaneGeometry(planeW,planeH,1,1);
-      card.innerRain.position.set(0,0,z);
-    }
-    const glassCards=[
-      { group:glassGroup, innerRain:null }
-    ];
-    for(const card of glassCards){
-      const mat=new THREE.MeshBasicMaterial({ map:rainTexture, toneMapped:false, transparent:true, depthWrite:true });
-      const mesh=new THREE.Mesh(new THREE.PlaneGeometry(1,1,1,1), mat);
-      mesh.renderOrder=-1; mesh.visible=false;
-      card.group.add(mesh);
-      card.innerRain=mesh;
-    }
-    let viewW=1, viewH=1;
-    let rafId=0;
-    let lastFrameTime=0;
-    let lastCodeFrameTime=0;
-    let needsRender=true;
-    let qaFramesRemaining=QA_MODE ? 8 : 0;
-    let sectionInView=true;
-
-    function renderActive(){ return QA_MODE || (!document.hidden && sectionInView); }
-    function requestSceneRender(){
-      needsRender=true;
-      if(renderActive() && !rafId){
-        rafId=requestAnimationFrame(loop);
+    /* ===== CSS 3D 多層程式碼隧道：旋轉直條 bar 在 z 軸多層墜落 ===== */
+    function buildRain(){
+      rainScene.innerHTML='';
+      const N=Math.round(getNum('--layers'));
+      const gap=getNum('--gap');
+      const persp=getNum('--persp');
+      const comp=getNum('--comp');
+      const fog=getNum('--fog');
+      const dof=getNum('--dof');
+      const fall=getNum('--fall');
+      const par=getNum('--parallax');
+      const breadth=getNum('--breadth')||1.5;
+      const isMobile=window.matchMedia('(max-width: 760px), (pointer: coarse)').matches;
+      let dens=Math.round(getNum('--density'));
+      if(isMobile) dens=Math.max(5, Math.round(dens*0.6));   // 手機降密度省效能
+      const barsPerCol=Math.max(1, Math.round(getNum('--barsPerCol'))||2);
+      for(let i=0;i<N;i++){
+        const t = N>1 ? i/(N-1) : 0;                          // 0=近 1=遠
+        const z = -gap*i;
+        const fullComp=(persp+gap*i)/persp;                   // 完全補償=填滿(會變平)
+        const scl=1+(fullComp-1)*comp;                        // 部分補償=遠層真縮小=隧道縱深
+        const layer=document.createElement('div');
+        layer.className='dev-rain-layer';
+        const bright=1-fog*t*0.82, sat=1-t*0.3, blur=dof*t;   // 遠層：暗(fog)+偏藍+模糊(dof)
+        layer.style.transform=`translateZ(${z}px) scale(${scl.toFixed(3)})`;
+        layer.style.opacity=(1-t*0.18).toFixed(2);
+        layer.style.filter=`brightness(${bright.toFixed(2)}) saturate(${sat.toFixed(2)}) blur(${blur.toFixed(2)}px)`;
+        layer.style.zIndex=String(100-i);
+        const fontPx=(15-t*3).toFixed(1);
+        const dur=fall*(1+par*i);                             // 遠層更慢=視差
+        /* 落雨廣度：遠層透視下縮小→橫向覆蓋變窄，依視覺縮放反向加寬 own-space 鋪設，
+           讓每層在畫面上都覆蓋 breadth×視窗寬（>1 留邊，傾斜時兩側仍有遠景雨、不空）*/
+        const apparentScale=scl*(persp/(persp+gap*i));        // ≤1，遠層更小
+        const spanPct=100*breadth/apparentScale;              // own-space 鋪設寬（遠層更寬）
+        const cols=Math.max(4, Math.round(dens*breadth));     // 柱數定值＝維持各層視覺密度一致、遠層不再變稀
+        for(let c=0;c<cols;c++){
+          const x=50 - spanPct/2 + (c+0.5)/cols*spanPct + (hash(i*7+c,3)-0.5)*(spanPct/cols*0.6);
+          const r=hash(i*13+c,9);
+          const base = r<0.12 ? '255,199,9' : r<0.34 ? '0,200,255' : '150,180,235';
+          for(let b=0;b<barsPerCol;b++){
+            const wrap=document.createElement('div');
+            wrap.className='bar-wrap';
+            wrap.style.left=x.toFixed(2)+'%';
+            wrap.style.animationDuration=dur.toFixed(1)+'s';
+            wrap.style.animationDelay=(-(hash(i*5+c,11+b))*dur).toFixed(1)+'s';
+            const bar=document.createElement('div');
+            bar.className='bar';
+            bar.style.fontSize=fontPx+'px';
+            bar.style.setProperty('--bc',base);
+            bar.textContent=CODE[(c*3+b*5+i*2)%CODE.length];
+            wrap.appendChild(bar);
+            layer.appendChild(wrap);
+          }
+        }
+        rainScene.appendChild(layer);
       }
     }
 
-    function activeCardRect(){
-      const card=cardEls[activeCardIndex];
-      const rect=card ? card.getBoundingClientRect() : htmlCard.getBoundingClientRect();
-      if(rect.width && rect.height) return rect;
-      return htmlCard.getBoundingClientRect();
-    }
-
-    /* 依現役卡片尺寸重算落雨平面（玻璃幾何已退場，只留落雨 sizing） */
-    function rebuildRainGeometry(){
-      const rect=activeCardRect();
-      if(!rect.width || !rect.height || !viewH) return;
-      const cameraDist=Math.abs(camera.position.z-glassGroup.position.z);
-      const fovRad=THREE.MathUtils.degToRad(camera.fov);
-      const unitsPerPx=(2*cameraDist*Math.tan(fovRad/2))/viewH;
-      const w=rect.width*unitsPerPx;
-      const h=rect.height*unitsPerPx;
-      const d=112*unitsPerPx;
-      sizeInnerRain(glassCards[0], w, h, d);
-    }
-
-    function resize(){
-      const dpr=Math.min(window.devicePixelRatio || 1, FX.pixelRatioMax);
-      viewW=window.innerWidth;
-      viewH=window.innerHeight;
-      renderer.setPixelRatio(dpr);
-      renderer.setSize(viewW, viewH, false);
-      camera.aspect=viewW/viewH;
-      camera.updateProjectionMatrix();
-      rebuildRainGeometry();
-      requestSceneRender();
-    }
-    window.addEventListener('resize', resize);
-
-    function applyState(){
-      cssRoot.style.setProperty('--tiltX', state.tiltX);
-      cssRoot.style.setProperty('--tiltY', state.tiltY);
-      glassGroup.rotation.x=THREE.MathUtils.degToRad(-state.tiltX);
-      glassGroup.rotation.y=THREE.MathUtils.degToRad(state.tiltY);
-      requestSceneRender();
-    }
-
-
-    /* ===== 單卡左右滑：HTML 內容層 slide/fade，WebGL 落雨維持穩定 ===== */
+    /* ===== 單卡左右滑：HTML 內容層 slide/fade（卡片透視傾斜沿用原 cardTransform）===== */
     let transitionSerial=0;
     const CARD_TRANSITION_MS=360;
     function cardTransform(x){
@@ -286,14 +162,6 @@
         cardEls[idx].setAttribute('aria-hidden', isActive ? 'false' : 'true');
       }
       syncCardControls();
-      const card=glassCards[0];
-      card.group.position.set(0,0,0);
-      card.group.scale.setScalar(1);
-      card.group.rotation.x=THREE.MathUtils.degToRad(-state.tiltX);
-      card.group.rotation.y=THREE.MathUtils.degToRad(state.tiltY);
-      card.group.visible=true;
-      if(card.innerRain) card.innerRain.visible=true;
-      requestSceneRender();
     }
     function goToCard(target, direction){
       const nextIndex=Math.max(0, Math.min(CARDS.length-1, Number(target)));
@@ -331,8 +199,6 @@
         incoming.style.transition='';
         updateDevCardState();
       }, CARD_TRANSITION_MS+30);
-      requestSceneRender();
-      applyState();
       return activeCardIndex;
     }
     function goPrev(){ return goToCard(activeCardIndex-1, -1); }
@@ -340,6 +206,7 @@
     prevBtn.addEventListener('click', goPrev);
     nextBtn.addEventListener('click', goNext);
 
+    /* ===== 拖曳切卡 ===== */
     let dragState=null;
     devStage.addEventListener('pointerdown', e=>{
       if(e.button!==undefined && e.button!==0) return;
@@ -367,15 +234,17 @@
     }
     devStage.addEventListener('pointerup', finishDrag);
     devStage.addEventListener('pointercancel', ()=>{ dragState=null; });
+
+    /* ===== 鍵盤切卡（僅 #dev 在視窗內時）===== */
+    let sectionInView=true;
     window.addEventListener('keydown', e=>{
       if(!sectionInView || e.altKey || e.ctrlKey || e.metaKey) return;
       if(e.key==='ArrowLeft'){ e.preventDefault(); goPrev(); }
       if(e.key==='ArrowRight'){ e.preventDefault(); goNext(); }
     });
-    window.addEventListener('resize', updateDevCardState);
 
-    resize();
-    applyState();
+    /* ===== 初始化 ===== */
+    buildRain();
     updateDevCardState();
     cardEls.forEach((el,idx)=>{
       el.style.transform=cardTransform(0);
@@ -383,46 +252,15 @@
       el.setAttribute('aria-hidden', idx===activeCardIndex ? 'false' : 'true');
     });
 
-
-    /* #dev 進出視窗才 render（IntersectionObserver 效能閘） */
+    /* #dev 離開視窗：暫停雨動畫（效能閘）＋ 關閉鍵盤切卡 */
     new IntersectionObserver(es=>{
       sectionInView=es[0].isIntersecting;
-      if(sectionInView){ lastFrameTime=0; requestSceneRender(); }
+      rainScene.classList.toggle('dev-rain-paused', !sectionInView);
     }, {threshold:0, rootMargin:'120px 0px'}).observe(document.getElementById('dev'));
 
-    const t0=performance.now();
-    function loop(now){
-      rafId=requestAnimationFrame(loop);
-      if(!QA_MODE && !renderActive()){
-        cancelAnimationFrame(rafId);
-        rafId=0;
-        return;
-      }
-      const elapsed=now-lastFrameTime;
-      const forceQaFrame=QA_MODE && qaFramesRemaining>0;
-      if(elapsed<TARGET_FRAME_MS && !needsRender && !forceQaFrame) return;
-      lastFrameTime=now-(elapsed%TARGET_FRAME_MS);
-      const t=QA_MODE ? 0.75 : (performance.now()-t0)/1000;
-      if(forceQaFrame || now-lastCodeFrameTime>=FX.codeFrameMs){
-        drawInnerRain(t);
-        lastCodeFrameTime=now;
-      }
-      renderer.render(scene, camera);
-      needsRender=false;
-      if(forceQaFrame){
-        qaFramesRemaining--;
-        needsRender=qaFramesRemaining>0;
-      }
-    }
-    document.addEventListener('visibilitychange',()=>{
-      if(!QA_MODE && document.hidden){
-        if(rafId){
-          cancelAnimationFrame(rafId);
-          rafId=0;
-        }
-      }else{
-        lastFrameTime=0;
-        requestSceneRender();
-      }
+    /* resize：debounce 重建雨（跨手機/桌機斷點時密度才需變）*/
+    let resizeTimer=0;
+    window.addEventListener('resize', ()=>{
+      clearTimeout(resizeTimer);
+      resizeTimer=window.setTimeout(buildRain, 250);
     });
-    requestSceneRender();

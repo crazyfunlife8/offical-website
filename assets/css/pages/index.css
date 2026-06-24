@@ -1075,10 +1075,34 @@ body {
          canvas 鎖在 #dev 一屏區塊內、不 fixed 到全站。 */
       #dev{ position:relative; min-height:100vh; min-height:100dvh; background:transparent; }
       .dev-glass-stack{ position:relative; z-index:1; width:100%;
-        --cardW:min(960px,92vw); --cardH:min(560px,78vh); --cardRadius:28px; --tiltX:9; --tiltY:-12;
-        --dg-blue:23,54,245; --dg-gold:245,166,35; min-height:100vh; min-height:100dvh; background:transparent; }
+        --cardW:min(960px,92vw); --cardH:min(560px,78vh); --cardRadius:28px; --tiltX:9; --tiltY:-16;
+        --dg-blue:23,54,245; --dg-gold:245,166,35;
+        /* CSS 3D 程式碼隧道落雨參數（demo-liquid/dev-rain-css3d-sandbox.html 定版） */
+        --persp:600px; --layers:6; --gap:620px; --comp:.2; --fog:.82; --dof:0px; --fall:13s; --parallax:.05; --density:5; --barsPerCol:2; --breadth:1.5; --l2:.2; --l2r:46%; --bgDim:.55;
+        --bandK:1.08; --rainBandH:calc(var(--cardH) * var(--bandK));   /* 落雨橫帶高度 = 卡片高 × bandK（原設計 1.08）*/
+        min-height:100vh; min-height:100dvh; background:transparent; }
       .dev-stack-stage{ position:relative; min-height:100vh; min-height:100dvh; width:100%; overflow:hidden; touch-action:pan-y; background:transparent; }
-      .dev-stack-webgl{ position:absolute; inset:0; width:100%; height:100%; display:block; z-index:1; }
+      /* ===== CSS 3D 多層程式碼隧道（取代 WebGL canvas；無 Three.js）===== */
+      /* 落雨收成「置中橫帶」（非滿版）：高 ≈ 卡片高、上下羽化進乾淨深底、左右出血超出畫面 */
+      .dev-rain3d{ position:absolute; left:0; right:0; top:50%; height:var(--rainBandH); transform:translateY(-50%);
+        z-index:1; pointer-events:none; perspective:var(--persp); perspective-origin:50% 50%;
+        -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 15%, #000 85%, transparent 100%);
+                mask-image:linear-gradient(180deg, transparent 0%, #000 15%, #000 85%, transparent 100%); }
+      .dev-rain3d::before{ content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
+        background:radial-gradient(130% 130% at 50% 50%, #0a1838 0%, #050d24 52%, #02060f 100%);
+        filter:brightness(var(--bgDim)); }
+      .dev-rain-scene{ position:absolute; inset:0; transform-style:preserve-3d;
+        transform:rotateX(calc(var(--tiltX)*1deg)) rotateY(calc(var(--tiltY)*1deg)); }
+      .dev-rain-layer{ position:absolute; inset:0 -10%; transform-style:preserve-3d; will-change:transform; }
+      .dev-rain3d .bar-wrap{ position:absolute; top:0; will-change:transform; animation:dev-barfall linear infinite; }
+      .dev-rain3d .bar{ display:inline-block; white-space:nowrap; font-family:"JetBrains Mono",monospace;
+        transform-origin:0 0; transform:rotate(-90deg);
+        background:linear-gradient(to right, rgba(255,255,255,.96) 0%, rgba(232,244,255,.9) 6%,
+          rgba(var(--bc),.92) 18%, rgba(var(--bc),.5) 55%, rgba(var(--bc),0) 96%);
+        -webkit-background-clip:text; background-clip:text; color:transparent;
+        filter:drop-shadow(0 0 5px rgba(150,190,255,.32)); }
+      .dev-rain-paused .bar-wrap{ animation-play-state:paused; }
+      @keyframes dev-barfall{ from{ transform:translateY(calc(var(--rainBandH) * -0.25));} to{ transform:translateY(calc(var(--rainBandH) * 1.25));} }
       .dev-stack-html-deck{ position:absolute; inset:0; z-index:2; pointer-events:none; }
       .dev-glass-stack .slot{ position:absolute; left:50%; top:50%; width:var(--cardW); height:var(--cardH);
         transform:translate(-50%,-50%); visibility:hidden; pointer-events:none; }
@@ -1098,11 +1122,14 @@ body {
       .dev-glass-stack .codebar{ position:absolute; top:0; left:0; right:0; z-index:5; padding:13px 26px; border-bottom:1px solid rgba(225,235,255,.05); opacity:.72; }
       .dev-glass-stack .codebar .cpath{ font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:rgba(225,235,255,.42); }
       .dev-glass-stack .content{ position:relative; z-index:5; width:100%; height:100%; padding:54px 56px 50px; display:flex; flex-direction:row; align-items:center; gap:clamp(28px,3.8vw,52px); }
-      .dev-glass-stack .content::before{ content:''; position:absolute; left:0; top:28px; bottom:26px; width:54%; z-index:-1; pointer-events:none;
-        background:linear-gradient(90deg, rgba(5,13,46,.26), rgba(5,13,46,.12) 52%, transparent 100%); }
-      .dev-glass-stack .lead{ flex:1 1 46%; min-width:0; }
+      /* L2 文字襯底：羽化暗暈（取代原硬邊矩形，消除可見直角；--l2/--l2r 可調）*/
+      .dev-glass-stack .lead{ position:relative; z-index:1; flex:1 1 46%; min-width:0; }
+      .dev-glass-stack .lead::before{ content:''; position:absolute; inset:-18% -24% -22% -22%; z-index:-1; pointer-events:none;
+        background:radial-gradient(ellipse 70% 64% at 38% 50%, rgba(3,9,28,var(--l2)) 0%,
+          rgba(3,9,28,calc(var(--l2)*.55)) calc(var(--l2r)*.6), rgba(3,9,28,0) var(--l2r));
+        filter:blur(6px); }
       .dev-glass-stack .klab{ font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.26em; color:rgba(var(--dg-gold),.82); }
-      .dev-glass-stack .knum{ position:absolute; top:36px; right:58px; font-family:"Italiana",serif; font-size:54px; color:rgba(var(--dg-gold),.15); line-height:1; }
+      .dev-glass-stack .knum{ position:absolute; top:36px; right:58px; font-family:"Italiana",serif; font-size:54px; color:rgba(255,199,9,.92); line-height:1; text-shadow:0 1px 10px rgba(0,0,0,.55); }
       .dev-glass-stack .ztitle{ font-family:"Noto Serif TC",serif; font-weight:700; font-size:clamp(2.1rem,4vw,3.2rem); color:rgba(225,235,255,.97); margin:16px 0 8px; line-height:1.12; letter-spacing:.02em; text-shadow:0 2px 18px rgba(0,0,0,.35); }
       .dev-glass-stack .zen{ font-family:"Italiana",serif; font-size:1.18rem; color:rgba(210,222,245,.5); letter-spacing:.04em; text-shadow:0 1px 1px rgba(2,8,22,.75); }
       .dev-glass-stack .zsub{ margin-top:14px; font-size:.92rem; line-height:1.65; color:rgba(225,235,255,.6); max-width:34ch; text-shadow:0 1px 1px rgba(2,8,22,.72); }

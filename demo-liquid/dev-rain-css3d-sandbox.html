@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>軟體開發區 — CSS 3D 程式碼隧道沙盒</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Italiana&family=Noto+Sans+TC:wght@300;400;700&family=Noto+Serif+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ===== 可調參數（由控制面板即時寫入）===== */
+    /* ===== 與正式站 index.css .dev-glass-stack 同步（2026-06-24 定版）===== */
+    --persp: 600px;      /* 透視焦距：越小越誇張 */
+    --layers: 6;         /* z 層數 */
+    --gap: 620px;        /* 層間 z 距離 */
+    --comp: 0.2;         /* 縱深補償：低=遠層真縮小=隧道深；高=填滿變平 */
+    --tiltX: 9deg;       /* 卡片+雨 3D 透視傾斜 X（原設計值 9）*/
+    --tiltY: -16deg;     /* 卡片+雨 3D 透視傾斜 Y */
+    --fog: 0.82;         /* 大氣衰減：遠層變暗強度 0~1 */
+    --dof: 0px;          /* 景深：最遠層模糊 px */
+    --fall: 13s;         /* 近層落速（秒，越大越慢）*/
+    --parallax: 0.05;    /* 遠層慢多少：每深一層 +parallax 倍時長 */
+    --density: 5;        /* 每層幾根落雨柱 */
+    --barsPerCol: 2;     /* 每柱幾條 bar */
+    --breadth: 1.5;      /* 落雨廣度：遠層反向加寬鋪設，傾斜時兩側遠景不空 */
+    --l2: 0.2;           /* L2 文字襯底暗度 0~1 */
+    --l2r: 46%;          /* L2 襯底羽化半徑 */
+    --bgDim: 0.55;       /* 背景亮度：低=更暗更深邃 */
+    --bandK: 1.08;       /* 落雨橫帶高度 = 卡片高 × bandK */
+    --rainBandH: calc(min(560px,74vh) * var(--bandK));
+    --hue: 218;          /* 雨主色相（藍）*/
+
+    --navy0:#040a1e; --navy1:#050d2a; --navy2:#02060f;
+    --gold: 245,166,35; --goldL: 255,199,9;
+    --cyan: 0,200,255;  --blue: 150,180,235;
+    --ink: 225,235,255;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; background:#02040c; color:rgb(var(--ink));
+    font-family:"Noto Sans TC",sans-serif; overflow:hidden; }
+
+  /* ====== 區塊（對應正式站 #dev 一屏）====== */
+  .dev{ position:relative; width:100vw; height:100vh; overflow:hidden;
+    background:
+      radial-gradient(120% 90% at 50% 8%, #0a1838 0%, #050d24 42%, #02060f 100%);
+  }
+  /* 上下出血羽化（對應雨的 verticalMask）*/
+  .dev::after{ content:''; position:absolute; inset:0; pointer-events:none; z-index:6;
+    background:linear-gradient(180deg,#02040c 0%, transparent 12%, transparent 86%, #02040c 100%); }
+
+  /* 星空底（L0）*/
+  .stars{ position:absolute; inset:0; z-index:0; opacity:.7;
+    background-image:
+      radial-gradient(1.4px 1.4px at 20% 30%, rgba(255,255,255,.7), transparent),
+      radial-gradient(1.2px 1.2px at 70% 60%, rgba(200,220,255,.6), transparent),
+      radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.3px 1.3px at 85% 25%, rgba(220,230,255,.6), transparent),
+      radial-gradient(1px 1px at 55% 15%, rgba(255,255,255,.45), transparent),
+      radial-gradient(1.1px 1.1px at 12% 70%, rgba(220,230,255,.5), transparent);
+  }
+
+  /* ====== 容器（傾斜改用原設計的 3D 透視旋轉，不是 2D rotate）====== */
+  .slab{ position:absolute; inset:0; z-index:1; }
+
+  /* ====== CSS 3D 舞台：落雨收成置中橫帶（高 ≈ 卡片高，非滿版）====== */
+  .stage{ position:absolute; left:0; right:0; top:50%; height:var(--rainBandH); transform:translateY(-50%);
+    z-index:1; perspective:var(--persp); perspective-origin:50% 50%;
+    -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 15%, #000 85%, transparent 100%);
+            mask-image:linear-gradient(180deg, transparent 0%, #000 15%, #000 85%, transparent 100%); }
+  .stage::before{ content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
+    background:radial-gradient(130% 130% at 50% 50%, #0a1838 0%, #050d24 52%, #02060f 100%);
+    filter:brightness(var(--bgDim)); }
+  .scene{ position:absolute; inset:0; transform-style:preserve-3d;
+    transform:rotateX(var(--tiltX)) rotateY(var(--tiltY));
+    transition:transform .18s ease-out; }
+
+  /* 每層落雨平面（L1，多層 = 隧道縱深）；上下羽化交由 .stage 帶狀遮罩處理 */
+  .rain-layer{ position:absolute; inset:0 -10%; transform-style:preserve-3d; will-change:transform; }
+  /* 旋轉直條 bar：白頭 → 色尾漸層、垂直落下（對齊現站 #dev-rain 血統）*/
+  .bar-wrap{ position:absolute; top:0; will-change:transform; animation:barfall linear infinite; }
+  .bar{ display:inline-block; white-space:nowrap; font-family:"JetBrains Mono",monospace;
+    transform-origin:0 0; transform:rotate(-90deg);
+    background:linear-gradient(to right,
+      rgba(255,255,255,.96) 0%, rgba(232,244,255,.9) 6%,
+      rgba(var(--bc),.92) 18%, rgba(var(--bc),.5) 55%, rgba(var(--bc),0) 96%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 0 5px rgba(150,190,255,.32)); }
+  @keyframes barfall{ from{ transform:translateY(calc(var(--rainBandH) * -0.25));} to{ transform:translateY(calc(var(--rainBandH) * 1.25));} }
+
+  /* ====== 前景卡片內容（L2+L3）====== */
+  .card{ position:absolute; left:50%; top:50%; z-index:5; width:min(1080px,86vw); height:min(560px,74vh);
+    /* 原設計置中法：負 margin 置中 + perspective 第一、繞中心旋轉（不混 translate）*/
+    margin-left:calc(min(1080px,86vw) / -2); margin-top:calc(min(560px,74vh) / -2);
+    transform:perspective(1700px) rotateX(var(--tiltX)) rotateY(var(--tiltY));
+    transform-origin:center center;
+    display:flex; align-items:center; gap:clamp(28px,4vw,56px);
+    padding:0 clamp(30px,4vw,60px); pointer-events:none; }
+  /* 浮水印巨字：卡片最底層（文字後/雨前），右下爆出邊界、近乎隱形 */
+  .ghost{ position:absolute; right:-2%; bottom:-16%; z-index:0;
+    font-family:"Noto Serif TC",serif; font-weight:700; font-size:min(34vw,400px); line-height:.8;
+    color:rgba(225,235,255,.04); letter-spacing:-.02em; pointer-events:none; user-select:none; }
+  .lead{ position:relative; z-index:1; flex:1 1 50%; min-width:0; }
+  /* L2 = 羽化暗暈（無硬邊，取代原本的硬直角方塊）*/
+  .lead::before{ content:''; position:absolute; inset:-18% -24% -22% -22%; z-index:-1; pointer-events:none;
+    background:radial-gradient(ellipse 70% 64% at 38% 50%,
+      rgba(3,9,28,var(--l2)) 0%,
+      rgba(3,9,28,calc(var(--l2) * .55)) calc(var(--l2r) * .6),
+      rgba(3,9,28,0) var(--l2r));
+    filter:blur(6px); }
+  .klab{ font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.26em;
+    color:rgba(var(--gold),.85); margin:0; }
+  .ztitle{ font-family:"Noto Serif TC",serif; font-weight:900; font-size:clamp(2.2rem,4.4vw,3.4rem);
+    color:rgba(var(--ink),.98); margin:14px 0 8px; line-height:1.1; letter-spacing:.02em;
+    text-shadow:0 2px 22px rgba(0,0,0,.5); }
+  .zen{ font-family:"Italiana",serif; font-size:1.2rem; color:rgba(210,222,245,.55);
+    letter-spacing:.04em; margin:0; }
+  .zsub{ margin:14px 0 0; font-size:.94rem; line-height:1.7; color:rgba(var(--ink),.66);
+    max-width:32ch; text-shadow:0 1px 2px rgba(2,8,22,.8); }
+  .svccol{ position:relative; z-index:1; flex:0 0 42%; }
+  .svc-head{ font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.24em;
+    text-transform:uppercase; color:rgba(var(--gold),.72); margin:0 0 24px; }
+  .svc{ list-style:none; margin:0; padding:0; }
+  .svc li{ margin-bottom:24px; }
+  .svc li:last-child{ margin-bottom:0; }
+  .svc li::before{ content:''; display:block; width:22px; height:1px;
+    background:rgba(var(--gold),.5); margin-bottom:11px; }
+  .sn{ display:block; font-family:"Noto Serif TC",serif; font-size:1.1rem; color:rgba(var(--ink),.97); }
+  .sd{ display:block; margin-top:5px; font-size:.8rem; line-height:1.5; color:rgba(var(--ink),.74);
+    text-shadow:0 1px 2px rgba(0,3,14,.9); }
+  .knum{ position:absolute; top:6%; right:8%; font-family:"Italiana",serif; font-size:56px;
+    color:rgba(var(--goldL),.92); line-height:1; z-index:2;
+    text-shadow:0 1px 10px rgba(0,0,0,.55); }
+
+  /* ====== 控制面板 ====== */
+  .panel{ position:fixed; top:14px; right:14px; z-index:50; width:268px;
+    background:rgba(8,14,30,.86); backdrop-filter:blur(12px);
+    border:1px solid rgba(var(--ink),.12); border-radius:12px; padding:14px 14px 10px;
+    font-size:12px; box-shadow:0 18px 50px rgba(0,0,0,.5); max-height:94vh; overflow:auto; }
+  .panel h4{ margin:0 0 10px; font-size:12px; letter-spacing:.1em; color:rgba(var(--gold),.9);
+    font-family:"JetBrains Mono",monospace; }
+  .row{ display:grid; grid-template-columns:1fr 46px; align-items:center; gap:8px; margin-bottom:9px; }
+  .row label{ color:rgba(var(--ink),.78); }
+  .row output{ font-family:"JetBrains Mono",monospace; color:rgba(var(--cyan),.95); text-align:right; }
+  input[type=range]{ grid-column:1 / -1; width:100%; height:3px; margin:2px 0 0;
+    accent-color:rgb(var(--goldL)); }
+  .btns{ display:flex; gap:6px; margin-top:8px; }
+  .btns button{ flex:1; padding:7px 4px; font-size:11px; cursor:pointer; border-radius:7px;
+    border:1px solid rgba(var(--ink),.18); background:rgba(var(--ink),.06); color:rgba(var(--ink),.9);
+    font-family:"JetBrains Mono",monospace; }
+  .btns button:hover{ background:rgba(var(--goldL),.18); border-color:rgba(var(--goldL),.5); }
+  .hint{ margin-top:8px; font-size:10.5px; line-height:1.5; color:rgba(var(--ink),.5); }
+  .toggle{ position:fixed; top:14px; right:14px; z-index:51; display:none; }
+</style>
+</head>
+<body>
+  <section class="dev" id="dev">
+    <div class="stars"></div>
+    <div class="slab" id="slab">
+    <div class="stage">
+      <div class="scene" id="scene">
+        <!-- rain layers injected by JS -->
+      </div>
+    </div>
+
+    <!-- 前景卡：直接用正式站「客製化系統開發」(02) 內容 -->
+    <div class="card">
+      <div class="ghost">系</div>
+      <div class="lead">
+        <p class="klab">// SYSTEM DEVELOPMENT</p>
+        <h2 class="ztitle">客製化系統開發</h2>
+        <p class="zen">Built around how you work.</p>
+        <p class="zsub">現成軟體框不住的需求，從零打造只屬於你的系統。</p>
+      </div>
+      <div class="svccol">
+        <span class="knum">02</span>
+        <p class="svc-head">服務範疇</p>
+        <ul class="svc">
+          <li><span class="sn">內部管理後台</span><span class="sd">訂單、客戶、庫存一站管理</span></li>
+          <li><span class="sn">系統串接整合</span><span class="sd">打通既有工具與金流物流</span></li>
+          <li><span class="sn">資料庫 / 報表系統</span><span class="sd">數據集中、決策看得見</span></li>
+        </ul>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- 控制面板 -->
+  <div class="panel" id="panel">
+    <h4>程式碼隧道 · CSS 3D</h4>
+    <div id="ctrls"></div>
+    <div class="btns">
+      <button id="preset">建議值</button>
+      <button id="dump">輸出參數</button>
+      <button id="hidep">收合</button>
+    </div>
+    <p class="hint">純 CSS 3D + DOM，無 WebGL。拖軸即時調，「輸出參數」會把目前數值印到 console，方便帶進正式站。</p>
+  </div>
+  <button class="toggle" id="showp">⚙ 參數</button>
+
+<script>
+  const CODE=[
+    'const nest = createStudio()','export default function App() {','<section class="services">',
+    'router.get("/api/orders", fn)','await db.clients.findMany()','npm run build && deploy',
+    'return <Card {...props} />','useEffect(() => render(), [])','if (user.ready) launch()',
+    'SELECT * FROM orders;','transform: translateY(-4px)','git commit -m "ship it"'
+  ];
+  const root=document.documentElement;
+  const scene=document.getElementById('scene');
+  const hash=(a,b)=>{ const x=Math.sin(a*127.1+b*311.7)*43758.5453; return x-Math.floor(x); };
+
+  // ---- 可調參數定義 ----
+  const PARAMS=[
+    {k:'--density',label:'每層柱數',min:4,   max:24,  step:1,  unit:'', re:true},
+    {k:'--barsPerCol',label:'每柱條數',min:1,max:4,  step:1,  unit:'', re:true},
+    {k:'--breadth',label:'落雨廣度',min:1,   max:3,   step:0.1,unit:'', re:true},
+    {k:'--bgDim', label:'背景亮度(低=深)',min:0.3,max:1.2,step:0.05,unit:''},
+    {k:'--bandK', label:'雨帶高×卡高',min:0.6,max:1.6,step:0.02,unit:''},
+    {k:'--layers',label:'z 層數',  min:2,  max:8,   step:1,  unit:'',   re:true},
+    {k:'--gap',   label:'層間 z 距', min:160, max:700, step:20, unit:'px', re:true},
+    {k:'--comp',  label:'縱深補償', min:0.15,max:0.9, step:0.05,unit:'', re:true},
+    {k:'--persp', label:'透視焦距', min:400, max:1600,step:50, unit:'px', re:true},
+    {k:'--fog',   label:'大氣衰減', min:0,   max:1,   step:0.02,unit:'', re:true},
+    {k:'--dof',   label:'景深模糊', min:0,   max:6,   step:0.2, unit:'px',re:true},
+    {k:'--fall',  label:'落速(近)', min:6,   max:26,  step:1,  unit:'s', re:true},
+    {k:'--parallax',label:'遠層慢倍',min:0,  max:1.2, step:0.05,unit:'',re:true},
+    {k:'--l2',    label:'L2襯底暗', min:0,   max:.7,  step:0.02,unit:''},
+    {k:'--l2r',   label:'L2羽化徑', min:40,  max:90,  step:2,  unit:'%'},
+    {k:'--tiltX', label:'傾斜X(俯仰)',min:-20,max:20, step:1,  unit:'deg'},
+    {k:'--tiltY', label:'傾斜Y(偏擺)',min:-20,max:20, step:1,  unit:'deg'},
+  ];
+  const PRESET={'--persp':600,'--layers':6,'--gap':620,'--comp':.2,'--tiltX':9,'--tiltY':-16,
+    '--fog':.82,'--dof':0,'--fall':13,'--parallax':.05,'--density':5,'--barsPerCol':2,'--breadth':1.5,
+    '--l2':.2,'--l2r':46,'--bgDim':.55,'--bandK':1.08};
+
+  function getNum(k){ return parseFloat(getComputedStyle(root).getPropertyValue(k)); }
+  function setVar(k,v,unit){ root.style.setProperty(k, v + (unit||'')); }
+
+  // ---- 建落雨層 ----
+  function buildRain(){
+    scene.innerHTML='';
+    const N=Math.round(getNum('--layers'));
+    const gap=getNum('--gap');
+    const persp=getNum('--persp');
+    const fog=getNum('--fog');
+    const dof=getNum('--dof');
+    const fall=getNum('--fall');
+    const par=getNum('--parallax');
+    const breadth=getNum('--breadth')||1.5;
+    const barsPerCol=Math.max(1, Math.round(getNum('--barsPerCol'))||2);
+    const dens=Math.round(getNum('--density'));
+
+    for(let i=0;i<N;i++){
+      const t = N>1 ? i/(N-1) : 0;          // 0=近 1=遠
+      const z = -gap*i;
+      const fullComp = (persp + gap*i)/persp;          // 完全補償=填滿(會變平)
+      const comp = 1 + (fullComp - 1)*getNum('--comp');// 部分補償=遠層真縮小=隧道縱深
+      const layer=document.createElement('div');
+      layer.className='rain-layer';
+      // 遠層：變暗(fog) + 模糊(dof) + 偏藍 + 字級略小
+      const bright = 1 - fog*t*0.82;
+      const sat = 1 - t*0.3;
+      const blur = dof*t;
+      layer.style.transform=`translateZ(${z}px) scale(${comp.toFixed(3)})`;
+      layer.style.opacity = (1 - t*0.18).toFixed(2);
+      layer.style.filter=`brightness(${bright.toFixed(2)}) saturate(${sat.toFixed(2)}) blur(${blur.toFixed(2)}px)`;
+      layer.style.zIndex = String(100 - i);
+
+      const fontPx = (15 - t*3).toFixed(1);
+      const dur = fall*(1 + par*i);          // 遠層更慢 = 視差
+      /* 落雨廣度：遠層透視下縮小→橫向變窄，依視覺縮放反向加寬鋪設＋定值柱數，傾斜時兩側不空 */
+      const apparentScale = comp * (persp/(persp + gap*i));   // ≤1，遠層更小
+      const spanPct = 100 * breadth / apparentScale;          // own-space 鋪設寬（遠層更寬）
+      const cols = Math.max(4, Math.round(dens*breadth));      // 柱數定值＝各層視覺密度一致
+      for(let c=0;c<cols;c++){
+        const x = 50 - spanPct/2 + (c+0.5)/cols*spanPct + (hash(i*7+c,3)-0.5)*(spanPct/cols*0.6);
+        // 主色：多數藍灰、少數青、極少金（沿用 #dev-rain 配色）
+        const r=hash(i*13+c,9);
+        const base = r<0.12 ? '255,199,9' : r<0.34 ? '0,200,255' : '150,180,235';
+        for(let b=0;b<barsPerCol;b++){
+          const wrap=document.createElement('div');
+          wrap.className='bar-wrap';
+          wrap.style.left = x.toFixed(2)+'%';
+          wrap.style.animationDuration = dur.toFixed(1)+'s';
+          wrap.style.animationDelay = (-(hash(i*5+c,11+b))*dur).toFixed(1)+'s';
+
+          const bar=document.createElement('div');
+          bar.className='bar';
+          bar.style.fontSize = fontPx+'px';
+          bar.style.setProperty('--bc', base);
+          bar.textContent = CODE[(c*3 + b*5 + i*2) % CODE.length];
+
+          wrap.appendChild(bar);
+          layer.appendChild(wrap);
+        }
+      }
+      scene.appendChild(layer);
+    }
+  }
+
+  // ---- 控制面板 ----
+  const ctrls=document.getElementById('ctrls');
+  PARAMS.forEach(p=>{
+    const row=document.createElement('div'); row.className='row';
+    const val=getNum(p.k);
+    row.innerHTML=`<label>${p.label}</label><output id="o${p.k}">${val}${p.unit}</output>
+      <input type="range" data-k="${p.k}" data-unit="${p.unit}" data-re="${p.re?1:0}"
+        min="${p.min}" max="${p.max}" step="${p.step}" value="${val}">`;
+    ctrls.appendChild(row);
+  });
+  ctrls.addEventListener('input', e=>{
+    const el=e.target; if(el.type!=='range') return;
+    const k=el.dataset.k, unit=el.dataset.unit;
+    setVar(k, el.value, unit);
+    document.getElementById('o'+k).textContent = el.value+unit;
+    if(el.dataset.re==='1') buildRain();
+  });
+
+  document.getElementById('preset').onclick=()=>{
+    Object.entries(PRESET).forEach(([k,v])=>{
+      const p=PARAMS.find(x=>x.k===k);
+      setVar(k,v,p.unit);
+      const inp=document.querySelector(`input[data-k="${k}"]`);
+      if(inp) inp.value=v;
+      document.getElementById('o'+k).textContent=v+p.unit;
+    });
+    buildRain();
+  };
+  document.getElementById('dump').onclick=()=>{
+    const out={}; PARAMS.forEach(p=>out[p.k]=getNum(p.k)+p.unit);
+    console.log('=== 目前參數 ===\n'+JSON.stringify(out,null,2));
+    alert('已印到 console（F12 看）');
+  };
+  const panel=document.getElementById('panel'), showp=document.getElementById('showp');
+  document.getElementById('hidep').onclick=()=>{ panel.style.display='none'; showp.style.display='block'; };
+  showp.onclick=()=>{ panel.style.display='block'; showp.style.display='none'; };
+
+  // ---- 滑鼠視差（增強縱深感）----
+  const baseX=()=>getNum('--tiltX'), baseY=()=>getNum('--tiltY');
+  document.getElementById('dev').addEventListener('pointermove', e=>{
+    const nx=(e.clientX/innerWidth-0.5), ny=(e.clientY/innerHeight-0.5);
+    scene.style.transform=`rotateX(${(baseX()-ny*5).toFixed(2)}deg) rotateY(${(baseY()+nx*7).toFixed(2)}deg)`;
+  });
+  document.getElementById('dev').addEventListener('pointerleave', ()=>{
+    scene.style.transform=`rotateX(${baseX()}deg) rotateY(${baseY()}deg)`;
+  });
+
+  buildRain();
+</script>
+</body>
+</html>
