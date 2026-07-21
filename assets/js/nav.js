@@ -88,6 +88,7 @@
         <!-- 最底版權行 -->
         <p class="site-footer__copy">
             © 2024–2026 Nest Digital. All rights reserved.
+            &ensp;·&ensp;<a href="privacy.html" class="site-footer__privacy-link">隱私政策</a>
         </p>
     </div>
 </footer>
