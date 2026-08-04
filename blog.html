@@ -200,7 +200,7 @@
         <!-- ── 檔案牆 ───────────────────────────────────── -->
         <section class="arc-wall" aria-labelledby="wall-title">
             <div class="arc-wall__head">
-                <h2 class="arc-wall__title" id="wall-title">全部檔案 <span class="arc-wall__count">／ 7 CASES ON FILE</span></h2>
+                <h2 class="arc-wall__title" id="wall-title">全部檔案 <span class="arc-wall__count">／ 8 CASES ON FILE</span></h2>
                 <nav class="arc-filter" aria-label="觀測領域">
                     <button type="button" class="arc-filter__btn is-active" data-cat="all">全部</button>
                     <button type="button" class="arc-filter__btn" data-cat="dev">軟體開發</button>
@@ -325,7 +325,7 @@
     <footer class="arc-footer">
         <div class="arc-footer__rule" aria-hidden="true"></div>
         <p class="arc-footer__mark">NEST&nbsp;DIGITAL ／ 不正常觀點 · 異常觀察檔案</p>
-        <p class="arc-footer__copy">© 2024–2026 創巢數位 Nest Digital ·　不正常人類軟體開發有限公司</p>
+        <p class="arc-footer__copy">© 2024–2026 創巢數位 Nest Digital ·　創巢數位資訊企業社</p>
     </footer>
 
     <script>
@@ -341,6 +341,7 @@
                 cards.forEach((card) => {
                     const show = cat === 'all' || card.dataset.cat === cat;
                     card.classList.toggle('is-hidden', !show);
+                    if (show) card.classList.add('is-in');
                 });
             });
         });
