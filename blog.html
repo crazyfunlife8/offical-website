@@ -200,7 +200,7 @@
         <!-- ── 檔案牆 ───────────────────────────────────── -->
         <section class="arc-wall" aria-labelledby="wall-title">
             <div class="arc-wall__head">
-                <h2 class="arc-wall__title" id="wall-title">全部檔案 <span class="arc-wall__count">／ 8 CASES ON FILE</span></h2>
+                <h2 class="arc-wall__title" id="wall-title">全部檔案 <span class="arc-wall__count">／ 7 CASES ON FILE</span></h2>
                 <nav class="arc-filter" aria-label="觀測領域">
                     <button type="button" class="arc-filter__btn is-active" data-cat="all">全部</button>
                     <button type="button" class="arc-filter__btn" data-cat="dev">軟體開發</button>
@@ -312,7 +312,7 @@
                     <h3 class="casefile__title"><a href="https://blog.nestdigitalai.com" target="_blank" rel="noopener">跳動e投放 · TikTok 廣告實測知識庫</a></h3>
                     <p class="casefile__excerpt">NT$900/天試投 14 天的完整 CTR、CPM、轉單數據，加上失敗素材解析與學習曲線紀錄。台灣小商家評估 TikTok 廣告值不值得投的第一手資料庫。</p>
                     <div class="casefile__foot"><time datetime="2026-08">2026.08</time><span class="arc-dot" aria-hidden="true">·</span>18 篇 · 持續更新</div>
-                    <span class="casefile__open" aria-hidden="true">前往知識庫&nbsp;↗</span>
+                    <span class="casefile__open" aria-hidden="true">OPEN&nbsp;FILE</span>
                 </article>
 
             </div>
@@ -325,7 +325,7 @@
     <footer class="arc-footer">
         <div class="arc-footer__rule" aria-hidden="true"></div>
         <p class="arc-footer__mark">NEST&nbsp;DIGITAL ／ 不正常觀點 · 異常觀察檔案</p>
-        <p class="arc-footer__copy">© 2024–2026 創巢數位 Nest Digital ·　創巢數位資訊企業社</p>
+        <p class="arc-footer__copy">© 2024–2026 創巢數位 Nest Digital ·　不正常人類軟體開發有限公司</p>
     </footer>
 
     <script>
@@ -341,7 +341,6 @@
                 cards.forEach((card) => {
                     const show = cat === 'all' || card.dataset.cat === cat;
                     card.classList.toggle('is-hidden', !show);
-                    if (show) card.classList.add('is-in');
                 });
             });
         });
