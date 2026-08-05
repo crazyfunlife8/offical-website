@@ -481,7 +481,8 @@ body.archive {
 }
 
 /* ORIGIN FILE：本尊嫌犯三面存證單（跨兩欄放大、罪名讀得到）*/
-.casefile--origin { grid-column: span 2; }
+/* grid-column 1 / span 2 = 強制從第 1 欄開始，避免與前一列最後一張小卡共列被撐高 */
+.casefile--origin { grid-column: 1 / span 2; }
 .casefile__evidence {
     position: relative;
     margin: 0.3rem 0 1.2rem;
