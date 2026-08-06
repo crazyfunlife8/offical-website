@@ -15,6 +15,7 @@
             {n:'成長推廣', p:'NT$8,500', u:'/月', d:'8 篇圖文 · 數據分析＋方向建議', feat:true},
             {n:'整合行銷', p:'NT$21,000', u:'/月', d:'12 篇圖文 · 完整數據＋活動企劃'},
           ],
+          cta:'services/social.html',
         },
         { key:'blog', n:'02', cjk:'部落格代營運', en:'SEO CONTENT', echo:'Traffic that compounds.',
           lead:'用自動化內容產線，為你建立並長期經營 SEO 部落格，讓搜尋與 AI 都找得到你，把網站養成會自己長流量的引流資產。',
@@ -22,6 +23,7 @@
           flow:'<b>選題對準搜尋意圖</b> · <b>AI 輔助產文</b> · <b>SEO/GEO 結構化</b> · <b>自動發布＋收錄追蹤</b>',
           proof:[{n:'16',l:'專責 AI 代理'},{n:'60+',l:'道品質把關'},{n:'5',l:'站自有實證'}],
           price:'依規模規劃 · 訂閱式長期經營',
+          cta:'services/seo.html',
         },
         { key:'ads', n:'03', cjk:'廣告投放', en:'PAID ADS', echo:'Spend that performs.',
           lead:'跨 FB/IG/TikTok 代客操盤，含影片與短影音廣告，把每一塊投放預算都盯成看得見的成效。',
@@ -30,6 +32,7 @@
           flowLabel:'操盤流程',
           proof:[{n:'3',l:'平台同步代操'},{n:'10–25%',l:'成效抽成'},{n:'4',l:'步驟全包'}],
           bgx:65,
+          cta:'services/ads.html',
         },
         { key:'ai', n:'04', cjk:'AI 形象網紅', en:'AI TALENT', echo:'A face that never tires.',
           lead:'為企業打造可長期經營的專屬虛擬代言人，無出鏡包袱、形象完全可控。標準只有一個：做到沒有 AI 感。',
@@ -38,6 +41,7 @@
           flowLabel:'角色系統',
           proof:[{n:'3',l:'倍互動率勝真人'},{n:'100%',l:'形象可控'},{n:'0',l:'真人翻車風險'}],
           price:'詢價制', bgs:400,
+          cta:'services/ai-influencer.html',
         },
       ];
       const MURAL='mural-j.webp';
@@ -63,13 +67,13 @@
                 <div class="meta"><div class="ml">日常動作</div><div class="acts">${s.acts}</div></div>
                 <div class="offer">
                   ${s.plans.map(pl=>`
-                    <a class="offer-row${pl.feat?' feat':''}" href="contact.html">
+                    <a class="offer-row${pl.feat?' feat':''}" href="${s.cta}">
                       <span class="offer-name">${pl.n}${pl.feat?'<span class="rec">推薦</span>':''}</span>
                       <span class="offer-note">${pl.d}</span>
                       <span class="offer-price">${pl.p}<small>${pl.u}</small>${pl.feat?'<span class="ar">→</span>':''}</span>
                     </a>`).join('')}
                 </div>
-                <a class="cta" href="contact.html">想開始經營 <span class="ar">→</span></a>
+                <a class="cta" href="${s.cta}">想開始經營 <span class="ar">→</span></a>
               </div>
             </div>`;
         }else if(s.flow){
@@ -87,7 +91,7 @@
                   ${s.proof.map(pf=>`<div class="stat"><b>${pf.n}</b><span>${pf.l}</span></div>`).join('')}
                 </div>
                 ${s.price?`<p class="priceline">${s.price}</p>`:''}
-                <a class="cta" href="contact.html">想了解更多 <span class="ar">→</span></a>
+                <a class="cta" href="${s.cta}">想了解更多 <span class="ar">→</span></a>
               </div>
             </div>`;
         }else{
@@ -98,7 +102,7 @@
               <p class="en">${s.echo}</p>
               <p class="lead">${s.lead}</p>
               <p class="priceline">${s.price}</p>
-              <a class="cta" href="contact.html">想了解更多 <span class="ar">→</span></a>
+              <a class="cta" href="${s.cta||'contact.html'}">想了解更多 <span class="ar">→</span></a>
             </div>`;
         }
         const px = (s.bgx != null ? s.bgx : i/3*100);
