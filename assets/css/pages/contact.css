@@ -103,6 +103,146 @@
     margin: 0;
 }
 
+/* ── 詢問表單 ── */
+
+/* 分隔線 + 「或填寫詢問表單」標題 */
+.contact__form-section {
+    margin-top: var(--sp-lg);
+    width: 100%;
+    max-width: 520px;
+}
+
+.contact__form-sep {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    margin-bottom: var(--sp-md);
+}
+
+.contact__form-sep::before,
+.contact__form-sep::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(var(--c-cyan-rgb), 0.22);
+}
+
+.contact__form-sep span {
+    font-family: var(--f-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    color: rgba(var(--c-stellar-rgb), 0.45);
+    white-space: nowrap;
+}
+
+/* 表單本體 */
+.contact__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.contact__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4em;
+}
+
+.contact__label {
+    font-family: var(--f-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.18em;
+    color: rgba(var(--c-stellar-rgb), 0.5);
+    text-transform: uppercase;
+}
+
+.contact__label .req {
+    color: rgba(var(--c-cyan-rgb), 0.85);
+    margin-left: 0.2em;
+}
+
+/* 輸入框、下拉選單、文字區域 — 玻璃質感，與 channel 卡片同系 */
+.contact__input,
+.contact__select,
+.contact__textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.78em 1em;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(var(--c-cyan-rgb), 0.18);
+    border-radius: 8px;
+    color: var(--c-stellar);
+    font-family: var(--f-sans);
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+    outline: none;
+    transition: border-color 0.25s, box-shadow 0.25s;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.contact__input::placeholder,
+.contact__textarea::placeholder {
+    color: rgba(var(--c-stellar-rgb), 0.28);
+}
+
+.contact__input:focus,
+.contact__select:focus,
+.contact__textarea:focus {
+    border-color: rgba(var(--c-cyan-rgb), 0.55);
+    box-shadow: 0 0 0 3px rgba(var(--c-cyan-rgb), 0.07);
+}
+
+/* 下拉選單箭頭 */
+.contact__select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300b4d8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1em center;
+    padding-right: 2.5em;
+}
+
+.contact__select option {
+    background: #111;
+    color: #e8f0ff;
+}
+
+.contact__textarea {
+    resize: vertical;
+    min-height: 7em;
+}
+
+/* Honeypot — 完全隱藏，機器人填了就靜默丟棄 */
+.contact__honey {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    pointer-events: none;
+    tabindex: -1;
+}
+
+/* 送出按鈕 */
+.contact__submit {
+    align-self: flex-start;
+    margin-top: 0.25rem;
+}
+
+/* 狀態訊息（loading / error） */
+.contact__status {
+    font-family: var(--f-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    min-height: 1.2em;
+    margin-top: 0.25rem;
+}
+
+.contact__status--error   { color: #ff6b6b; }
+.contact__status--loading { color: rgba(var(--c-cyan-rgb), 0.75); }
+
 /* ── 手機版（≤ 720px）── */
 @media (max-width: 720px) {
     .contact__channel {

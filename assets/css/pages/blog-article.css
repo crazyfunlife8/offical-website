@@ -1,0 +1,194 @@
+/* ============================================================
+   pages/blog-article.css — 文章內頁
+   創巢數位 Nest Digital ／ 不正常觀點 · 異常觀察檔案
+   ─────────────────────────────────────────────────────────────
+   這份 CSS 在 blog.css 之後載入，擴充文章內頁樣式。
+   使用 body.archive 已定義的 CSS 變數：
+   --paper, --paper-2, --paper-3, --ink, --ink-2, --ink-3,
+   --read, --line, --line-mid, --line-str, --pen-blue, --gold
+   圖路徑：由 blog.css 承擔（../../images/blog/），本檔無 url()
+   ============================================================ */
+
+/* ── 麵包屑返回連結 ───────────────────────────────────────── */
+.arc-breadcrumb {
+    margin-bottom: 2rem;
+}
+.arc-breadcrumb a {
+    font-family: var(--f-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    color: var(--pen-blue);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color .2s;
+}
+.arc-breadcrumb a:hover {
+    border-bottom-color: var(--pen-blue);
+}
+
+/* ── 文章容器 ─────────────────────────────────────────────── */
+.arc-article {
+    max-width: 720px;
+    margin: 0 auto;
+    padding-bottom: clamp(4rem, 8vw, 8rem);
+}
+
+/* ── 文章頁首 ─────────────────────────────────────────────── */
+.arc-article__header {
+    margin-bottom: 2.5rem;
+    border-bottom: 1.5px solid var(--line-mid);
+    padding-bottom: 1.5rem;
+}
+.arc-article__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    flex-wrap: wrap;
+    margin-bottom: 1.2rem;
+}
+.arc-article__date {
+    font-family: var(--f-mono);
+    font-size: 0.72rem;
+    color: var(--ink-3);
+}
+.arc-article__title {
+    font-family: var(--f-serif-cjk);
+    font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1.3;
+    letter-spacing: 0.02em;
+    margin: 0;
+}
+
+/* ── 正文排版 ─────────────────────────────────────────────── */
+.arc-article__body {
+    color: var(--read);
+    line-height: 1.9;
+    font-size: 1.0625rem;
+}
+
+.arc-article__body h2 {
+    font-family: var(--f-serif-cjk);
+    font-weight: 700;
+    font-size: clamp(1.25rem, 2.8vw, 1.55rem);
+    color: var(--ink);
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    margin: 2.2em 0 0.9em;
+    padding-left: 0.75em;
+    border-left: 3px solid var(--pen-blue);
+}
+
+.arc-article__body h3 {
+    font-family: var(--f-serif-cjk);
+    font-weight: 700;
+    font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+    color: var(--ink);
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    margin: 1.8em 0 0.7em;
+}
+
+.arc-article__body p {
+    margin: 0 0 1.4em;
+}
+
+.arc-article__body strong {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.arc-article__body ul,
+.arc-article__body ol {
+    margin: 0 0 1.4em;
+    padding-left: 1.5em;
+}
+
+.arc-article__body li {
+    margin-bottom: 0.4em;
+}
+
+.arc-article__body blockquote {
+    border-left: 3px solid var(--pen-blue);
+    background: var(--paper-3, #f7f0e2);
+    padding: 0.8em 1.2em;
+    margin: 1.5em 0;
+    font-style: italic;
+}
+
+.arc-article__body blockquote p {
+    margin: 0;
+}
+
+.arc-article__body blockquote strong {
+    font-style: normal;
+}
+
+.arc-article__body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5em 0;
+    font-size: 0.92rem;
+}
+
+.arc-article__body th {
+    font-family: var(--f-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    border-bottom: 1.5px solid var(--line-str);
+    padding: 0.5em 0.8em;
+    text-align: left;
+    color: var(--ink-2);
+}
+
+.arc-article__body td {
+    border-bottom: 1px solid var(--line);
+    padding: 0.5em 0.8em;
+    color: var(--read);
+}
+
+.arc-article__body hr {
+    border: none;
+    border-top: 1px solid var(--line-mid);
+    margin: 2em 0;
+}
+
+/* ── 文末 CTA ─────────────────────────────────────────────── */
+.arc-article__cta {
+    margin-top: 3rem;
+    border-top: 1.5px solid var(--line-mid);
+    padding-top: 1.5rem;
+}
+
+.arc-article__cta p {
+    color: var(--ink-2);
+    margin: 0.5em 0 1em;
+}
+
+.arc-article__cta-btn {
+    display: inline-block;
+    font-family: var(--f-mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    color: var(--pen-blue);
+    border: 1.5px solid var(--pen-blue);
+    padding: 0.5em 1.2em;
+    text-decoration: none;
+    transition: background .2s, color .2s;
+}
+
+.arc-article__cta-btn:hover {
+    background: var(--pen-blue);
+    color: var(--paper);
+}
+
+/* ── 響應式 ───────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .arc-article__title {
+        font-size: 1.5rem;
+    }
+    .arc-article__body {
+        font-size: 1rem;
+    }
+}

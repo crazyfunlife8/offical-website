@@ -69,12 +69,87 @@
                     </a>
                 </div>
 
-                <div class="contact__studio" data-reveal data-reveal-delay="0.4">
+                <!-- 詢問表單 -->
+                <div class="contact__form-section" data-reveal data-reveal-delay="0.4">
+                    <div class="contact__form-sep">
+                        <span>OR&nbsp;·&nbsp;或填寫詢問表單</span>
+                    </div>
+
+                    <form class="contact__form" id="contactForm" novalidate>
+
+                        <!-- Honeypot：正常人看不到、機器人會填 -->
+                        <div class="contact__honey" aria-hidden="true">
+                            <label>請勿填寫 <input type="text" name="_url" tabindex="-1" autocomplete="off"></label>
+                        </div>
+
+                        <div class="contact__field">
+                            <label class="contact__label" for="cf-name">
+                                姓名 <span class="req" aria-label="必填">*</span>
+                            </label>
+                            <input class="contact__input" id="cf-name" name="name"
+                                   type="text" placeholder="你的名字或公司名稱" autocomplete="name" required>
+                        </div>
+
+                        <div class="contact__field">
+                            <label class="contact__label" for="cf-contact">
+                                聯絡方式（Email 或電話）<span class="req" aria-label="必填">*</span>
+                            </label>
+                            <input class="contact__input" id="cf-contact" name="contact"
+                                   type="text" placeholder="email@example.com 或 09xx-xxx-xxx" autocomplete="email" required>
+                        </div>
+
+                        <div class="contact__field">
+                            <label class="contact__label" for="cf-service">
+                                想詢問的服務 <span class="req" aria-label="必填">*</span>
+                            </label>
+                            <select class="contact__select" id="cf-service" name="service" required>
+                                <option value="" disabled selected>請選擇</option>
+                                <option value="跳動E投放（TikTok 廣告）">跳動E投放（TikTok 廣告）</option>
+                                <option value="一鍵式架站">一鍵式架站</option>
+                                <option value="AI 網紅經營">AI 網紅經營</option>
+                                <option value="SEO 部落格撰寫">SEO 部落格撰寫</option>
+                                <option value="社群經營">社群經營</option>
+                                <option value="預約系統開發">預約系統開發</option>
+                                <option value="其他 / 不確定">其他 / 不確定</option>
+                            </select>
+                        </div>
+
+                        <div class="contact__field">
+                            <label class="contact__label" for="cf-budget">預算範圍（選填）</label>
+                            <select class="contact__select" id="cf-budget" name="budget">
+                                <option value="" selected>不確定 / 想先了解</option>
+                                <option value="10,000 以下">10,000 以下</option>
+                                <option value="10,000 – 30,000">10,000 – 30,000</option>
+                                <option value="30,000 – 100,000">30,000 – 100,000</option>
+                                <option value="100,000 以上">100,000 以上</option>
+                            </select>
+                        </div>
+
+                        <div class="contact__field">
+                            <label class="contact__label" for="cf-message">
+                                需求描述 <span class="req" aria-label="必填">*</span>
+                            </label>
+                            <textarea class="contact__textarea" id="cf-message" name="message"
+                                      placeholder="簡單說說你的情況、目前遇到的問題，或想達到的目標——多說一點我們回得更快。"
+                                      rows="5" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn--primary contact__submit">
+                            送出詢問
+                            <span class="btn-arrow" aria-hidden="true">→</span>
+                        </button>
+
+                        <p class="contact__status" id="contactStatus" role="status" aria-live="polite"></p>
+
+                    </form>
+                </div>
+
+                <div class="contact__studio" data-reveal data-reveal-delay="0.5">
                     <p>創巢數位資訊企業社・統編 93019200</p>
                     <p>桃園市中壢區中央西路二段 268-1 號 5 樓</p>
                 </div>
 
-                <a href="index.html" class="coming-soon__back-link" data-reveal data-reveal-delay="0.5">
+                <a href="index.html" class="coming-soon__back-link" data-reveal data-reveal-delay="0.6">
                     ← 回首頁
                 </a>
 
@@ -87,5 +162,36 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="assets/js/core.js"></script>
     <script src="assets/js/nav.js"></script>
+    <script>
+    (function () {
+        const form   = document.getElementById('contactForm');
+        const status = document.getElementById('contactStatus');
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            status.textContent = '傳送中……';
+            status.className   = 'contact__status contact__status--loading';
+
+            try {
+                const res  = await fetch('/api/contact', {
+                    method:  'POST',
+                    body:    new FormData(form),
+                });
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    window.location.href = 'thank-you.html';
+                } else {
+                    status.textContent = '送出失敗：' + (data.error || '請稍後再試，或直接 LINE 我們。');
+                    status.className   = 'contact__status contact__status--error';
+                }
+            } catch {
+                status.textContent = '網路錯誤，請稍後再試，或直接 LINE 我們。';
+                status.className   = 'contact__status contact__status--error';
+            }
+        });
+    })();
+    </script>
 </body>
 </html>
