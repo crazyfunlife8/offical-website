@@ -10,24 +10,23 @@
     // ─── 導覽列 HTML ──────────────────────────────────────────
     const NAV_HTML = `
 <nav class="site-nav" role="navigation" aria-label="主導覽列">
-    <a href="index.html" class="nav__brand" aria-label="創巢數位 Nest Digital 首頁">
+    <a href="/" class="nav__brand" aria-label="創巢數位 Nest Digital 首頁">
         <span class="nav__brand-zh">創巢數位</span>
         <span class="nav__brand-divider" aria-hidden="true"></span>
         <span class="nav__brand-en">NEST DIGITAL</span>
     </a>
 
     <ul class="nav__links" role="list">
-        <li><a href="index.html#services-section">服務</a></li>
-        <li><a href="blog.html">不正常觀點</a></li>
-        <li><a href="quick-site.html">一鍵架站</a></li>
+        <li><a href="/#services-section">服務</a></li>
+        <li><a href="/blog.html">不正常觀點</a></li>
         <li class="nav__links-cta-mobile">
-            <a href="contact.html">聯絡我們 <span aria-hidden="true">→</span></a>
+            <a href="/contact.html">聯絡我們 <span aria-hidden="true">→</span></a>
         </li>
     </ul>
 
     <span class="nav__divider" aria-hidden="true"></span>
 
-    <a href="contact.html" class="nav__cta">
+    <a href="/contact.html" class="nav__cta">
         <span class="nav__cta-label">聯絡我們</span>
         <span class="nav__cta-arrow" aria-hidden="true">→</span>
     </a>
@@ -89,7 +88,9 @@
         <!-- 最底版權行 -->
         <p class="site-footer__copy">
             © 2024–2026 Nest Digital. All rights reserved.
-            &ensp;·&ensp;<a href="privacy.html" class="site-footer__privacy-link">隱私政策</a>
+            &ensp;·&ensp;<a href="/privacy.html" class="site-footer__privacy-link">隱私政策</a>
+            &ensp;·&ensp;<a href="/terms.html" class="site-footer__privacy-link">服務條款</a>
+            &ensp;·&ensp;<a href="/refund.html" class="site-footer__privacy-link">退費政策</a>
         </p>
     </div>
 </footer>
@@ -138,7 +139,7 @@
     }
 
     function bootStarfield() {
-        loadScript('assets/js/starfield.js').catch((e) => {
+        loadScript('/assets/js/starfield.js').catch((e) => {
             console.warn(e);
             // starfield.js 載入失敗 → 拔 has-threejs，CSS 星空 fallback 接手
             document.body.classList.remove('has-threejs');
@@ -254,11 +255,14 @@
     });
 
     // ─── Active 狀態：高亮目前頁面連結 ───────────────────────
-    const currentPath = location.pathname.split('/').pop() || 'index.html';
+    const currentPathname = location.pathname;
 
     document.querySelectorAll('.nav__links a').forEach((a) => {
         const href = a.getAttribute('href');
-        if (href && href === currentPath) {
+        if (!href) return;
+        const hrefPath = href.split('#')[0].split('?')[0];
+        if (hrefPath === currentPathname ||
+            (hrefPath === '/' && (currentPathname === '/' || currentPathname === '/index.html'))) {
             a.classList.add('active');
         }
     });
@@ -294,5 +298,103 @@
     }
 
     initHamburger();
+
+    // ─── Cookie 同意橫幅 ──────────────────────────────────────
+    // 順序紀律：privacy.html 先改 → 本橫幅上線 → GA4/Pixel 才能裝
+    // 使用者偏好存 localStorage key "nd_cookie"
+    // 值："all"（接受所有）或 "essential"（僅必要）
+
+    function loadAnalytics() {
+        // ── GA4 ──────────────────────────────────────────────
+        // 取得 Measurement ID 後，移除下方整段的 /* */ 並填入真實 ID：
+        /*
+        const GA4_ID = 'G-XXXXXXXXXX';
+        const s = document.createElement('script');
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA4_ID;
+        s.async = true;
+        document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', GA4_ID);
+        */
+
+        // ── Meta Pixel ───────────────────────────────────────
+        // 取得 Pixel ID 後填入：
+        /*
+        const META_PIXEL_ID = 'XXXXXXXXXXXXXXXXXX';
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+        n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+        document,'script','https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', META_PIXEL_ID);
+        fbq('track', 'PageView');
+        */
+
+        // ── TikTok Pixel ─────────────────────────────────────
+        // 取得 Pixel ID 後填入：
+        /*
+        const TIKTOK_PIXEL_ID = 'CXXXXXXXXXXXXXXXXX';
+        !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];
+        ttq.methods=["page","track","identify","instances","debug","on","off","once",
+        "ready","alias","group","enableCookie","disableCookie"];
+        ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};
+        for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
+        ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)
+        ttq.setAndDefer(e,ttq.methods[n]);return e};ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";
+        ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=i;ttq._f=ttq._f||{};
+        ttq._f[e]=n;var o=document.createElement("script");o.type="text/javascript";
+        o.async=!0;o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];
+        a.parentNode.insertBefore(o,a)};ttq.load(TIKTOK_PIXEL_ID);ttq.page()}(window,document,'ttq');
+        */
+    }
+
+    function initCookieConsent() {
+        const PREF_KEY = 'nd_cookie';
+        const pref = localStorage.getItem(PREF_KEY);
+
+        if (pref === 'all') { loadAnalytics(); return; }
+        if (pref === 'essential') { return; }
+
+        // 未設定偏好：顯示橫幅
+        const banner = document.createElement('div');
+        banner.id = 'cookie-banner';
+        banner.setAttribute('role', 'dialog');
+        banner.setAttribute('aria-label', 'Cookie 同意');
+        banner.innerHTML =
+            '<p class="cookie-banner__text">' +
+                '我們使用分析型與廣告型 Cookie 改善服務體驗。' +
+                '<a href="/privacy.html" class="cookie-banner__link">隱私政策</a>' +
+            '</p>' +
+            '<div class="cookie-banner__actions">' +
+                '<button class="cookie-banner__btn cookie-banner__btn--accept">接受所有</button>' +
+                '<button class="cookie-banner__btn cookie-banner__btn--decline">僅必要</button>' +
+            '</div>';
+
+        document.body.appendChild(banner);
+
+        // 用 rAF 確保 translateY(100%) 的初始態已渲染，再加 is-visible 觸發過渡
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => banner.classList.add('is-visible'));
+        });
+
+        function dismiss(choice) {
+            localStorage.setItem(PREF_KEY, choice);
+            banner.classList.remove('is-visible');
+            banner.addEventListener('transitionend', () => banner.remove(), { once: true });
+        }
+
+        banner.querySelector('.cookie-banner__btn--accept').addEventListener('click', function () {
+            dismiss('all');
+            loadAnalytics();
+        });
+
+        banner.querySelector('.cookie-banner__btn--decline').addEventListener('click', function () {
+            dismiss('essential');
+        });
+    }
+
+    initCookieConsent();
 
 })();

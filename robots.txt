@@ -1,1 +1,8 @@
+User-agent: *
+Disallow: /404.html
+Disallow: /maintenance.html
+Disallow: /thank-you.html
+Disallow: /services.html
+Disallow: /demo/
+
 Sitemap: https://nestdigitalai.com/sitemap.xml

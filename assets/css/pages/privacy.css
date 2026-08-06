@@ -160,6 +160,65 @@
     color: var(--c-cyan);
 }
 
+/* ── 資料表格（Cookie 類型、第三方揭露、版本紀錄）── */
+.privacy-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.75em 0 1em;
+    font-family: var(--f-sans);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.privacy-table th {
+    font-family: var(--f-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(var(--c-cyan-rgb), 0.65);
+    padding: 0.6em 0.9em;
+    border-bottom: 1px solid rgba(var(--c-cyan-rgb), 0.18);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.privacy-table td {
+    padding: 0.6em 0.9em;
+    color: rgba(var(--c-stellar-rgb), 0.62);
+    border-bottom: 1px solid rgba(var(--c-stellar-rgb), 0.06);
+    vertical-align: top;
+}
+
+.privacy-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* 版本紀錄表：前兩欄（版次、生效日期）固定寬度不換行 */
+.privacy-table--versions th:nth-child(1),
+.privacy-table--versions td:nth-child(1) {
+    white-space: nowrap;
+    width: 4em;
+}
+
+.privacy-table--versions th:nth-child(2),
+.privacy-table--versions td:nth-child(2) {
+    white-space: nowrap;
+    width: 7.5em;
+}
+
+/* 手機：表格允許橫向捲動，避免被擠爆 */
+.privacy-section .privacy-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0.75em 0 1em;
+}
+
+.privacy-section .privacy-table-wrap .privacy-table {
+    margin: 0;
+    min-width: 480px;
+}
+
 /* ── 回首頁連結 ── */
 .privacy-back {
     margin-top: var(--sp-lg);
