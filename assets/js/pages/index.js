@@ -93,15 +93,7 @@
         // 2026-06-23 舊 bento 卡片 stagger 移除；手風琴/玻璃卡靜態呈現、各有獨立互動腳本。
         // section-header 的淡入由 core.js initScrollReveal 統一處理（eyebrow/title 帶 data-reveal），此處不重複綁定。
 
-        // ── Section 5：終點 CTA ──
-        const ctaEls = document.querySelectorAll('.final-cta__inner > *');
-        gsap.fromTo(ctaEls,
-            { opacity: 0, y: 30 },
-            {
-                opacity: 1, y: 0, duration: 0.65, stagger: 0.12, ease: 'power2.out',
-                scrollTrigger: { trigger: '.final-cta', start: 'top 80%', toggleActions: 'play none none none' }
-            }
-        );
+        // Section 5 的進場動畫由 core.js initScrollReveal 的 data-reveal 統一處理
     }
 
     /* ════════════════════════════════════════════════════════
