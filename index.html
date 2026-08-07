@@ -176,10 +176,9 @@
                     </h2>
                 </div>
 
-                <!-- 數位行銷手風琴（4 卡，內容由 index-accordion.js 動態注入；2026-06-23 取代舊 Bento） -->
-                <div class="accordion-wrap">
-                    <div class="alabel">DIGITAL MARKETING ── 數位行銷</div>
-                    <div class="svc-accordion"><div class="acc"></div></div>
+                <!-- 服務六張卡片（3×2，內容由 index-accordion.js 動態注入） -->
+                <div class="svc-grid-wrap">
+                    <div class="svc-grid"></div>
                 </div>
 
             </div>
@@ -209,46 +208,76 @@
 
 
         <!-- ════════════════════════════════════════════════
-             Section 5｜終點 CTA（反轉 CTA：「先別點」）
+             Section 5｜產品展示（一鍵式架站 ＋ 跳動E投放）
         ════════════════════════════════════════════════ -->
-        <section class="final-cta" aria-labelledby="cta-title">
+        <section class="product-showcase" aria-label="產品展示">
 
-            <div class="final-cta__glow" aria-hidden="true"></div>
+            <div class="product-showcase__glow" aria-hidden="true"></div>
 
-            <!-- 太空人 Beat 04（無頭追頭盔）2026-05-11 改用 WebP 偵序列
-                 取代原 video 標籤：iOS Safari 對 VP9+alpha WebM 不渲染 alpha、Windows ffmpeg
-                 又無法產 HEVC+alpha mp4。改用偵序列方案（同 beat02/03 管線）→ 所有平台真透明 -->
+            <!-- ── Block 1：一鍵式架站（文字左、Demo 縮圖右）── -->
+            <div class="spotlight-block">
+                <div class="spotlight-block__inner">
+                    <div class="spotlight-block__text" data-reveal>
+                        <p class="spotlight-block__eyebrow">QUICK SITE</p>
+                        <h2 class="spotlight-block__name">一鍵式架站</h2>
+                        <p class="spotlight-block__price">NT$5,000 一年</p>
+                        <ul class="spotlight-block__points">
+                            <li>填四個欄位，AI 生成三款版型</li>
+                            <li>選到滿意再付款，試用完全免費</li>
+                            <li>含網域、主機、SSL、電子信箱</li>
+                        </ul>
+                        <a href="services/website.html" class="btn btn--yellow">免費看三個版型 <span class="btn-arrow" aria-hidden="true">→</span></a>
+                    </div>
+                    <div class="spotlight-block__visual" data-reveal data-reveal-delay="0.1">
+                        <div class="spotlight-demos">
+                            <a class="spotlight-demo" href="demo/group-buy/" target="_blank" rel="noopener" aria-label="團購網站 Demo">
+                                <img src="assets/images/demoSite-pic/Group-Buying.png" alt="團購網站 Demo" loading="lazy" decoding="async">
+                                <span class="spotlight-demo__label">GROUP BUYING</span>
+                            </a>
+                            <a class="spotlight-demo" href="demo/gaming/" target="_blank" rel="noopener" aria-label="遊戲平台 Demo">
+                                <img src="assets/images/demoSite-pic/game-platform.png" alt="遊戲平台 Demo" loading="lazy" decoding="async">
+                                <span class="spotlight-demo__label">GAMING PLATFORM</span>
+                            </a>
+                            <a class="spotlight-demo" href="demo/travel/" target="_blank" rel="noopener" aria-label="旅遊網站 Demo">
+                                <img src="assets/images/demoSite-pic/travel-website.png" alt="旅遊網站 Demo" loading="lazy" decoding="async">
+                                <span class="spotlight-demo__label">TRAVEL</span>
+                            </a>
+                        </div>
+                        <p class="spotlight-demos__note">以上皆為真實可互動的 Demo 站，點擊即可進入</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spotlight-sep" aria-hidden="true"></div>
+
+            <!-- ── Block 2：跳動E投放（截圖左、文字右）── -->
+            <div class="spotlight-block spotlight-block--flip">
+                <div class="spotlight-block__inner">
+                    <div class="spotlight-block__visual" data-reveal>
+                        <!-- 截圖請存至 assets/images/products/ads-platform.png -->
+                        <div class="spotlight-ads-frame">
+                            <img src="assets/images/products/ads-platform.png" alt="跳動E投放平台截圖" loading="lazy" decoding="async">
+                        </div>
+                    </div>
+                    <div class="spotlight-block__text" data-reveal data-reveal-delay="0.1">
+                        <p class="spotlight-block__eyebrow">TIKTOK ADS</p>
+                        <h2 class="spotlight-block__name">跳動E投放</h2>
+                        <p class="spotlight-block__price">NT$900 起投</p>
+                        <ul class="spotlight-block__points">
+                            <li>總代理要先儲 3 萬，我們 900 就進場</li>
+                            <li>首次投放手續費全免</li>
+                            <li>投得越多，費率越低</li>
+                        </ul>
+                        <a href="services/ads.html" class="btn btn--yellow">開始免費首投 <span class="btn-arrow" aria-hidden="true">→</span></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 太空人 Beat 04（無頭追頭盔）保留 -->
             <div class="footer-astronaut" aria-hidden="true">
                 <canvas id="footer-astronaut-canvas" width="480" height="270"></canvas>
             </div>
 
-            <div class="final-cta__inner">
-                <h2 class="final-cta__title" id="cta-title">先別點。</h2>
-                <p class="final-cta__title-en" lang="en">Don't click yet.</p>
-
-                <div class="final-cta__divider" aria-hidden="true"></div>
-
-                <p class="final-cta__subtitle">除非你準備好不正常一次。</p>
-                <p class="final-cta__subtitle-en" lang="en">Unless you're ready to break something.</p>
-
-                <div class="final-cta__btn-group">
-                    <a href="https://ads.nest-creation.com" class="btn btn--yellow final-cta__btn" target="_blank" rel="noopener">
-                        免費試做，滿意再付款
-                        <span class="btn-arrow" aria-hidden="true">→</span>
-                    </a>
-                    <a href="contact.html" class="btn btn--ghost final-cta__btn-ghost">
-                        先聊聊
-                        <span class="btn-arrow" aria-hidden="true">→</span>
-                    </a>
-                </div>
-
-                <!-- 品牌宣言段落（04-4 §0：接住品牌語氣，落到數字）-->
-                <p class="final-cta__tagline">
-                    <strong>別人要你先儲 3 萬才准開始。</strong>
-                    <strong>我們讓你 900 元就開跑。</strong>
-                    這不叫優惠，這叫本來就該這樣。
-                </p>
-            </div>
         </section>
 
     </main>
