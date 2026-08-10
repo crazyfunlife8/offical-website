@@ -17,14 +17,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install function dependencies
-        run: npm install
-
       # 內部文件不對外部署：在 runner checkout 上移除（repo 保留；.assetsignore 對 pages deploy 無效，故在此 rm）
       - name: Strip internal docs from deploy
         run: rm -f *.md
@@ -34,5 +26,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # npm install 在 wrangler-action 同一 Node 環境執行，確保 Functions 可正確 bundle npm 套件
+          preCommands: npm install
           # commit-message 必須 ASCII，避免 Cloudflare API 8000111 Invalid commit message
           command: pages deploy . --project-name=nestdigitalai --branch=main --commit-dirty=true --commit-message="GHA auto-deploy ${{ github.sha }}"
