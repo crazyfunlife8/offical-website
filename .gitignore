@@ -40,3 +40,6 @@ _imgtest/_*.py
 
 # _imgtest 整目錄（.assetsignore 已排除不上站；純 repo 體積債，2026-06-24 git rm --cached）
 _imgtest/
+
+# 影片素材（Cloudflare Pages 單檔上限 25MB，影片改用 Cloudinary 托管）
+assets/videos/
