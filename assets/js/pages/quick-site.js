@@ -3,7 +3,7 @@
    創巢數位 Nest Digital
    ============================================================ */
 
-const API_GENERATE = 'https://auto-website-builder-production.up.railway.app/api/generate';
+const API_GENERATE = '/api/generate';
 const API_ENHANCE  = '/api/enhance';
 const API_SUBMIT   = '/api/submit';
 

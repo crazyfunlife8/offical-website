@@ -741,14 +741,14 @@ body {
 
 /* ── 視覺欄：廣告平台截圖 ── */
 .spotlight-ads-frame {
+    width: 100%;
+    height: 100%;
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid rgba(var(--c-blue-rgb), 0.25);
     box-shadow:
         0 0 0 1px rgba(var(--c-blue-rgb), 0.08),
         0 8px 40px rgba(var(--c-blue-rgb), 0.18);
-    /* 截圖未到位時顯示暗藍佔位 */
-    min-height: 260px;
     background: rgba(var(--c-navy-rgb), 0.5);
     display: flex;
     align-items: center;
@@ -757,7 +757,103 @@ body {
 
 .spotlight-ads-frame img {
     width: 100%;
+    height: 100%;
+    object-fit: contain;
     display: block;
+}
+
+/* ── 截圖 / 影片 箭頭輪播 ── */
+.spotlight-carousel {
+    position: relative;
+    /* 固定高度：所有 panel 共用同一空間，截圖與影片容器一致 */
+    min-height: 380px;
+}
+
+/* 所有 panel 永遠 absolute 填滿 carousel，靠 opacity 切換可見性 */
+.spotlight-panel {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+}
+.spotlight-panel.is-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* 左右箭頭 */
+.spotlight-carousel__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(var(--c-blue-rgb), 0.38);
+    background: rgba(0, 0, 0, 0.50);
+    backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.spotlight-carousel__arrow:hover {
+    border-color: rgba(var(--c-blue-rgb), 0.75);
+    background: rgba(var(--c-blue-rgb), 0.12);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(var(--c-blue-rgb), 0.28);
+}
+.spotlight-carousel__arrow--prev { left:  0.6rem; }
+.spotlight-carousel__arrow--next { right: 0.6rem; }
+
+/* ── 單支 Reel（全高居中，panel 決定容器大小）── */
+.spotlight-reel {
+    height: 100%;
+    aspect-ratio: 9 / 16;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(var(--c-navy-rgb), 0.5);
+    border: 1px solid rgba(var(--c-blue-rgb), 0.15);
+}
+.spotlight-reel iframe,
+.spotlight-reel video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    object-fit: contain;
+}
+
+/* ── 視覺佔位（素材待補）── */
+.spotlight-placeholder {
+    width: 100%;
+    min-height: 380px;
+    border-radius: 8px;
+    border: 1px dashed rgba(var(--c-blue-rgb), 0.25);
+    background: rgba(var(--c-navy-rgb), 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.spotlight-placeholder span {
+    font-family: var(--f-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.2);
 }
 
 /* ── 兩個產品區塊之間的分隔線 ── */
@@ -835,6 +931,7 @@ body {
     .spotlight-demos .spotlight-demo:last-child img {
         max-height: 120px;
     }
+
 }
 
 

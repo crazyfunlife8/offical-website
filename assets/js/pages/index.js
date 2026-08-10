@@ -111,6 +111,7 @@
             return;
         }
 
+        initSpotlightCarousels();
         initHeroEntrance();
         initScrollAnimations();
 
@@ -131,6 +132,27 @@
             // 太空人隨機漂移（Beat 04）—— 漂移 transform 由 GSAP 控制 wrapper、與 frame loop 並行
             try { initFooterAstronautDrift(); } catch(e) { console.warn('[index.js] footer astronaut drift failed:', e); }
         }
+    }
+
+    // ── 視覺輪播：截圖 ↔ 影片（spotlight-carousel）──
+    function initSpotlightCarousels() {
+        document.querySelectorAll('.spotlight-carousel').forEach(carousel => {
+            const panels = Array.from(carousel.querySelectorAll(':scope > .spotlight-panel'));
+            if (panels.length < 2) return;
+
+            let cur = 0;
+
+            function goTo(idx) {
+                panels[cur].classList.remove('is-active');
+                cur = ((idx % panels.length) + panels.length) % panels.length;
+                panels[cur].classList.add('is-active');
+            }
+
+            const prev = carousel.querySelector('.spotlight-carousel__arrow--prev');
+            const next = carousel.querySelector('.spotlight-carousel__arrow--next');
+            if (prev) prev.addEventListener('click', () => goTo(cur - 1));
+            if (next) next.addEventListener('click', () => goTo(cur + 1));
+        });
     }
 
     // ═══════════════════════════════════════════════════════════

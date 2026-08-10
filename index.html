@@ -254,9 +254,33 @@
             <div class="spotlight-block spotlight-block--flip">
                 <div class="spotlight-block__inner">
                     <div class="spotlight-block__visual" data-reveal>
-                        <!-- 截圖請存至 assets/images/products/ads-platform.png -->
-                        <div class="spotlight-ads-frame">
-                            <img src="assets/images/products/ads-platform.png" alt="跳動E投放平台截圖" loading="lazy" decoding="async">
+                        <!-- 截圖 ↔ 影片 箭頭輪播 -->
+                        <div class="spotlight-carousel" aria-label="跳動E投放展示">
+                            <!-- Panel 1：平台截圖 -->
+                            <div class="spotlight-panel is-active">
+                                <div class="spotlight-ads-frame">
+                                    <img src="assets/images/products/ads-platform.png" alt="跳動E投放平台截圖" loading="lazy" decoding="async">
+                                </div>
+                            </div>
+                            <!-- Panel 2：操作示範一 -->
+                            <div class="spotlight-panel">
+                                <div class="spotlight-reel">
+                                    <video controls playsinline preload="metadata">
+                                        <source src="assets/videos/ads-demo-1.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                            </div>
+                            <!-- Panel 3：操作示範二（影片到位後自動生效）-->
+                            <div class="spotlight-panel">
+                                <div class="spotlight-reel">
+                                    <video controls playsinline preload="metadata">
+                                        <source src="assets/videos/ads-demo-2.mp4" type="video/mp4">
+                                    </video>
+                                </div>
+                            </div>
+                            <!-- 左右切換箭頭 -->
+                            <button class="spotlight-carousel__arrow spotlight-carousel__arrow--prev" aria-label="上一個">‹</button>
+                            <button class="spotlight-carousel__arrow spotlight-carousel__arrow--next" aria-label="下一個">›</button>
                         </div>
                     </div>
                     <div class="spotlight-block__text" data-reveal data-reveal-delay="0.1">
@@ -265,10 +289,70 @@
                         <p class="spotlight-block__price">NT$900 起投</p>
                         <ul class="spotlight-block__points">
                             <li>總代理要先儲 3 萬，我們 900 就進場</li>
-                            <li>首次投放手續費全免</li>
-                            <li>投得越多，費率越低</li>
+                            <li>首次投放手續費折抵200元</li>
+                            <li>推薦越多，費用越低</li>
                         </ul>
                         <a href="services/ads.html" class="btn btn--yellow">開始免費首投 <span class="btn-arrow" aria-hidden="true">→</span></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spotlight-sep" aria-hidden="true"></div>
+
+            <!-- ── Block 3：社群經營（文字左、視覺右）── -->
+            <div class="spotlight-block">
+                <div class="spotlight-block__inner">
+                    <div class="spotlight-block__text" data-reveal>
+                        <p class="spotlight-block__eyebrow">SOCIAL</p>
+                        <h2 class="spotlight-block__name">社群經營</h2>
+                        <p class="spotlight-block__price">NT$8,000 起</p>
+                        <ul class="spotlight-block__points">
+                            <li>影片剪輯、文案撰寫，可以只買一項</li>
+                            <li>每月固定發文，維持帳號活躍度</li>
+                            <li>配合品牌調性，不走制式公版風</li>
+                        </ul>
+                        <a href="contact.html" class="btn btn--yellow">聊聊你的需求 <span class="btn-arrow" aria-hidden="true">→</span></a>
+                    </div>
+                    <div class="spotlight-block__visual" data-reveal data-reveal-delay="0.1">
+                        <div class="spotlight-carousel">
+                            <div class="spotlight-panel is-active">
+                                <div class="spotlight-ads-frame">
+                                    <img src="assets/images/products/social-demo-1.jpg" alt="社群經營作品截圖 1" loading="lazy">
+                                </div>
+                            </div>
+                            <div class="spotlight-panel">
+                                <div class="spotlight-ads-frame">
+                                    <img src="assets/images/products/social-demo-2.png" alt="社群經營作品截圖 2" loading="lazy">
+                                </div>
+                            </div>
+                            <button class="spotlight-carousel__arrow spotlight-carousel__arrow--prev" aria-label="上一張">‹</button>
+                            <button class="spotlight-carousel__arrow spotlight-carousel__arrow--next" aria-label="下一張">›</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spotlight-sep" aria-hidden="true"></div>
+
+            <!-- ── Block 4：AI形象網紅（視覺左、文字右）── -->
+            <div class="spotlight-block spotlight-block--flip">
+                <div class="spotlight-block__inner">
+                    <div class="spotlight-block__visual" data-reveal>
+                        <!-- 素材待補：放 AI 網紅作品截圖或影片 -->
+                        <div class="spotlight-placeholder">
+                            <span>素材準備中</span>
+                        </div>
+                    </div>
+                    <div class="spotlight-block__text" data-reveal data-reveal-delay="0.1">
+                        <p class="spotlight-block__eyebrow">AI TALENT</p>
+                        <h2 class="spotlight-block__name">AI形象網紅</h2>
+                        <p class="spotlight-block__price">NT$18,000 起 / 月</p>
+                        <ul class="spotlight-block__points">
+                            <li>不會有醜聞、遲到、或突然失聯</li>
+                            <li>外貌、聲音、個性全部客製化</li>
+                            <li>一個代言人，全渠道無限次使用</li>
+                        </ul>
+                        <a href="contact.html" class="btn btn--yellow">聊聊你的需求 <span class="btn-arrow" aria-hidden="true">→</span></a>
                     </div>
                 </div>
             </div>

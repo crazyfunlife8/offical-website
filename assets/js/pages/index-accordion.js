@@ -13,7 +13,7 @@
   // 位置計算：左欄 bgx≈1，中欄 bgx=50，右欄 bgx≈99；上排 bgy≈2，下排 bgy≈98
   const DATA = [
     { n:'01', cjk:'跳動E投放',     en:'TIKTOK ADS',  desc:'900 元就能投 TikTok 廣告',  price:'手續費 25% 起，首投免費', href:'services/ads.html',          bgx:99,  bgy:2   },
-    { n:'02', cjk:'一鍵式架站',    en:'QUICK SITE',  desc:'填四個欄位，看三個版型',      price:'一年 NT$5,000',          href:'quick-site.html',             bgx:50,  bgy:98  },
+    { n:'02', cjk:'一鍵式架站',    en:'QUICK SITE',  desc:'填四個欄位，看三個版型',      price:'一年 NT$5,000',          href:'services/website.html',             bgx:50,  bgy:98  },
     { n:'03', cjk:'AI形象網紅',    en:'AI TALENT',   desc:'一個不會爆雷的代言人',        price:'月費 NT$18,000 起',      href:'services/ai-influencer.html', bgx:1,   bgy:98  },
     { n:'04', cjk:'SEO 部落格撰寫', en:'SEO CONTENT', desc:'一個月四篇，關鍵字到上稿', price:'月費 NT$12,000 起',      href:'services/seo.html',           bgx:50,  bgy:2   },
     { n:'05', cjk:'社群經營',      en:'SOCIAL',      desc:'影片、文案可以只買一個',      price:'NT$8,000 起',            href:'services/social.html',        bgx:1,   bgy:2   },
