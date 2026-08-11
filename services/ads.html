@@ -218,6 +218,39 @@
             </div>
         </section>
 
+        <!-- ── Demo ── -->
+        <section class="svc-demo" aria-label="平台操作展示">
+            <div class="svc-demo__inner">
+                <p class="svc-label" data-reveal>DEMO</p>
+                <h2 class="svc-section-title" data-reveal data-reveal-delay="0.08">平台長這樣。</h2>
+                <div class="svc-body" data-reveal data-reveal-delay="0.10">
+                    <p>開完戶就是這個畫面。設廣告目標、選受眾、填預算，送出。</p>
+                </div>
+                <div class="svc-demo__carousel" data-reveal data-reveal-delay="0.14">
+                    <div class="svc-demo__panel is-active">
+                        <img src="/assets/images/products/ads-platform.png" alt="跳動E投放平台操作介面" loading="lazy">
+                    </div>
+                    <div class="svc-demo__panel">
+                        <video autoplay loop muted playsinline controls>
+                            <source src="https://res.cloudinary.com/dyuasumw8/video/upload/v1786420459/ads-demo-1_amn9ty.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="svc-demo__panel">
+                        <video autoplay loop muted playsinline controls>
+                            <source src="https://res.cloudinary.com/dyuasumw8/video/upload/v1786429323/ads-demo-3_ndydq3.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <button class="svc-demo__arrow svc-demo__arrow--prev" aria-label="上一張">‹</button>
+                    <button class="svc-demo__arrow svc-demo__arrow--next" aria-label="下一張">›</button>
+                </div>
+                <div class="svc-demo__dots" aria-hidden="true">
+                    <button class="svc-demo__dot is-active"></button>
+                    <button class="svc-demo__dot"></button>
+                    <button class="svc-demo__dot"></button>
+                </div>
+            </div>
+        </section>
+
         <!-- ── Final CTA ── -->
         <section class="svc-final-cta" aria-label="開始投放">
             <div class="svc-final-cta__inner">
@@ -237,5 +270,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="/assets/js/core.js"></script>
     <script src="/assets/js/nav.js"></script>
+    <script>
+    (function () {
+        document.querySelectorAll('.svc-demo__carousel').forEach(function (carousel) {
+            var panels = Array.from(carousel.querySelectorAll('.svc-demo__panel'));
+            if (panels.length <= 1) return;
+            var dotsWrap = carousel.parentElement.querySelector('.svc-demo__dots');
+            var dots = dotsWrap ? Array.from(dotsWrap.querySelectorAll('.svc-demo__dot')) : [];
+            var current = 0;
+
+            function show(idx) {
+                var prev = current;
+                panels[prev].classList.remove('is-active');
+                if (dots[prev]) dots[prev].classList.remove('is-active');
+                current = (idx + panels.length) % panels.length;
+                panels[current].classList.add('is-active');
+                if (dots[current]) dots[current].classList.add('is-active');
+                var prevVid = panels[prev].querySelector('video');
+                if (prevVid) prevVid.pause();
+                var nextVid = panels[current].querySelector('video');
+                if (nextVid) nextVid.play().catch(function () {});
+            }
+
+            carousel.querySelector('.svc-demo__arrow--prev').addEventListener('click', function () { show(current - 1); });
+            carousel.querySelector('.svc-demo__arrow--next').addEventListener('click', function () { show(current + 1); });
+            dots.forEach(function (dot, i) { dot.addEventListener('click', function () { show(i); }); });
+        });
+    })();
+    </script>
 </body>
 </html>
