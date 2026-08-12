@@ -257,16 +257,37 @@
 
     // ─── Active 狀態：高亮目前頁面連結 ───────────────────────
     const currentPathname = location.pathname;
+    const isHomePage = currentPathname === '/' || currentPathname === '/index.html';
 
     document.querySelectorAll('.nav__links a').forEach((a) => {
         const href = a.getAttribute('href');
         if (!href) return;
-        const hrefPath = href.split('#')[0].split('?')[0];
+        const hasHash = href.includes('#');
+        // 錨點連結（如 /#services-section）不做 pathname 比對，避免首頁雙高亮
+        if (hasHash) return;
+        const hrefPath = href.split('?')[0];
         if (hrefPath === currentPathname ||
-            (hrefPath === '/' && (currentPathname === '/' || currentPathname === '/index.html'))) {
+            (hrefPath === '/' && isHomePage)) {
             a.classList.add('active');
         }
     });
+
+    // 首頁：滾入服務區時改高亮「服務」，離開時恢復「首頁」
+    if (isHomePage) {
+        const homeLink     = document.querySelector('.nav__links a[href="/"]');
+        const servicesLink = document.querySelector('.nav__links a[href="/#services-section"]');
+        const servicesSection = document.querySelector('#services-section');
+
+        if (homeLink && servicesLink && servicesSection) {
+            const observer = new IntersectionObserver((entries) => {
+                const inView = entries[0].isIntersecting;
+                homeLink.classList.toggle('active', !inView);
+                servicesLink.classList.toggle('active', inView);
+            }, { threshold: 0.15, rootMargin: '-80px 0px 0px 0px' });
+
+            observer.observe(servicesSection);
+        }
+    }
 
     // ─── Hamburger 選單開合（mobile）──────────────────────────
     // 只在 mobile（≤900px）顯示按鈕；桌機 CSS 隱藏 .nav__hamburger
