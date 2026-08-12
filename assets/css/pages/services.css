@@ -594,8 +594,9 @@
     margin-top: var(--sp-md);
     border-radius: 10px;
     overflow: hidden;
-    background: rgba(var(--c-navy-rgb), 0.40);
-    border: 1px solid rgba(var(--c-stellar-rgb), 0.06);
+    background: #000;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6), 0 8px 32px rgba(0, 0, 0, 0.55);
 }
 
 .svc-demo__panel {
