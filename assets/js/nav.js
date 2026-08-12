@@ -17,6 +17,7 @@
     </a>
 
     <ul class="nav__links" role="list">
+        <li><a href="/">首頁</a></li>
         <li><a href="/#services-section">服務</a></li>
         <li><a href="/blog.html">不正常觀點</a></li>
         <li class="nav__links-cta-mobile">
