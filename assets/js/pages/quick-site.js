@@ -480,13 +480,16 @@ function selectDesign(index) {
 // 全屏預覽 Overlay
 // ════════════════════════════════════════════════
 
-// 注入到 srcdoc 的點擊攔截 script（封鎖所有 <a> 導航，不影響滾動）
-const BLOCK_LINKS_SCRIPT = '<script>document.addEventListener("click",function(e){if(e.target.closest("a"))e.preventDefault();},{capture:true});<\/script>';
+// 注入到 srcdoc：強制 overflow 可捲動 + 封鎖 <a> 導航
+const FULLSCREEN_INJECT = [
+    '<style>html,body{overflow-y:auto!important;height:auto!important}</style>',
+    '<script>document.addEventListener("click",function(e){if(e.target.closest("a"))e.preventDefault();},{capture:true});<\/script>'
+].join('');
 
 function injectBlockScript(html) {
-    return /<\/body>/i.test(html)
-        ? html.replace(/<\/body>/i, BLOCK_LINKS_SCRIPT + '</body>')
-        : html + BLOCK_LINKS_SCRIPT;
+    if (/<\/body>/i.test(html)) return html.replace(/<\/body>/i, FULLSCREEN_INJECT + '</body>');
+    if (/<\/html>/i.test(html)) return html.replace(/<\/html>/i, FULLSCREEN_INJECT + '</html>');
+    return html + FULLSCREEN_INJECT;
 }
 
 function openFullscreen(index) {
