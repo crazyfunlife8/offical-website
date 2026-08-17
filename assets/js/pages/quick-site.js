@@ -480,10 +480,10 @@ function selectDesign(index) {
 // 全屏預覽 Overlay
 // ════════════════════════════════════════════════
 
-// 注入到 srcdoc：強制 overflow 可捲動 + 封鎖 <a> 導航
+// 注入到 srcdoc：強制 overflow 可捲動 + 接收 parent postMessage 執行 scrollBy
 const FULLSCREEN_INJECT = [
     '<style>html,body{overflow-y:auto!important;height:auto!important}</style>',
-    '<script>document.addEventListener("click",function(e){if(e.target.closest("a"))e.preventDefault();},{capture:true});<\/script>'
+    '<script>window.addEventListener("message",function(e){if(e.data&&e.data.type==="qs-scroll")window.scrollBy(0,e.data.dy);});<\/script>'
 ].join('');
 
 function injectBlockScript(html) {
@@ -491,6 +491,34 @@ function injectBlockScript(html) {
     if (/<\/html>/i.test(html)) return html.replace(/<\/html>/i, FULLSCREEN_INJECT + '</html>');
     return html + FULLSCREEN_INJECT;
 }
+
+// Shield：攔截點擊（div 覆蓋 iframe，click 打不到 iframe）
+// 並將 wheel / touch 轉發給 iframe 執行 scrollBy
+(function setupShield() {
+    const shield = document.getElementById('fullscreenShield');
+    const frame  = document.getElementById('fullscreenFrame');
+
+    function postScroll(dy) {
+        frame.contentWindow.postMessage({ type: 'qs-scroll', dy }, '*');
+    }
+
+    shield.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        postScroll(e.deltaY);
+    }, { passive: false });
+
+    let touchY = 0;
+    shield.addEventListener('touchstart', function (e) {
+        touchY = e.touches[0].clientY;
+    }, { passive: true });
+
+    shield.addEventListener('touchmove', function (e) {
+        e.preventDefault();
+        const dy = touchY - e.touches[0].clientY;
+        touchY = e.touches[0].clientY;
+        postScroll(dy);
+    }, { passive: false });
+}());
 
 function openFullscreen(index) {
     const design  = generatedDesigns[index];
