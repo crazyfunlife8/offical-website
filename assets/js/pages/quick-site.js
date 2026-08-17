@@ -480,6 +480,15 @@ function selectDesign(index) {
 // 全屏預覽 Overlay
 // ════════════════════════════════════════════════
 
+// 注入到 srcdoc 的點擊攔截 script（封鎖所有 <a> 導航，不影響滾動）
+const BLOCK_LINKS_SCRIPT = '<script>document.addEventListener("click",function(e){if(e.target.closest("a"))e.preventDefault();},{capture:true});<\/script>';
+
+function injectBlockScript(html) {
+    return /<\/body>/i.test(html)
+        ? html.replace(/<\/body>/i, BLOCK_LINKS_SCRIPT + '</body>')
+        : html + BLOCK_LINKS_SCRIPT;
+}
+
 function openFullscreen(index) {
     const design  = generatedDesigns[index];
     const overlay = document.getElementById('fullscreenOverlay');
@@ -488,7 +497,7 @@ function openFullscreen(index) {
     document.getElementById('fullscreenTitle').textContent =
         design.style_name || `樣板 ${index + 1}`;
 
-    frame.srcdoc = design.html;
+    frame.srcdoc = injectBlockScript(design.html);
     overlay.classList.add('visible');
     document.body.style.overflow = 'hidden';
 }
