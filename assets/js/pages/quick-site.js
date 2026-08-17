@@ -507,6 +507,13 @@ document.addEventListener('keydown', e => {
     }
 });
 
+// 攔截全屏預覽時 iframe 內連結觸發的 hash 導航，避免跳回表單頁
+window.addEventListener('hashchange', () => {
+    if (document.getElementById('fullscreenOverlay').classList.contains('visible')) {
+        history.replaceState(null, '', location.pathname);
+    }
+});
+
 
 // ════════════════════════════════════════════════
 // Loading Overlay

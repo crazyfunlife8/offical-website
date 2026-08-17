@@ -1195,7 +1195,6 @@ button.qs-back-link {
     border: none;
     background: #ffffff;
     width: 100%;
-    pointer-events: none;
 }
 
 /* ════════════════════════════════════════════════
