@@ -52,7 +52,8 @@ const SYSTEM_PROMPT_BASE = `你是一位資深前端工程師兼視覺設計師�
 
 - 直接輸出 JSON，不加任何說明或 markdown 包裝
 - 每份 HTML 必須是完整、可獨立運行的 <!DOCTYPE html> 文件
-- 使用內嵌 CSS（<style> 標籤）；字型可用 Google Fonts @import，其餘不依賴外部資源
+- 使用內嵌 CSS（<style> 標籤）；字型可用 Google Fonts @import；圖示必須使用 Font Awesome 6（CDN：https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css）或簡潔的內嵌 SVG；其餘不依賴外部資源
+- **嚴禁使用任何 emoji（如 🏡 🌟 📞 ✨ 等）作為裝飾圖示**——一律改用 Font Awesome（寫法：<i class="fas fa-phone"></i>）或 inline SVG；純文字段落中偶爾出現的 emoji 亦禁止
 - 若有提供圖片 URL，將其嵌入 hero 或 gallery 區塊；若無，使用 CSS 漸層背景
 - 必須響應式（RWD），手機優先，使用 flexbox 或 grid
 - **禁止生成任何 <script> 標籤**——純 HTML + CSS，零 JavaScript
@@ -111,17 +112,18 @@ async function uploadToCloudinary(file, env) {
     }
 }
 
-async function fetchUnsplashPhoto(query, env) {
-    if (!env.UNSPLASH_ACCESS_KEY) return null;
+async function fetchUnsplashPhotos(query, env, count = 3) {
+    if (!env.UNSPLASH_ACCESS_KEY) return [];
     try {
         const res = await fetch(
-            `https://api.unsplash.com/photos/random?query=${encodeURIComponent(query)}&orientation=landscape&client_id=${env.UNSPLASH_ACCESS_KEY}`
+            `https://api.unsplash.com/photos/random?query=${encodeURIComponent(query)}&count=${count}&orientation=landscape&client_id=${env.UNSPLASH_ACCESS_KEY}`
         );
-        if (!res.ok) return null;
+        if (!res.ok) return [];
         const data = await res.json();
-        return data.urls?.regular || null;
+        const photos = Array.isArray(data) ? data : [data];
+        return photos.map(p => p.urls?.regular).filter(Boolean);
     } catch {
-        return null;
+        return [];
     }
 }
 
@@ -158,10 +160,10 @@ export async function onRequestPost(context) {
             }
         }
 
-        // Fetch stock photo from Unsplash as fallback
+        // Fetch stock photos from Unsplash as fallback (3 photos, one per design)
         if (imageUrls.length === 0) {
-            const stockPhoto = await fetchUnsplashPhoto(industry, env);
-            if (stockPhoto) imageUrls.push(stockPhoto);
+            const stockPhotos = await fetchUnsplashPhotos(industry, env, 3);
+            imageUrls.push(...stockPhotos);
         }
 
         const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
@@ -190,8 +192,10 @@ export async function onRequestPost(context) {
 地址：${address || '未提供'}
 Email：${email || '未提供'}
 
-${imageUrls.length > 0
-    ? `可用圖片（嵌入 hero 或 gallery）：\n${imageUrls.map((u, i) => `${i + 1}. ${u}`).join('\n')}`
+${imageUrls.length >= 3
+    ? `可用圖片（每份設計請優先使用對應編號的圖片作為 hero 主視覺，讓三份設計畫面各異）：\n設計1主圖：${imageUrls[0]}\n設計2主圖：${imageUrls[1]}\n設計3主圖：${imageUrls[2]}${imageUrls.length > 3 ? `\n其餘圖片可穿插至 gallery：\n${imageUrls.slice(3).map((u, i) => `${i + 4}. ${u}`).join('\n')}` : ''}`
+    : imageUrls.length > 0
+    ? `可用圖片（嵌入所有設計的 hero 或 gallery）：\n${imageUrls.map((u, i) => `${i + 1}. ${u}`).join('\n')}`
     : '無圖片，使用 CSS 漸層背景'}
 
 生成序號 #${variationSeed}：請在各風格定義內選擇你認為最適合此商家的具體字體、配色與排版細節，確保三份設計彼此明顯不同，且不落入千篇一律的模板感。
