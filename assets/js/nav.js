@@ -4,6 +4,17 @@
    修改此檔 = 所有頁面同步生效
    ============================================================ */
 
+/* ── 全站定價設定檔（唯一真相來源） ─────────────────────────
+   調價只改這裡。meta / JSON-LD 仍需手動同步同一 HTML 檔案。
+   ─────────────────────────────────────────────────────────── */
+window.PRICES = {
+    ads:          { start: 900,   rebate: 200 },
+    aiInfluencer: { monthly: 21000 },
+    social:       { entry: 9500 },
+    seo:          { monthly: 15000 },
+    website:      { annual: 6000 },
+};
+
 (function () {
     'use strict';
 
@@ -19,15 +30,15 @@
     <ul class="nav__links" role="list">
         <li><a href="/">首頁</a></li>
         <li><a href="/#services-section">服務</a></li>
-        <li><a href="/blog.html">不正常觀點</a></li>
+        <li><a href="/blog">不正常觀點</a></li>
         <li class="nav__links-cta-mobile">
-            <a href="/contact.html">聯絡我們 <span aria-hidden="true">→</span></a>
+            <a href="/contact">聯絡我們 <span aria-hidden="true">→</span></a>
         </li>
     </ul>
 
     <span class="nav__divider" aria-hidden="true"></span>
 
-    <a href="/contact.html" class="nav__cta">
+    <a href="/contact" class="nav__cta">
         <span class="nav__cta-label">聯絡我們</span>
         <span class="nav__cta-arrow" aria-hidden="true">→</span>
     </a>
@@ -89,9 +100,9 @@
         <!-- 最底版權行 -->
         <p class="site-footer__copy">
             © 2024–2026 Nest Digital. All rights reserved.
-            &ensp;·&ensp;<a href="/privacy.html" class="site-footer__privacy-link">隱私政策</a>
-            &ensp;·&ensp;<a href="/terms.html" class="site-footer__privacy-link">服務條款</a>
-            &ensp;·&ensp;<a href="/refund.html" class="site-footer__privacy-link">退費政策</a>
+            &ensp;·&ensp;<a href="/privacy" class="site-footer__privacy-link">隱私政策</a>
+            &ensp;·&ensp;<a href="/terms" class="site-footer__privacy-link">服務條款</a>
+            &ensp;·&ensp;<a href="/refund" class="site-footer__privacy-link">退費政策</a>
         </p>
     </div>
 </footer>
@@ -328,9 +339,7 @@
 
     function loadAnalytics() {
         // ── GA4 ──────────────────────────────────────────────
-        // 取得 Measurement ID 後，移除下方整段的 /* */ 並填入真實 ID：
-        /*
-        const GA4_ID = 'G-XXXXXXXXXX';
+        const GA4_ID = 'G-MXV88FLJ64';
         const s = document.createElement('script');
         s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA4_ID;
         s.async = true;
@@ -339,7 +348,7 @@
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', GA4_ID);
-        */
+        window.gtag = gtag;
 
         // ── Meta Pixel ───────────────────────────────────────
         // 取得 Pixel ID 後填入：
@@ -387,7 +396,7 @@
         banner.innerHTML =
             '<p class="cookie-banner__text">' +
                 '我們使用分析型與廣告型 Cookie 改善服務體驗。' +
-                '<a href="/privacy.html" class="cookie-banner__link">隱私政策</a>' +
+                '<a href="/privacy" class="cookie-banner__link">隱私政策</a>' +
             '</p>' +
             '<div class="cookie-banner__actions">' +
                 '<button class="cookie-banner__btn cookie-banner__btn--accept">接受所有</button>' +

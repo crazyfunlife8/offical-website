@@ -11,13 +11,14 @@
   // bgx/bgy 對應 sixservices.png 3×2 格位置（background-size:315% 210%，放大 5% 裁掉 panel 邊框）
   // 圖片佈局：上排 社群經營／SEO 部落格撰寫／跳動E投放；下排 AI形象網紅／一鍵式架站／預約系統
   // 位置計算：左欄 bgx≈1，中欄 bgx=50，右欄 bgx≈99；上排 bgy≈2，下排 bgy≈98
+  const P = window.PRICES || {};
   const DATA = [
-    { n:'01', cjk:'跳動E投放',     en:'TIKTOK ADS',  desc:'900 元就能投 TikTok 廣告',  price:'手續費 25% 起，首投折抵 200 元', href:'services/ads.html',          bgx:99,  bgy:2   },
-    { n:'02', cjk:'一鍵式架站',    en:'QUICK SITE',  desc:'填四個欄位，看三個版型',      price:'一年 NT$6,000',          href:'services/website.html',             bgx:50,  bgy:98  },
-    { n:'03', cjk:'AI形象網紅',    en:'AI TALENT',   desc:'一個不會爆雷的代言人',        price:'月費 NT$21,000 起',      href:'services/ai-influencer.html', bgx:1,   bgy:98  },
-    { n:'04', cjk:'SEO 部落格撰寫', en:'SEO CONTENT', desc:'一個月三篇，關鍵字到上稿', price:'月費 NT$15,000 起',      href:'services/seo.html',           bgx:50,  bgy:2   },
-    { n:'05', cjk:'社群經營',      en:'SOCIAL',      desc:'有什麼素材，我們就從那裡開始', price:'NT$19,000 起',          href:'services/social.html',        bgx:1,   bgy:2   },
-    { n:'06', cjk:'預約系統',      en:'BOOKING',     desc:'還沒好。好了會說。',          price:'Coming Soon',            href:'services/booking.html',       bgx:99,  bgy:98, soon:true },
+    { n:'01', cjk:'跳動E投放',     en:'TIKTOK ADS',  desc:'900 元就能投 TikTok 廣告',  price:`${P.ads?.start ?? 900} 元起投，首投折抵 ${P.ads?.rebate ?? 200} 元`, href:'services/ads',          bgx:99,  bgy:2   },
+    { n:'02', cjk:'一鍵式架站',    en:'QUICK SITE',  desc:'填四個欄位，看三個版型',      price:`一年 NT$${(P.website?.annual ?? 6000).toLocaleString()}`,          href:'services/website',      bgx:50,  bgy:98  },
+    { n:'03', cjk:'AI形象網紅',    en:'AI TALENT',   desc:'一個不會爆雷的代言人',        price:`月費 NT$${(P.aiInfluencer?.monthly ?? 21000).toLocaleString()} 起`, href:'services/ai-influencer', bgx:1,  bgy:98  },
+    { n:'04', cjk:'SEO 部落格撰寫', en:'SEO CONTENT', desc:'一個月三篇，關鍵字到上稿',  price:`月費 NT$${(P.seo?.monthly ?? 15000).toLocaleString()} 起`,          href:'services/seo',           bgx:50, bgy:2   },
+    { n:'05', cjk:'社群經營',      en:'SOCIAL',      desc:'有什麼素材，我們就從那裡開始', price:`NT$${(P.social?.entry ?? 9500).toLocaleString()} 起`,             href:'services/social',        bgx:1,  bgy:2   },
+    { n:'06', cjk:'預約系統',      en:'BOOKING',     desc:'還沒好。好了會說。',          price:'Coming Soon',            href:'services/booking',       bgx:99,  bgy:98, soon:true },
   ];
 
   DATA.forEach(s => {
