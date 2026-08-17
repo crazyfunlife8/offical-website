@@ -7,14 +7,6 @@ const API_GENERATE = '/api/generate';
 const API_ENHANCE  = '/api/enhance';
 const API_SUBMIT   = '/api/submit';
 
-// postMessage scroll relay — 注入進 srcdoc，讓 parent 可以遙控滾動
-const SCROLL_RELAY = '<script>window.addEventListener(\'message\',function(e){var d=e.data;if(d&&d.__qs===\'scroll\')window.scrollBy(d.dx||0,d.dy||0);});<\/script>';
-
-function withScrollRelay(html) {
-    return html.includes('</head>')
-        ? html.replace('</head>', SCROLL_RELAY + '</head>')
-        : SCROLL_RELAY + html;
-}
 
 let stepTimers       = [];
 let generatedDesigns = [];   // 後端回傳的 3 份設計
@@ -478,7 +470,7 @@ function openFullscreen(index) {
     document.getElementById('fullscreenTitle').textContent =
         design.style_name || `樣板 ${index + 1}`;
 
-    frame.srcdoc = withScrollRelay(design.html);
+    frame.srcdoc = design.html;
     overlay.classList.add('visible');
     document.body.style.overflow = 'hidden';
 }
@@ -497,14 +489,6 @@ document.addEventListener('keydown', e => {
     }
 });
 
-// Shield 把滾輪事件透過 postMessage 轉給 iframe（iframe 已注入 SCROLL_RELAY 監聽器）
-document.getElementById('fullscreenShield').addEventListener('wheel', e => {
-    e.preventDefault();
-    document.getElementById('fullscreenFrame').contentWindow?.postMessage(
-        { __qs: 'scroll', dy: e.deltaY, dx: e.deltaX },
-        '*'
-    );
-}, { passive: false });
 
 // ════════════════════════════════════════════════
 // Loading Overlay
