@@ -932,6 +932,14 @@ button.qs-back-link {
     position: relative;
 }
 
+/* 阻止縮圖 iframe 內的連結被點擊 */
+.qs-preview-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
 .qs-preview-wrap iframe {
     position: absolute;       /* 脫離排版流，不再撐寬卡片 */
     top: 0;
@@ -1144,6 +1152,8 @@ button.qs-back-link {
     background: rgba(var(--c-stellar-rgb), 0.04);
     border-bottom: 1px solid rgba(var(--c-stellar-rgb), 0.10);
     flex-shrink: 0;
+    position: relative;
+    z-index: 10;
 }
 
 .qs-fullscreen__label {
@@ -1187,6 +1197,13 @@ button.qs-back-link {
     border: none;
     background: #ffffff;
     width: 100%;
+}
+
+/* 擋住全屏 iframe 的所有點擊；bar 的 z-index:10 確保關閉按鈕仍可按 */
+.qs-fullscreen__shield {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
 }
 
 /* ════════════════════════════════════════════════
