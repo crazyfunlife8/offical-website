@@ -55,9 +55,18 @@ const SYSTEM_PROMPT_BASE = `你是一位資深前端工程師兼視覺設計師�
 - 使用內嵌 CSS（<style> 標籤）；字型可用 Google Fonts @import，其餘不依賴外部資源
 - 若有提供圖片 URL，將其嵌入 hero 或 gallery 區塊；若無，使用 CSS 漸層背景
 - 必須響應式（RWD），手機優先，使用 flexbox 或 grid
-- 不使用 JavaScript 動態功能（靜態 HTML 即可）
-- HTML 可適當壓縮，避免過多空行
+- **禁止生成任何 <script> 標籤**——純 HTML + CSS，零 JavaScript
+- HTML 移除所有縮排與空行，盡量壓縮（節省 token，確保 3 份都能完整輸出）
 - 每份設計必須在視覺上與其他兩份有明顯差異（配色、字體、排版結構三者都要不同）
+
+## 可見性紅線（違反則輸出無效）
+
+- **body 必須設定 min-height: 100vh**
+- **主要版面區塊（section、header、footer）使用正常文件流**，禁止用 position: absolute / fixed 排主版面
+- **禁止在預設 CSS 設定 opacity: 0、visibility: hidden、display: none 隱藏內容**——所有元素預設即可見，不可依賴 JS 觸發才顯示
+- 文字顏色必須與背景顏色形成足夠對比（深底配淺字，淺底配深字）
+- **<style> 區塊必須以 </style> 正確關閉**；CSS 內容中嚴禁出現 </style> 字串（哪怕在註解裡），否則瀏覽器會把整個 body 當作 CSS 文字吞掉，造成頁面空白
+- **</head> 之後必須緊接 <body>，body 內必須有可見的結構標籤**（header、main、section 等），禁止輸出空 body
 
 ## JSON 輸出格式（嚴格遵守，不加 markdown 包裝）
 

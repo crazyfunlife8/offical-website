@@ -39,11 +39,15 @@ document.getElementById('siteForm').addEventListener('submit', async function (e
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const result = await response.json();
-        if (!result.designs || result.designs.length < 3) {
+        if (!result.designs || result.designs.length < 1) {
             throw new Error('Invalid response: missing designs');
         }
 
-        generatedDesigns = result.designs;
+        const valid = filterValidDesigns(result.designs);
+        if (valid.length < 1) throw new Error('生成的模板內容無效，請重試');
+        if (valid.length < result.designs.length) showToast(`${result.designs.length - valid.length} 個模板生成失敗，已顯示其餘有效模板。`);
+
+        generatedDesigns = valid;
         saveCache();
         enableGuard();
         finishSteps(() => {
@@ -348,11 +352,15 @@ document.getElementById('regenBtn').addEventListener('click', async function () 
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const result = await response.json();
-        if (!result.designs || result.designs.length < 3) {
+        if (!result.designs || result.designs.length < 1) {
             throw new Error('Invalid response: missing designs');
         }
 
-        generatedDesigns = result.designs;
+        const valid = filterValidDesigns(result.designs);
+        if (valid.length < 1) throw new Error('生成的模板內容無效，請重試');
+        if (valid.length < result.designs.length) showToast(`${result.designs.length - valid.length} 個模板生成失敗，已顯示其餘有效模板。`);
+
+        generatedDesigns = valid;
         selectedIndex    = null;
         enhancedHtml     = null;
         saveCache();
@@ -377,6 +385,16 @@ document.getElementById('backToPreview').addEventListener('click', () => {
 // ════════════════════════════════════════════════
 // 樣板預覽區
 // ════════════════════════════════════════════════
+
+function filterValidDesigns(designs) {
+    return designs.filter(d => {
+        if (!d.html) return false;
+        try {
+            const doc = new DOMParser().parseFromString(d.html, 'text/html');
+            return doc.body.children.length > 0;
+        } catch { return false; }
+    });
+}
 
 function renderPreviewCards(designs) {
     const grid = document.getElementById('previewGrid');
