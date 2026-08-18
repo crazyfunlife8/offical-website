@@ -27,32 +27,38 @@
             "alternateName": "創巢數位",
             "url": "https://nestdigitalai.com"
         },
-        "offers": [
-            {
-                "@type": "Offer",
-                "name": "基礎費率（手續費 25%）",
-                "description": "月累計儲值 NT$1,000–4,999，最低起投 NT$900",
-                "priceCurrency": "TWD",
-                "price": "900",
-                "availability": "https://schema.org/InStock"
-            },
-            {
-                "@type": "Offer",
-                "name": "進階費率（手續費 20%）",
-                "description": "月累計儲值 NT$5,000–29,999",
-                "priceCurrency": "TWD",
-                "price": "5000",
-                "availability": "https://schema.org/InStock"
-            },
-            {
-                "@type": "Offer",
-                "name": "高量費率（手續費 15%）",
-                "description": "月累計儲值 NT$30,000–49,999",
-                "priceCurrency": "TWD",
-                "price": "30000",
-                "availability": "https://schema.org/InStock"
-            }
-        ],
+        "offers": {
+            "@type": "Offer",
+            "priceCurrency": "TWD",
+            "price": "900",
+            "availability": "https://schema.org/InStock",
+            "priceSpecification": [
+                {
+                    "@type": "UnitPriceSpecification",
+                    "name": "基礎費率（手續費 25%）",
+                    "description": "月累計儲值 NT$900–NT$9,999",
+                    "priceCurrency": "TWD",
+                    "minPrice": "900",
+                    "maxPrice": "9999"
+                },
+                {
+                    "@type": "UnitPriceSpecification",
+                    "name": "進階費率（手續費 20%）",
+                    "description": "月累計儲值 NT$10,000–NT$29,999",
+                    "priceCurrency": "TWD",
+                    "minPrice": "10000",
+                    "maxPrice": "29999"
+                },
+                {
+                    "@type": "UnitPriceSpecification",
+                    "name": "高量費率（手續費 15%）",
+                    "description": "月累計儲值 NT$30,000–NT$49,999",
+                    "priceCurrency": "TWD",
+                    "minPrice": "30000",
+                    "maxPrice": "49999"
+                }
+            ]
+        },
         "url": "https://nestdigitalai.com/services/ads",
         "areaServed": "TW"
     }
