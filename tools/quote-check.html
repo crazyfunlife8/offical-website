@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>拿到報價單之前，先問完這五件事｜創巢數位</title>
+<meta name="description" content="做網站的報價單最常出事的五個地方。問完再講預算，先講預算報價就會長成你預算的樣子。">
+<meta property="og:title" content="拿到報價單之前，先問完這五件事">
+<meta property="og:description" content="五件事問完再講預算。先講預算，報價就會長成你的預算的樣子。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0A; --fg:#FFFFFF; --dim:#8A8A8A; --line:#262626;
+  --card:#141414; --hl:#D6FF3F;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg); color:var(--fg);
+  font-family:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  font-weight:400; line-height:1.6;
+  padding:0 20px 64px; max-width:640px; margin:0 auto;
+}
+header{padding:44px 0 8px}
+.kicker{font-size:14px;font-weight:700;letter-spacing:.14em;color:var(--dim)}
+h1{font-size:clamp(28px,7.4vw,40px);font-weight:900;line-height:1.2;margin-top:14px;letter-spacing:-.01em}
+.sub{font-size:16px;color:var(--dim);margin-top:14px;line-height:1.65}
+
+.bar{
+  position:sticky; top:0; z-index:5; background:var(--bg);
+  padding:16px 0 12px; margin-top:24px;
+  border-bottom:1px solid var(--line);
+  display:flex; align-items:center; gap:12px;
+}
+.bar b{font-size:15px;font-weight:900;white-space:nowrap}
+.bar b span{color:var(--hl)}
+.track{flex:1;height:6px;background:#1E1E1E;border-radius:99px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--hl);border-radius:99px;transition:width .25s ease}
+
+ol{list-style:none;margin-top:8px}
+li{
+  display:flex; gap:14px; align-items:flex-start;
+  padding:22px 16px; margin-top:12px;
+  background:var(--card); border:1px solid var(--line); border-radius:14px;
+  cursor:pointer; transition:border-color .15s, background .15s;
+}
+li:active{background:#181818}
+li.on{border-color:var(--hl)}
+li.on .box{background:var(--hl);border-color:var(--hl);color:#0A0A0A}
+li.on .t1{color:var(--dim);text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:#3A3A3A}
+li.key{border-color:#3A3A3A}
+.box{
+  flex:0 0 34px; height:34px; border:2px solid #3A3A3A; border-radius:50%;
+  font-size:15px; font-weight:900; color:var(--dim);
+  display:flex; align-items:center; justify-content:center;
+  transition:.15s;
+}
+.box::after{content:attr(data-n)}
+li.on .box::after{content:"✓"}
+.tx{flex:1;min-width:0}
+.t1{font-size:17px;font-weight:700;line-height:1.5}
+.t2{font-size:14px;color:var(--dim);margin-top:8px;line-height:1.6}
+.tag{
+  display:inline-block; font-size:12px; font-weight:900; letter-spacing:.08em;
+  color:#0A0A0A; background:var(--hl); padding:3px 8px; border-radius:5px; margin-bottom:9px;
+}
+b{color:var(--fg)}
+.hl{color:var(--hl)}
+
+.note{
+  margin-top:28px; padding:20px 18px;
+  border-left:3px solid var(--hl); background:var(--card); border-radius:0 12px 12px 0;
+  font-size:15px; line-height:1.7; color:#CFCFCF;
+}
+.note strong{color:var(--fg);font-weight:900}
+
+.end{
+  margin-top:32px; padding-top:26px; border-top:1px solid var(--line);
+  font-size:18px; font-weight:900; line-height:1.55;
+}
+.cta{margin-top:26px;padding:22px 18px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.cta p{font-size:15px;color:var(--dim);line-height:1.65}
+.cta a{
+  display:block; margin-top:16px; text-align:center;
+  background:var(--hl); color:#0A0A0A; text-decoration:none;
+  font-weight:900; font-size:16px; padding:15px 18px; border-radius:10px;
+}
+footer{margin-top:36px;font-size:13px;color:#5A5A5A;line-height:1.7}
+footer a{color:#8A8A8A}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">創巢數位</div>
+  <h1>拿到報價單之前，<br>先問完這五件事</h1>
+  <p class="sub">做網站的報價單，出事都出在這五個地方。<br>問完再講預算 —— 點一下就可以打勾。</p>
+</header>
+
+<div class="bar">
+  <b>問完 <span id="done">0</span>／5</b>
+  <div class="track"><div class="fill" id="fill"></div></div>
+</div>
+
+<ol id="list">
+  <li><div class="box" data-n="1"></div><div class="tx">
+    <div class="t1">規格寫死了嗎？幾頁、哪些功能、手機版算不算？</div>
+    <div class="t2">「一式」「一批」「視情況」這種寫法，之後怎麼吵都是你輸。</div>
+  </div></li>
+
+  <li><div class="box" data-n="2"></div><div class="tx">
+    <div class="t1">改幾次？第幾次開始加錢？一次多少？</div>
+    <div class="t2">沒寫次數的預設是「他說了算」。這是實務上最常吵的一條。</div>
+  </div></li>
+
+  <li><div class="box" data-n="3"></div><div class="tx">
+    <div class="t1">誰維護？上線之後壞了找誰、要不要錢、多久回？</div>
+    <div class="t2">多數人只問「多少錢做」，沒問「壞了怎麼辦」。</div>
+  </div></li>
+
+  <li class="key"><div class="box" data-n="4"></div><div class="tx">
+    <span class="tag">最多人踩到</span>
+    <div class="t1">網域跟主機在<b>誰名下</b>？</div>
+    <div class="t2">登記在對方名下，你等於租房子還沒有租約。想換人做、想搬走，等於重來一次。</div>
+  </div></li>
+
+  <li><div class="box" data-n="5"></div><div class="tx">
+    <div class="t1">原始檔給不給？想換人做的時候，帶得走嗎？</div>
+    <div class="t2">這一項決定你被綁多久。</div>
+  </div></li>
+</ol>
+
+<div class="note">
+  <strong>手上已經有網站的話，第 4 項現在就能查。</strong><br>
+  網域查 whois，主機問現在幫你維護的人要後台。
+  兩個都不在你名下，那是最該先處理的事，比改版還先。
+</div>
+
+<div class="end">
+  這五件問完再講預算。<br>先講預算，報價就會長成<span class="hl">你的預算</span>的樣子。
+</div>
+
+<div class="cta">
+  <p>我們自己的做法是價格全部標出來 —— 不用問、不用等回覆、不用先講預算。</p>
+  <a href="/services/website">看我們怎麼標 →</a>
+</div>
+
+<footer>
+  這份清單刻意沒有列任何一家的報價，包含我們自己的。<br>
+  這階段給的是判斷力，不是型錄。<br>
+  <a href="https://nestdigitalai.com">創巢數位</a>
+</footer>
+
+<script>
+(function(){
+  var list = document.getElementById('list');
+  var done = document.getElementById('done');
+  var fill = document.getElementById('fill');
+  var items = list.querySelectorAll('li');
+  function sync(){
+    var n = list.querySelectorAll('li.on').length;
+    done.textContent = n;
+    fill.style.width = (n / items.length * 100) + '%';
+  }
+  items.forEach(function(li){
+    li.addEventListener('click', function(){
+      li.classList.toggle('on');
+      sync();
+    });
+  });
+  sync();
+})();
+</script>
+</body>
+</html>

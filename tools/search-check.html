@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>你的店搜不搜得到 — 七項自己檢查｜創巢數位</title>
+<meta name="description" content="七項不用花錢、不用工具就能自己做完的檢查，五分鐘知道客人 Google 你的店會看到什麼。">
+<meta property="og:title" content="你的店搜不搜得到 — 七項自己檢查">
+<meta property="og:description" content="五分鐘自己對一遍。七項裡有三項以上答不出來，那就不是內容問題，是入口問題。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0A; --fg:#FFFFFF; --dim:#8A8A8A; --line:#262626;
+  --card:#141414; --hl:#D6FF3F;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg); color:var(--fg);
+  font-family:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  font-weight:400; line-height:1.6;
+  padding:0 20px 64px; max-width:640px; margin:0 auto;
+}
+header{padding:44px 0 8px}
+.kicker{font-size:14px;font-weight:700;letter-spacing:.14em;color:var(--dim)}
+h1{font-size:clamp(30px,8vw,42px);font-weight:900;line-height:1.18;margin-top:14px;letter-spacing:-.01em}
+.sub{font-size:16px;color:var(--dim);margin-top:14px;line-height:1.65}
+
+.bar{
+  position:sticky; top:0; z-index:5; background:var(--bg);
+  padding:16px 0 12px; margin-top:24px;
+  border-bottom:1px solid var(--line);
+  display:flex; align-items:center; gap:12px;
+}
+.bar b{font-size:15px;font-weight:900;white-space:nowrap}
+.bar b span{color:var(--hl)}
+.track{flex:1;height:6px;background:#1E1E1E;border-radius:99px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--hl);border-radius:99px;transition:width .25s ease}
+
+ol{list-style:none;margin-top:8px}
+li{
+  display:flex; gap:14px; align-items:flex-start;
+  padding:22px 16px; margin-top:12px;
+  background:var(--card); border:1px solid var(--line); border-radius:14px;
+  cursor:pointer; transition:border-color .15s, background .15s;
+}
+li:active{background:#181818}
+li.on{border-color:var(--hl)}
+li.on .box{background:var(--hl);border-color:var(--hl);color:#0A0A0A}
+li.on .t1{color:var(--dim);text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:#3A3A3A}
+.box{
+  flex:0 0 34px; height:34px; border:2px solid #3A3A3A; border-radius:50%;
+  font-size:15px; font-weight:900; color:var(--dim);
+  display:flex; align-items:center; justify-content:center;
+  transition:.15s;
+}
+.box::after{content:attr(data-n)}
+li.on .box::after{content:"✓"}
+.tx{flex:1;min-width:0}
+.t1{font-size:17px;font-weight:700;line-height:1.5}
+.t2{font-size:14px;color:var(--dim);margin-top:8px;line-height:1.6}
+b{color:var(--fg)}
+code{
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  font-size:.94em; background:#1E1E1E; padding:2px 7px; border-radius:5px;
+  word-break:break-all;
+}
+.hl{color:var(--hl)}
+
+.note{
+  margin-top:28px; padding:20px 18px;
+  border-left:3px solid var(--hl); background:var(--card); border-radius:0 12px 12px 0;
+  font-size:15px; line-height:1.7; color:#CFCFCF;
+}
+.note strong{color:var(--fg);font-weight:900}
+
+.end{
+  margin-top:32px; padding-top:26px; border-top:1px solid var(--line);
+  font-size:18px; font-weight:900; line-height:1.55;
+}
+.cta{margin-top:26px;padding:22px 18px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.cta p{font-size:15px;color:var(--dim);line-height:1.65}
+.cta a{
+  display:block; margin-top:16px; text-align:center;
+  background:var(--hl); color:#0A0A0A; text-decoration:none;
+  font-weight:900; font-size:16px; padding:15px 18px; border-radius:10px;
+}
+footer{margin-top:36px;font-size:13px;color:#5A5A5A;line-height:1.7}
+footer a{color:#8A8A8A}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">創巢數位</div>
+  <h1>你的店<br>搜不搜得到</h1>
+  <p class="sub">七項自己檢查。<b>不用花錢、不用裝任何東西</b>，五分鐘做得完。<br>點一下就可以打勾。</p>
+</header>
+
+<div class="bar">
+  <b>完成 <span id="done">0</span>／7</b>
+  <div class="track"><div class="fill" id="fill"></div></div>
+</div>
+
+<ol id="list">
+  <li><div class="box" data-n="1"></div><div class="tx">
+    <div class="t1">手機開<b>無痕視窗</b>，搜你的店名。第一頁有沒有你？</div>
+    <div class="t2">一定要無痕。你自己搜一定搜得到，那是你的瀏覽紀錄，不是客人看到的畫面。</div>
+  </div></li>
+
+  <li><div class="box" data-n="2"></div><div class="tx">
+    <div class="t1">搜「行業 ＋ 區域」，例如「中壢 手作麵包」。有沒有你？</div>
+    <div class="t2">客人記不住店名，只會搜「這附近有沒有」。</div>
+  </div></li>
+
+  <li><div class="box" data-n="3"></div><div class="tx">
+    <div class="t1">Google 商家檔案有沒有？營業時間對不對？照片是幾年前的？</div>
+    <div class="t2">免費、五分鐘就能設完，但多數小店沒設，或設完就沒再更新。</div>
+  </div></li>
+
+  <li><div class="box" data-n="4"></div><div class="tx">
+    <div class="t1">點進你的網站，手機上三秒內載得完嗎？</div>
+    <div class="t2">用手機的行動網路測，不要用店裡的 Wi-Fi。</div>
+  </div></li>
+
+  <li><div class="box" data-n="5"></div><div class="tx">
+    <div class="t1">電話、地址、營業時間，要滑幾下才找得到？</div>
+    <div class="t2">超過一下就太多。搜到了但打不到，還是沒生意。</div>
+  </div></li>
+
+  <li><div class="box" data-n="6"></div><div class="tx">
+    <div class="t1">IG 個人簡介那個連結，現在點得開嗎？</div>
+    <div class="t2">很多人的早就死了，而且自己不會發現 —— 你不會沒事去點自己的連結。</div>
+  </div></li>
+
+  <li><div class="box" data-n="7"></div><div class="tx">
+    <div class="t1">搜 <code>site:你的網域</code>，出來幾筆？</div>
+    <div class="t2"><span class="hl">0 筆 ＝ Google 根本沒收錄你的網站。</span>那就不是排名問題，是根本沒進去。</div>
+  </div></li>
+</ol>
+
+<div class="note">
+  <strong>第 7 項最多人卡住。</strong><br>
+  如果 <code>site:你的網域</code> 出來是 0 筆，代表 Google 完全沒收錄你的網站。
+  在那之前討論關鍵字、討論排名，都是白講的。
+</div>
+
+<div class="end">
+  七項裡有三項以上答不出來，<br>那就不是內容問題，是<span class="hl">入口問題</span>。
+</div>
+
+<div class="cta">
+  <p>如果第 1、2、7 項都是「沒有」，通常代表你根本還沒有一個能被搜到的入口。<br>我們自己的官網三個月前也只有三頁。</p>
+  <a href="/quick-site">免費生成一個看看 →</a>
+</div>
+
+<footer>
+  這份清單不需要買任何東西就能做完。<br>
+  有卡住的地方，回 IG 私訊跟我們說一聲。<br>
+  <a href="https://nestdigitalai.com">創巢數位</a>
+</footer>
+
+<script>
+(function(){
+  var list = document.getElementById('list');
+  var done = document.getElementById('done');
+  var fill = document.getElementById('fill');
+  var items = list.querySelectorAll('li');
+  function sync(){
+    var n = list.querySelectorAll('li.on').length;
+    done.textContent = n;
+    fill.style.width = (n / items.length * 100) + '%';
+  }
+  items.forEach(function(li){
+    li.addEventListener('click', function(){
+      li.classList.toggle('on');
+      sync();
+    });
+  });
+  sync();
+})();
+</script>
+</body>
+</html>
