@@ -87,8 +87,10 @@ code{
   background:var(--hl); color:#0A0A0A; text-decoration:none;
   font-weight:900; font-size:16px; padding:15px 18px; border-radius:10px;
 }
+.cta a:focus-visible,footer a:focus-visible{outline:2px solid var(--hl);outline-offset:3px}
 footer{margin-top:36px;font-size:13px;color:#5A5A5A;line-height:1.7}
 footer a{color:#8A8A8A}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
@@ -107,7 +109,7 @@ footer a{color:#8A8A8A}
 <ol id="list">
   <li><div class="box" data-n="1"></div><div class="tx">
     <div class="t1">手機開<b>無痕視窗</b>，搜你的店名。第一頁有沒有你？</div>
-    <div class="t2">一定要無痕。你自己搜一定搜得到，那是你的瀏覽紀錄，不是客人看到的畫面。</div>
+    <div class="t2">Chrome 叫「無痕視窗」，iPhone 的 Safari 叫「私密瀏覽」。一定要用這個開 —— 你自己平常搜一定搜得到，那是你的瀏覽紀錄，不是客人看到的畫面。</div>
   </div></li>
 
   <li><div class="box" data-n="2"></div><div class="tx">
@@ -136,14 +138,14 @@ footer a{color:#8A8A8A}
   </div></li>
 
   <li><div class="box" data-n="7"></div><div class="tx">
-    <div class="t1">搜 <code>site:你的網域</code>，出來幾筆？</div>
-    <div class="t2"><span class="hl">0 筆 ＝ Google 根本沒收錄你的網站。</span>那就不是排名問題，是根本沒進去。</div>
+    <div class="t1">在 Google 打 <code>site:</code> 再接你的網址，出來幾筆？</div>
+    <div class="t2">例如你的網站是 abcshop.com，就搜 <code>site:abcshop.com</code>。<br><span class="hl">出來 0 筆 ＝ Google 根本沒收錄你的網站。</span></div>
   </div></li>
 </ol>
 
 <div class="note">
   <strong>第 7 項最多人卡住。</strong><br>
-  如果 <code>site:你的網域</code> 出來是 0 筆，代表 Google 完全沒收錄你的網站。
+  出來 0 筆，代表 Google 完全沒收錄你的網站 —— 那不是排名問題，是根本沒進去。
   在那之前討論關鍵字、討論排名，都是白講的。
 </div>
 
@@ -153,7 +155,7 @@ footer a{color:#8A8A8A}
 
 <div class="cta">
   <p>如果第 1、2、7 項都是「沒有」，通常代表你根本還沒有一個能被搜到的入口。<br>我們自己的官網三個月前也只有三頁。</p>
-  <a href="/quick-site">免費生成一個看看 →</a>
+  <a href="https://nestdigitalai.com/quick-site">免費生成一個看看 →</a>
 </div>
 
 <footer>
