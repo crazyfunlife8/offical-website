@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>拿到報價單之前，先問完這五件事｜創巢數位</title>
-<meta name="description" content="做網站的報價單最常出事的五個地方。問完再講預算，先講預算報價就會長成你預算的樣子。">
-<meta property="og:title" content="拿到報價單之前，先問完這五件事">
-<meta property="og:description" content="五件事問完再講預算。先講預算，報價就會長成你的預算的樣子。">
+<title>講出你的預算之前，先問完這五句｜創巢數位</title>
+<meta name="description" content="找人做網站，照著念的五句話。不用懂專業名詞，五句問完再講預算。">
+<meta property="og:title" content="講出你的預算之前，先問完這五句">
+<meta property="og:description" content="照著念就好，不用懂任何專業名詞。五句問完再講預算，先講預算報價就會長成你預算的樣子。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
@@ -27,6 +27,21 @@ header{padding:44px 0 8px}
 .kicker{font-size:14px;font-weight:700;letter-spacing:.14em;color:var(--dim)}
 h1{font-size:clamp(28px,7.4vw,40px);font-weight:900;line-height:1.2;margin-top:14px;letter-spacing:-.01em}
 .sub{font-size:16px;color:var(--dim);margin-top:14px;line-height:1.65}
+
+.when{
+  margin-top:24px; display:flex; flex-direction:column; gap:10px;
+}
+.when-row{
+  font-size:14px; line-height:1.6; color:var(--dim);
+  padding:12px 14px; background:var(--card);
+  border:1px solid var(--line); border-radius:10px;
+}
+.when-row span{
+  display:inline-block; margin-right:9px; padding:2px 8px;
+  background:#1E1E1E; color:var(--hl); border-radius:5px;
+  font-size:12px; font-weight:900; letter-spacing:.06em;
+}
+.when-row b{color:var(--fg)}
 
 .bar{
   position:sticky; top:0; z-index:5; background:var(--bg);
@@ -80,24 +95,51 @@ b{color:var(--fg)}
   margin-top:32px; padding-top:26px; border-top:1px solid var(--line);
   font-size:18px; font-weight:900; line-height:1.55;
 }
-.cta{margin-top:26px;padding:22px 18px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.ans{
+  margin-top:32px; padding:24px 20px;
+  background:var(--card); border:2px solid var(--hl); border-radius:14px;
+}
+.ans h2{font-size:22px;font-weight:900;line-height:1.3;color:var(--hl)}
+.ans .lead{font-size:15px;color:var(--dim);margin-top:8px;line-height:1.6}
+.ans .lead b{color:var(--fg)}
+.ans dl{margin-top:20px;display:flex;flex-direction:column;gap:16px}
+.ans dt{
+  font-size:14px;font-weight:900;color:var(--dim);
+  letter-spacing:.04em;display:flex;align-items:center;gap:9px;
+}
+.ans dt i{
+  font-style:normal;flex:0 0 22px;height:22px;border-radius:50%;
+  background:#1E1E1E;color:var(--hl);font-size:12px;
+  display:flex;align-items:center;justify-content:center;
+}
+.ans dd{font-size:16px;line-height:1.6;color:var(--fg);margin-top:6px;padding-left:31px}
+.ans dd b{color:var(--hl)}
+
+.cta{margin-top:20px;padding:22px 18px;background:var(--card);border:1px solid var(--line);border-radius:14px}
 .cta p{font-size:15px;color:var(--dim);line-height:1.65}
 .cta a{
   display:block; margin-top:16px; text-align:center;
   background:var(--hl); color:#0A0A0A; text-decoration:none;
   font-weight:900; font-size:16px; padding:15px 18px; border-radius:10px;
 }
+.cta a:focus-visible,footer a:focus-visible{outline:2px solid var(--hl);outline-offset:3px}
 footer{margin-top:36px;font-size:13px;color:#5A5A5A;line-height:1.7}
 footer a{color:#8A8A8A}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 
 <header>
   <div class="kicker">創巢數位</div>
-  <h1>拿到報價單之前，<br>先問完這五件事</h1>
-  <p class="sub">做網站的報價單，出事都出在這五個地方。<br>問完再講預算 —— 點一下就可以打勾。</p>
+  <h1>講出你的預算之前，<br>先問完這五句</h1>
+  <p class="sub"><b>照著念就好</b>，不用懂任何專業名詞。<br>五句問完再講預算 —— 點一下就可以打勾。</p>
 </header>
+
+<div class="when">
+  <div class="when-row"><span>還在問價</span>打電話或傳訊息的時候，照著念。</div>
+  <div class="when-row"><span>單子在手</span>對著報價單把五句對一遍，<b>單子上沒寫到的就是要回去問的</b>。</div>
+</div>
 
 <div class="bar">
   <b>問完 <span id="done">0</span>／5</b>
@@ -106,50 +148,73 @@ footer a{color:#8A8A8A}
 
 <ol id="list">
   <li><div class="box" data-n="1"></div><div class="tx">
-    <div class="t1">規格寫死了嗎？幾頁、哪些功能、手機版算不算？</div>
-    <div class="t2">「一式」「一批」「視情況」這種寫法，之後怎麼吵都是你輸。</div>
+    <div class="t1">「這個價錢包含幾頁？<br>手機上看的那個版本，算不算在裡面？」</div>
+    <div class="t2">單子上寫「一式」「一批」「視情況」的，就是還沒講定。之後想加什麼，都要再談一次錢。</div>
   </div></li>
 
   <li><div class="box" data-n="2"></div><div class="tx">
-    <div class="t1">改幾次？第幾次開始加錢？一次多少？</div>
-    <div class="t2">沒寫次數的預設是「他說了算」。這是實務上最常吵的一條。</div>
+    <div class="t1">「可以改幾次？<br>第幾次開始要加錢？一次加多少？」</div>
+    <div class="t2">沒講次數的，預設就是對方說了算。這是實務上最常吵的一條。</div>
   </div></li>
 
   <li><div class="box" data-n="3"></div><div class="tx">
-    <div class="t1">誰維護？上線之後壞了找誰、要不要錢、多久回？</div>
-    <div class="t2">多數人只問「多少錢做」，沒問「壞了怎麼辦」。</div>
+    <div class="t1">「做好以後如果壞掉，找誰？<br>要不要另外收錢？多久會處理好？」</div>
+    <div class="t2">多數人只問「多少錢做」，很少人問「壞了怎麼辦」。</div>
   </div></li>
 
   <li class="key"><div class="box" data-n="4"></div><div class="tx">
     <span class="tag">最多人踩到</span>
-    <div class="t1">網域跟主機在<b>誰名下</b>？</div>
-    <div class="t2">登記在對方名下，你等於租房子還沒有租約。想換人做、想搬走，等於重來一次。</div>
+    <div class="t1">「如果哪天我不做了，<br>網址可以轉到我這邊嗎？<b>要不要另外收錢</b>？」</div>
+    <div class="t2">網址放在對方那邊代管沒問題，省事。<b>會出事的是走不掉</b> —— 想換人做的時候對方不放，或是開個價才肯放。</div>
   </div></li>
 
   <li><div class="box" data-n="5"></div><div class="tx">
-    <div class="t1">原始檔給不給？想換人做的時候，帶得走嗎？</div>
-    <div class="t2">這一項決定你被綁多久。</div>
+    <div class="t1">「網站上的照片、文字、<br>客人留的資料，<br>拿得回來嗎？」</div>
+    <div class="t2">那些是你自己的東西，不是他做的。要得回來才叫你的。</div>
   </div></li>
 </ol>
 
 <div class="note">
-  <strong>手上已經有網站的話，第 4 項現在就能查。</strong><br>
-  網域查 whois，主機問現在幫你維護的人要後台。
-  兩個都不在你名下，那是最該先處理的事，比改版還先。
+  <strong>手上已經有網站的話，第 4 句現在就問得到。</strong><br>
+  打給現在幫你維護的人，就問一句：<br>
+  「如果我以後想換人做，網址你們放不放？要收多少？」<br>
+  問不到、或對方支支吾吾，那就是答案 —— 那件事比改版還該先處理。
 </div>
 
 <div class="end">
-  這五件問完再講預算。<br>先講預算，報價就會長成<span class="hl">你的預算</span>的樣子。
+  這五句問完再講預算。<br>先講預算，報價就會長成<span class="hl">你的預算</span>的樣子。
 </div>
 
+<section class="ans">
+  <h2>我們自己的答案</h2>
+  <p class="lead">這五句你可以拿去問任何一家。<b>我們先答。</b></p>
+
+  <dl>
+    <div><dt><i>1</i>包含幾頁</dt>
+      <dd>一頁式介紹頁，手機版本來就含在裡面。網址、主機、SSL、信箱都含，<b>一年 6,000</b>。</dd></div>
+
+    <div><dt><i>2</i>可以改幾次</dt>
+      <dd><b>期間內不限次數，不收費</b>。改網站上已經有的資訊（電話、營業時間、文字、照片）都算。<br>不是即時改，<b>收到需求後一週內</b>會上。</dd></div>
+
+    <div><dt><i>3</i>壞了找誰</dt>
+      <dd>上線之後聯繫客服。</dd></div>
+
+    <div><dt><i>4</i>網址轉不轉得走</dt>
+      <dd><b>放，而且不收錢。</b>網址平常我們代管，你不用去辦註冊手續 —— 那些資料很煩，本來就不該丟給你。要轉走跟我們說一聲就轉。</dd></div>
+
+    <div><dt><i>5</i>資料拿不拿得回來</dt>
+      <dd>頁面上有聯絡表單，但客人填的東西<b>直接送到你自己的信箱或 LINE</b>，不會停在我們這裡。<b>客人是你的，不是我們的。</b></dd></div>
+  </dl>
+</section>
+
 <div class="cta">
-  <p>我們自己的做法是價格全部標出來 —— 不用問、不用等回覆、不用先講預算。</p>
-  <a href="/services/website">看我們怎麼標 →</a>
+  <p>價格也是全部標出來，不用問、不用等回覆、不用先講預算。</p>
+  <a href="https://nestdigitalai.com/services/website">看我們怎麼標 →</a>
 </div>
 
 <footer>
-  這份清單刻意沒有列任何一家的報價，包含我們自己的。<br>
-  這階段給的是判斷力，不是型錄。<br>
+  別家的報價我們不列，那要你自己去問。<br>
+  這份給的是「要問什麼」，我們自己的答案附在上面。<br>
   <a href="https://nestdigitalai.com">創巢數位</a>
 </footer>
 
