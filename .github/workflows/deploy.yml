@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - 'feature/**'
   workflow_dispatch:
 
 jobs:
@@ -29,4 +30,4 @@ jobs:
           # npm install 在 wrangler-action 同一 Node 環境執行，確保 Functions 可正確 bundle npm 套件
           preCommands: npm install
           # commit-message 必須 ASCII，避免 Cloudflare API 8000111 Invalid commit message
-          command: pages deploy . --project-name=nestdigitalai --branch=main --commit-dirty=true --commit-message="GHA auto-deploy ${{ github.sha }}"
+          command: pages deploy . --project-name=nestdigitalai --branch=${{ github.ref_name }} --commit-dirty=true --commit-message="GHA auto-deploy ${{ github.sha }}"
