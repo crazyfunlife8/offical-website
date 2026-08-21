@@ -325,6 +325,24 @@
     margin: 0;
 }
 
+.qs-submit-free {
+    font-family: var(--f-sans);
+    font-size: 0.8rem;
+    color: rgba(var(--c-yellow-rgb), 0.8);
+    text-align: center;
+    margin: 0;
+}
+
+.qs-final-note {
+    font-family: var(--f-sans);
+    font-size: 0.78rem;
+    color: rgba(var(--c-yellow-rgb), 0.75);
+    text-align: center;
+    padding: 0.6rem 1rem;
+    margin: 0;
+    background: rgba(var(--c-yellow-rgb), 0.04);
+}
+
 /* ── 回服務連結 ── */
 
 .qs-back-link {
