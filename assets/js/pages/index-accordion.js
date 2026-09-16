@@ -18,7 +18,7 @@
     { n:'03', cjk:'AI形象網紅',    en:'AI TALENT',   desc:'一個不會爆雷的代言人',        price:`月費 NT$${(P.aiInfluencer?.monthly ?? 21000).toLocaleString()} 起`, href:'services/ai-influencer', bgx:1,  bgy:98  },
     { n:'04', cjk:'SEO 部落格撰寫', en:'SEO CONTENT', desc:'一個月三篇，關鍵字到上稿',  price:`月費 NT$${(P.seo?.monthly ?? 15000).toLocaleString()} 起`,          href:'services/seo',           bgx:50, bgy:2   },
     { n:'05', cjk:'社群經營',      en:'SOCIAL',      desc:'有什麼素材，我們就從那裡開始', price:`NT$${(P.social?.entry ?? 9500).toLocaleString()} 起`,             href:'services/social',        bgx:1,  bgy:2   },
-    { n:'06', cjk:'預約系統',      en:'BOOKING',     desc:'還沒好。好了會說。',          price:'Coming Soon',            href:'services/booking',       bgx:99,  bgy:98, soon:true },
+    { n:'06', cjk:'預約系統',      en:'BOOKING',     desc:'不用來回問，客人直接選時段',  price:'洽詢',                   href:'services/booking',       bgx:99,  bgy:98  },
   ];
 
   DATA.forEach(s => {

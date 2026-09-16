@@ -737,3 +737,63 @@
         width: 100%;
     }
 }
+
+/* ── Booking Demo Showcase ── */
+.bk-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.75rem;
+}
+
+.bk-tab {
+    font-family: var(--f-sans);
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.45rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+    transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+    white-space: nowrap;
+}
+
+.bk-tab:hover {
+    border-color: rgba(255, 255, 255, 0.35);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.bk-tab.active {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.55);
+    color: #fff;
+}
+
+.bk-demo-wrap {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.bk-demo-wrap iframe {
+    width: 100%;
+    height: 700px;
+    border: none;
+    display: block;
+    background: #fff;
+}
+
+@media (max-width: 520px) {
+    .bk-demo-wrap {
+        border-radius: 8px;
+    }
+    .bk-demo-wrap iframe {
+        height: 620px;
+    }
+}
