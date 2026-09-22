@@ -1,0 +1,449 @@
+<title>日日茶舖預點示範</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>
+/* 這頁是手機聊天介面的示範，刻意只做一套亮色（聊天介面本來就是亮的），外框底色一樣寫死 */
+:root{
+  --ground:#DDE3EA;        /* 桌機外框底 */
+  --ink:#1D2430;
+  --muted:#6B7686;
+  --chat:#B9C9DB;          /* 聊天室底：灰藍 */
+  --bubble-me:#A9E27E;     /* 客人自己的泡泡 */
+  --bubble-shop:#FFFFFF;
+  --tea-yellow:#FFD84D;    /* 日日茶舖的品牌黃，跟點單頁一致 */
+  --tea-black:#171717;
+  --tea-red:#E8412A;
+  --owner-ground:#F4F1E8;
+  --line:#D5DCE4;
+  --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}   /* 本機開的時候沒有發布外殼的 reset，不寫這條 .toast 會一開場就露出來 */
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid #2F6FEB;outline-offset:2px}
+
+/* ── 外框 ───────────────────────────── */
+.stage{min-height:100%;display:flex;flex-direction:column;align-items:center;padding-block:20px 28px;padding-inline:16px;gap:14px}
+.demobar{width:100%;max-width:820px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.demobar .tag{background:var(--tea-black);color:var(--tea-yellow);font-weight:700;font-size:12px;letter-spacing:.08em;padding:3px 9px;border-radius:4px}
+.demobar .note{color:var(--muted);font-size:13px}
+.demobar .restart{margin-left:auto;border:1px solid #B3BDC9;background:#fff;border-radius:999px;padding:4px 12px;font-size:13px}
+.tabs{display:none}
+.phones{display:flex;gap:40px;align-items:flex-start;justify-content:center}
+.col{display:flex;flex-direction:column;align-items:center;gap:10px}
+.col-label{font-size:13px;font-weight:700;letter-spacing:.06em;color:#3A4453}
+.phone{position:relative;width:375px;height:780px;border-radius:46px;background:#0E0F11;padding:11px;box-shadow:0 30px 60px -30px rgba(20,30,50,.55),0 0 0 1px #2A2D33 inset}
+.screen{position:relative;width:100%;height:100%;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;background:var(--chat)}
+.status{flex:none;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 26px 0 30px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;background:#fff}
+.status .sig{letter-spacing:2px;font-size:11px}
+.foot{width:100%;max-width:820px;text-align:center;color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:8px;align-items:center}
+.foot .cta{display:inline-block;background:var(--tea-black);color:#fff;text-decoration:none;font-weight:700;padding:11px 20px;border-radius:10px}
+.foot .brand{color:var(--ink)}
+
+/* ── 客人：聊天室 ───────────────────── */
+.chat-head{flex:none;height:52px;background:#fff;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line)}
+.chat-head .back{font-size:22px;color:#333;width:20px}
+.avatar{flex:none;width:34px;height:34px;border-radius:50%;background:var(--tea-yellow);color:var(--tea-black);display:grid;place-items:center;font-weight:900;font-size:15px}
+.chat-head .who{display:flex;flex-direction:column;line-height:1.2}
+.chat-head b{font-size:16px}
+.chat-head small{font-size:11px;color:var(--muted)}
+.chat-head .icons{margin-left:auto;color:#555;letter-spacing:10px;font-size:16px}
+.log{flex:1;overflow-y:auto;padding:14px 12px 18px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.day{align-self:center;background:rgba(40,55,75,.28);color:#fff;font-size:11px;padding:2px 10px;border-radius:999px}
+.msg{display:flex;gap:7px;align-items:flex-end;max-width:100%}
+.msg.shop{align-self:flex-start}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.msg .avatar{width:32px;height:32px;font-size:13px;align-self:flex-start}
+.bubble{max-width:236px;padding:9px 12px;border-radius:18px;font-size:14.5px;line-height:1.55;white-space:pre-line;word-break:break-word}
+.shop .bubble{background:var(--bubble-shop);border-top-left-radius:6px}
+.me .bubble{background:var(--bubble-me);border-top-right-radius:6px}
+.meta{font-size:10px;color:#4E5B6C;white-space:nowrap;line-height:1.3;text-align:right;font-variant-numeric:tabular-nums}
+.shop .meta{text-align:left}
+.enter{animation:pop .28s ease-out}
+@keyframes pop{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* 預點成功的卡片 */
+.card{width:236px;background:#fff;border-radius:16px;overflow:hidden;border-top-left-radius:6px}
+.card-top{background:var(--tea-yellow);padding:10px 14px;font-weight:900;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+.card-top span{font-size:11px;font-weight:700;background:var(--tea-black);color:var(--tea-yellow);padding:2px 7px;border-radius:4px}
+.card-num{padding:12px 14px 4px;display:flex;align-items:baseline;gap:8px}
+.card-num strong{font-size:34px;font-weight:900;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.card-num small{color:var(--muted);font-size:12px}
+.card dl{margin:0;padding:4px 14px 10px;display:grid;grid-template-columns:44px 1fr;gap:4px 8px;font-size:13px}
+.card dt{color:var(--muted)}
+.card dd{margin:0;font-weight:500}
+.card .total{border-top:1px dashed var(--line);margin:0 14px;padding:9px 0 12px;display:flex;justify-content:space-between;font-weight:900}
+.card .hint{background:#F6F7F9;font-size:12px;color:#4E5B6C;padding:8px 14px}
+
+/* 圖文選單（1200×810 的比例） */
+.menu{flex:none;background:#fff;border-top:1px solid var(--line)}
+.rich{position:relative;display:grid;grid-template-columns:1.25fr 1fr;grid-template-rows:1fr 1fr;aspect-ratio:1200/810;gap:2px;background:#fff;max-width:100%}
+.rich[hidden]{display:none}
+.tile{border:0;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:14px 16px;text-align:left}
+.tile b{font-size:19px;font-weight:900;letter-spacing:.04em}
+.tile small{font-size:12px;opacity:.8;line-height:1.35}
+.tile.order{grid-row:1/3;background:var(--tea-yellow);color:var(--tea-black)}
+.tile.order b{font-size:26px}
+.tile.order .cup{font-size:13px;font-weight:700;background:var(--tea-black);color:var(--tea-yellow);align-self:flex-start;padding:3px 9px;border-radius:999px;margin-top:6px}
+.tile.dark{background:var(--tea-black);color:#fff}
+.tile.dark b{color:var(--tea-yellow)}
+.tile:active{filter:brightness(.93)}
+.coach{position:absolute;left:10px;top:-44px;background:var(--tea-red);color:#fff;font-size:13px;font-weight:700;padding:7px 12px;border-radius:10px;box-shadow:0 6px 14px -6px rgba(0,0,0,.5);pointer-events:none;animation:bob 1.6s ease-in-out infinite}
+.coach:after{content:"";position:absolute;left:28px;bottom:-6px;border:6px solid transparent;border-top-color:var(--tea-red);border-bottom:0}
+@keyframes bob{50%{transform:translateY(-4px)}}
+.menubar{height:40px;display:flex;align-items:center;gap:10px;padding:0 12px;border-top:1px solid var(--line);font-size:13px;color:#445}
+.menubar .kb{border:1px solid #C7CED7;background:#fff;border-radius:6px;width:30px;height:26px;font-size:13px}
+.menubar .toggle{flex:1;border:0;background:none;font-weight:700;color:#334;text-align:center}
+.menubar .field{flex:1;height:28px;border-radius:999px;background:#EEF1F4;color:#98A2AE;display:flex;align-items:center;padding:0 12px}
+
+/* 內建瀏覽器（從底部滑上來） */
+.sheet{position:absolute;inset:34px 0 0;background:#fff;display:flex;flex-direction:column;transform:translateY(102%);transition:transform .32s cubic-bezier(.2,.8,.2,1);z-index:5;border-radius:14px 14px 0 0;box-shadow:0 -10px 30px -12px rgba(0,0,0,.45)}
+.sheet.open{transform:none}
+.sheet-bar{flex:none;height:46px;display:flex;align-items:center;gap:10px;padding:0 12px;border-bottom:1px solid var(--line)}
+.sheet-bar .x{border:0;background:none;font-size:20px;width:30px;height:30px}
+.sheet-bar .t{display:flex;flex-direction:column;line-height:1.2}
+.sheet-bar .t b{font-size:14px}
+.sheet-bar .t small{font-size:10.5px;color:var(--muted)}
+.sheet iframe{flex:1;width:100%;border:0;background:#fff}
+.sheet-done{flex:none;padding:10px 12px 14px;border-top:1px solid var(--line);background:#fff}
+.sheet-done button{width:100%;border:0;background:var(--tea-black);color:#fff;font-weight:700;padding:13px;border-radius:12px;font-size:15px}
+
+/* 手機版：老闆那邊有新單時的提示 */
+.toast{position:absolute;left:12px;right:12px;bottom:14px;z-index:6;background:var(--tea-black);color:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:14px;box-shadow:0 12px 26px -10px rgba(0,0,0,.6)}
+.toast b{color:var(--tea-yellow)}
+.toast button{margin-left:auto;border:0;background:var(--tea-yellow);color:var(--tea-black);font-weight:900;border-radius:999px;padding:6px 12px;white-space:nowrap}
+
+/* ── 老闆：預點後台 ───────────────────── */
+.owner .screen{background:var(--owner-ground)}
+.owner .status{background:var(--owner-ground)}
+.o-head{flex:none;padding:10px 18px 14px;display:flex;flex-direction:column;gap:2px;border-bottom:3px solid var(--tea-black)}
+.o-head small{color:#6A6456;font-size:12px;font-weight:700;letter-spacing:.06em}
+.o-head h2{margin:0;font-size:22px;font-weight:900;display:flex;align-items:center;gap:10px}
+.o-head .live{font-size:11px;font-weight:700;background:#1F8A4C;color:#fff;padding:2px 8px;border-radius:999px}
+.o-stats{flex:none;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 6px}
+.o-stat{background:#fff;border:1px solid #E2DCCB;border-radius:12px;padding:10px 12px}
+.o-stat small{display:block;font-size:11px;color:#7B7465}
+.o-stat strong{font-size:24px;font-weight:900;font-variant-numeric:tabular-nums}
+.o-note{flex:none;font-size:12px;color:#6A6456;padding:6px 18px 8px}
+.o-list{flex:1;overflow-y:auto;padding:0 16px 20px;display:flex;flex-direction:column;gap:8px}
+.o-row{background:#fff;border:1px solid #E2DCCB;border-radius:12px;display:grid;grid-template-columns:58px 1fr auto;align-items:center;gap:10px;padding:10px 12px}
+.o-row time{font-weight:900;font-size:16px;font-variant-numeric:tabular-nums;line-height:1.1}
+.o-row time small{display:block;font-size:10px;font-weight:700;color:#8A8372}
+.o-row b{display:block;font-size:14px}
+.o-row .opt{font-size:12px;color:#6A6456}
+.o-row .num{font-weight:900;font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.o-row .chip{display:block;margin-top:3px;font-size:10.5px;font-weight:700;background:#F0EBDD;color:#6A6456;padding:1px 7px;border-radius:999px;text-align:center}
+.o-row.new{border:2px solid var(--tea-black);background:#FFFBE6}
+.o-row.new .chip{background:var(--tea-red);color:#fff}
+.flash{animation:flash 1.2s ease-out 2}
+@keyframes flash{0%{box-shadow:0 0 0 0 rgba(232,65,42,.55)}100%{box-shadow:0 0 0 12px rgba(232,65,42,0)}}
+.o-wait{border:1.5px dashed #CFC6AE;border-radius:12px;padding:14px;text-align:center;font-size:13px;color:#7B7465}
+.push{position:absolute;left:10px;right:10px;top:40px;z-index:4;background:rgba(28,28,30,.93);color:#fff;border-radius:18px;padding:11px 14px;display:flex;gap:11px;align-items:flex-start;transform:translateY(-140%);transition:transform .45s cubic-bezier(.2,.9,.25,1.15);box-shadow:0 14px 30px -12px rgba(0,0,0,.6)}
+.push.show{transform:none}
+.push .avatar{width:34px;height:34px;border-radius:9px}
+.push .p-t{display:flex;justify-content:space-between;font-size:12px;color:#C9CCD2}
+.push .p-b{font-size:14px;font-weight:700;line-height:1.35}
+.push .p-s{font-size:12.5px;color:#DDE0E5}
+.push .grow{flex:1;min-width:0}
+
+/* ── 窄螢幕：一次一支手機，上面切換 ─────────── */
+@media (max-width:879px){
+  .stage{padding-block:10px 20px;gap:10px}
+  .tabs{display:flex;width:100%;max-width:430px;background:#fff;border-radius:12px;padding:4px;gap:4px;box-shadow:0 1px 0 #C9D1DB}
+  .tabs button{flex:1;border:0;background:none;padding:8px 6px;border-radius:9px;font-weight:700;font-size:14px;color:#5A6575;position:relative}
+  .tabs button[aria-selected="true"]{background:var(--tea-black);color:#fff}
+  .tabs .dot{position:absolute;top:6px;right:14px;width:9px;height:9px;border-radius:50%;background:var(--tea-red)}
+  .phones{width:100%;flex-direction:column;align-items:center;gap:0}
+  .col{width:100%;max-width:430px}
+  .col[hidden]{display:none}
+  .col-label{display:none}
+  .demobar{max-width:430px}
+}
+@media (max-width:519px){
+  /* 手機上直接滿版：螢幕本身就是那支手機 */
+  .stage{padding-inline:0;padding-block:0 18px}
+  .demobar,.tabs{margin-inline:12px;width:calc(100% - 24px)}
+  .demobar{padding-top:10px}
+  .phone{width:100%;height:calc(100svh - 96px);min-height:560px;border-radius:0;padding:0;background:none;box-shadow:none}
+  .screen{border-radius:0}
+  .status{display:none}
+  .sheet{inset:0}
+  .push{top:8px}
+  .foot{padding-inline:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+
+<div class="stage">
+  <div class="demobar">
+    <span class="tag">示範</span>
+    <span class="note">店名與內容都是虛構的，不會真的下單</span>
+    <button class="restart" id="restart" type="button">重新開始</button>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="切換手機">
+    <button role="tab" id="tab-guest" aria-selected="true" aria-controls="col-guest" type="button">客人的手機</button>
+    <button role="tab" id="tab-owner" aria-selected="false" aria-controls="col-owner" type="button">老闆的手機<i class="dot" id="ownerDot" hidden></i></button>
+  </div>
+
+  <div class="phones">
+    <!-- 客人 -->
+    <div class="col" id="col-guest">
+      <div class="col-label">客人的手機</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status"><span class="clock">--:--</span><span class="sig">▂▄▆ 5G ▮</span></div>
+          <div class="chat-head">
+            <span class="back" aria-hidden="true">‹</span>
+            <span class="avatar" aria-hidden="true">茶</span>
+            <span class="who"><b>日日茶舖</b><small>官方帳號</small></span>
+            <span class="icons" aria-hidden="true">⌕ ☰</span>
+          </div>
+          <div class="log" id="log" aria-live="polite"></div>
+          <div class="menu">
+            <div class="rich" id="rich">
+              <div class="coach" id="coach">點這裡，用客人的角度走一次</div>
+              <button class="tile order" id="btnOrder" type="button"><b>我要預點</b><small>先點好<br>到店直接拿</small><span class="cup">最快 20 分鐘</span></button>
+              <button class="tile dark" id="btnQuery" type="button"><b>查訂單</b><small>取餐號碼、時間</small></button>
+              <button class="tile dark" id="btnHours" type="button"><b>營業時間</b><small>今天開到幾點</small></button>
+            </div>
+            <div class="menubar">
+              <button class="kb" id="kb" type="button" aria-label="切換選單">⌨</button>
+              <button class="toggle" id="menuToggle" type="button">預點選單 ▾</button>
+            </div>
+          </div>
+
+          <div class="sheet" id="sheet" aria-hidden="true">
+            <div class="sheet-bar">
+              <button class="x" id="sheetClose" type="button" aria-label="關閉">✕</button>
+              <span class="t"><b>日日茶舖｜預點取餐</b><small>在聊天室裡直接開，不用另外下載</small></span>
+            </div>
+            <iframe id="drink" title="日日茶舖預點頁"></iframe>
+            <div class="sheet-done" id="sheetDone" hidden><button id="backToChat" type="button">回到聊天室</button></div>
+          </div>
+
+          <div class="toast" id="toast" hidden><span>老闆的手機<b>收到新訂單</b>了</span><button id="toastGo" type="button">切過去看</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 老闆 -->
+    <div class="col" id="col-owner">
+      <div class="col-label">老闆的手機</div>
+      <div class="phone owner">
+        <div class="screen">
+          <div class="status"><span class="clock">--:--</span><span class="sig">▂▄▆ 5G ▮</span></div>
+          <div class="push" id="push" role="status">
+            <span class="avatar" aria-hidden="true">茶</span>
+            <div class="grow">
+              <div class="p-t"><span>預點通知</span><span>現在</span></div>
+              <div class="p-b" id="pushTitle">新訂單</div>
+              <div class="p-s" id="pushBody"></div>
+            </div>
+          </div>
+          <div class="o-head">
+            <small>日日茶舖・預點後台</small>
+            <h2>今天要做的 <span class="live">接單中</span></h2>
+          </div>
+          <div class="o-stats">
+            <div class="o-stat"><small>今日預點</small><strong id="statOrders">0</strong> 單</div>
+            <div class="o-stat"><small>要做的杯數</small><strong id="statCups">0</strong> 杯</div>
+          </div>
+          <div class="o-note">依取餐時間排好，照順序做就好。每個時段限量 12 杯。</div>
+          <div class="o-list" id="olist"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <a class="cta" href="https://nestdigitalai.com/services/booking" target="_blank" rel="noopener">想要你店裡也有一個？看怎麼接到你的 LINE 官方帳號 →</a>
+    <span>這是 <a class="brand" href="https://nestdigitalai.com" target="_blank" rel="noopener">創巢數位</a> 做的示範頁</span>
+  </div>
+</div>
+
+<script>
+// 原始點單頁（創巢/03-素材/demo-預約頁/booking-drink.html）由 build.js 塞進來
+const DRINK_HTML = "\u003c!-- NEST-VERSION: 2026-09-15-v1 -->\n\u003c!doctype html>\u003chtml lang=\"zh-Hant\">\u003chead>\u003cmeta charset=\"utf-8\">\u003cmeta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\u003ctitle>日日茶舖｜預點取餐示範\u003c/title>\u003cmeta name=\"description\" content=\"日日茶舖手機預點取餐，甜度冰塊不再抄錯。\">\u003cmeta property=\"og:title\" content=\"日日茶舖｜預點取餐\">\u003cmeta property=\"og:description\" content=\"先點好，到店報號碼直接拿。\">\u003cmeta name=\"robots\" content=\"noindex\">\u003cmeta name=\"nest-version\" content=\"2026-09-15-v1\">\u003clink rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\u003clink rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\u003clink href=\"https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;800&display=swap\" rel=\"stylesheet\">\u003cstyle>\n:root{--red:#ed3b22;--yellow:#ffd84a;--ink:#171717;--cream:#fff9df}*{box-sizing:border-box}body{margin:0;background:#222;font-family:'Noto Sans TC',sans-serif;color:var(--ink);font-size:16px}.app{max-width:480px;min-height:100vh;margin:auto;background:var(--cream);overflow:hidden}.switch{position:sticky;top:0;z-index:5;display:flex;padding:8px;background:#171717;gap:8px}.switch button{flex:1;min-height:44px;border:2px solid white;background:transparent;color:white;font:800 14px inherit}.switch .on{background:var(--yellow);color:#111;border-color:var(--yellow)}header{padding:24px 18px 18px;background:var(--yellow);border-bottom:5px solid #111}header h1{font-size:clamp(28px,9vw,40px);line-height:1.1;margin:4px 0;text-wrap:balance}header p{margin:8px 0 0;font-weight:600}.ticker{background:var(--red);color:white;padding:9px 18px;font-weight:800}.content{padding:20px 16px 34px}.steps{font-weight:800;font-size:14px;margin-bottom:14px}.card{border:3px solid #111;background:white;box-shadow:5px 5px 0 #111;padding:14px}.grid{display:grid;gap:10px}.drink{min-height:70px;background:white;border:2px solid #111;padding:12px;text-align:left;font:600 16px inherit;display:flex;justify-content:space-between}.drink.on{background:var(--yellow);box-shadow:4px 4px 0 #111}.price{font-weight:800}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{min-height:44px;padding:8px 13px;border:2px solid #111;background:white;font:600 14px inherit}.chip.on{background:#111;color:white}.row{margin-bottom:22px}.row h3,h2{margin:0 0 10px}h2{font-size:24px;text-wrap:balance}.nav{display:flex;gap:10px;margin-top:22px}.btn{min-height:50px;border:2px solid #111;padding:10px 14px;font:800 16px inherit;background:white}.next{flex:1;background:var(--red);color:white}.btn:disabled,.drink:disabled{opacity:.45}.qty{display:flex;align-items:center;justify-content:center;gap:20px}.qty button{width:48px;height:48px;border:2px solid #111;background:var(--yellow);font-size:24px}.qty strong{font-size:28px}.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.slot{min-height:54px;border:2px solid #111;background:white;font:700 14px inherit}.slot.on{background:var(--yellow)}.slot:disabled{background:#ddd;color:#777}.fields{display:grid;gap:12px}.fields input{width:100%;height:48px;border:2px solid #111;padding:10px;font:16px inherit;margin-top:5px}.summary{border:3px solid #111;background:white;padding:15px}.summary p{margin:7px 0}.number{font-size:54px;font-weight:800;letter-spacing:.06em}.success{text-align:center;background:var(--yellow);border:3px solid #111;padding:18px}.footer{background:#171717;color:white;text-align:center;padding:24px 16px 36px;font-size:13px}.footer .cta{display:block;background:var(--yellow);color:#111;min-height:48px;padding:13px;margin:12px 0;text-decoration:none;font-weight:800}.footer a{color:white}.order{background:white;border:2px solid #111;margin-bottom:10px;padding:12px}.order b{font-size:18px}.meter{height:12px;border:2px solid #111;margin-top:6px}.meter i{display:block;height:100%;background:var(--red)}.toggle{width:100%;min-height:54px;border:3px solid #111;background:#fff;font:800 16px inherit}.toggle.stop{background:var(--red);color:white}@media(max-width:374px){header h1{font-size:27px}.content{padding-left:12px;padding-right:12px}}\n\u003c/style>\u003cstyle>.switch,.footer{display:none!important}\u003c/style>\u003c/head>\u003cbody>\u003cmain class=\"app\">\u003cnav class=\"switch\">\u003cbutton class=\"on\" data-v=\"g\">客人看到的\u003c/button>\u003cbutton data-v=\"o\">老闆看到的\u003c/button>\u003c/nav>\u003cdiv id=\"screen\">\u003c/div>\u003cfooter class=\"footer\">\u003cdiv>這是創巢數位做的示範頁，店名與內容都是虛構的\u003c/div>\u003ca class=\"cta\" href=\"https://nestdigitalai.com/services/booking\">想要你店裡也有一個？留 Email 等上線 →\u003c/a>\u003ca href=\"https://nestdigitalai.com\">創巢數位\u003c/a>\u003c/footer>\u003c/main>\u003cscript>\nconst S={step:0,drink:'',price:0,sugar:'',ice:'',toppings:[],qty:1,time:'',name:'',last3:'',paused:false};const menu=[['日煮紅茶',45],['焙香烏龍',50],['冬瓜青茶',50],['黑糖珍珠鮮奶',65],['柚香翡翠',60],['抹茶鮮奶',70]];const $=s=>document.querySelector(s),screen=$('#screen');\ndocument.querySelectorAll('.switch button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.switch button').forEach(x=>x.classList.toggle('on',x===b));b.dataset.v==='o'?owner():render()});\nfunction pickup(){let n=new Date(),tom=n.getHours()>21||(n.getHours()===21&&n.getMinutes()>10),d=new Date(n);if(tom){d.setDate(d.getDate()+1);d.setHours(10,0,0,0)}else{d.setMinutes(d.getMinutes()+20);d.setSeconds(0,0);d.setMinutes(Math.ceil(d.getMinutes()/10)*10)}let arr=[];while(d.getHours()\u003c21||(d.getHours()===21&&d.getMinutes()\u003c=30)){arr.push({label:`${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`,full:(d.getHours()*6+d.getMinutes()/10)%7===0});d=new Date(d.getTime()+600000)}return{arr,tom}}\nfunction head(){let p=pickup();return `\u003cheader>\u003csmall>日日茶舖・預點取餐\u003c/small>\u003ch1>先點好，少排一下\u003c/h1>\u003cp>甜度、冰塊、加料一次寫清楚。\u003c/p>\u003c/header>\u003cdiv class=\"ticker\">${S.paused?'目前暫停接單':p.tom?'今天已打烊，預點明天':'今日營業至 21:30・最快 20 分鐘後取餐'}\u003c/div>`}\nfunction nav(ok=true,l='下一步'){return `\u003cdiv class=\"nav\">${S.step?'\u003cbutton class=\"btn\" onclick=\"S.step--;render()\">上一步\u003c/button>':''}\u003cbutton class=\"btn next\" ${ok?'':'disabled'} onclick=\"S.step++;render()\">${l}\u003c/button>\u003c/div>`}function choose(k,v){S[k]=v;render()}function render(){if(S.paused){screen.innerHTML=head()+`\u003cdiv class=\"content\">\u003cdiv class=\"success\">\u003ch2>目前暫停接單\u003c/h2>\u003cp>現場製作量較大，請稍後再回來看看。\u003c/p>\u003c/div>\u003c/div>`;return}let b='';if(S.step===0)b=`\u003ch2>今天想喝什麼？\u003c/h2>\u003cdiv class=\"grid\">${menu.map(x=>`\u003cbutton class=\"drink ${S.drink===x[0]?'on':''}\" onclick=\"S.drink='${x[0]}';S.price=${x[1]};render()\">\u003cspan>${x[0]}\u003csmall style=\"display:block\">現泡茶湯\u003c/small>\u003c/span>\u003cspan class=\"price\">$${x[1]}\u003c/span>\u003c/button>`).join('')}\u003c/div>${nav(!!S.drink)}`;\nif(S.step===1)b=`\u003cdiv class=\"row\">\u003ch2>甜度與冰塊\u003c/h2>\u003ch3>甜度\u003c/h3>\u003cdiv class=\"chips\">${['正常','少糖','半糖','微糖','無糖'].map(x=>`\u003cbutton class=\"chip ${S.sugar===x?'on':''}\" onclick=\"choose('sugar','${x}')\">${x}\u003c/button>`).join('')}\u003c/div>\u003c/div>\u003cdiv class=\"row\">\u003ch3>冰塊\u003c/h3>\u003cdiv class=\"chips\">${['正常','少冰','微冰','去冰','熱'].map(x=>`\u003cbutton class=\"chip ${S.ice===x?'on':''}\" onclick=\"choose('ice','${x}')\">${x}\u003c/button>`).join('')}\u003c/div>\u003c/div>${nav(S.sugar&&S.ice)}`;\nif(S.step===2)b=`\u003ch2>要加料嗎？\u003c/h2>\u003cp>可以複選，也可以都不加。\u003c/p>\u003cdiv class=\"chips\">${['珍珠','椰果'].map(x=>`\u003cbutton class=\"chip ${S.toppings.includes(x)?'on':''}\" onclick=\"S.toppings=S.toppings.includes('${x}')?S.toppings.filter(t=>t!=='${x}'):[...S.toppings,'${x}'];render()\">${x} +10\u003c/button>`).join('')}\u003c/div>${nav(true)}`;\nif(S.step===3)b=`\u003ch2>要幾杯？\u003c/h2>\u003cdiv class=\"card qty\">\u003cbutton onclick=\"S.qty=Math.max(1,S.qty-1);render()\">−\u003c/button>\u003cstrong>${S.qty} 杯\u003c/strong>\u003cbutton onclick=\"S.qty=Math.min(10,S.qty+1);render()\">＋\u003c/button>\u003c/div>${nav()}`;\nif(S.step===4){let p=pickup();b=`\u003ch2>選取餐時間\u003c/h2>\u003cp>${p.tom?'明天':'今天'}，每個時段限量 12 杯\u003c/p>\u003cdiv class=\"slots\">${p.arr.map((x,i)=>`\u003cbutton class=\"slot ${S.time===x.label?'on':''}\" ${x.full?'disabled':''} onclick=\"choose('time','${x.label}')\">${x.label}${x.full?'\u003cbr>已滿':''}\u003c/button>`).join('')}\u003c/div>${nav(!!S.time)}`}\nif(S.step===5)b=`\u003ch2>取餐資料\u003c/h2>\u003cdiv class=\"fields\">\u003clabel>稱呼\u003cinput id=\"n\" value=\"${S.name}\" placeholder=\"例如：林小姐\">\u003c/label>\u003clabel>手機末三碼\u003cinput id=\"p\" inputmode=\"numeric\" maxlength=\"3\" value=\"${S.last3}\" placeholder=\"例如：168\">\u003c/label>\u003c/div>\u003cdiv class=\"nav\">\u003cbutton class=\"btn\" onclick=\"S.step--;render()\">上一步\u003c/button>\u003cbutton class=\"btn next\" onclick=\"S.name=$('#n').value;S.last3=$('#p').value;if(S.name&&/^\\\\d{3}$/.test(S.last3)){S.step++;render()}else document.querySelector('h2').textContent='請填稱呼與手機末三碼'\">送出預點\u003c/button>\u003c/div>`;\nif(S.step===6)b=`\u003cdiv class=\"success\">\u003cdiv>取餐號碼\u003c/div>\u003cdiv class=\"number\">A${(137+S.qty).toString()}\u003c/div>\u003ch2>${pickup().tom?'明天':'今天'} ${S.time}\u003c/h2>\u003cp>到店報號碼直接拿\u003c/p>\u003c/div>\u003cbr>${sum()}`;screen.innerHTML=head()+`\u003cdiv class=\"content\">\u003cdiv class=\"steps\">${S.step\u003c6?`第 ${S.step+1} 步／共 6 步`:''}\u003c/div>${b}\u003c/div>`}\nfunction sum(){return `\u003cdiv class=\"summary\">\u003cp>\u003cb>${S.drink} × ${S.qty}\u003c/b>\u003c/p>\u003cp>${S.sugar}・${S.ice}・${S.toppings.join('、')||'不加料'}\u003c/p>\u003cp>取餐：${S.time}\u003c/p>\u003cp>\u003cb>合計 $${(S.price+S.toppings.length*10)*S.qty}\u003c/b>\u003c/p>\u003c/div>`}\nfunction owner(){screen.innerHTML=head()+`\u003cdiv class=\"content\">\u003cbutton class=\"toggle ${S.paused?'stop':''}\" onclick=\"S.paused=!S.paused;owner()\">${S.paused?'恢復接單':'暫停接單'}・目前${S.paused?'暫停':'接單中'}\u003c/button>\u003ch2 style=\"margin-top:24px\">各時段已接杯數 \u003csmall>示範數據\u003c/small>\u003c/h2>${[['18:10',8],['18:20',12],['18:30',6]].map(x=>`\u003cdiv class=\"card\" style=\"margin-bottom:10px\">\u003cb>${x[0]}・${x[1]}／12 杯\u003c/b>\u003cdiv class=\"meter\">\u003ci style=\"width:${x[1]/12*100}%\">\u003c/i>\u003c/div>\u003c/div>`).join('')}\u003ch2 style=\"margin-top:24px\">依取餐時間製作\u003c/h2>${[['18:10','A132','黑糖珍珠鮮奶 × 2','微糖・少冰・珍珠'],['18:10','A133','柚香翡翠 × 1','無糖・微冰・椰果'],['18:20','A134','日煮紅茶 × 3','半糖・去冰・不加料']].map(x=>`\u003cdiv class=\"order\">\u003cb>${x[0]}　${x[1]}\u003c/b>\u003cdiv>${x[2]}\u003c/div>\u003cdiv>${x[3]}\u003c/div>\u003c/div>`).join('')}\u003c/div>`}render();\n\u003c/script>\u003cscript>\n(function(){var last='';setInterval(function(){try{\n  var d={step:S.step,drink:S.drink,price:S.price,sugar:S.sugar,ice:S.ice,toppings:S.toppings.slice(),\n         qty:S.qty,time:S.time,name:S.name,last3:S.last3,tom:pickup().tom};\n  var j=JSON.stringify(d);if(j!==last){last=j;parent.postMessage({src:'drink-demo',d:d},'*');}\n}catch(e){}},200);})();\n\u003c/script>\u003c/body>\u003c/html>\n";
+
+const $ = s => document.querySelector(s);
+const log = $('#log'), sheet = $('#sheet'), frame = $('#drink');
+const pad = n => String(n).padStart(2, '0');
+const nowHM = () => { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const narrow = () => matchMedia('(max-width:879px)').matches;
+
+let order = null, posted = false, touched = false;
+
+function tickClock() { document.querySelectorAll('.clock').forEach(e => e.textContent = nowHM()); }
+tickClock(); setInterval(tickClock, 20000);
+
+function scrollDown() { requestAnimationFrame(() => { log.scrollTop = log.scrollHeight; }); }
+function add(who, inner, read) {
+  const m = document.createElement('div');
+  m.className = 'msg ' + who + ' enter';
+  const meta = `<span class="meta">${read ? '已讀<br>' : ''}${nowHM()}</span>`;
+  m.innerHTML = who === 'shop'
+    ? `<span class="avatar" aria-hidden="true">茶</span>${inner}${meta}`
+    : `${inner}${meta}`;
+  log.appendChild(m); scrollDown();
+}
+const say = (who, text, read) => add(who, `<div class="bubble">${esc(text)}</div>`, read);
+const shopLater = (text, ms = 650) => setTimeout(() => say('shop', text), ms);
+
+function welcome() {
+  log.innerHTML = '<div class="day">今天</div>';
+  say('shop', '嗨，歡迎加入日日茶舖！\n想先點好再過來拿，按下面的「我要預點」就可以，不用在店門口排隊。');
+  say('shop', '甜度、冰塊、加料都能自己選，送出後會直接給你取餐號碼。');
+}
+
+// ── 老闆那一頭 ─────────────────────────────
+function slotsFromNow() {
+  const d = new Date(); d.setSeconds(0, 0);
+  d.setMinutes(Math.ceil((d.getMinutes() + 10) / 10) * 10);
+  return [0, 10, 20].map(k => { const t = new Date(d.getTime() + k * 60000); return pad(t.getHours()) + ':' + pad(t.getMinutes()); });
+}
+let rows = [];
+function resetOwner() {
+  const [a, b, c] = slotsFromNow();
+  rows = [
+    { t: a, tom: false, num: 'A135', item: '黑糖珍珠鮮奶 × 2', opt: '微糖・少冰・珍珠', cups: 2 },
+    { t: b, tom: false, num: 'A136', item: '柚香翡翠 × 1', opt: '無糖・微冰・椰果', cups: 1 },
+    { t: c, tom: false, num: 'A137', item: '日煮紅茶 × 3', opt: '半糖・去冰・不加料', cups: 3 },
+  ];
+  $('#push').classList.remove('show');
+  $('#ownerDot').hidden = true;
+  renderOwner();
+}
+function renderOwner() {
+  const key = r => (r.tom ? '1' : '0') + r.t;
+  rows.sort((x, y) => key(x) < key(y) ? -1 : 1);
+  $('#olist').innerHTML = rows.map(r => `
+    <div class="o-row${r.isNew ? ' new flash' : ''}">
+      <time>${r.t}${r.tom ? '<small>明天</small>' : ''}</time>
+      <div><b>${esc(r.item)}</b><span class="opt">${esc(r.opt)}</span></div>
+      <div class="num">${r.num}<span class="chip">${r.isNew ? '新單' : '待製作'}</span></div>
+    </div>`).join('') + (order ? '' : `<div class="o-wait">客人一送出，新單會直接跳到這裡，不用盯私訊</div>`);
+  $('#statOrders').textContent = rows.length;
+  $('#statCups').textContent = rows.reduce((s, r) => s + r.cups, 0);
+}
+function ownerReceive(o) {
+  rows.forEach(r => r.isNew = false);
+  rows.push({ t: o.time, tom: o.tom, num: o.num, item: `${o.drink} × ${o.qty}`, opt: o.opt, cups: o.qty, isNew: true });
+  renderOwner();
+  $('#pushTitle').textContent = `新訂單 ${o.num}・${o.tom ? '明天 ' : ''}${o.time} 取`;
+  $('#pushBody').textContent = `${o.drink} × ${o.qty}（${o.opt}）・${o.name}・末三碼 ${o.last3}`;
+  const p = $('#push'); p.classList.remove('show'); void p.offsetWidth; p.classList.add('show');
+  setTimeout(() => p.classList.remove('show'), 6000);
+  if (narrow()) $('#ownerDot').hidden = false;
+}
+
+// ── 點單頁（內建瀏覽器） ───────────────────────
+function loadDrink() {
+  frame.srcdoc = DRINK_HTML;
+  $('#sheetDone').hidden = true;
+}
+function openSheet() {
+  touched = true; $('#coach').hidden = true;
+  sheet.classList.add('open'); sheet.setAttribute('aria-hidden', 'false');
+}
+function closeSheet() {
+  sheet.classList.remove('open'); sheet.setAttribute('aria-hidden', 'true');
+  if (order && !posted) {
+    posted = true;
+    setTimeout(postConfirm, 380);
+  }
+}
+function postConfirm() {
+  const o = order;
+  add('shop', `<div class="card">
+    <div class="card-top">預點成功 <span>日日茶舖</span></div>
+    <div class="card-num"><strong>${o.num}</strong><small>取餐號碼</small></div>
+    <dl>
+      <dt>品項</dt><dd>${esc(o.drink)} × ${o.qty}</dd>
+      <dt>做法</dt><dd>${esc(o.opt)}</dd>
+      <dt>取餐</dt><dd>${o.tom ? '明天' : '今天'} ${o.time}</dd>
+      <dt>稱呼</dt><dd>${esc(o.name)}</dd>
+    </dl>
+    <div class="total"><span>合計</span><span>$${o.total}・到店付款</span></div>
+    <div class="hint">到店報號碼直接拿，不用再排隊</div>
+  </div>`);
+  if (narrow()) setTimeout(() => { $('#toast').hidden = false; }, 900);
+}
+
+window.addEventListener('message', e => {
+  const m = e.data;
+  if (!m || m.src !== 'drink-demo') return;
+  const d = m.d;
+  if (d.step === 6 && !order) {
+    const tops = d.toppings.length ? d.toppings.join('、') : '不加料';
+    order = {
+      drink: d.drink, qty: d.qty, time: d.time, tom: d.tom, name: d.name, last3: d.last3,
+      num: 'A' + (137 + d.qty),                               // 跟點單頁的取餐號碼算法一致
+      opt: `${d.sugar}・${d.ice}・${tops}`,
+      total: (d.price + d.toppings.length * 10) * d.qty,
+    };
+    $('#sheetDone').hidden = false;
+    ownerReceive(order);                                      // 客人一送出，老闆那邊同時收到
+  }
+});
+
+// ── 圖文選單 ─────────────────────────────
+$('#btnOrder').onclick = openSheet;
+$('#btnHours').onclick = () => {
+  touched = true;
+  say('me', '營業時間', true);
+  shopLater('今天營業到 21:30，最快 20 分鐘後可以取餐。\n要先點的話，按下面的「我要預點」。');
+};
+$('#btnQuery').onclick = () => {
+  touched = true;
+  say('me', '查訂單', true);
+  if (order) shopLater(`你的預點：${order.num}\n${order.drink} × ${order.qty}（${order.opt}）\n${order.tom ? '明天' : '今天'} ${order.time} 取餐，合計 $${order.total}`);
+  else shopLater('目前沒有進行中的預點。\n按下面的「我要預點」就可以開始。');
+};
+function setMenu(open) {
+  $('#rich').hidden = !open;
+  $('#menuToggle').textContent = open ? '預點選單 ▾' : '預點選單 ▴';
+}
+$('#menuToggle').onclick = () => setMenu($('#rich').hidden);
+$('#kb').onclick = () => setMenu($('#rich').hidden);
+$('#sheetClose').onclick = closeSheet;
+$('#backToChat').onclick = closeSheet;
+
+// ── 窄螢幕的分頁 ──────────────────────────
+function showTab(which) {
+  const g = which === 'guest';
+  $('#tab-guest').setAttribute('aria-selected', g);
+  $('#tab-owner').setAttribute('aria-selected', !g);
+  $('#col-guest').hidden = !g;
+  $('#col-owner').hidden = g;
+  if (!g) {
+    $('#ownerDot').hidden = true; $('#toast').hidden = true;
+    if (order) { const p = $('#push'); p.classList.remove('show'); void p.offsetWidth; p.classList.add('show'); setTimeout(() => p.classList.remove('show'), 5000); }
+  }
+}
+$('#tab-guest').onclick = () => showTab('guest');
+$('#tab-owner').onclick = () => showTab('owner');
+$('#toastGo').onclick = () => showTab('owner');
+function applyLayout() {
+  if (narrow()) showTab($('#tab-owner').getAttribute('aria-selected') === 'true' ? 'owner' : 'guest');
+  else { $('#col-guest').hidden = false; $('#col-owner').hidden = false; }
+}
+matchMedia('(max-width:879px)').addEventListener('change', applyLayout);
+
+// ── 重新開始 ─────────────────────────────
+function start() {
+  order = null; posted = false;
+  sheet.classList.remove('open'); $('#toast').hidden = true;
+  $('#coach').hidden = false; setMenu(true);
+  welcome(); resetOwner(); loadDrink();
+  if (narrow()) showTab('guest'); else applyLayout();
+}
+$('#restart').onclick = start;
+start();
+</script>

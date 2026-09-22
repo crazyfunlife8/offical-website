@@ -1,0 +1,685 @@
+<title>安居清潔到府預約示範</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>
+/* 手機聊天介面的示範，刻意只做一套亮色（聊天介面本來就是亮的）。店家的品牌色由 build.js 從 shops.js 寫進來 */
+:root{
+  --brand:#176B87;--brand-ink:#FFFFFF;--dark:#123444;--dark-ink:#FFB27A;--accent:#E0782E;--owner-ground:#F3F8F9;--new-bg:#E3F4F4;
+  --ground:#DDE3EA;
+  --ink:#1D2430;
+  --muted:#6B7686;
+  --chat:#B9C9DB;
+  --bubble-me:#A9E27E;
+  --bubble-shop:#FFFFFF;
+  --line:#D5DCE4;
+  --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}   /* 本機或官網直接開時沒有發布外殼的 reset，不寫這條提示框會一開場就露出來 */
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid #2F6FEB;outline-offset:2px}
+
+/* ── 外框 ───────────────────────────── */
+.stage{min-height:100%;display:flex;flex-direction:column;align-items:center;padding-block:20px 28px;padding-inline:16px;gap:14px}
+.demobar{width:100%;max-width:820px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.demobar .tag{background:var(--dark);color:var(--dark-ink);font-weight:700;font-size:12px;letter-spacing:.08em;padding:3px 9px;border-radius:4px}
+.demobar .note{color:var(--muted);font-size:13px}
+.demobar .restart{margin-left:auto;border:1px solid #B3BDC9;background:#fff;border-radius:999px;padding:4px 12px;font-size:13px}
+.tabs{display:none}
+.phones{display:flex;gap:40px;align-items:flex-start;justify-content:center}
+.col{display:flex;flex-direction:column;align-items:center;gap:10px}
+.col-label{font-size:13px;font-weight:700;letter-spacing:.06em;color:#3A4453}
+.phone{position:relative;width:375px;height:780px;border-radius:46px;background:#0E0F11;padding:11px;box-shadow:0 30px 60px -30px rgba(20,30,50,.55),0 0 0 1px #2A2D33 inset}
+.screen{position:relative;width:100%;height:100%;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;background:var(--chat)}
+.status{flex:none;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 26px 0 30px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;background:#fff}
+.status .sig{letter-spacing:2px;font-size:11px}
+.foot{width:100%;max-width:820px;text-align:center;color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:8px;align-items:center}
+.foot .cta{display:inline-block;background:var(--dark);color:#fff;text-decoration:none;font-weight:700;padding:11px 20px;border-radius:10px}
+.foot .brand{color:var(--ink)}
+
+/* ── 客人：聊天室 ───────────────────── */
+.chat-head{flex:none;height:52px;background:#fff;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line)}
+.chat-head .back{font-size:22px;color:#333;width:20px}
+.avatar{flex:none;width:34px;height:34px;border-radius:50%;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font-weight:900;font-size:15px}
+.chat-head .who{display:flex;flex-direction:column;line-height:1.2}
+.chat-head b{font-size:16px}
+.chat-head small{font-size:11px;color:var(--muted)}
+.chat-head .icons{margin-left:auto;color:#555;letter-spacing:10px;font-size:16px}
+.log{flex:1;overflow-y:auto;padding:14px 12px 18px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.day{align-self:center;background:rgba(40,55,75,.28);color:#fff;font-size:11px;padding:2px 10px;border-radius:999px}
+.msg{display:flex;gap:7px;align-items:flex-end;max-width:100%}
+.msg.shop{align-self:flex-start}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.msg .avatar{width:32px;height:32px;font-size:13px;align-self:flex-start}
+.bubble{max-width:236px;padding:9px 12px;border-radius:18px;font-size:14.5px;line-height:1.55;white-space:pre-line;word-break:break-word}
+.shop .bubble{background:var(--bubble-shop);border-top-left-radius:6px}
+.me .bubble{background:var(--bubble-me);border-top-right-radius:6px}
+.meta{font-size:10px;color:#4E5B6C;white-space:nowrap;line-height:1.3;text-align:right;font-variant-numeric:tabular-nums}
+.shop .meta{text-align:left}
+.enter{animation:pop .28s ease-out}
+@keyframes pop{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* 送出後的確認卡片 */
+.card{width:236px;background:#fff;border-radius:16px;overflow:hidden;border-top-left-radius:6px}
+.card-top{background:var(--brand);color:var(--brand-ink);padding:10px 14px;font-weight:900;font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-top span{font-size:11px;font-weight:700;background:var(--dark);color:var(--dark-ink);padding:2px 7px;border-radius:4px;white-space:nowrap}
+.card-num{padding:12px 14px 4px;display:flex;align-items:baseline;gap:8px}
+.card-num strong{font-size:32px;font-weight:900;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.card-num small{color:var(--muted);font-size:12px}
+.card dl{margin:0;padding:4px 14px 12px;display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:13px}
+.card dt{color:var(--muted);white-space:nowrap}
+.card dd{margin:0;font-weight:500}
+.card .hint{background:#F6F7F9;font-size:12px;color:#4E5B6C;padding:8px 14px}
+
+/* 圖文選單（1200×810 的比例） */
+.menu{flex:none;background:#fff;border-top:1px solid var(--line)}
+.rich{position:relative;display:grid;grid-template-columns:1.25fr 1fr;grid-template-rows:1fr 1fr;aspect-ratio:1200/810;gap:2px;background:#fff;max-width:100%}
+.tile{border:0;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:14px 16px;text-align:left}
+.tile b{font-size:19px;font-weight:900;letter-spacing:.04em}
+.tile small{font-size:12px;opacity:.85;line-height:1.35;white-space:pre-line}
+.tile.main{grid-row:1/3;background:var(--brand);color:var(--brand-ink)}
+.tile.main b{font-size:26px}
+.tile.main .pill{font-size:13px;font-weight:700;background:var(--dark);color:var(--dark-ink);align-self:flex-start;padding:3px 9px;border-radius:999px;margin-top:6px}
+.tile.side{background:var(--dark);color:#fff}
+.tile.side b{color:var(--dark-ink)}
+.tile:active{filter:brightness(.93)}
+.coach{position:absolute;left:10px;top:-44px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;padding:7px 12px;border-radius:10px;box-shadow:0 6px 14px -6px rgba(0,0,0,.5);pointer-events:none;animation:bob 1.6s ease-in-out infinite}
+.coach:after{content:"";position:absolute;left:28px;bottom:-6px;border:6px solid transparent;border-top-color:var(--accent);border-bottom:0}
+@keyframes bob{50%{transform:translateY(-4px)}}
+.menubar{height:40px;display:flex;align-items:center;gap:10px;padding:0 12px;border-top:1px solid var(--line);font-size:13px;color:#445}
+.menubar .kb{border:1px solid #C7CED7;background:#fff;border-radius:6px;width:30px;height:26px;font-size:13px}
+.menubar .toggle{flex:1;border:0;background:none;font-weight:700;color:#334;text-align:center}
+
+/* 聊天室裡開的點單頁（從底部滑上來） */
+.sheet{position:absolute;inset:34px 0 0;background:#fff;display:flex;flex-direction:column;transform:translateY(102%);transition:transform .32s cubic-bezier(.2,.8,.2,1);z-index:5;border-radius:14px 14px 0 0;box-shadow:0 -10px 30px -12px rgba(0,0,0,.45)}
+.sheet.open{transform:none}
+.sheet-bar{flex:none;height:46px;display:flex;align-items:center;gap:10px;padding:0 12px;border-bottom:1px solid var(--line)}
+.sheet-bar .x{border:0;background:none;font-size:20px;width:30px;height:30px}
+.sheet-bar .t{display:flex;flex-direction:column;line-height:1.2}
+.sheet-bar .t b{font-size:14px}
+.sheet-bar .t small{font-size:10.5px;color:var(--muted)}
+.sheet iframe{flex:1;width:100%;border:0;background:#fff}
+.sheet-done{flex:none;padding:10px 12px 14px;border-top:1px solid var(--line);background:#fff}
+.sheet-done button{width:100%;border:0;background:var(--dark);color:#fff;font-weight:700;padding:13px;border-radius:12px;font-size:15px}
+
+/* 手機版：老闆那邊有新單時的提示 */
+.toast{position:absolute;left:12px;right:12px;bottom:14px;z-index:6;background:var(--dark);color:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:14px;box-shadow:0 12px 26px -10px rgba(0,0,0,.6)}
+.toast b{color:var(--dark-ink)}
+.toast button{margin-left:auto;border:0;background:var(--dark-ink);color:var(--dark);font-weight:900;border-radius:999px;padding:6px 12px;white-space:nowrap}
+
+/* ── 老闆：後台 ───────────────────── */
+.owner .screen{background:var(--owner-ground)}
+.owner .status{background:var(--owner-ground)}
+.o-head{flex:none;padding:10px 18px 14px;display:flex;flex-direction:column;gap:2px;border-bottom:3px solid var(--dark)}
+.o-head small{color:#6A6456;font-size:12px;font-weight:700;letter-spacing:.06em}
+.o-head h2{margin:0;font-size:22px;font-weight:900;display:flex;align-items:center;gap:10px;text-wrap:balance}
+.o-head .live{font-size:11px;font-weight:700;background:#1F8A4C;color:#fff;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.o-stats{flex:none;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 6px}
+.o-stat{background:#fff;border:1px solid #E2DCCB;border-radius:12px;padding:10px 12px}
+.o-stat small{display:block;font-size:11px;color:#7B7465}
+.o-stat strong{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums}
+.o-note{flex:none;font-size:12px;color:#6A6456;padding:6px 18px 8px}
+.o-list{flex:1;overflow-y:auto;padding:0 16px 20px;display:flex;flex-direction:column;gap:8px}
+.o-row{background:#fff;border:1px solid #E2DCCB;border-radius:12px;display:grid;grid-template-columns:70px 1fr auto;align-items:center;gap:10px;padding:10px 12px}
+.o-row time{font-weight:900;font-size:14px;font-variant-numeric:tabular-nums;line-height:1.25}
+.o-row time small{display:block;font-size:10px;font-weight:700;color:#8A8372}
+.o-row b{display:block;font-size:14px}
+.o-row .opt{font-size:12px;color:#6A6456}
+.o-row .num{font-weight:900;font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.o-row .chip{display:block;margin-top:3px;font-size:10.5px;font-weight:700;background:#F0EBDD;color:#6A6456;padding:1px 7px;border-radius:999px;text-align:center;white-space:nowrap}
+.o-row.new{border:2px solid var(--dark);background:var(--new-bg)}
+.o-row.new .chip{background:var(--accent);color:#fff}
+.flash{animation:flash 1.2s ease-out 2}
+@keyframes flash{0%{box-shadow:0 0 0 0 rgba(0,0,0,.35)}100%{box-shadow:0 0 0 12px rgba(0,0,0,0)}}
+.o-wait{border:1.5px dashed #CFC6AE;border-radius:12px;padding:14px;text-align:center;font-size:13px;color:#7B7465}
+.push{position:absolute;left:10px;right:10px;top:40px;z-index:4;background:rgba(28,28,30,.93);color:#fff;border-radius:18px;padding:11px 14px;display:flex;gap:11px;align-items:flex-start;transform:translateY(-140%);transition:transform .45s cubic-bezier(.2,.9,.25,1.15);box-shadow:0 14px 30px -12px rgba(0,0,0,.6)}
+.push.show{transform:none}
+.push .avatar{width:34px;height:34px;border-radius:9px}
+.push .p-t{display:flex;justify-content:space-between;font-size:12px;color:#C9CCD2}
+.push .p-b{font-size:14px;font-weight:700;line-height:1.35}
+.push .p-s{font-size:12.5px;color:#DDE0E5}
+.push .grow{flex:1;min-width:0}
+
+/* ── 窄螢幕：一次一支手機，上面切換 ─────────── */
+@media (max-width:879px){
+  .stage{padding-block:10px 20px;gap:10px}
+  .tabs{display:flex;width:100%;max-width:430px;background:#fff;border-radius:12px;padding:4px;gap:4px;box-shadow:0 1px 0 #C9D1DB}
+  .tabs button{flex:1;border:0;background:none;padding:8px 6px;border-radius:9px;font-weight:700;font-size:14px;color:#5A6575;position:relative}
+  .tabs button[aria-selected="true"]{background:var(--dark);color:#fff}
+  .tabs .dot{position:absolute;top:6px;right:14px;width:9px;height:9px;border-radius:50%;background:var(--accent)}
+  .phones{width:100%;flex-direction:column;align-items:center;gap:0}
+  .col{width:100%;max-width:430px}
+  .col-label{display:none}
+  .demobar{max-width:430px}
+}
+@media (max-width:519px){
+  /* 手機上直接滿版：螢幕本身就是那支手機 */
+  .stage{padding-inline:0;padding-block:0 18px}
+  .demobar,.tabs{margin-inline:12px;width:calc(100% - 24px)}
+  .demobar{padding-top:10px}
+  .phone{width:100%;height:calc(100svh - 96px);min-height:560px;border-radius:0;padding:0;background:none;box-shadow:none}
+  .screen{border-radius:0}
+  .status{display:none}
+  .sheet{inset:0}
+  .push{top:8px}
+  .foot{padding-inline:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+
+<div class="stage">
+  <div class="demobar">
+    <span class="tag">示範</span>
+    <span class="note">店名與內容都是虛構的，不會真的送出</span>
+    <button class="restart" id="restart" type="button">重新開始</button>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="切換手機">
+    <button role="tab" id="tab-guest" aria-selected="true" aria-controls="col-guest" type="button">客人的手機</button>
+    <button role="tab" id="tab-owner" aria-selected="false" aria-controls="col-owner" type="button">老闆的手機<i class="dot" id="ownerDot" hidden></i></button>
+  </div>
+
+  <div class="phones">
+    <div class="col" id="col-guest">
+      <div class="col-label">客人的手機</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status"><span class="clock">--:--</span><span class="sig">▂▄▆ 5G ▮</span></div>
+          <div class="chat-head">
+            <span class="back" aria-hidden="true">‹</span>
+            <span class="avatar mark" aria-hidden="true"></span>
+            <span class="who"><b class="shop-name"></b><small>官方帳號</small></span>
+            <span class="icons" aria-hidden="true">⌕ ☰</span>
+          </div>
+          <div class="log" id="log" aria-live="polite"></div>
+          <div class="menu">
+            <div class="rich" id="rich">
+              <div class="coach" id="coach">點這裡，用客人的角度走一次</div>
+              <button class="tile main" id="btnMain" type="button"><b id="mMain"></b><small id="mMainSub"></small><span class="pill" id="mPill"></span></button>
+              <button class="tile side" id="btnQuery" type="button"><b id="mQ"></b><small id="mQSub"></small></button>
+              <button class="tile side" id="btnHours" type="button"><b id="mH"></b><small id="mHSub"></small></button>
+            </div>
+            <div class="menubar">
+              <button class="kb" id="kb" type="button" aria-label="切換選單">⌨</button>
+              <button class="toggle" id="menuToggle" type="button">選單 ▾</button>
+            </div>
+          </div>
+
+          <div class="sheet" id="sheet" aria-hidden="true">
+            <div class="sheet-bar">
+              <button class="x" id="sheetClose" type="button" aria-label="關閉">✕</button>
+              <span class="t"><b id="sheetTitle"></b><small>在聊天室裡直接開，不用另外下載</small></span>
+            </div>
+            <iframe id="booking" title="點單頁"></iframe>
+            <div class="sheet-done" id="sheetDone" hidden><button id="backToChat" type="button">回到聊天室</button></div>
+          </div>
+
+          <div class="toast" id="toast" hidden><span>老闆的手機<b>收到新的單</b>了</span><button id="toastGo" type="button">切過去看</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col" id="col-owner">
+      <div class="col-label">老闆的手機</div>
+      <div class="phone owner">
+        <div class="screen">
+          <div class="status"><span class="clock">--:--</span><span class="sig">▂▄▆ 5G ▮</span></div>
+          <div class="push" id="push" role="status">
+            <span class="avatar mark" aria-hidden="true"></span>
+            <div class="grow">
+              <div class="p-t"><span id="pushApp"></span><span>現在</span></div>
+              <div class="p-b" id="pushTitle"></div>
+              <div class="p-s" id="pushBody"></div>
+            </div>
+          </div>
+          <div class="o-head">
+            <small id="oApp"></small>
+            <h2><span id="oHead"></span> <span class="live">接單中</span></h2>
+          </div>
+          <div class="o-stats">
+            <div class="o-stat"><small id="aLabel"></small><strong id="aVal">0</strong> <span id="aUnit"></span></div>
+            <div class="o-stat"><small id="bLabel"></small><strong id="bVal">0</strong> <span id="bUnit"></span></div>
+          </div>
+          <div class="o-note" id="oNote"></div>
+          <div class="o-list" id="olist"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <a class="cta" href="https://nestdigitalai.com/services/booking" target="_blank" rel="noopener">想要你店裡也有一個？看怎麼接到你的 LINE 官方帳號 →</a>
+    <span>這是 <a class="brand" href="https://nestdigitalai.com" target="_blank" rel="noopener">創巢數位</a> 做的示範頁</span>
+  </div>
+</div>
+
+<script>
+// ── 小工具（shops.js 會用到） ─────────────────
+const pad = n => String(n).padStart(2, '0');
+const plus = k => { const d = new Date(); d.setDate(d.getDate() + k); return d; };
+const day = k => { const d = plus(k); return `${d.getMonth() + 1}/${d.getDate()}`; };
+const wk = k => '週' + '日一二三四五六'[plus(k).getDay()];
+const slot = k => { const d = new Date(); d.setSeconds(0, 0); d.setMinutes(Math.ceil((d.getMinutes() + 10) / 10) * 10 + k * 10); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+const pick = (o, re) => ((o.pairs || []).find(p => re.test(p[0])) || [, ''])[1];
+const money = s => { const m = String(s || '').match(/\$\s*([\d,]+)/); return m ? +m[1].replace(/,/g, '') : 0; };
+const int = s => { const m = String(s || '').match(/\d+/); return m ? +m[0] : 0; };
+
+// 10 家店的 LINE 示範設定。build.js 會把這份原封不動塞進每一頁。
+// 在頁面裡可以用的小工具（模板裡定義）：
+//   day(k)   今天加 k 天，回傳「9/24」
+//   wk(k)    今天加 k 天是星期幾，回傳「週三」
+//   slot(k)  現在往後第 k 個 10 分鐘整點，回傳「16:30」（只有飲料店用）
+//   pick(o, /正規式/)  從完成畫面讀到的摘要裡，找標籤符合的那一格的值
+//   money(s) 從「NT$ 2,400・約 3 小時」這種字串取出 2400
+//   int(s)   取出第一個整數
+//
+// 每家店的欄位：
+//   file      原始點單頁（創巢/03-素材/demo-預約頁/ 底下），原檔不會被改
+//   reporter  'drink'＝日日茶舖專用（讀 S 狀態）；其他都是 'generic'（讀完成畫面的摘要）
+//   peek      generic 讀不到品項時，在點單頁裡每 0.25 秒偷看一次，回傳 [[標籤, 值], …]
+//   newRow(o) 客人送出後，老闆清單要多的那一列：t 時間、item 品項、opt 補充、n 算進第二格統計的數字
+const SHOPS = {
+  drink: {
+    file: 'booking-drink.html', reporter: 'drink', title: '日日茶舖預點示範',
+    shop: '日日茶舖', mark: '茶',
+    colors: { brand: '#FFD84D', brandInk: '#171717', dark: '#171717', darkInk: '#FFD84D', accent: '#E8412A', ownerGround: '#F4F1E8', newBg: '#FFFBE6' },
+    menu: { main: '我要預點', mainSub: '先點好\n到店直接拿', pill: '最快 20 分鐘', q: '查訂單', qSub: '取餐號碼、時間', h: '營業時間', hSub: '今天開到幾點' },
+    sheet: '日日茶舖｜預點取餐',
+    welcome: ['嗨，歡迎加入日日茶舖！\n想先點好再過來拿，按下面的「我要預點」就可以，不用在店門口排隊。', '甜度、冰塊、加料都能自己選，送出後會直接給你取餐號碼。'],
+    hours: '今天營業到 21:30，最快 20 分鐘後可以取餐。\n要先點的話，按下面的「我要預點」。',
+    noun: '預點', none: '目前沒有進行中的預點。\n按下面的「我要預點」就可以開始。',
+    card: { title: '預點成功', numLabel: '取餐號碼', hint: '到店報號碼直接拿，不用再排隊', prefix: 'A' },
+    owner: {
+      app: '日日茶舖・預點後台', head: '今天要做的', a: ['今日預點', '單'], b: ['要做的杯數', '杯'],
+      note: '依取餐時間排好，照順序做就好。每個時段限量 12 杯。', sort: true,
+      wait: '客人一送出，新單會直接跳到這裡，不用盯私訊',
+      rows: () => [
+        { t: slot(0), num: 'A135', item: '黑糖珍珠鮮奶 × 2', opt: '微糖・少冰・珍珠', n: 2 },
+        { t: slot(1), num: 'A136', item: '柚香翡翠 × 1', opt: '無糖・微冰・椰果', n: 1 },
+        { t: slot(2), num: 'A137', item: '日煮紅茶 × 3', opt: '半糖・去冰・不加料', n: 3 },
+      ],
+    },
+    newRow: o => ({ t: o.time, tom: o.tom, item: `${o.drink} × ${o.qty}`, opt: o.opt, n: o.qty }),
+  },
+
+  nails: {
+    file: 'booking-nails.html', reporter: 'generic', title: '青苔指甲預約示範',
+    shop: '青苔指甲', mark: '苔',
+    colors: { brand: '#486554', brandInk: '#FFFFFF', dark: '#24352D', darkInk: '#CFE3C4', accent: '#A4563B', ownerGround: '#FBF8F0', newBg: '#EEF4EA' },
+    menu: { main: '我要預約', mainSub: '挑款式\n選空檔', pill: '一人工作室', q: '我的預約', qSub: '時間、訂金', h: '營業時間', hSub: '哪天有開' },
+    sheet: '青苔指甲｜線上預約',
+    welcome: ['嗨，歡迎加入青苔指甲～\n我是一人工作室，做指甲的時候常常沒辦法馬上回訊息，想預約直接按下面的「我要預約」就好。', '款式跟時段都能自己挑，灰色的時段是已經有人約了。'],
+    hours: '營業時間 10:00–20:00，一次只接一位。\n要約時間按下面的「我要預約」，看得到的空檔都能約。',
+    noun: '預約', none: '目前沒有你的預約。\n按下面的「我要預約」就可以挑時間。',
+    card: { title: '預約成功', numLabel: '預約編號', hint: '前一天晚上 8 點會再提醒你', prefix: 'M' },
+    owner: {
+      app: '青苔指甲・預約後台', head: '接下來的預約', a: ['預約', '筆'], b: ['已收訂金', '筆'],
+      note: '客人自己挑空檔，時段不會重疊。', sort: false,
+      wait: '客人一預約，這裡會直接跳出來，不用盯私訊',
+      rows: () => [
+        { t: `${day(1)} 10:00`, num: 'M035', item: '手部保養', opt: '陳小姐・舊客', n: 0 },
+        { t: `${day(1)} 13:30`, num: 'M036', item: '法式凝膠', opt: '吳小姐・新客・已付訂金', n: 1 },
+        { t: `${day(2)} 16:00`, num: 'M037', item: '單色凝膠', opt: '林小姐・舊客', n: 0 },
+      ],
+    },
+    newRow: o => ({ t: pick(o, /時間/), item: pick(o, /服務/), opt: `${pick(o, /稱呼/)}・已付訂金`, n: 1 }),
+  },
+
+  brows: {
+    file: 'booking-brows.html', reporter: 'generic', title: '晨霧眉睫預約示範',
+    shop: '晨霧眉睫', mark: '霧',
+    colors: { brand: '#613B46', brandInk: '#FFFFFF', dark: '#342B2D', darkInk: '#E9C6CB', accent: '#AD8551', ownerGround: '#FFFAF6', newBg: '#F8ECEA' },
+    menu: { main: '我要預約', mainSub: '選項目\n留一段完整時間', pill: '一次一位', q: '我的預約', qSub: '時間、術前須知', h: '營業時間', hSub: '哪天可以約' },
+    sheet: '晨霧眉睫｜預約',
+    welcome: ['歡迎加入晨霧眉睫。\n我一次只接一位客人，施作中沒辦法即時回覆，想預約可以直接按下面的「我要預約」。', '先回答三個小問題，我會幫你留一段完整的長時段。'],
+    hours: '營業時間 10:00–19:00，全預約制。\n想約時間按下面的「我要預約」。',
+    noun: '預約', none: '目前沒有你的預約。\n按下面的「我要預約」就可以開始。',
+    card: { title: '預約成功', numLabel: '預約編號', hint: '術前注意事項記得看，前一天會再提醒你', prefix: 'W' },
+    owner: {
+      app: '晨霧眉睫・預約後台', head: '這週的預約', a: ['本週預約', '位'], b: ['已收訂金', '元'], money: true,
+      note: '一天只排兩到三位，長時段不會重疊。', sort: false,
+      wait: '客人付完訂金，這裡會直接跳出來',
+      rows: () => [
+        { t: `${day(1)} 10:00`, num: 'W021', item: '柔霧眉', opt: '補色・舊客', n: 0 },
+        { t: `${day(2)} 14:00`, num: 'W022', item: '自然款植睫', opt: '新客・已付訂金', n: 1000 },
+        { t: `${day(3)} 13:00`, num: 'W023', item: '濃密款植睫', opt: '舊客・已付訂金', n: 1000 },
+      ],
+    },
+    newRow: o => ({ t: pick(o, /時間/), item: pick(o, /項目/), opt: `新客・訂金 ${pick(o, /訂金/)}`, n: money(pick(o, /訂金/)) }),
+  },
+
+  pet: {
+    file: 'booking-pet.html', reporter: 'generic', title: '毛球澡堂預約示範',
+    shop: '毛球澡堂', mark: '毛',
+    colors: { brand: '#FFD56A', brandInk: '#193B44', dark: '#196B78', darkInk: '#FFD56A', accent: '#E9795D', ownerGround: '#FFFEF9', newBg: '#FFF6D9' },
+    menu: { main: '我要預約', mainSub: '洗澡・修剪\n選毛孩跟時段', pill: '洗好傳照片', q: '我的預約', qSub: '時間、費用', h: '營業時間', hSub: '接送範圍' },
+    sheet: '毛球澡堂｜洗澡預約',
+    welcome: ['汪～歡迎加入毛球澡堂！\n洗澡、修剪都可以直接在這裡預約，按下面的「我要預約」選毛孩跟時段。', '洗好會傳照片給你，接到通知再來接就好，不用在附近久等。'],
+    hours: '營業時間 9:00–18:00。\n中壢區可以到府接送，預約時一起選就好。',
+    noun: '預約', none: '目前沒有預約。\n按下面的「我要預約」就可以幫毛孩排時間。',
+    card: { title: '預約成功', numLabel: '預約編號', hint: '洗好會傳照片通知你', prefix: 'P' },
+    owner: {
+      app: '毛球澡堂・今日排程', head: '要洗的毛孩', a: ['預約', '隻'], b: ['預估營收', '元'], money: true,
+      note: '依時段排好，洗好一鍵通知飼主來接。', sort: false,
+      wait: '飼主一預約，這裡會直接跳出來',
+      rows: () => [
+        { t: `${day(1)} 09:00`, num: 'P101', item: '中型犬・基礎洗澡', opt: '柯基「布丁」', n: 850 },
+        { t: `${day(1)} 10:30`, num: 'P102', item: '貓・洗澡', opt: '到府接送', n: 1000 },
+        { t: `${day(1)} 13:00`, num: 'P103', item: '小型犬・造型修剪', opt: '貴賓「可可」', n: 950 },
+      ],
+    },
+    newRow: o => ({ t: pick(o, /時間/), item: `${pick(o, /毛孩/)}・${pick(o, /服務/)}`, opt: pick(o, /接送/), n: money(pick(o, /費用/)) }),
+  },
+
+  cake: {
+    file: 'booking-cake.html', reporter: 'generic', title: '小麥日常蛋糕預訂示範',
+    shop: '小麥日常烘焙', mark: '麥',
+    colors: { brand: '#7B2944', brandInk: '#FFFFFF', dark: '#4B352F', darkInk: '#F7E5E9', accent: '#C8553D', ownerGround: '#FFFAF2', newBg: '#FBEFF2' },
+    menu: { main: '我要預訂', mainSub: '尺寸・口味\n字卡一次選好', pill: '字卡免費', q: '我的訂單', qSub: '取貨時間、尾款', h: '營業時間', hSub: '取貨時段' },
+    sheet: '小麥日常烘焙｜客製蛋糕',
+    welcome: ['歡迎加入小麥日常烘焙！\n客製蛋糕可以直接在這裡預訂，尺寸、口味、字卡一次選好，不用來回傳訊息確認。', '按下面的「我要預訂」開始，付一半訂金就會幫你排進製作。'],
+    hours: '營業時間 11:00–19:00。\n蛋糕的取貨時段在預訂的時候選。',
+    noun: '訂單', none: '目前沒有你的蛋糕訂單。\n按下面的「我要預訂」就可以開始。',
+    card: { title: '預訂成功', numLabel: '訂單編號', hint: '取貨前一天會傳 LINE 提醒你', prefix: 'C' },
+    owner: {
+      app: '小麥日常・訂單後台', head: '這週要做的蛋糕', a: ['訂單', '顆'], b: ['已收訂金', '元'], money: true,
+      note: '依取貨日排好，字卡內容直接照抄。', sort: false,
+      wait: '客人付完訂金，這裡會直接跳出來',
+      rows: () => [
+        { t: `${day(2)} 14:00`, num: 'C035', item: '6 吋・巧克力', opt: '字卡「生日快樂」', n: 490 },
+        { t: `${day(3)} 12:00`, num: 'C036', item: '8 吋・香草草莓', opt: '數字蠟燭', n: 780 },
+        { t: `${day(4)} 16:00`, num: 'C037', item: '6 吋・伯爵茶', opt: '鮮花', n: 640 },
+      ],
+    },
+    newRow: o => ({ t: pick(o, /取貨/), item: pick(o, /蛋糕/), opt: pick(o, /裝飾/) || '不加裝飾', n: Math.ceil(money(pick(o, /總額/)) / 2) }),
+  },
+
+  class: {
+    file: 'booking-class.html', reporter: 'generic', title: '週三小班報名示範',
+    shop: '週三小班', mark: '燭',
+    colors: { brand: '#D9ED88', brandInk: '#26212D', dark: '#3E315C', darkInk: '#D9ED88', accent: '#C9602A', ownerGround: '#F8F4EC', newBg: '#F1F8D6' },
+    menu: { main: '我要報名', mainSub: '看近期場次\n剩幾位一目了然', pill: '每班 8 人', q: '我的報名', qSub: '場次、時間', h: '上課資訊', hSub: '費用、要帶什麼' },
+    sheet: '週三小班｜香氛蠟燭報名',
+    welcome: ['歡迎加入週三小班！\n香氛蠟燭課每班最多 8 個人，想報名直接按下面的「我要報名」挑場次，剩幾位都看得到。', '材料全含，人來就好。'],
+    hours: '一堂兩小時，NT$ 1,500，材料全含。\n穿不怕沾到蠟的衣服就可以，其他都幫你準備好。',
+    noun: '報名', none: '目前沒有你的報名。\n按下面的「我要報名」就可以挑場次。',
+    card: { title: '報名成功', numLabel: '報名編號', hint: '上課前一天會傳提醒給你', prefix: 'K' },
+    owner: {
+      app: '週三小班・報名後台', head: '近期場次', a: ['報名', '筆'], b: ['已收款', '元'], money: true,
+      note: '額滿自動轉候補，不用一個一個回訊息。', sort: false,
+      wait: '學員一付款，這裡會直接跳出來',
+      rows: () => [
+        { t: `${day(3)} 19:00`, num: 'K035', item: '晚間班・2 位', opt: '陳小姐', n: 3000 },
+        { t: `${day(3)} 19:00`, num: 'K036', item: '晚間班・1 位', opt: '黃先生', n: 1500 },
+        { t: `${day(10)} 10:00`, num: 'K037', item: '週末班・2 位', opt: '吳小姐', n: 3000 },
+      ],
+    },
+    // 「9 月 25 日 週五」＋「19:00–21:00」縮成「9/25 19:00」，跟其他列同一種寫法
+    newRow: o => ({ t: `${pick(o, /場次/).replace(/(\d+)\s*月\s*(\d+)\s*日.*/, '$1/$2')} ${pick(o, /時間/).split('–')[0]}`, item: `香氛蠟燭・${pick(o, /人數/)}`, opt: pick(o, /狀態/), n: 1500 * (int(pick(o, /人數/)) || 1) }),
+  },
+
+  cleaning: {
+    file: 'booking-cleaning.html', reporter: 'generic', title: '安居清潔到府預約示範',
+    shop: '安居清潔', mark: '安',
+    colors: { brand: '#176B87', brandInk: '#FFFFFF', dark: '#123444', darkInk: '#FFB27A', accent: '#E0782E', ownerGround: '#F3F8F9', newBg: '#E3F4F4' },
+    menu: { main: '我要預約', mainSub: '先看建議時數\n再挑時段', pill: '桃園市到府', q: '我的預約', qSub: '到府時間、人員', h: '服務範圍', hSub: '哪些區可以到' },
+    sheet: '安居清潔｜到府預約',
+    welcome: ['您好，歡迎加入安居清潔。\n到府清潔可以直接在這裡預約：選服務、填坪數，會先算好建議時數跟費用，再挑方便的時段。', '按下面的「我要預約」開始。'],
+    hours: '服務範圍是桃園市各區。\n到府時段在預約的時候選，確認後會告訴你是哪一組師傅。',
+    noun: '預約', none: '目前沒有你的預約。\n按下面的「我要預約」就可以開始。',
+    card: { title: '預約成功', numLabel: '預約編號', hint: '前一天會傳 LINE 提醒你', prefix: 'H' },
+    owner: {
+      app: '安居清潔・派班後台', head: '接下來的派班', a: ['待派班', '筆'], b: ['預估營收', '元'], money: true,
+      note: '坪數、地區、需求都填好了，直接派組。', sort: false,
+      wait: '客人付完訂金，這裡會直接跳出來',
+      rows: () => [
+        { t: `${day(1)} 上午 9–12`, num: 'H035', item: '居家清潔・20 坪', opt: '桃園區・A 組', n: 2800 },
+        { t: `${day(1)} 下午 1–4`, num: 'H036', item: '廚房深層清潔', opt: '中壢區・B 組', n: 3200 },
+        { t: `${day(2)} 上午 9–12`, num: 'H037', item: '搬家前清潔', opt: '八德區・A 組', n: 4500 },
+      ],
+    },
+    newRow: o => ({ t: pick(o, /時間/), item: pick(o, /服務/), opt: `${pick(o, /地區/)}・待派組`, n: money(pick(o, /估價/)) }),
+  },
+
+  preorder: {
+    file: 'booking-preorder.html', reporter: 'generic', title: '巷口早點預留示範',
+    shop: '巷口早點', mark: '早',
+    colors: { brand: '#FFD43B', brandInk: '#211F1A', dark: '#165B42', darkInk: '#FFD43B', accent: '#F45B26', ownerGround: '#FFF8DC', newBg: '#FFF1B8' },
+    menu: { main: '我要預留', mainSub: '明天的早餐\n先點先留', pill: '到店就拿', q: '我的預留', qSub: '取餐編號', h: '營業時間', hSub: '明天幾點開' },
+    sheet: '巷口早點｜早餐預留',
+    welcome: ['早安～歡迎加入巷口早點！\n不用再留言「＋1」等回覆了，明天的早餐直接按下面的「我要預留」點好，到店報編號就拿。', '每樣都有份數，賣完會直接顯示已售完。'],
+    hours: '明天早上 06:30–10:30 取餐。\n要預留按下面的「我要預留」。',
+    noun: '預留', none: '目前沒有你的預留。\n按下面的「我要預留」就可以點明天的早餐。',
+    card: { title: '預留成功', numLabel: '取餐編號', hint: '請在預定時間前後 10 分鐘內取餐', prefix: 'A' },
+    owner: {
+      app: '巷口早點・明天備料', head: '明天要準備的', a: ['預留單', '筆'], b: ['份數', '份'],
+      note: '照取餐時間排好，品項跟客製都寫清楚了。', sort: false,
+      wait: '客人一預留，這裡會直接跳出來，不用翻留言',
+      rows: () => [
+        { t: '06:30', num: 'A034', item: '古早味飯糰 × 2', opt: '明天取', n: 2 },
+        { t: '07:00', num: 'A035', item: '招牌粉漿蛋餅 × 1', opt: '明天取', n: 1 },
+        { t: '07:30', num: 'A036', item: '煎蘿蔔糕 × 3', opt: '明天取', n: 3 },
+      ],
+    },
+    // 早點的完成畫面只有編號跟時間，品項要在「份數與客製」那一步先記下來
+    peek: () => {
+      const r = document.querySelector('.review strong'), q = document.querySelector('.qty strong');
+      return r && q ? [['餐點', `${r.textContent.trim()} × ${q.textContent.trim()}`]] : null;
+    },
+    newRow: o => ({ t: (o.time || '').replace('明天 ', ''), item: pick(o, /餐點/), opt: '明天取', n: int((pick(o, /餐點/).split('×')[1]) || '1') || 1 }),
+  },
+
+  salon: {
+    file: 'booking-salon.html', reporter: 'generic', title: '午後髮室預約示範',
+    shop: '午後髮室', mark: '髮',
+    colors: { brand: '#315C4D', brandInk: '#FFFFFF', dark: '#26312E', darkInk: '#D9B06F', accent: '#B5673A', ownerGround: '#F3F0E8', newBg: '#EEF2EC' },
+    menu: { main: '我要預約', mainSub: '選設計師\n看得到的都能約', pill: '不用等回覆', q: '我的預約', qSub: '時間、設計師', h: '營業時間', hSub: '哪天時段多' },
+    sheet: '午後髮室｜線上預約',
+    welcome: ['歡迎加入午後髮室。\n想剪、染、燙，直接按下面的「我要預約」，選設計師跟時段就好，看到的都是可以約的時間。', '以前要在這裡來回問時間，現在自己選，不會撞時段。'],
+    hours: '營業時間 10:00–20:00。\n週一的時段比較少，其他天都滿好約的。',
+    noun: '預約', none: '目前沒有你的預約。\n按下面的「我要預約」就可以挑設計師。',
+    card: { title: '預約成功', numLabel: '預約編號', hint: '前一天會傳 LINE 提醒你', prefix: 'S' },
+    owner: {
+      app: '午後髮室・今日排班', head: '設計師的時間', a: ['預約', '組'], b: ['預估營收', '元'], money: true,
+      note: '三位設計師各看各的時段，不用共用聊天室對時間。', sort: false,
+      wait: '客人一預約，這裡會直接跳出來',
+      rows: () => [
+        { t: `${day(1)} 10:00`, num: 'S035', item: '映安・剪髮', opt: '林小姐・舊客', n: 600 },
+        { t: `${day(1)} 10:30`, num: 'S036', item: '子晴・染髮', opt: '吳小姐・新客', n: 2800 },
+        { t: `${day(1)} 14:00`, num: 'S037', item: '庭宇・燙髮', opt: '江小姐・舊客', n: 3200 },
+      ],
+    },
+    newRow: o => ({ t: pick(o, /時間/), item: `${pick(o, /設計師/)}・${pick(o, /服務/).split('・')[0]}`, opt: `${pick(o, /預約人/)}・新客`, n: money(pick(o, /服務/)) }),
+  },
+
+  table: {
+    file: 'booking-table.html', reporter: 'generic', title: '燉鍋小館訂位示範',
+    shop: '燉鍋小館', mark: '燉',
+    colors: { brand: '#681F2A', brandInk: '#FFFFFF', dark: '#3C1118', darkInk: '#E2BD83', accent: '#B58A43', ownerGround: '#F7F0E3', newBg: '#F6E8E0' },
+    menu: { main: '我要訂位', mainSub: '選人數・日期\n直接看空位', pill: '開放未來 7 天', q: '我的訂位', qSub: '日期、人數', h: '營業時間', hSub: '午餐、晚餐' },
+    sheet: '燉鍋小館｜線上訂位',
+    welcome: ['歡迎加入燉鍋小館！\n訂位直接按下面的「我要訂位」，選人數、日期跟時段，不用打電話也不用等回覆。', '8 位以上請來電，我們幫你安排併桌。'],
+    hours: '午餐 11:30–14:00，晚餐 17:30–21:00。\n訂位開放未來 7 天，按下面的「我要訂位」。',
+    noun: '訂位', none: '目前沒有你的訂位。\n按下面的「我要訂位」就可以開始。',
+    card: { title: '訂位成功', numLabel: '訂位編號', hint: '座位保留 10 分鐘，前一天會傳 LINE 提醒你', prefix: 'T' },
+    owner: {
+      app: '燉鍋小館・訂位表', head: '接下來的訂位', a: ['訂位', '組'], b: ['來客數', '位'],
+      note: '人數、時段、備註都寫好了，照表排桌。', sort: false,
+      wait: '客人一訂位，這裡會直接跳出來，不用接電話',
+      rows: () => [
+        { t: `${day(1)} 18:00`, num: 'T035', item: '4 位', opt: '陳先生', n: 4 },
+        { t: `${day(1)} 18:30`, num: 'T036', item: '2 位', opt: '林小姐・靠窗', n: 2 },
+        { t: `${day(1)} 19:00`, num: 'T037', item: '6 位', opt: '黃先生・已付訂金', n: 6 },
+      ],
+    },
+    newRow: o => ({ t: `${pick(o, /日期/)} ${pick(o, /時間/)}`, item: pick(o, /人數/), opt: pick(o, /訂位人/).split('・')[0], n: int(pick(o, /人數/)) || 2 }),
+  },
+};
+
+const C = SHOPS["cleaning"];
+// 原始點單頁（已藏掉切換鈕與頁尾、補上回報腳本），由 build.js 塞進來
+const BOOKING_HTML = "\u003c!-- NEST-VERSION: 2026-09-15-v1 -->\n\u003c!doctype html>\u003chtml lang=\"zh-Hant\">\u003chead>\u003cmeta charset=\"utf-8\">\u003cmeta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\u003ctitle>安居清潔｜到府清潔預約示範\u003c/title>\u003cmeta name=\"description\" content=\"安居清潔桃園到府服務，即時計算建議時數與費用。\">\u003cmeta property=\"og:title\" content=\"安居清潔｜桃園到府清潔\">\u003cmeta property=\"og:description\" content=\"輸入坪數、選擇地區與時間，立即取得清潔費用。\">\u003cmeta name=\"robots\" content=\"noindex\">\u003cmeta name=\"nest-version\" content=\"2026-09-15-v1\">\u003clink rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\u003clink rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\u003clink href=\"https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap\" rel=\"stylesheet\">\u003cstyle>\n:root{--blue:#176b87;--navy:#123444;--aqua:#dff4f4;--orange:#ef873b;--white:#fff;--gray:#edf2f3}*{box-sizing:border-box}body{margin:0;background:#dce7e9;color:var(--navy);font:16px/1.5 'Noto Sans TC',sans-serif}.app{max-width:480px;margin:auto;min-height:100vh;background:white;overflow:hidden}.switch{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:1fr 1fr;background:var(--navy);padding:8px 14px;gap:4px}.switch button{min-height:44px;border:0;background:transparent;color:#b9d2da;font:700 14px inherit;border-radius:8px}.switch .on{background:white;color:var(--navy)}.hero{padding:27px 20px;color:white;background:linear-gradient(135deg,var(--blue),var(--navy));position:relative}.hero h1{font-size:clamp(28px,8vw,38px);line-height:1.18;margin:6px 0;text-wrap:balance}.hero p{margin:0;color:#d7ebef}.city{display:inline-block;background:var(--orange);padding:4px 9px;border-radius:5px;font-weight:700}.content{padding:20px 16px 34px}.problem{background:var(--aqua);padding:13px;border-radius:10px;margin-bottom:18px}.progress{font-size:14px;font-weight:700;color:var(--blue);margin-bottom:12px}h2{font-size:24px;line-height:1.3;margin:0 0 6px;text-wrap:balance}.hint{color:#5f747c;margin:0 0 16px}.grid{display:grid;gap:10px}.choice{min-height:64px;padding:12px 14px;border:1px solid #b9c9cd;background:white;border-radius:10px;text-align:left;color:var(--navy);font:500 16px inherit}.choice.on{border:2px solid var(--blue);background:var(--aqua)}.choice:disabled{opacity:.48}.choice b{display:block}.choice small{color:#637a82}.input{width:100%;min-height:50px;border:2px solid #9db4ba;border-radius:8px;padding:10px;font:16px inherit}.estimate{margin:14px 0;background:var(--navy);color:white;padding:17px;border-radius:10px}.estimate strong{display:block;font-size:28px}.areas{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.area{min-height:48px;border:1px solid #a8bcc1;border-radius:8px;background:white;font:700 14px inherit}.area.on{background:var(--blue);color:white}.warn{margin-top:12px;padding:12px;background:#fff0e5;color:#873d09;border-left:4px solid var(--orange)}.dates{display:flex;gap:8px;overflow:auto;padding-bottom:6px}.date{min-width:105px;min-height:58px;border:1px solid #aac0c5;background:white;border-radius:8px}.date.on{background:var(--navy);color:white}.slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.slot{min-height:58px;border:1px solid #aac0c5;background:white;border-radius:8px;font:700 15px inherit}.slot.on{background:var(--blue);color:white}.slot:disabled{background:#eee;color:#999}.checks label{display:flex;align-items:center;gap:12px;min-height:56px;padding:11px;border:1px solid #bdcdd0;border-radius:8px;margin-bottom:10px}.checks input{width:22px;height:22px;accent-color:var(--blue)}.nav{display:flex;gap:9px;margin-top:22px}.btn{min-height:50px;border:1px solid var(--blue);border-radius:8px;background:white;color:var(--blue);padding:10px 16px;font:700 16px inherit}.next{background:var(--orange);border-color:var(--orange);color:white;flex:1}.sum{background:var(--gray);border-radius:10px;padding:15px}.sum dl{display:grid;grid-template-columns:82px 1fr;gap:8px;margin:0}.sum dd{margin:0;font-weight:700}.success{text-align:center}.check{width:72px;height:72px;background:var(--blue);color:white;border-radius:18px;display:grid;place-items:center;font-size:38px;margin:8px auto 16px}.footer{background:var(--navy);color:white;text-align:center;padding:24px 16px 36px;font-size:13px}.footer .cta{display:block;background:var(--orange);color:white;min-height:48px;padding:13px;margin:12px 0;border-radius:8px;text-decoration:none;font-weight:700}.footer a{color:#bfe8ef}.team{background:var(--gray);padding:14px;border-radius:10px;margin-bottom:12px}.shift{display:grid;grid-template-columns:62px 1fr;gap:8px;padding:8px 0;border-top:1px solid #ccd9dc}.quote{border-left:5px solid var(--orange);padding:12px;margin:10px 0;background:#fff7f0}@media(max-width:374px){.hero h1{font-size:27px}.content{padding-left:12px;padding-right:12px}.areas{grid-template-columns:repeat(2,1fr)}}\n\u003c/style>\u003cstyle>.switch,.switcher,.modebar,footer,.footer,.foot{display:none!important}\u003c/style>\u003c/head>\u003cbody>\u003cmain class=\"app\">\u003cnav class=\"switch\">\u003cbutton class=\"on\" data-v=\"g\">客人看到的\u003c/button>\u003cbutton data-v=\"o\">老闆看到的\u003c/button>\u003c/nav>\u003cdiv id=\"screen\">\u003c/div>\u003cfooter class=\"footer\">\u003cdiv>這是創巢數位做的示範頁，店名與內容都是虛構的\u003c/div>\u003ca class=\"cta\" href=\"https://nestdigitalai.com/services/booking\">想要你店裡也有一個？留 Email 等上線 →\u003c/a>\u003ca href=\"https://nestdigitalai.com\">創巢數位\u003c/a>\u003c/footer>\u003c/main>\u003cscript>\nconst S={step:0,service:'',amount:0,hours:0,price:0,area:'',date:'',time:'',needs:[]};const days=Array.from({length:7},(_,i)=>{let d=new Date();d.setDate(d.getDate()+i+1);return d});const fmt=d=>`${d.getMonth()+1}/${d.getDate()} ${'日一二三四五六'[d.getDay()]}`;const screen=document.querySelector('#screen');document.querySelectorAll('.switch button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.switch button').forEach(x=>x.classList.toggle('on',x===b));b.dataset.v==='o'?owner():render()});\nfunction head(){return `\u003csection class=\"hero\">\u003cspan class=\"city\">服務桃園市\u003c/span>\u003ch1>家裡交給我們，時間留給自己\u003c/h1>\u003cp>先看建議時數與費用，再挑方便時段。\u003c/p>\u003c/section>`}function nav(ok=true,l='下一步'){return `\u003cdiv class=\"nav\">${S.step?'\u003cbutton class=\"btn\" onclick=\"S.step--;render()\">上一步\u003c/button>':''}\u003cbutton class=\"btn next\" ${ok?'':'disabled'} onclick=\"S.step++;render()\">${l}\u003c/button>\u003c/div>`}function calc(){if(S.service==='冷氣清洗'){S.hours=S.amount*1.5;S.price=S.amount*2000}else{S.hours=S.amount\u003c=15?3:S.amount\u003c=25?4:S.amount\u003c=35?5:6;S.price=S.service==='退租清潔'?S.hours*1000:S.hours/3*2400}}function render(){let b='';if(S.step===0)b=`\u003cdiv class=\"problem\">不用來回回答坪數，也不用等排班：先取得估價，再選附近人員可到的時間。\u003c/div>\u003ch2>想預約哪種服務？\u003c/h2>\u003cdiv class=\"grid\">${[['居家清潔','日常除塵、廚衛整理'],['退租清潔','空屋細清、交屋前整理'],['冷氣清洗','分離式冷氣室內機']].map(x=>`\u003cbutton class=\"choice ${S.service===x[0]?'on':''}\" onclick=\"S.service='${x[0]}';S.amount=0;render()\">\u003cb>${x[0]}\u003c/b>\u003csmall>${x[1]}\u003c/small>\u003c/button>`).join('')}\u003c/div>${nav(!!S.service)}`;\nif(S.step===1)b=`\u003ch2>${S.service==='冷氣清洗'?'有幾台冷氣？':'空間大約幾坪？'}\u003c/h2>\u003cp class=\"hint\">輸入後立即顯示建議時間與費用\u003c/p>\u003cinput class=\"input\" type=\"number\" inputmode=\"numeric\" min=\"1\" max=\"100\" value=\"${S.amount||''}\" placeholder=\"請輸入${S.service==='冷氣清洗'?'台數':'坪數'}\" oninput=\"S.amount=Number(this.value);calc();document.querySelector('.estimate').innerHTML=est();document.querySelector('.next').disabled=!S.amount\">\u003cdiv class=\"estimate\">${est()}\u003c/div>${nav(!!S.amount)}`;\nif(S.step===2){let areas=['桃園區','中壢區','平鎮區','八德區','蘆竹區','龜山區','楊梅區','大園區','觀音區','新屋區','龍潭區','大溪區','復興區','新竹市'];b=`\u003ch2>服務地址在哪一區？\u003c/h2>\u003cp class=\"hint\">目前以桃園市主要生活圈為主\u003c/p>\u003cdiv class=\"areas\">${areas.map(x=>`\u003cbutton class=\"area ${S.area===x?'on':''}\" onclick=\"S.area='${x}';render()\">${x}\u003c/button>`).join('')}\u003c/div>${S.area==='新竹市'||S.area==='復興區'?'\u003cdiv class=\"warn\">目前沒有服務這區\u003c/div>':''}${nav(S.area&&S.area!=='新竹市'&&S.area!=='復興區')}`}\nif(S.step===3)b=`\u003ch2>選日期與時段\u003c/h2>\u003cp class=\"hint\">只顯示還能派員的班次\u003c/p>\u003cdiv class=\"dates\">${days.map(d=>`\u003cbutton class=\"date ${S.date===fmt(d)?'on':''}\" onclick=\"S.date='${fmt(d)}';S.time='';render()\">${fmt(d)}\u003c/button>`).join('')}\u003c/div>${S.date?`\u003cdiv class=\"slots\">${['上午 9–12','下午 14–17'].map((x,i)=>{let full=(days.findIndex(d=>fmt(d)===S.date)+i)%4===1;return `\u003cbutton class=\"slot ${S.time===x?'on':''}\" ${full?'disabled':''} onclick=\"S.time='${x}';render()\">${x}${full?'\u003cbr>已滿':''}\u003c/button>`}).join('')}\u003c/div>`:''}${nav(S.date&&S.time)}`;\nif(S.step===4)b=`\u003ch2>有什麼需要先知道？\u003c/h2>\u003cp class=\"hint\">可以複選，也可以直接下一步\u003c/p>\u003cdiv class=\"checks\">${['家裡有寵物','需要我們帶清潔劑'].map(x=>`\u003clabel>\u003cinput type=\"checkbox\" ${S.needs.includes(x)?'checked':''} onchange=\"this.checked?S.needs.push('${x}'):S.needs=S.needs.filter(v=>v!=='${x}');render()\">\u003cb>${x}\u003c/b>\u003c/label>`).join('')}\u003c/div>${nav()}`;\nif(S.step===5)b=`\u003ch2>確認預約與訂金\u003c/h2>\u003cp class=\"hint\">訂金可保留派班名額；這是操作示範。\u003c/p>${sum()}${nav(true,'付訂金 500（示範，不會扣款）')}`;\nif(S.step===6)b=`\u003cdiv class=\"success\">\u003cdiv class=\"check\">✓\u003c/div>\u003ch2>到府預約完成\u003c/h2>\u003cp>到府人員：安居 A 組・林師傅、游師傅\u003c/p>\u003cp>前一天會傳 LINE 提醒你\u003c/p>\u003c/div>${sum()}`;screen.innerHTML=head()+`\u003cdiv class=\"content\">\u003cdiv class=\"progress\">${S.step\u003c6?`預約進度 ${S.step+1}／6`:'已完成預約'}\u003c/div>${b}\u003c/div>`}\nfunction est(){return S.amount?`\u003cspan>建議安排 ${S.hours} 小時\u003c/span>\u003cstrong>預估 NT$ ${S.price.toLocaleString()}\u003c/strong>\u003csmall>${S.service==='居家清潔'?'居家清潔每 3 小時 NT$ 2,400 起':S.service==='冷氣清洗'?'分離式冷氣每台 NT$ 2,000':'實際費用依現場髒污狀況確認'}\u003c/small>`:'\u003cspan>填寫後會在這裡看到估價\u003c/span>'}function sum(){return `\u003cdiv class=\"sum\">\u003cdl>\u003cdt>服務\u003c/dt>\u003cdd>${S.service}・${S.amount} ${S.service==='冷氣清洗'?'台':'坪'}\u003c/dd>\u003cdt>估價\u003c/dt>\u003cdd>NT$ ${S.price.toLocaleString()}・約 ${S.hours} 小時\u003c/dd>\u003cdt>地區\u003c/dt>\u003cdd>桃園市${S.area}\u003c/dd>\u003cdt>時間\u003c/dt>\u003cdd>${S.date}・${S.time}\u003c/dd>\u003cdt>需求\u003c/dt>\u003cdd>${S.needs.join('、')||'無'}\u003c/dd>\u003cdt>訂金\u003c/dt>\u003cdd>NT$ 500\u003c/dd>\u003c/dl>\u003c/div>`}\nfunction owner(){screen.innerHTML=head()+`\u003cdiv class=\"content\">\u003ch2>本週雙組排班\u003c/h2>\u003cp class=\"hint\">排班與路線為示範數據\u003c/p>${[['安居 A 組',['週二上午・桃園區 林宅','週二下午・八德區 陳宅','週三上午・中壢區 吳宅','週三下午・已滿']],['安居 B 組',['週二上午・中壢區 張宅','週二下午・平鎮區 王宅','週三上午・蘆竹區 許宅','週三下午・龜山區 李宅']]].map(t=>`\u003csection class=\"team\">\u003ch3>${t[0]}\u003c/h3>${t[1].map(x=>`\u003cdiv class=\"shift\">\u003cb>${x.split('・')[0]}\u003c/b>\u003cspan>${x.split('・')[1]}\u003c/span>\u003c/div>`).join('')}\u003c/section>`).join('')}\u003ch2>今天的順路安排\u003c/h2>\u003cdiv class=\"team\">\u003cb>桃園區 09:00\u003c/b> → \u003cb>八德區 14:00\u003c/b>\u003cp>預估車程 18 分鐘，已保留 40 分鐘移動。\u003c/p>\u003c/div>\u003ch2>待確認報價單\u003c/h2>${[['郭小姐','楊梅區・退租 32 坪','等待照片'],['周先生','大園區・冷氣 4 台','待確認機型'],['謝小姐','龍潭區・居家 28 坪','等待回覆時段']].map(x=>`\u003cdiv class=\"quote\">\u003cb>${x[0]}・${x[1]}\u003c/b>\u003cdiv>${x[2]}\u003c/div>\u003c/div>`).join('')}\u003c/div>`}render();\n\u003c/script>\u003cscript>\n(function(){var mem=[],peekMem=[],sent=false,PEEK=null;\nfunction vis(e){var r=e.getBoundingClientRect();return r.width>0&&r.height>0}\nfunction tx(e){return (e.innerText||e.textContent||'').replace(/\\s+/g,' ').trim()}\nfunction scrape(){var out=[];\n  [].forEach.call(document.querySelectorAll('dl'),function(dl){if(!vis(dl))return;\n    [].forEach.call(dl.querySelectorAll('dt'),function(dt){var dd=dt.nextElementSibling;if(dd&&dd.tagName==='DD')out.push([tx(dt),tx(dd)])})});\n  if(!out.length)[].forEach.call(document.querySelectorAll('.summary>div,.recap>div,.review>div,.sum>div'),function(d){if(!vis(d))return;\n    var a=d.querySelector('span,dt'),b=d.querySelector('b,dd');if(a&&b&&a!==b&&!a.contains(b))out.push([tx(a),tx(b)])});\n  return out.filter(function(p){return p[0]&&p[1]&&p[0].length\u003c=6})}\nsetInterval(function(){try{\n  var p=scrape();if(p.length>=2)mem=p;\n  if(PEEK){var k=PEEK();if(k&&k.length)peekMem=k}\n  var h=[].filter.call(document.querySelectorAll('h2'),vis).map(tx).join(' ');\n  var done=/完成|成功|留好/.test(h);\n  if(done&&!sent){sent=true;\n    var numEl=document.querySelector('.number'),tm=document.querySelector('.picktime'),tk=document.querySelector('.ticket small');\n    var time=tm?((tk&&/明天/.test(tx(tk))?'明天 ':'')+tx(tm).replace(/\\s*取餐/,'')):'';\n    var pairs=(p.length>=2?p:mem).slice();\n    peekMem.forEach(function(x){if(!pairs.some(function(y){return y[0]===x[0]}))pairs.unshift(x)});\n    parent.postMessage({src:'booking-demo',d:{title:h,num:numEl?tx(numEl):'',time:time,pairs:pairs}},'*')}\n  if(!done)sent=false;\n}catch(e){}},250)})();\n\u003c/script>\u003c/body>\u003c/html>\n";
+
+const $ = s => document.querySelector(s);
+const log = $('#log'), sheet = $('#sheet'), frame = $('#booking');
+const nowHM = () => { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const narrow = () => matchMedia('(max-width:879px)').matches;
+
+let order = null, posted = false, runs = 0, rows = [];
+
+// ── 把設定填進畫面 ───────────────────────────
+document.querySelectorAll('.mark').forEach(e => e.textContent = C.mark);
+document.querySelectorAll('.shop-name').forEach(e => e.textContent = C.shop);
+$('#mMain').textContent = C.menu.main; $('#mMainSub').textContent = C.menu.mainSub; $('#mPill').textContent = C.menu.pill;
+$('#mQ').textContent = C.menu.q; $('#mQSub').textContent = C.menu.qSub;
+$('#mH').textContent = C.menu.h; $('#mHSub').textContent = C.menu.hSub;
+$('#sheetTitle').textContent = C.sheet;
+$('#pushApp').textContent = C.owner.app.split('・')[0] + ' 通知';
+$('#oApp').textContent = C.owner.app; $('#oHead').textContent = C.owner.head;
+$('#aLabel').textContent = C.owner.a[0]; $('#aUnit').textContent = C.owner.a[1];
+$('#bLabel').textContent = C.owner.b[0]; $('#bUnit').textContent = C.owner.b[1];
+$('#oNote').textContent = C.owner.note;
+
+function tickClock() { document.querySelectorAll('.clock').forEach(e => e.textContent = nowHM()); }
+tickClock(); setInterval(tickClock, 20000);
+
+// ── 聊天室 ──────────────────────────────────
+function scrollDown() { requestAnimationFrame(() => { log.scrollTop = log.scrollHeight; }); }
+function add(who, inner, read) {
+  const m = document.createElement('div');
+  m.className = 'msg ' + who + ' enter';
+  const meta = `<span class="meta">${read ? '已讀<br>' : ''}${nowHM()}</span>`;
+  m.innerHTML = who === 'shop' ? `<span class="avatar" aria-hidden="true">${esc(C.mark)}</span>${inner}${meta}` : `${inner}${meta}`;
+  log.appendChild(m); scrollDown();
+}
+const say = (who, text, read) => add(who, `<div class="bubble">${esc(text)}</div>`, read);
+const shopLater = (text, ms = 650) => setTimeout(() => say('shop', text), ms);
+function welcome() {
+  log.innerHTML = '<div class="day">今天</div>';
+  C.welcome.forEach(t => say('shop', t));
+}
+
+// ── 老闆那一頭 ───────────────────────────────
+function resetOwner() {
+  rows = C.owner.rows().map(r => ({ ...r }));
+  $('#push').classList.remove('show');
+  $('#ownerDot').hidden = true;
+  renderOwner();
+}
+function renderOwner() {
+  if (C.owner.sort) { const key = r => (r.tom ? '1' : '0') + r.t; rows.sort((x, y) => key(x) < key(y) ? -1 : 1); }
+  $('#olist').innerHTML = rows.map(r => `
+    <div class="o-row${r.isNew ? ' new flash' : ''}">
+      <time>${esc(r.t)}${r.tom ? '<small>明天</small>' : ''}</time>
+      <div><b>${esc(r.item)}</b><span class="opt">${esc(r.opt || '')}</span></div>
+      <div class="num">${esc(r.num)}<span class="chip">${r.isNew ? '新的' : '已排'}</span></div>
+    </div>`).join('') + (order ? '' : `<div class="o-wait">${esc(C.owner.wait)}</div>`);
+  const b = rows.reduce((s, r) => s + (r.n || 0), 0);
+  $('#aVal').textContent = rows.length;
+  $('#bVal').textContent = C.owner.money ? b.toLocaleString() : b;
+}
+function flashPush() { const p = $('#push'); p.classList.remove('show'); void p.offsetWidth; p.classList.add('show'); setTimeout(() => p.classList.remove('show'), 6000); }
+function ownerReceive(o) {
+  rows.forEach(r => r.isNew = false);
+  const r = { ...C.newRow(o), num: o.num, isNew: true };
+  if (C.owner.sort) rows.push(r); else rows.unshift(r);
+  renderOwner();
+  $('#pushTitle').textContent = `新的單 ${o.num}・${r.tom ? '明天 ' : ''}${r.t}`;
+  $('#pushBody').textContent = [r.item, r.opt].filter(Boolean).join('・');
+  flashPush();
+  if (narrow()) $('#ownerDot').hidden = false;
+}
+
+// ── 點單頁（聊天室裡開） ─────────────────────
+function loadBooking() { frame.srcdoc = BOOKING_HTML; $('#sheetDone').hidden = true; }
+function openSheet() { $('#coach').hidden = true; sheet.classList.add('open'); sheet.setAttribute('aria-hidden', 'false'); }
+function closeSheet() {
+  sheet.classList.remove('open'); sheet.setAttribute('aria-hidden', 'true');
+  if (order && !posted) { posted = true; setTimeout(postConfirm, 380); }
+}
+function postConfirm() {
+  const o = order;
+  add('shop', `<div class="card">
+    <div class="card-top">${esc(C.card.title)} <span>${esc(C.shop)}</span></div>
+    <div class="card-num"><strong>${esc(o.num)}</strong><small>${esc(C.card.numLabel)}</small></div>
+    <dl>${o.pairs.map(p => `<dt>${esc(p[0])}</dt><dd>${esc(p[1])}</dd>`).join('')}</dl>
+    <div class="hint">${esc(C.card.hint)}</div>
+  </div>`);
+  if (narrow()) setTimeout(() => { $('#toast').hidden = false; }, 900);
+}
+function nextNum() { return C.card.prefix + String(38 + runs).padStart(3, '0'); }
+
+window.addEventListener('message', e => {
+  const m = e.data;
+  if (!m || order) return;
+  if (m.src === 'drink-demo' && m.d.step === 6) {
+    // 日日茶舖：直接讀點單頁的狀態
+    const d = m.d, tops = d.toppings.length ? d.toppings.join('、') : '不加料';
+    const opt = `${d.sugar}・${d.ice}・${tops}`, total = (d.price + d.toppings.length * 10) * d.qty;
+    order = {
+      num: 'A' + (137 + d.qty), drink: d.drink, qty: d.qty, time: d.time, tom: d.tom, opt,
+      pairs: [['品項', `${d.drink} × ${d.qty}`], ['做法', opt], ['取餐', `${d.tom ? '明天' : '今天'} ${d.time}`], ['稱呼', d.name], ['合計', `$${total}・到店付款`]],
+    };
+  } else if (m.src === 'booking-demo') {
+    // 其他九家：讀完成畫面的摘要
+    const d = m.d;
+    const pairs = d.pairs.filter(p => p[1] && !/^(無|—|-)$/.test(p[1])).slice(0, 6);
+    if (d.time && !pairs.some(p => /取|時間/.test(p[0]))) pairs.push(['取餐', d.time]);   // 早點的時間只在票券上
+    order = { num: d.num || nextNum(), time: d.time, pairs };
+  } else return;
+  $('#sheetDone').hidden = false;
+  ownerReceive(order);                                    // 客人一送出，老闆那邊同時收到
+});
+
+// ── 圖文選單 ─────────────────────────────────
+$('#btnMain').onclick = openSheet;
+$('#btnHours').onclick = () => { $('#coach').hidden = true; say('me', C.menu.h, true); shopLater(C.hours); };
+$('#btnQuery').onclick = () => {
+  $('#coach').hidden = true;
+  say('me', C.menu.q, true);
+  if (order) shopLater(`你的${C.noun}：${order.num}\n` + order.pairs.slice(0, 4).map(p => `${p[0]}：${p[1]}`).join('\n'));
+  else shopLater(C.none);
+};
+function setMenu(open) { $('#rich').hidden = !open; $('#menuToggle').textContent = open ? '選單 ▾' : '選單 ▴'; }
+$('#menuToggle').onclick = () => setMenu($('#rich').hidden);
+$('#kb').onclick = () => setMenu($('#rich').hidden);
+$('#sheetClose').onclick = closeSheet;
+$('#backToChat').onclick = closeSheet;
+
+// ── 窄螢幕的分頁 ─────────────────────────────
+function showTab(which) {
+  const g = which === 'guest';
+  $('#tab-guest').setAttribute('aria-selected', g);
+  $('#tab-owner').setAttribute('aria-selected', !g);
+  $('#col-guest').hidden = !g;
+  $('#col-owner').hidden = g;
+  if (!g) { $('#ownerDot').hidden = true; $('#toast').hidden = true; if (order) flashPush(); }
+}
+$('#tab-guest').onclick = () => showTab('guest');
+$('#tab-owner').onclick = () => showTab('owner');
+$('#toastGo').onclick = () => showTab('owner');
+function applyLayout() {
+  if (narrow()) showTab($('#tab-owner').getAttribute('aria-selected') === 'true' ? 'owner' : 'guest');
+  else { $('#col-guest').hidden = false; $('#col-owner').hidden = false; }
+}
+matchMedia('(max-width:879px)').addEventListener('change', applyLayout);
+
+// ── 重新開始 ─────────────────────────────────
+function start() {
+  if (order) runs++;
+  order = null; posted = false;
+  sheet.classList.remove('open'); $('#toast').hidden = true;
+  $('#coach').hidden = false; setMenu(true);
+  welcome(); resetOwner(); loadBooking();
+  if (narrow()) showTab('guest'); else applyLayout();
+}
+$('#restart').onclick = start;
+start();
+</script>

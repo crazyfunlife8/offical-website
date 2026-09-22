@@ -87,20 +87,21 @@
                 <h2 class="svc-section-title" data-reveal data-reveal-delay="0.08">先看看長什麼樣</h2>
                 <p class="svc-body" data-reveal data-reveal-delay="0.12">選你的行業，直接試用完整預約流程。客人看到的和你看到的都可以切換。</p>
                 <div class="bk-tabs" role="tablist" aria-label="行業示範" data-reveal data-reveal-delay="0.16">
-                    <button class="bk-tab active" role="tab" aria-selected="true"  data-src="booking-demos/booking-salon.html">美髮</button>
-                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-nails.html">美甲</button>
-                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-brows.html">眉睫</button>
-                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-cleaning.html">清潔</button>
-                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-class.html">課程</button>
-                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-cake.html">蛋糕</button>
-                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-drink.html">飲料</button>
-                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-table.html">餐廳</button>
-                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-preorder.html">預留取餐</button>
-                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-pet.html">寵物</button>
+                    <button class="bk-tab active" role="tab" aria-selected="true"  data-src="booking-demos/booking-salon.html"   data-line="booking-demos/line-salon.html">美髮</button>
+                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-nails.html"   data-line="booking-demos/line-nails.html">美甲</button>
+                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-brows.html"   data-line="booking-demos/line-brows.html">眉睫</button>
+                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-cleaning.html" data-line="booking-demos/line-cleaning.html">清潔</button>
+                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-class.html"   data-line="booking-demos/line-class.html">課程</button>
+                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-cake.html"    data-line="booking-demos/line-cake.html">蛋糕</button>
+                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-drink.html"   data-line="booking-demos/line-drink.html">飲料</button>
+                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-table.html"   data-line="booking-demos/line-table.html">餐廳</button>
+                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-preorder.html" data-line="booking-demos/line-preorder.html">預留取餐</button>
+                    <button class="bk-tab"        role="tab" aria-selected="false" data-src="booking-demos/booking-pet.html"     data-line="booking-demos/line-pet.html">寵物</button>
                 </div>
                 <div class="bk-demo-wrap" data-reveal data-reveal-delay="0.2">
                     <iframe id="bkFrame" src="booking-demos/booking-salon.html" title="預約系統示範" loading="lazy"></iframe>
                 </div>
+                <a id="bkLineLink" class="bk-line-link" href="booking-demos/line-salon.html" target="_blank" rel="noopener">看客人從 LINE 點進來的樣子 →</a>
             </div>
         </section>
 
@@ -128,12 +129,14 @@
     (function(){
         var tabs = document.querySelectorAll('.bk-tab');
         var frame = document.getElementById('bkFrame');
+        var lineLink = document.getElementById('bkLineLink');
         tabs.forEach(function(tab){
             tab.addEventListener('click', function(){
                 tabs.forEach(function(t){ t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
                 tab.classList.add('active');
                 tab.setAttribute('aria-selected','true');
                 frame.src = tab.dataset.src;
+                if (lineLink && tab.dataset.line) lineLink.href = tab.dataset.line;
             });
         });
     })();
