@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>行銷錢有沒有花對</title>
+<meta name="description" content="七個情境題，大概三分鐘，不用留電話。看你的行銷錢可能漏在哪、今天自己能怎麼改。">
+<meta property="og:title" content="你的行銷錢，有沒有花對？">
+<meta property="og:description" content="七個情境題，大概三分鐘，不用留電話。看你的行銷錢可能漏在哪、今天自己能怎麼改。">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
+<style>
+:root{
+  --ground:#F4F1EB; --paper:#FFFDF8; --sand:#E6DED2; --accent:#2F6B5A; --accent-ink:#245446; --accent-soft:#E3EFEA;
+  --ink:#262420; --muted:#6b645a; --line:#E1D8CB; --on-accent:#FFFDF8; --warn-bg:#FFF1D6; --warn-ink:#7A4B0E;
+  --miss:#B0532E; --miss-soft:#F8E6DD;
+  --serif:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#191816; --paper:#221F1C; --sand:#34302A; --accent:#7FC2AC; --accent-ink:#A6D8C6; --accent-soft:#1F3A32;
+    --ink:#EEE9E0; --muted:#A69E92; --line:#35302A; --on-accent:#141312; --warn-bg:#3A2E16; --warn-ink:#F2D29A;
+    --miss:#E89371; --miss-soft:#3A2419;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#191816; --paper:#221F1C; --sand:#34302A; --accent:#7FC2AC; --accent-ink:#A6D8C6; --accent-soft:#1F3A32;
+  --ink:#EEE9E0; --muted:#A69E92; --line:#35302A; --on-accent:#141312; --warn-bg:#3A2E16; --warn-ink:#F2D29A;
+  --miss:#E89371; --miss-soft:#3A2419;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.75;padding:24px 16px 72px}
+.wrap{max-width:560px;margin:0 auto}
+h1,h2,h3{font-family:var(--serif);margin:0;line-height:1.35;text-wrap:balance}
+h1{font-size:30px}
+h2{font-size:21px}
+h3{font-size:17px}
+p{margin:0}
+a{color:var(--accent-ink)}
+button{font:inherit;color:inherit;cursor:pointer}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--muted);margin-bottom:28px}
+.top a{color:var(--muted);text-decoration:none}
+.brand{font-weight:700;letter-spacing:.04em}
+.lead{color:var(--muted);margin:14px 0 26px}
+.gets{list-style:none;padding:0;margin:0 0 30px;display:grid;gap:12px}
+.gets li{display:flex;gap:14px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.gets .n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-size:14px;font-weight:700}
+.gets b{display:block}
+.gets span{color:var(--muted);font-size:14px}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:15px 18px;font-weight:700;font-size:17px;background:var(--accent);color:var(--on-accent);text-align:center;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--accent-ink);border:1px solid var(--line);font-weight:500;margin-top:10px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.progress{height:4px;background:var(--sand);border-radius:4px;margin:0 0 22px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.step-no{font-size:14px;color:var(--muted);margin-bottom:6px}
+.hint{color:var(--muted);font-size:14px;margin:8px 0 18px}
+.opts{display:grid;gap:10px;margin-bottom:24px}
+.opts.two{grid-template-columns:1fr 1fr}
+.opt{text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:13px 15px;line-height:1.5}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.nav{display:flex;gap:10px}
+.nav .btn{flex:1}
+.nav .back{flex:0 0 auto;width:auto;padding-inline:20px;background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px 18px;margin-bottom:16px}
+.sheet-head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed var(--line);padding-bottom:10px;margin-bottom:12px;font-size:14px;color:var(--muted)}
+.rows{display:grid;grid-template-columns:5.2em 1fr;gap:6px 12px;font-size:15px}
+.rows dt{color:var(--muted)}
+.rows dd{margin:0}
+.score{border-left:4px solid var(--miss)}
+.score.clean{border-left-color:var(--accent)}
+.score .big{font-family:var(--serif);font-size:26px;line-height:1.3;margin:2px 0 8px}
+.score .big em{font-style:normal;color:var(--miss)}
+.score.clean .big em{color:var(--accent-ink)}
+.dots{display:flex;gap:6px;margin:12px 0 2px}
+.dots span{flex:1;height:8px;border-radius:4px;background:var(--accent)}
+.dots span.miss{background:var(--miss)}
+.k{font-size:14px;color:var(--muted)}
+.order{list-style:none;counter-reset:o;padding:0;margin:6px 0 4px;display:grid;gap:8px}
+.order li{counter-increment:o;display:flex;align-items:center;gap:10px;background:var(--miss-soft);border-radius:10px;padding:9px 12px}
+.order li::before{content:counter(o);flex:none;width:24px;height:24px;border-radius:50%;background:var(--miss);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
+.order b{font-weight:700}
+.order span{margin-left:auto;font-size:13px;color:var(--muted)}
+.warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:12px;padding:12px 14px;font-size:15px;margin-top:12px}
+.item{padding:16px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0;padding-top:4px}
+.tag{display:inline-block;font-size:12px;border-radius:999px;padding:1px 9px;background:var(--miss-soft);color:var(--miss);margin-bottom:6px}
+.item h3{margin-bottom:6px}
+.you{font-size:14px;color:var(--muted);margin-bottom:6px}
+.you b{color:var(--ink);font-weight:500}
+.lbl{font-size:13px;color:var(--muted);margin-top:10px}
+.case{background:var(--ground);border-radius:10px;padding:10px 12px;margin-top:6px;font-size:15px}
+.case .src{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.price{font-size:14px;margin-top:8px}
+.rights{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:6px;font-size:15px}
+.rights li::before{content:"✓ ";color:var(--accent-ink);font-weight:700}
+.qs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.qs li{display:flex;gap:10px;align-items:flex-start}
+.qs input{margin-top:6px;width:18px;height:18px;accent-color:var(--accent);flex:none}
+.qs small{display:block;color:var(--muted);font-size:13px}
+.demo{display:block;margin-top:10px}
+.cta p{color:var(--muted);font-size:15px;margin:6px 0 14px}
+.code{font-size:13px;color:var(--muted);margin-top:12px;text-align:center}
+.note{font-size:14px;color:var(--muted);margin-top:8px}
+.example-banner{background:var(--warn-bg);color:var(--warn-ink);border-radius:10px;padding:10px 14px;font-size:14px;margin-bottom:14px}
+.foot{margin-top:40px;text-align:center;font-size:13px;color:var(--muted)}
+.foot a{color:var(--muted)}
+.copied{color:var(--accent-ink);font-size:14px;text-align:center;margin-top:8px;min-height:1.4em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><span class="brand">創巢數位</span><span id="topRight"></span></div>
+  <main id="app"></main>
+  <div class="foot">創巢數位 Nest Digital</div>
+</div>
+<script>
+(function(){
+"use strict";
+
+var LINE_ID = "@604vqsva";
+var BASE = "https://nestdigitalai.com";
+
+var INDUSTRIES = [
+  {id:"drink", label:"飲料店", demo:"drink"},
+  {id:"breakfast", label:"早餐店", demo:"preorder"},
+  {id:"nails", label:"美甲", demo:"nails"},
+  {id:"brows", label:"紋繡、美睫", demo:"brows"},
+  {id:"salon", label:"美髮", demo:"salon"},
+  {id:"pet", label:"寵物美容", demo:"pet"},
+  {id:"cleaning", label:"居家清潔", demo:"cleaning"},
+  {id:"cake", label:"蛋糕甜點", demo:"cake"},
+  {id:"class", label:"課程、手作", demo:"class"},
+  {id:"table", label:"餐廳", demo:"table"},
+  {id:"retail", label:"服飾、網拍", demo:""},
+  {id:"other", label:"其他、還沒開店", demo:""}
+];
+
+var STAGES = {
+  "catch":{label:"留住客人", order:1},
+  face:{label:"查得到你", order:2},
+  reach:{label:"被人看到", order:3},
+  boost:{label:"花錢加速", order:4}
+};
+
+var CASE_WEILI_SOCIAL = {text:"維立室內設計：我們接手經營 IG 一季，追蹤從 18 到 118。其中一支講軍艦島的影片 7 萬觀看，帶來 80 位追蹤", src:"2026 第二季成果報表"};
+var CASE_BAIYIAN = {text:"一位想賣衣服、不想自己露面的老闆：我們做了一個角色替她經營，一個半月 3,200 位追蹤", src:"創巢經營紀錄"};
+var CASE_WEILI_PATROL = {text:"維立室內設計：15 天在脆上送出 257 則留言，帳號 30 天瀏覽從 6 萬到 30 萬，原 PO 回覆我們的比例從 0% 到 37.5%", src:"2026 年 8 月海巡數據", honest:"先講清楚另一面：前 10 天留言 238 則，粉絲只多 19 位。所以第一個月我們不承諾追蹤數"};
+
+var BOOKING = {svc:"預約系統", backing:"demo"};
+
+/* 七個情境題：right 是我們認為對的方向；每題答錯就是一個「錢可能沒花對」的地方 */
+var QUIZ = [
+  {id:"post", short:"發文方向", stage:"reach", q:"發文發了一個月，沒什麼人看。你第一個會做什麼？",
+    opts:[{id:"a", t:"發得更勤，一天多發幾則"},{id:"b", t:"花錢下廣告，把貼文推出去"},{id:"c", t:"先看最近有誰在問你這行的問題，照那個題目寫", right:true}],
+    title:"錢花在放大一個沒人要看的東西",
+    why:"沒人看的時候加量或下廣告，是把錢跟時間花在放大一個還沒人要的題目。先找到誰在問，題目對了再加碼",
+    diy:"在脆搜你的行業加「推薦」，看最近三天誰在問什麼，下一則就寫那個",
+    svc:"脆海巡（去客人發問的地方回話）", backing:"case", cases:[CASE_WEILI_PATROL]},
+  {id:"msgs", short:"回訊息太慢", stage:"catch", q:"客人私訊問「這週還有空嗎」，你手上正在忙。你會怎麼處理？",
+    opts:[{id:"a", t:"先忙完，晚點一次回"},{id:"b", t:"讓他自己看得到哪些時段還空，想要就直接約", right:true},{id:"c", t:"先回一句「稍等喔」"}],
+    title:"回慢的那段時間，客人在問別家",
+    why:"這筆錢不會出現在帳上：你在忙的那段時間，客人已經去問下一家了。每天都在漏，只是看不到",
+    diy:"把最常被問的三句存成 LINE 常用訊息，之後按一下就送出",
+    svc:BOOKING.svc, backing:BOOKING.backing},
+  {id:"ads", short:"廣告費白花", stage:"boost", q:"決定要下廣告了，第一件要確認的是什麼？",
+    opts:[{id:"a", t:"一天預算抓多少"},{id:"b", t:"素材夠不夠好看"},{id:"c", t:"點進來的人會落在哪裡，有沒有人接", right:true}],
+    title:"廣告帶來的人，沒地方接",
+    why:"廣告只負責把人帶來。點進來之後沒有 LINE 可以加、沒有地方看價錢跟預約，錢就是白花",
+    diy:"先確定廣告點進來的人會落在哪：LINE 官方帳號或網站。還沒有的話，先別投",
+    svc:"", backing:"none"},
+  {id:"vendor", short:"找代操怎麼比", stage:"reach", q:"要付錢請小編或代操之前，你最先比的是什麼？",
+    opts:[{id:"a", t:"一個月發幾則"},{id:"b", t:"誰的報價比較低"},{id:"c", t:"帳號、客人名單、做出來的東西，不做了在誰手上", right:true}],
+    title:"不做了，錢買到的東西帶不走",
+    why:"只比則數跟報價，最後帳號、客人名單都在別人手上。換人的時候等於從零開始，前面的錢等於沒花",
+    diy:"簽約前先問三件事：帳號密碼在誰手上、客人名單能不能匯出、做的圖跟影片給不給原檔",
+    svc:"社群代操", backing:"case", cases:[CASE_WEILI_SOCIAL, CASE_BAIYIAN]},
+  {id:"noshow", short:"被放鳥", stage:"catch", q:"客人約好了沒來，下次你會怎麼做？",
+    opts:[{id:"a", t:"算了，摸摸鼻子"},{id:"b", t:"約之前就講好取消規則，或收一點訂金", right:true},{id:"c", t:"把他封鎖"}],
+    title:"空掉的時段，材料跟時間都已經花了",
+    why:"約好不來對客人沒有任何代價，就不會有人當一回事。每一個空掉的時段，是你已經付出去的時間",
+    diy:"確認訊息裡寫清楚：幾小時前可以改、當天不來怎麼處理。客人回「好」才算約好",
+    svc:BOOKING.svc, backing:BOOKING.backing},
+  {id:"metric", short:"看錯數字", stage:"reach", q:"每週只能看一個數字，你會看哪一個？",
+    opts:[{id:"a", t:"粉絲多了幾個"},{id:"b", t:"這週有幾個人來問、來約", right:true},{id:"c", t:"按讚數"}],
+    title:"看的數字不會付錢",
+    why:"粉絲跟讚好看，但不會付錢。每週看有幾個人來問、來約，才知道花出去的錢有沒有換到東西",
+    diy:"從這週開始，每天記一個數：今天幾個人來問。記一個月就看得出哪些事有用",
+    svc:"社群經營", backing:"case", cases:[CASE_WEILI_SOCIAL]},
+  {id:"site", short:"網站", stage:"face", q:"關於網站，你比較接近哪一種想法？",
+    opts:[{id:"a", t:"要做就花一筆，做一個漂亮的官網"},{id:"b", t:"有 IG 就夠了，不用網站"},{id:"c", t:"先讓人查得到營業時間、地址、怎麼約就好", right:true}],
+    title:"錢花在客人不看的地方，或客人查不到你",
+    why:"客人查你的時候要的是營業時間、地址、怎麼約。一開始就花大錢做漂亮官網，錢多半花在他不看的地方；只有 IG 的話，搜店名不一定找得到你",
+    diy:"先把 Google 商家開起來，放營業時間、地址、三張照片",
+    svc:"一鍵式架站", backing:"feature",
+    feature:"填表加一張照片，大約 50 秒出三個版型讓你挑",
+    fact:"我們在脆上碰過的 52 家店，46 家沒有自己的網站（到 9 月中）"}
+];
+
+var QUESTIONS = {
+  "catch":[
+    {q:"客人的名單跟預約紀錄是我的還是你們的？不做了能不能整份帶走？"},
+    {q:"LINE 官方帳號的推播訊息費是誰付？一個月大概會多少？"},
+    {q:"客人放鳥的話，可以設定收訂金嗎？", only:"noshow"}
+  ],
+  face:[
+    {q:"網站用的是我的網域還是你們的？不續約的話網站還在嗎？"},
+    {q:"營業時間跟價目，我自己改得動嗎？"}
+  ],
+  reach:[
+    {q:"第一個月承諾什麼、不承諾什麼？"},
+    {q:"每個月會給我看哪些數字？"},
+    {q:"帳號密碼在誰手上？"}
+  ],
+  boost:[
+    {q:"廣告點進來的人，會落在哪裡？"},
+    {q:"花到多少錢會先停下來檢討？"}
+  ],
+  general:[
+    {q:"報價裡有沒有之後可能再加的項目？可以先標出來嗎？"}
+  ]
+};
+
+var EXAMPLE = {answers:{post:"b", msgs:"a", ads:"a", vendor:"c", noshow:"a", metric:"b", site:"c"}, industry:"nails"};
+
+var state = fresh();
+var isExample = false;
+var step = 0;
+var TOTAL = QUIZ.length + 1;
+
+function fresh(){ return {answers:{}, industry:""}; }
+function byId(list, id){ for(var i=0;i<list.length;i++){ if(list[i].id===id) return list[i]; } return null; }
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+function app(){ return document.getElementById("app"); }
+function top(t){ document.getElementById("topRight").textContent = t || ""; }
+
+function code(){
+  if(state._code) return state._code;
+  var d = new Date();
+  var mm = ("0"+(d.getMonth()+1)).slice(-2), dd = ("0"+d.getDate()).slice(-2);
+  var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", r = "";
+  for(var i=0;i<3;i++) r += chars.charAt(Math.floor(Math.random()*chars.length));
+  state._code = "ND"+mm+dd+"-"+r;
+  return state._code;
+}
+
+function source(){
+  try{ var p = new URLSearchParams(location.search); return p.get("utm_source") || p.get("src") || ""; }catch(e){ return ""; }
+}
+
+function misses(){
+  var list = QUIZ.filter(function(q){ var o = byId(q.opts, state.answers[q.id]); return o && !o.right; });
+  list.sort(function(a,b){ return STAGES[a.stage].order - STAGES[b.stage].order; });
+  return list;
+}
+function rights(){ return QUIZ.filter(function(q){ var o = byId(q.opts, state.answers[q.id]); return o && o.right; }); }
+
+/* ---------- 開頭 ---------- */
+function renderIntro(){
+  isExample = false; top("");
+  app().innerHTML =
+    '<h1>你的行銷錢<br>有沒有花對？</h1>'+
+    '<p class="lead">對行銷不熟的時候，錢最容易花在看不到回報的地方<br>七個情境題，大概三分鐘，不用留電話</p>'+
+    '<ul class="gets">'+
+      li(1,"你的錢可能漏在哪幾個地方","每一題都是老闆最常遇到的狀況")+
+      li(2,"為什麼會漏，今天自己怎麼改","每一項都有，不用買任何東西")+
+      li(3,"先改哪一個","漏好幾個地方的話，幫你排先後")+
+      li(4,"找任何行銷公司前可以問的題目","見面時照著問，比較不會花冤枉錢")+
+    '</ul>'+
+    '<button class="btn" id="start">開始</button>'+
+    '<button class="btn ghost" id="ex">先看一份填好的範例</button>';
+  document.getElementById("start").onclick = function(){ state = fresh(); step = 1; renderStep(); };
+  document.getElementById("ex").onclick = function(){ state = JSON.parse(JSON.stringify(EXAMPLE)); isExample = true; renderResult(); };
+  window.scrollTo(0,0);
+}
+function li(n,b,s){ return '<li><span class="n">'+n+'</span><div><b>'+b+'</b><span>'+s+'</span></div></li>'; }
+
+/* ---------- 題目 ---------- */
+function optBtn(id,label,pressed){
+  return '<button class="opt" data-id="'+esc(id)+'" aria-pressed="'+(pressed?"true":"false")+'">'+esc(label)+'</button>';
+}
+
+function renderStep(){
+  top(step+" / "+TOTAL);
+  var h = '<div class="progress"><i style="width:'+Math.round(step/TOTAL*100)+'%"></i></div>';
+  var ok = false;
+  if(step<=QUIZ.length){
+    var q = QUIZ[step-1];
+    h += '<div class="step-no">第 '+step+' 題</div><h2>'+esc(q.q)+'</h2><p class="hint">選你真的會做的，不是你覺得對的</p><div class="opts">';
+    q.opts.forEach(function(o){ h += optBtn(o.id,o.t,state.answers[q.id]===o.id); });
+    h += '</div>'; ok = !!state.answers[q.id];
+  }else{
+    h += '<div class="step-no">最後一題</div><h2>你是做哪一行的</h2><p class="hint">用來挑給你看的示範，挑最接近的就好</p><div class="opts two">';
+    INDUSTRIES.forEach(function(o){ h += optBtn(o.id,o.label,state.industry===o.id); });
+    h += '</div>'; ok = !!state.industry;
+  }
+  h += '<div class="nav"><button class="btn back" id="back">上一步</button><button class="btn" id="next"'+(ok?'':' disabled')+'>'+(step===TOTAL?'看結果':'下一題')+'</button></div>';
+  app().innerHTML = h;
+
+  Array.prototype.forEach.call(app().querySelectorAll(".opt"), function(b){
+    b.onclick = function(){
+      var id = b.getAttribute("data-id");
+      if(step<=QUIZ.length) state.answers[QUIZ[step-1].id] = id;
+      else state.industry = id;
+      renderStep();
+    };
+  });
+  document.getElementById("back").onclick = function(){ if(step===1){ renderIntro(); } else { step--; renderStep(); } };
+  document.getElementById("next").onclick = function(){ if(step===TOTAL){ renderResult(); } else { step++; renderStep(); } };
+  window.scrollTo(0,0);
+}
+
+/* ---------- 結果 ---------- */
+function verdict(n){
+  if(n===0) return "你很清楚錢該花在哪。下面是給你留著用的檢查題";
+  if(n<=2) return "大方向是對的，有幾個地方在漏";
+  if(n<=4) return "有好幾個地方，錢很可能花了沒換到東西";
+  return "錢很可能花在看不到回報的地方，先從最上面那一項改";
+}
+
+function renderResult(){
+  top("");
+  var ind = byId(INDUSTRIES, state.industry) || {label:"",demo:""};
+  var miss = misses();
+  var n = miss.length;
+  var stagesOn = {};
+  miss.forEach(function(q){ stagesOn[q.stage] = true; });
+
+  var h = '';
+  if(isExample) h += '<div class="example-banner">這是範例：一位一個人顧店的美甲師，假想的答案</div>';
+
+  /* 分數 */
+  h += '<section class="card score'+(n===0?' clean':'')+'"><div class="k">七題裡</div>'+
+    '<div class="big">'+(n===0 ? '<em>沒有</em>地方漏' : '有 <em>'+n+'</em> 個地方<br>錢可能沒花對')+'</div><p>'+verdict(n)+'</p>'+
+    '<div class="dots">'+QUIZ.map(function(q){ var o = byId(q.opts,state.answers[q.id]); return '<span class="'+(o&&o.right?'':'miss')+'"></span>'; }).join("")+'</div>';
+  if(n>0){
+    h += '<div class="k" style="margin-top:14px">建議照這個順序改</div><ol class="order">'+
+      miss.map(function(q){ return '<li><b>'+esc(q.short)+'</b></li>'; }).join("")+
+    '</ol><p class="note">先把來問的人留住、讓人查得到你，再花錢帶人進來，錢才不會白花</p>';
+  }
+  if(state.answers.ads && !byId(byId(QUIZ,"ads").opts,state.answers.ads).right && (stagesOn["catch"] || stagesOn.face)){
+    h += '<div class="warn">來問的客人還會漏掉、或客人還查不到你，這時候下廣告，帶進來的人多半會流掉。先改前面的，再考慮投</div>';
+  }
+  h += '</section>';
+
+  /* 整理單 */
+  h += '<section class="card"><div class="sheet-head"><span>我的行銷整理單</span><span>'+code()+'</span></div><dl class="rows">'+
+    row("行業", ind.label)+
+    row("答對", (QUIZ.length-n)+" / "+QUIZ.length)+
+    row("在漏的", miss.map(function(q){ return q.short; }).join("、") || "沒有")+
+    row("先改", miss[0] ? STAGES[miss[0].stage].label : "")+
+  '</dl></section>';
+
+  /* 每個漏的地方 */
+  if(n>0){
+    h += '<section class="card"><h2 style="margin-bottom:6px">錢可能漏在這裡</h2>';
+    var shownSvc = {};
+    miss.forEach(function(q){
+      var mine = byId(q.opts, state.answers[q.id]);
+      var right = q.opts.filter(function(o){ return o.right; })[0];
+      h += '<div class="item"><h3>'+esc(q.title)+'</h3>'+
+        '<div class="you">你選了<b>「'+esc(mine.t)+'」</b>，比較好的做法是<b>「'+esc(right.t)+'」</b></div>'+
+        '<div class="lbl">為什麼錢會白花</div><p>'+esc(q.why)+'</p>'+
+        '<div class="lbl">今天自己就能改的</div><p>'+esc(q.diy)+'</p>';
+      if(q.backing!=="none" && shownSvc[q.svc]){
+        h += '<div class="lbl">這一項跟上面是同一件事：'+esc(q.svc)+'</div>';
+      }else if(q.backing!=="none"){
+        shownSvc[q.svc] = true;
+        h += '<div class="lbl">'+(q.backing==='case'?'我們做過的：':(q.backing==='demo'?'看示範：':'我們的做法：'))+esc(q.svc)+'</div>';
+        if(q.backing==="case"){
+          q.cases.forEach(function(k){
+            h += '<div class="case">'+esc(k.text)+'<span class="src">'+esc(k.src)+'</span></div>';
+            if(k.honest) h += '<div class="case">'+esc(k.honest)+'</div>';
+          });
+        }else if(q.backing==="feature"){
+          h += '<div class="case">'+esc(q.feature)+'<span class="src">'+esc(q.fact)+'</span></div>';
+        }else if(q.backing==="demo"){
+          h += '<div class="case">客人從 LINE 點進去自己挑時段，被約走的直接選不到，你的手機同時收到新單。'+
+            (ind.demo ? '這頁往下有'+esc(ind.label)+'的示範可以點（示範頁，不是真的店）' : '我們做了十種產業的示範，LINE 跟我說你是哪一行，我傳最接近的給你')+'</div>';
+        }
+        
+      }
+      h += '</div>';
+    });
+    h += '<a class="btn" style="margin-top:14px" href="'+lineHref()+'" target="_blank" rel="noopener">這幾個地方想聊聊，用 LINE 傳給吉米</a>';
+    h += '</section>';
+  }
+
+  var r = rights();
+  if(r.length){
+    h += '<section class="card"><h2>這幾題你是對的</h2><ul class="rights">'+
+      r.map(function(q){ var o = byId(q.opts,state.answers[q.id]); return '<li>'+esc(o.t)+'</li>'; }).join("")+'</ul></section>';
+  }
+
+  /* 示範 */
+  if(ind.demo){
+    h += '<section class="card"><h2>你那一行的預約示範</h2><p class="note">'+esc(ind.label)+'的版本，用客人的角度點一次，看你那邊會收到什麼</p>'+
+      '<a class="btn ghost demo" href="'+BASE+'/services/booking-demos/line-'+ind.demo+'.html" target="_blank" rel="noopener">打開'+esc(ind.label)+'的示範</a></section>';
+  }
+
+  /* 問題清單 */
+  var qs = [], seen = {};
+  var src = n ? miss : QUIZ;
+  src.forEach(function(q){
+    if(seen[q.stage]) return; seen[q.stage] = true;
+    QUESTIONS[q.stage].forEach(function(item){
+      if(item.only){
+        var oq = byId(QUIZ,item.only); var oa = oq && byId(oq.opts,state.answers[oq.id]);
+        if(n && !(oa && !oa.right)) return;
+        qs.push({q:item.q, why:n ? "你在「"+oq.title+"」這題漏了" : "留著用"});
+      }else{
+        qs.push({q:item.q, why:n ? "你在「"+STAGES[q.stage].label+"」這一段有漏" : "留著用"});
+      }
+    });
+  });
+  QUESTIONS.general.forEach(function(item){ qs.push({q:item.q, why:"每家都可以問"}); });
+  h += '<section class="card"><h2>找任何行銷公司前，可以先問這幾題</h2><p class="note" style="margin-bottom:12px">不管找不找我們都用得到，見面時照著問，問完打勾</p><ul class="qs">'+
+    qs.map(function(q,i){ return '<li><input type="checkbox" id="q'+i+'"><label for="q'+i+'">'+esc(q.q)+'<small>'+esc(q.why)+'</small></label></li>'; }).join("")+
+  '</ul></section>';
+
+  /* 收口 */
+  var text = summaryText();
+  h += '<section class="card cta"><h2>想知道你的店怎麼改</h2><p>按下去會開 LINE，整理單的重點已經幫你打好了。你看過再送出，吉米看完你的狀況再回你，不用從頭講一遍</p>'+
+    '<a class="btn" href="'+lineHref()+'" target="_blank" rel="noopener">用 LINE 把整理單傳給吉米</a>'+
+    '<button class="btn ghost" id="copy">複製整理單文字</button><div class="copied" id="copied"></div>'+
+    '<p class="code">代碼 '+code()+'　也可以直接截圖上面那張整理單<br>只想先加好友的話，LINE 搜尋 '+LINE_ID+'</p></section>';
+
+  h += '<button class="btn ghost" id="again">重新測一次</button>';
+  app().innerHTML = h;
+
+  document.getElementById("copy").onclick = function(){
+    var done = function(){ document.getElementById("copied").textContent = "複製好了"; };
+    function fallback(){
+      var t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select();
+      try{ document.execCommand("copy"); done(); }catch(e){}
+      document.body.removeChild(t);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done, fallback); }
+    else fallback();
+  };
+  document.getElementById("again").onclick = function(){ state = fresh(); isExample = false; renderIntro(); };
+  window.scrollTo(0,0);
+}
+
+function lineHref(){ return "https://line.me/R/oaMessage/"+LINE_ID+"/?"+encodeURIComponent(summaryText()); }
+
+function row(k,v){ return v ? '<dt>'+k+'</dt><dd>'+esc(v)+'</dd>' : ''; }
+
+function summaryText(){
+  var ind = byId(INDUSTRIES, state.industry) || {label:""};
+  var miss = misses();
+  var lines = [
+    "你好，我測了「行銷錢有沒有花對」",
+    "代碼："+code(),
+    "行業："+ind.label,
+    "答對："+(QUIZ.length-miss.length)+" / "+QUIZ.length,
+    "在漏的："+(miss.map(function(q){ return q.short; }).join("、") || "沒有"),
+    "想先聊："+(miss[0] ? STAGES[miss[0].stage].label : "整體看看")
+  ];
+  var s = source(); if(s) lines.push("從哪裡來："+s);
+  if(isExample) lines.unshift("（這是範例）");
+  return lines.join("\n");
+}
+
+renderIntro();
+})();
+</script>
+</body>
+</html>
