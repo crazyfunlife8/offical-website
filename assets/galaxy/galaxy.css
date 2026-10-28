@@ -1,0 +1,231 @@
+/* 創巢星系：首頁樣式。延續官網品牌系統（tokens.css）：深空藍 × 電藍 × 冷青 × 金，
+   明朝體主標 + JetBrains Mono 座標 + Noto Sans TC 內文。3D 舞台鋪滿，UI 浮在上面。 */
+:root{
+  /* 品牌色票（沿用官網 tokens.css） */
+  --c-black:#050d2e; --c-blue:#1736F5; --c-navy:#0b1a7a;
+  --c-cyan:#00c8ff; --c-yellow:#FFC709; --c-amber:#f5a623;
+  --c-stellar:#e8f0ff; --c-muted:rgba(232,240,255,.55);
+  --c-blue-rgb:23,54,245; --c-cyan-rgb:0,200,255; --c-yellow-rgb:255,199,9; --c-stellar-rgb:232,240,255;
+
+  --ink:var(--c-stellar);
+  --line:rgba(var(--c-stellar-rgb),.14);
+  --line-cyan:rgba(var(--c-cyan-rgb),.35);
+  /* 藍色液態玻璃（官網 .card 語言） */
+  --glass:linear-gradient(135deg,rgba(var(--c-blue-rgb),.10),rgba(var(--c-blue-rgb),.20));
+  --glass-solid:rgba(8,16,48,.88);
+  --radius:12px;
+  --shadow:0 24px 70px rgba(0,0,0,.55);
+
+  --f-sans:"Noto Sans TC",sans-serif;
+  --f-serif:"Fraunces",serif;
+  --f-serif-cjk:"Chiron Sung HK WS","Noto Serif TC","Songti TC",serif;
+  --f-display-en:"Italiana","Bodoni Moda",serif;
+  --f-mono:"JetBrains Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;font-family:var(--f-sans);color:var(--ink);background:var(--c-black);
+  overflow:hidden;-webkit-font-smoothing:antialiased;
+  opacity:0;transition:opacity .6s ease;
+}
+body.ready{opacity:1}
+a{color:inherit}
+button{font-family:inherit;cursor:pointer}
+::selection{background:rgba(var(--c-cyan-rgb),.3);color:#fff}
+
+/* 3D 舞台 */
+#stage{position:fixed;inset:0;z-index:0}
+#stage canvas{display:block;touch-action:none}
+
+/* 跳到清單（無障礙） */
+.skip{position:fixed;left:50%;top:-60px;transform:translateX(-50%);z-index:60;
+  background:var(--c-yellow);color:var(--c-black);padding:.6rem 1rem;border-radius:0 0 10px 10px;
+  font-weight:700;text-decoration:none;transition:top .2s}
+.skip:focus{top:0}
+
+/* ───────── 頂列 ───────── */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:45;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 24px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,13,46,.85),rgba(5,13,46,0))}
+#topbar>*{pointer-events:auto}
+.brand{display:flex;align-items:baseline;gap:12px;text-decoration:none}
+.brand-text{display:flex;align-items:baseline;gap:12px}
+.brand-text b{font-family:var(--f-serif-cjk);font-size:22px;font-weight:900;letter-spacing:.04em;color:#fff}
+.brand-text small{font-family:var(--f-mono);font-size:11px;color:rgba(var(--c-cyan-rgb),.8);letter-spacing:.3em}
+.topnav{display:flex;gap:10px}
+.topnav button{
+  border:1px solid var(--line);background:rgba(8,16,48,.55);color:var(--ink);
+  padding:.55rem 1.1rem;border-radius:10px;font-family:var(--f-mono);font-size:13px;font-weight:500;
+  letter-spacing:.05em;backdrop-filter:blur(12px);transition:.18s}
+.topnav button:hover{border-color:var(--line-cyan);color:#fff;
+  box-shadow:0 0 24px rgba(var(--c-cyan-rgb),.2),inset 0 1px 0 rgba(var(--c-cyan-rgb),.3)}
+body.list-open #btnList{border-color:var(--c-cyan);background:rgba(var(--c-cyan-rgb),.16);color:#fff}
+
+/* ───────── 星球座標名牌 ───────── */
+#labels{position:fixed;inset:0;z-index:20;pointer-events:none}
+.plabel{
+  position:absolute;left:0;top:0;pointer-events:auto;
+  display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
+  padding:.38rem .8rem;border-radius:999px;border:1px solid var(--line);
+  background:rgba(8,16,48,.6);backdrop-filter:blur(12px);color:var(--ink);
+  font-family:var(--f-sans);font-size:13px;font-weight:700;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+  transition:transform .12s,border-color .18s,background .18s,box-shadow .18s}
+.plabel i{font-style:normal;font-family:var(--f-mono);font-size:11px;color:rgba(var(--c-cyan-rgb),.85);font-weight:500}
+.plabel:hover{border-color:var(--line-cyan);transform:translate(-50%,-100%) scale(1.06)!important;
+  box-shadow:0 0 28px rgba(var(--c-cyan-rgb),.25)}
+.plabel.hot{border-color:rgba(var(--c-yellow-rgb),.6);
+  box-shadow:0 0 0 1px rgba(var(--c-yellow-rgb),.3),0 8px 28px rgba(var(--c-yellow-rgb),.25)}
+.plabel.hot i{color:var(--c-yellow)}
+.plabel.on{border-color:var(--c-cyan);background:rgba(var(--c-cyan-rgb),.16);box-shadow:0 0 28px rgba(var(--c-cyan-rgb),.3)}
+.plabel.on i{color:var(--c-cyan)}
+
+/* ───────── 右側清單 ───────── */
+#list{position:fixed;top:0;right:0;z-index:35;height:100%;width:340px;max-width:86vw;
+  padding:92px 20px 24px;overflow-y:auto;
+  background:linear-gradient(180deg,rgba(5,13,46,.1),rgba(5,13,46,.78) 16%);
+  transform:translateX(102%);transition:transform .32s cubic-bezier(.2,.8,.2,1);
+  -webkit-overflow-scrolling:touch}
+body.list-open #list{transform:none}
+.list-head{padding:0 6px 10px}
+.list-head h2{margin:0 0 8px;font-family:var(--f-serif-cjk);font-size:24px;font-weight:900;letter-spacing:.04em}
+.list-head p{margin:0;font-size:13px;line-height:1.7;color:var(--c-muted)}
+#index{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+#index button{
+  width:100%;display:flex;align-items:center;gap:14px;text-align:left;
+  padding:.72rem .9rem;border-radius:12px;border:1px solid transparent;border-bottom-color:var(--line);
+  background:transparent;color:var(--ink);transition:.16s}
+#index button:hover{border-color:var(--line-cyan);background:rgba(var(--c-blue-rgb),.12)}
+#index em{font-style:normal;font-family:var(--f-mono);font-size:12px;font-weight:500;color:rgba(var(--c-cyan-rgb),.7);min-width:24px}
+#index span{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+#index b{font-family:var(--f-serif-cjk);font-size:16px;font-weight:700}
+#index small{font-size:12px;color:var(--c-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#index i{font-style:normal;color:var(--c-muted);font-size:16px}
+#index li.on button{border-color:var(--line-cyan);background:rgba(var(--c-cyan-rgb),.1)}
+#index li.on em,#index li.on i{color:var(--c-cyan)}
+
+/* ───────── 左側詳情面板（藍色液態玻璃） ───────── */
+#panel{position:fixed;top:0;left:0;z-index:40;height:100%;width:440px;max-width:94vw;
+  padding:92px 30px 30px;overflow-y:auto;color:var(--ink);
+  background:
+    linear-gradient(135deg,rgba(var(--c-blue-rgb),.14),rgba(5,13,46,.96) 55%) padding-box,
+    linear-gradient(135deg,rgba(var(--c-cyan-rgb),.4),rgba(var(--c-blue-rgb),.1)) border-box;
+  border-right:1px solid transparent;backdrop-filter:blur(18px);box-shadow:var(--shadow);
+  transform:translateX(-104%);transition:transform .36s cubic-bezier(.2,.8,.2,1);
+  -webkit-overflow-scrolling:touch}
+#panel.open{transform:none}
+.pclose{position:absolute;top:20px;right:20px;width:38px;height:38px;border-radius:10px;
+  border:1px solid var(--line);background:rgba(8,16,48,.6);color:var(--ink);font-size:20px;line-height:1;transition:.16s}
+.pclose:hover{border-color:var(--line-cyan);color:#fff;box-shadow:0 0 20px rgba(var(--c-cyan-rgb),.25)}
+.pkicker{font-family:var(--f-mono);font-size:12px;font-weight:500;letter-spacing:.18em;
+  color:rgba(var(--c-cyan-rgb),.85);text-transform:uppercase}
+#panel h2{margin:12px 0 12px;font-family:var(--f-serif-cjk);font-size:34px;font-weight:900;line-height:1.18;color:#fff}
+.plead{margin:0 0 16px;font-size:15px;line-height:1.85;color:rgba(var(--c-stellar-rgb),.86)}
+#panel blockquote{margin:0 0 18px;padding:12px 18px;border-left:2px solid var(--c-cyan);
+  background:rgba(var(--c-cyan-rgb),.06);border-radius:0 10px 10px 0;
+  font-family:var(--f-serif-cjk);font-size:17px;font-weight:700;line-height:1.6;color:#fff}
+.pprice{display:flex;align-items:baseline;gap:10px;margin:0 0 18px;padding:12px 16px;border-radius:10px;
+  background:rgba(var(--c-blue-rgb),.1);border:1px solid var(--line-cyan)}
+.pprice span{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;color:var(--c-muted);text-transform:uppercase;white-space:nowrap}
+.pprice b{font-family:var(--f-mono);font-size:21px;font-weight:500;color:var(--c-cyan)}
+.ppoints{list-style:none;margin:0 0 20px;padding:0;display:flex;flex-direction:column;gap:11px}
+.ppoints li{position:relative;padding-left:24px;font-size:14px;line-height:1.65;color:rgba(var(--c-stellar-rgb),.9)}
+.ppoints li::before{content:"";position:absolute;left:3px;top:7px;width:8px;height:8px;
+  transform:rotate(45deg);background:var(--c-cyan);box-shadow:0 0 10px rgba(var(--c-cyan-rgb),.8)}
+.pmoons-t{font-family:var(--f-mono);font-size:11px;font-weight:500;letter-spacing:.14em;
+  color:rgba(var(--c-cyan-rgb),.7);margin:4px 0 12px;text-transform:uppercase}
+.pmoons{display:flex;flex-direction:column;gap:9px;margin-bottom:22px}
+.pmoons .moon{display:flex;flex-direction:column;gap:3px;text-decoration:none;
+  padding:.8rem .95rem;border-radius:12px;border:1px solid var(--line);
+  background:rgba(var(--c-blue-rgb),.06);transition:.16s}
+.pmoons .moon:hover{border-color:var(--line-cyan);background:rgba(var(--c-blue-rgb),.14);
+  transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.pmoons .moon b{font-family:var(--f-serif-cjk);font-size:16px;font-weight:700}
+.pmoons .moon small{font-size:12.5px;color:var(--c-muted);line-height:1.5}
+.pmoons .moon i{font-style:normal;font-family:var(--f-mono);font-size:12px;color:var(--c-cyan);margin-top:3px}
+.pcta{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+.pcta a{flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;
+  text-align:center;text-decoration:none;padding:.9rem 1rem;border-radius:10px;font-weight:700;font-size:15px;transition:.18s}
+/* 主 CTA＝官網金色按鈕（.btn--yellow） */
+.pcta a{background:linear-gradient(180deg,rgba(var(--c-yellow-rgb),1),rgba(245,166,35,.94));
+  color:var(--c-black);border:1px solid rgba(var(--c-yellow-rgb),.6)}
+.pcta a:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(var(--c-yellow-rgb),.45)}
+/* 次 CTA＝藍玻璃 ghost */
+.pcta a.ghost{background:rgba(var(--c-blue-rgb),.12);color:var(--ink);border:1px solid var(--line-cyan)}
+.pcta a.ghost:hover{background:rgba(var(--c-blue-rgb),.2);box-shadow:0 0 28px rgba(var(--c-cyan-rgb),.25)}
+
+/* ───────── 導覽卡 ───────── */
+#intro{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:rgba(3,7,20,.6);backdrop-filter:blur(5px);
+  opacity:0;visibility:hidden;transition:opacity .35s}
+#intro.show{opacity:1;visibility:visible}
+.icard{width:min(440px,92vw);padding:32px 30px 26px;border-radius:20px;
+  background:linear-gradient(160deg,rgba(var(--c-blue-rgb),.2),rgba(5,13,46,.97)) padding-box,
+    linear-gradient(135deg,rgba(var(--c-cyan-rgb),.5),rgba(var(--c-blue-rgb),.1)) border-box;
+  border:1px solid transparent;box-shadow:var(--shadow);
+  transform:translateY(16px) scale(.97);transition:transform .35s}
+#intro.show .icard{transform:none}
+.ik{font-family:var(--f-mono);font-size:12px;font-weight:500;letter-spacing:.16em;color:rgba(var(--c-cyan-rgb),.85);text-transform:uppercase}
+.icard h3{margin:14px 0 12px;font-family:var(--f-serif-cjk);font-size:24px;font-weight:900;line-height:1.35;color:#fff}
+.icard p{margin:0;font-size:15px;line-height:1.85;color:rgba(var(--c-stellar-rgb),.86)}
+.ibtns{display:flex;justify-content:space-between;align-items:center;margin-top:24px}
+.iskip{background:transparent;border:0;color:var(--c-muted);font-size:14px;padding:.5rem}
+.iskip:hover{color:var(--ink)}
+.inext{background:linear-gradient(180deg,rgba(var(--c-yellow-rgb),1),rgba(245,166,35,.94));color:var(--c-black);
+  border:0;padding:.75rem 1.5rem;border-radius:10px;font-weight:700;font-size:15px}
+.inext:hover{transform:translateY(-1px);box-shadow:0 8px 26px rgba(var(--c-yellow-rgb),.45)}
+
+/* ───────── Cookie 橫幅（與內頁 site.css 同款） ───────── */
+.cookie{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:60;width:min(680px,92vw);
+  display:none;align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between;
+  padding:16px 20px;border-radius:14px;border:1px solid var(--line-cyan);
+  background:rgba(5,13,46,.94);backdrop-filter:blur(14px);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.cookie.show{display:flex}
+.cookie p{margin:0;font-size:13.5px;color:rgba(var(--c-stellar-rgb),.85);flex:1;min-width:220px}
+.cookie a{color:var(--c-cyan)}
+.cookie .btns{display:flex;gap:10px}
+.cookie button{padding:.5rem 1.1rem;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent}
+.cookie .accept{background:rgba(var(--c-cyan-rgb),.14);border-color:var(--line-cyan);color:rgba(var(--c-cyan-rgb),.95)}
+.cookie .accept:hover{background:rgba(var(--c-cyan-rgb),.24)}
+.cookie .decline{background:transparent;border-color:var(--line);color:var(--c-muted)}
+.cookie .decline:hover{color:var(--c-stellar)}
+body.no3d .cookie.show{position:fixed}
+
+/* ───────── SEO／無 3D 退回版 ───────── */
+#seo{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);
+  clip-path:inset(50%);white-space:nowrap;border:0;padding:0;margin:-1px}
+body.no3d{overflow:auto}
+body.no3d #stage,body.no3d #labels,body.no3d #intro,body.no3d #list,body.no3d #panel{display:none}
+body.no3d #seo{position:static;width:auto;height:auto;overflow:visible;clip:auto;clip-path:none;
+  white-space:normal;margin:0;padding:0}
+.seo-wrap{max-width:820px;margin:0 auto;padding:96px 22px 60px;line-height:1.7}
+#seo h1{font-family:var(--f-serif-cjk);font-size:36px;font-weight:900;margin:0 0 14px}
+.seo-lead{font-size:17px;color:var(--c-muted);margin:0 0 34px}
+#seo h2{font-family:var(--f-serif-cjk);font-size:21px;font-weight:700;margin:32px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.seo-list{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:8px;font-size:15px}
+.seo-list a{color:var(--c-cyan);font-weight:700;text-decoration:none}
+.seo-list a:hover{text-decoration:underline}
+.seo-contact p{margin:6px 0;color:var(--c-muted)}
+.seo-legal{font-size:14px}
+
+/* ───────── 手機：面板變底部抽屜 ───────── */
+@media (max-width:760px){
+  #panel{top:auto;bottom:0;height:auto;max-height:70vh;width:100%;max-width:100%;
+    padding:24px 22px calc(26px + env(safe-area-inset-bottom));
+    border-right:0;border-top:1px solid var(--line-cyan);
+    border-radius:20px 20px 0 0;transform:translateY(104%)}
+  #panel.open{transform:none}
+  .pclose{top:16px;right:16px}
+  #panel h2{font-size:28px}
+  .pprice b{font-size:18px}
+  #list{width:100%;max-width:100%;padding-top:80px}
+  .plabel{font-size:12px;padding:.32rem .7rem}
+  #topbar{padding:14px 16px}
+  .brand-text b{font-size:19px}
+  .brand-text small{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  body,#list,#panel,.icard,#intro{transition:none}
+}

@@ -1,233 +1,151 @@
-<!DOCTYPE html>
-<html lang="zh-TW" class="no-js">
+<!doctype html>
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>創巢數位 Nest Digital｜用非常規思維解決真正的問題</title>
-    <meta name="description" content="創巢數位 Nest Digital — 軟體開發 × 品牌行銷 × AI應用 × 自動化，一條龍數位成長團隊。用驗證過的工具和流程，幫品牌在正確的地方成長。">
-    <meta property="og:title"       content="創巢數位 Nest Digital｜非常規，才是真解法">
-    <meta property="og:description" content="從軟體開發到行銷一條龍，我們用自己驗證過的工具和流程，在別人覺得不可能的地方找到真正的出口。">
-    <meta property="og:image"       content="https://nestdigitalai.com/assets/images/og/blog.jpg">
-    <meta property="og:type"        content="website">
-    <meta property="og:url"         content="https://nestdigitalai.com/">
-    <link rel="canonical"           href="https://nestdigitalai.com/">
-    <link rel="icon"                href="assets/images/brand/icon.png">
-    <link rel="apple-touch-icon"    href="assets/images/brand/icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>創巢數位 Nest Digital｜用非常規思維解決真正的問題</title>
+<meta name="description" content="創巢數位 Nest Digital — 軟體開發 × 品牌行銷 × AI應用 × 自動化，一條龍數位成長團隊。用驗證過的工具和流程，幫品牌在正確的地方成長。">
+<link rel="canonical" href="https://nestdigitalai.com/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="創巢數位 Nest Digital｜非常規，才是真解法">
+<meta property="og:description" content="從軟體開發到行銷一條龍，我們用自己驗證過的工具和流程，在別人覺得不可能的地方找到真正的出口。">
+<meta property="og:image" content="https://nestdigitalai.com/assets/images/og/blog.jpg">
+<meta property="og:url" content="https://nestdigitalai.com/">
+<link rel="icon" href="/assets/images/brand/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- 品牌字型（沿用官網 tokens.css）：明朝主標、Fraunces/Italiana 英文 display、Noto Sans TC 內文、JetBrains Mono 座標 -->
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..900&family=Italiana&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css" rel="stylesheet">
+<link rel="stylesheet" href="assets/galaxy/galaxy.css">
 
-    <!-- Schema 結構化資料 -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        "name": "Nest Digital",
-        "alternateName": "創巢數位",
-        "url": "https://nestdigitalai.com",
-        "logo": "https://nestdigitalai.com/assets/images/brand/icon.png",
-        "description": "軟體開發 × 品牌行銷 × AI應用 × 自動化，用非常規的跳躍思維解決習以為常卻永遠解決不了的問題。",
-        "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "+886-3-491-2872",
-            "contactType": "customer service",
-            "areaServed": "TW",
-            "availableLanguage": "zh-TW"
-        },
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "中央西路二段268-1號5樓",
-            "addressLocality": "中壢區",
-            "addressRegion": "桃園市",
-            "addressCountry": "TW"
-        },
-        "sameAs": ["https://line.me/R/ti/p/@604vqsva"]
-    }
-    </script>
+<!-- 結構化資料：搜尋引擎讀得到的公司資訊 -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"LocalBusiness","name":"Nest Digital","alternateName":"創巢數位","url":"https://nestdigitalai.com","logo":"https://nestdigitalai.com/assets/images/brand/icon.png","description":"軟體開發 × 品牌行銷 × AI應用 × 自動化，用非常規的跳躍思維解決習以為常卻永遠解決不了的問題。","contactPoint":{"@type":"ContactPoint","telephone":"+886-3-491-2872","contactType":"customer service","areaServed":"TW","availableLanguage":"zh-TW"},"address":{"@type":"PostalAddress","streetAddress":"中央西路二段268-1號5樓","addressLocality":"中壢區","addressRegion":"桃園市","addressCountry":"TW"},"sameAs":["https://line.me/R/ti/p/@604vqsva"]}
+</script>
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght,SOFT@9..144,100..900,0..100&family=Noto+Sans+TC:wght@100;300;400;700;900&family=Noto+Serif+TC:wght@400;500;700;900&family=Italiana&display=swap" rel="stylesheet">
-
-    <!-- Chiron Sung HK（港產明朝活字；中文主宋體，替代 Noto Serif 的通用感） -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
-
-    <!-- CSS（順序不得更改）-->
-    <link rel="stylesheet" href="assets/css/tokens.css">
-    <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="assets/css/components.css">
-    <link rel="stylesheet" href="assets/css/animations.css">
-    <link rel="stylesheet" href="assets/css/pages/index.css">
+<!-- GA4（G-MXV88FLJ64）由 /assets/js/site.js 在 Cookie 橫幅按「接受所有」後才載入；galaxy.js 的 planet_open 事件在那之後才會送出 -->
 </head>
-<body class="has-threejs">
+<body>
+<a class="skip" href="#seo">跳到服務清單</a>
 
-    <!-- 星空 canvas（全站固定後層，Three.js 渲染目標） -->
-    <!-- 黑洞虛空斜帶由 nav.js 注入的 #css-starfield::before 統一承擔（首頁 / 其他頁 / 手機 RWD 全適用） -->
-    <canvas id="starfield-canvas" aria-hidden="true"></canvas>
+<!-- 3D 舞台 -->
+<div id="stage" aria-hidden="true"></div>
 
-    <!-- Nav 由 nav.js 動態注入 -->
+<!-- 頂列 -->
+<header id="topbar">
+  <a class="brand" href="/">
+    <span class="brand-text"><b>創巢數位</b><small>NEST DIGITAL</small></span>
+  </a>
+  <nav class="topnav">
+    <button id="btnHome" type="button">全景</button>
+    <button id="btnList" type="button" aria-label="服務清單">服務清單</button>
+  </nav>
+</header>
 
-    <main>
+<!-- 星球名牌（JS 產生，跟著星球跑） -->
+<div id="labels" aria-hidden="true"></div>
 
-        <!-- ════════════════════════════════════════════════
-             Section 1｜Hero
-        ════════════════════════════════════════════════ -->
-        <section class="hero" aria-labelledby="hero-title">
+<!-- 右側清單 -->
+<aside id="list" aria-label="服務與作品清單">
+  <div class="list-head">
+    <h2>創巢星系</h2>
+    <p>中間那位是創巢。每顆星球是一項服務，點進去看介紹和做過的作品。</p>
+  </div>
+  <ul id="index"></ul>
+</aside>
 
-            <div class="hero__glow" aria-hidden="true"></div>
+<!-- 左側詳情面板（JS 填內容） -->
+<aside id="panel" aria-live="polite"></aside>
 
-            <div class="hero__inner">
+<!-- 第一次進來的導覽卡 -->
+<div id="intro" role="dialog" aria-label="導覽">
+  <div class="icard">
+    <div class="ik"></div>
+    <h3></h3>
+    <p></p>
+    <div class="ibtns">
+      <button class="iskip" type="button">略過</button>
+      <button class="inext" type="button">下一步 →</button>
+    </div>
+  </div>
+</div>
 
-                <!-- 左側文字區 -->
-                <div class="hero__content">
+<!--
+  SEO／無 3D 退回版：預設隱藏，瀏覽器不支援 WebGL（body.no3d）時顯示。
+  內容是搜尋引擎讀得到的純文字服務清單，網址沿用舊站。
+-->
+<main id="seo">
+  <div class="seo-wrap">
+    <h1>創巢數位 Nest Digital</h1>
+    <p class="seo-lead">用非常規的跳躍思維，解決習以為常卻永遠解決不了的問題。軟體開發 × 品牌行銷 × AI 應用 × 自動化，一條龍的數位成長團隊。</p>
 
-                    <!-- 主標題（品牌宣言） -->
-                    <h1 class="hero__title js-hidden" id="hero-title">
-                        <span class="line">用非常規的<span class="highlight">跳躍思維</span></span>
-                        <span class="line">解決習以為常</span>
-                        <span class="line">卻永遠</span>
-                        <span class="line">解決不了的問題</span>
-                    </h1>
+    <section>
+      <h2>服務</h2>
+      <ul class="seo-list">
+        <li><a href="/services/ads">跳動E投放</a>｜900 元就能投 TikTok 廣告（NT$900 起，首投折抵 200）</li>
+        <li><a href="/services/website">一鍵式架站</a>｜填完資料，看三個版型，喜歡再付（一年 NT$6,000）</li>
+        <li><a href="/quick-site">一鍵架站</a>｜填完就好，剩下交給我們（NT$6,000）</li>
+        <li><a href="/services/booking">預約系統</a>｜客人自己選時段，你不用守著手機（洽詢）</li>
+        <li><a href="/services/social">社群經營</a>｜有什麼素材就從那裡開始（NT$9,500 起）</li>
+        <li><a href="/services/seo">SEO 部落格撰寫</a>｜一個月三篇，關鍵字到上稿（月費 NT$15,000 起）</li>
+        <li><a href="/services/ai-influencer">AI 形象網紅</a>｜一個不會爆雷的代言人（月費 NT$21,000 起）</li>
+      </ul>
+    </section>
 
-                    <!-- CTA 按鈕（單一聚焦：探索服務） -->
-                    <div class="hero__cta-group js-hidden">
-                        <a href="#services-section" class="btn btn--primary">
-                            探索服務
-                            <span class="btn-arrow" aria-hidden="true">→</span>
-                        </a>
-                    </div>
+    <section>
+      <h2>作品與工具</h2>
+      <ul class="seo-list">
+        <li><a href="/demo/group-buy/">團購網站 Demo</a></li>
+        <li><a href="/demo/gaming/">遊戲平台 Demo</a></li>
+        <li><a href="/demo/travel/">旅遊網站 Demo</a></li>
+        <li><a href="/showcase">全部作品展示</a></li>
+        <li><a href="/blog/check">行銷健檢小工具</a>｜七題、約三分鐘、不用留電話</li>
+        <li><a href="https://addoneegg.pages.dev" rel="noopener">加一顆蛋</a>｜創巢遊樂園第一台機台</li>
+      </ul>
+    </section>
 
-                    <!-- 向下捲動 -->
-                    <div class="hero__scroll-hint js-hidden" aria-hidden="true">
-                        <span class="hero__scroll-hint__line"></span>
-                        <span>往下探索</span>
-                    </div>
+    <section>
+      <h2>不正常觀點</h2>
+      <ul class="seo-list">
+        <li><a href="/blog">部落格全部文章</a></li>
+        <li><a href="/blog/cheap-fast-good-pick-two">為什麼我們拒絕「便宜又快又好」的案子</a></li>
+        <li><a href="/blog/why-we-named-it-abnormal">為什麼我們把公司取名叫「不正常人類軟體開發」</a></li>
+      </ul>
+    </section>
 
-                </div>
+    <section class="seo-contact">
+      <h2>聯絡</h2>
+      <p>桃園・中壢｜中央西路二段 268-1 號 5 樓｜<a href="tel:+886-3-491-2872">03-4912872</a></p>
+      <p><a href="/contact">聯絡我們</a>｜<a href="https://line.me/R/ti/p/@604vqsva" rel="noopener">LINE 客服 @604vqsva</a></p>
+      <p class="seo-legal"><a href="/privacy">隱私權政策</a>｜<a href="/terms">服務條款</a>｜<a href="/refund">退費政策</a></p>
+    </section>
+  </div>
+</main>
 
-                <!-- 太空人 ScrollTrigger 偵序列（2026-05-07 PoC 掛載）
-                     固定於右側、捲動驅動 72 偵動畫，完整邏輯見 index.js initAstronautScroll()
-                     canvas 內部繪製尺寸 512px = WebP 偵原始尺寸，外觀大小由 CSS 控制 -->
-                <div class="hero-astronaut" aria-hidden="true">
-                    <canvas id="hero-astronaut-canvas" width="512" height="512"></canvas>
-                </div>
+<!-- Cookie 橫幅（GA4 只在「接受所有」後載入） -->
+<div class="cookie" role="dialog" aria-label="Cookie 同意">
+  <p>我們使用分析型與廣告型 Cookie 改善服務體驗。<a href="/privacy">隱私政策</a></p>
+  <div class="btns">
+    <button class="accept">接受所有</button>
+    <button class="decline">僅必要</button>
+  </div>
+</div>
+<script src="/assets/js/site.js"></script>
 
-            </div>
+<noscript>
+  <style>#stage,#topbar,#labels,#list,#panel,#intro{display:none!important}#seo{position:static!important;clip:auto!important;width:auto!important;height:auto!important;opacity:1!important}</style>
+  <p style="text-align:center;padding:1rem">這個首頁需要 JavaScript 顯示 3D 星系。以下是純文字版服務清單。</p>
+</noscript>
 
-            <!-- Hero 副標題：.hero__rift 定位容器（absolute, Hero 下半部右靠）
-                 .hero__readout (中文仿宋) / .hero__readout-divider (冷光分隔線) / .hero__readout-en (英文 Italianno) -->
-            <div class="hero__rift js-hidden" aria-hidden="false">
-                <p class="hero__readout">
-                    傳統做法不夠用時，你需要的<span class="hero__readout-dim">不是更努力</span>　<strong>而是一個敢用不同方法的團隊。</strong>
-                </p>
-                <div class="hero__readout-divider" aria-hidden="true"></div>
-                <p class="hero__readout-en" lang="en">
-                    Working harder isn't the answer when the rules don't work. A team that breaks them is.
-                </p>
-            </div>
-
-        </section>
-
-
-        <!-- ════════════════════════════════════════════════
-             Section 2｜宣言
-        ════════════════════════════════════════════════ -->
-        <section class="manifesto" aria-label="品牌宣言">
-            <div class="manifesto__line" aria-hidden="true"></div>
-
-            <!-- 太空人 ScrollTrigger Beat 03（懸線揮手 → 掉下）2026-05-08 PoC 掛載
-                 9:16 直式、Manifesto 區塊右側、捲動驅動 179 偵動畫 -->
-            <div class="manifesto-astronaut" aria-hidden="true">
-                <canvas id="manifesto-astronaut-canvas" width="432" height="768"></canvas>
-            </div>
-
-            <div class="manifesto__inner">
-                <h2 class="manifesto__big-text">
-                    <span class="line"><span class="accent">非常規，</span></span>
-                    <span class="line" data-text="才是真解法">才是真解法</span>
-                </h2>
-
-                <div class="manifesto__body">
-                    <p>
-                        <span>整世界都在發神經，你還在用正常思維面對？</span><span>要就跟著一起發瘋！</span>
-                    </p>
-                    <div class="manifesto__body-divider" aria-hidden="true"></div>
-                    <p class="manifesto__body-en" lang="en">
-                        <span>The world's gone mad.</span><span>Still trying to think straight?</span><span>Lose your mind with us.</span>
-                    </p>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- ════════════════════════════════════════════════
-             Section 3a｜服務 · 數位行銷（手風琴 4 卡）
-        ════════════════════════════════════════════════ -->
-        <section class="services-section" id="services-section" aria-labelledby="services-title">
-            <div class="services-section__inner">
-
-                <div class="section-header">
-                    <p class="section-header__eyebrow" data-reveal>OUR SERVICES</p>
-                    <h2 class="section-header__title" id="services-title" data-reveal data-reveal-delay="0.1">
-                        我們能做的，<span class="accent">比你想的更多</span>
-                    </h2>
-                </div>
-
-                <!-- 服務六張卡片（3×2，內容由 index-accordion.js 動態注入） -->
-                <div class="svc-grid-wrap">
-                    <div class="svc-grid"></div>
-                </div>
-
-            </div>
-        </section>
-
-
-        <!-- ════════════════════════════════════════════════
-             Section 3b｜服務 · 軟體開發（程式碼隧道 · CSS 3D 多層落雨，無 WebGL）
-             內容由 index-glass-stack.js 動態注入；雨層 DOM 鎖在 #dev 一屏內
-        ════════════════════════════════════════════════ -->
-        <section id="dev" aria-label="軟體開發服務">
-            <div class="dev-glass-stack" id="devGlassStack">
-                <div class="dev-stack-stage" id="devCardStage">
-                    <div class="dev-rain3d" aria-hidden="true"><div class="dev-rain-scene" id="devRainScene"></div></div>
-                    <div class="dev-stack-html-deck">
-                        <div class="deck" id="devStackDeck"></div>
-                    </div>
-                    <button class="dev-card-arrow dev-card-arrow--prev" type="button" id="devCardPrev" aria-label="上一張服務"><span aria-hidden="true">‹</span></button>
-                    <button class="dev-card-arrow dev-card-arrow--next" type="button" id="devCardNext" aria-label="下一張服務"><span aria-hidden="true">›</span></button>
-                    <div class="dev-card-dots" id="devCardDots" aria-label="服務卡片索引"></div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- Section 4 品牌故事預告 2026-05-07 整段移除 -->
-
-
-        <!-- 太空人 Beat 04（無頭追頭盔，GSAP 隨機漂移） -->
-        <div class="footer-astronaut" aria-hidden="true">
-            <canvas id="footer-astronaut-canvas" width="480" height="270"></canvas>
-        </div>
-
-    </main>
-
-
-    <!-- Scripts（順序不得更改）-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="assets/js/core.js"></script>
-    <script src="assets/js/nav.js"></script>
-    <script src="assets/js/pages/index.js"></script>
-
-    <!-- Section 3a 數位行銷手風琴（classic IIFE，動態注入 4 卡） -->
-    <script src="assets/js/pages/index-accordion.js"></script>
-
-    <!-- Section 3b 軟體開發 · 程式碼隧道（CSS 3D，無 WebGL；type=module 保留模組作用域隔離） -->
-    <script type="module" src="assets/js/pages/index-glass-stack.js"></script>
-
+<script type="importmap">
+{
+  "imports": {
+    "three": "./lib/three/build/three.module.min.js",
+    "three/addons/": "./lib/three/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="assets/galaxy/galaxy.js"></script>
 </body>
 </html>

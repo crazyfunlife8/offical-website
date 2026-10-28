@@ -1,7 +1,7 @@
 User-agent: *
-Disallow: /404.html
-Disallow: /maintenance.html
-Disallow: /thank-you.html
+Disallow: /404
+Disallow: /maintenance
+Disallow: /thank-you
 Disallow: /services.html
 Disallow: /demo/
 

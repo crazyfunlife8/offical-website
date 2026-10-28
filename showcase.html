@@ -1,151 +1,114 @@
-<!DOCTYPE html>
-<html lang="zh-TW" class="no-js">
+<!doctype html>
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>展示作品｜創巢數位 Nest Digital</title>
-    <meta name="description" content="創巢數位實際完成的網站作品展示——從團購平台到旅遊網站，看看我們能做什麼。">
-    <meta property="og:title"       content="展示作品｜創巢數位 Nest Digital">
-    <meta property="og:description" content="創巢數位實際完成的網站作品展示。">
-    <meta property="og:type"        content="website">
-    <meta property="og:image"       content="https://nestdigitalai.com/assets/images/og/blog.jpg">
-    <meta property="og:url"         content="https://nestdigitalai.com/showcase">
-    <link rel="canonical"           href="https://nestdigitalai.com/showcase">
-    <link rel="icon"                href="assets/images/brand/icon.png">
-    <link rel="apple-touch-icon"    href="assets/images/brand/icon.png">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght,SOFT@9..144,100..900,0..100&family=Noto+Sans+TC:wght@100;300;400;700;900&family=Italiana&display=swap" rel="stylesheet">
-
-    <!-- Chiron Sung HK -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css">
-
-    <!-- CSS（順序不得更改）-->
-    <link rel="stylesheet" href="assets/css/tokens.css">
-    <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="assets/css/components.css">
-    <link rel="stylesheet" href="assets/css/animations.css">
-    <link rel="stylesheet" href="assets/css/pages/showcase.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>展示作品｜創巢數位 Nest Digital</title>
+<meta name="description" content="創巢數位實際完成的網站作品展示——從團購平台到旅遊網站，看看我們能做什麼。">
+<link rel="canonical" href="https://nestdigitalai.com/showcase">
+<meta property="og:type" content="website">
+<meta property="og:title" content="展示作品｜創巢數位 Nest Digital">
+<meta property="og:description" content="創巢數位實際完成的網站作品展示。">
+<meta property="og:url" content="https://nestdigitalai.com/showcase">
+<meta property="og:image" content="https://nestdigitalai.com/assets/images/og/blog.jpg">
+<link rel="icon" href="/assets/images/brand/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..900&family=Italiana&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/chiron-fonts/chiron-sung-hk@1.024/WOFF2_TTF/css/vf.css" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/site.css">
 </head>
 <body>
-    <!-- Nav 由 nav.js 動態注入 -->
 
-    <main>
+<!-- 導覽列 -->
+<header class="nav">
+  <a class="nav__brand" href="/"><b>創巢數位</b><small>NEST DIGITAL</small></a>
+  <button class="nav__burger" aria-label="選單">☰</button>
+  <nav class="nav__links">
+    <a href="/">星系首頁</a>
+    <a href="/#services-section">服務</a>
+    <a href="/blog">不正常觀點</a>
+    <a class="cta" href="/contact">聯絡我們</a>
+  </nav>
+</header>
 
-        <!-- ── Hero ── -->
-        <section class="sc-hero">
-            <div class="sc-hero__inner">
-                <p class="sc-hero__eyebrow" data-reveal>DEMO SHOWCASE</p>
-                <h1 class="sc-hero__title" data-reveal data-reveal-delay="0.08">
-                    展示作品
-                </h1>
-                <p class="sc-hero__title-en" data-reveal data-reveal-delay="0.14">
-                    What we've built.
-                </p>
-                <div class="sc-hero__divider" aria-hidden="true" data-reveal data-reveal-delay="0.2"></div>
-                <p class="sc-hero__lead" data-reveal data-reveal-delay="0.25">
-                    以下是我們為客戶打造的網站作品，點擊即可進入完整 Demo 站查看。
-                </p>
-            </div>
-        </section>
+<!-- Hero -->
+<section class="hero" style="min-height:62vh">
+  <div class="hero__orb" aria-hidden="true"><span class="ring"></span><span class="ball"></span></div>
+  <div class="wrap hero__in">
+    <p class="eyebrow">DEMO SHOWCASE</p>
+    <h1 class="hero__title">展示作品</h1>
+    <p class="hero__sub">What we've built.</p>
+    <p class="hero__lead">以下是我們為客戶打造的網站作品，點擊即可進入完整 Demo 站查看。</p>
+  </div>
+</section>
 
-        <!-- ── 作品卡片 ── -->
-        <section class="sc-grid-section">
-            <div class="sc-container">
-                <div class="sc-grid" data-stagger-group>
+<!-- 作品 -->
+<section class="sec" style="padding-top:0">
+  <div class="wrap">
+    <div class="works">
+      <a class="work" href="/demo/group-buy/" target="_blank" rel="noopener">
+        <img src="/assets/images/demoSite-pic/Group-Buying.png" alt="團購網站" loading="lazy">
+        <div class="work__body"><div class="meta">GROUP BUYING</div><h3>團購網站</h3><p>群聚力量，讓每次購買都更划算。完整的商品列表、團購倒數與訂單管理流程。</p><span class="more">進 Demo →</span></div>
+      </a>
+      <a class="work" href="/demo/gaming/" target="_blank" rel="noopener">
+        <img src="/assets/images/demoSite-pic/game-platform.png" alt="遊戲平台" loading="lazy">
+        <div class="work__body"><div class="meta">GAMING PLATFORM</div><h3>遊戲平台</h3><p>沉浸式視覺體驗，為玩家打造的數位世界。遊戲介紹、排行榜與會員中心一站整合。</p><span class="more">進 Demo →</span></div>
+      </a>
+      <a class="work" href="/demo/travel/" target="_blank" rel="noopener">
+        <img src="/assets/images/demoSite-pic/travel-website.png" alt="旅遊網站" loading="lazy">
+        <div class="work__body"><div class="meta">TRAVEL</div><h3>旅遊網站</h3><p>探索每一個值得記憶的目的地。行程規劃、景點介紹與預訂功能完整呈現。</p><span class="more">進 Demo →</span></div>
+      </a>
+    </div>
+  </div>
+</section>
 
-                    <!-- 團購網站 -->
-                    <article class="sc-card card">
-                        <a class="sc-card__thumb-link" href="demo/group-buy/" target="_blank" rel="noopener" aria-label="查看團購網站 Demo">
-                            <img src="assets/images/demoSite-pic/Group-Buying.png" alt="團購網站" loading="lazy" decoding="async">
-                            <div class="sc-card__thumb-overlay">
-                                <span class="sc-card__view-btn">
-                                    <i class="fas fa-external-link-alt"></i> 查看 Demo
-                                </span>
-                            </div>
-                        </a>
-                        <div class="sc-card__body">
-                            <span class="sc-card__label">GROUP BUYING</span>
-                            <h2 class="sc-card__title">團購網站</h2>
-                            <p class="sc-card__desc">群聚力量，讓每次購買都更划算。完整的商品列表、團購倒數與訂單管理流程。</p>
-                            <a class="sc-card__link" href="demo/group-buy/" target="_blank" rel="noopener">
-                                查看展示
-                                <span class="sc-card__link-line" aria-hidden="true"></span>
-                            </a>
-                        </div>
-                    </article>
+<!-- 結尾 CTA -->
+<section class="finalcta">
+  <div class="wrap">
+    <h2>想要一個屬於你的網站？</h2>
+    <a class="btn btn--gold" href="/contact">與我們聯絡 <span class="arw">→</span></a>
+  </div>
+</section>
 
-                    <!-- 遊戲平台 -->
-                    <article class="sc-card card">
-                        <a class="sc-card__thumb-link" href="demo/gaming/" target="_blank" rel="noopener" aria-label="查看遊戲平台 Demo">
-                            <img src="assets/images/demoSite-pic/game-platform.png" alt="遊戲平台" loading="lazy" decoding="async">
-                            <div class="sc-card__thumb-overlay">
-                                <span class="sc-card__view-btn">
-                                    <i class="fas fa-external-link-alt"></i> 查看 Demo
-                                </span>
-                            </div>
-                        </a>
-                        <div class="sc-card__body">
-                            <span class="sc-card__label">GAMING PLATFORM</span>
-                            <h2 class="sc-card__title">遊戲平台</h2>
-                            <p class="sc-card__desc">沉浸式視覺體驗，為玩家打造的數位世界。遊戲介紹、排行榜與會員中心一站整合。</p>
-                            <a class="sc-card__link" href="demo/gaming/" target="_blank" rel="noopener">
-                                查看展示
-                                <span class="sc-card__link-line" aria-hidden="true"></span>
-                            </a>
-                        </div>
-                    </article>
+<!-- 頁尾 -->
+<footer class="footer">
+  <div class="wrap footer__grid">
+    <div class="footer__brand">
+      <b>創巢數位</b>
+      <div class="mark">NEST DIGITAL</div>
+      <div class="loc">桃園・中壢｜中央西路二段 268-1 號 5 樓</div>
+    </div>
+    <div class="footer__col">
+      <div class="label">CONTACT</div>
+      <div class="lines">
+        <div><a href="https://line.me/R/ti/p/@604vqsva" target="_blank" rel="noopener">LINE @604vqsva</a></div>
+        <div><a href="tel:+886-3-491-2872">03-4912872</a></div>
+      </div>
+    </div>
+    <div class="footer__col">
+      <div class="label">STUDIO</div>
+      <div class="lines">
+        <div class="entity">創巢數位資訊企業社<small>統編 93019200</small></div>
+        <div class="entity">不正常人類軟體開發有限公司<small>統編 83302868</small></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer__bar">
+    <span>© 2024–2026 Nest Digital. All rights reserved.</span>
+    <nav><a href="/privacy">隱私政策</a><a href="/terms">服務條款</a><a href="/refund">退費政策</a></nav>
+  </div>
+</footer>
 
-                    <!-- 旅遊網站 -->
-                    <article class="sc-card card">
-                        <a class="sc-card__thumb-link" href="demo/travel/" target="_blank" rel="noopener" aria-label="查看旅遊網站 Demo">
-                            <img src="assets/images/demoSite-pic/travel-website.png" alt="旅遊網站" loading="lazy" decoding="async">
-                            <div class="sc-card__thumb-overlay">
-                                <span class="sc-card__view-btn">
-                                    <i class="fas fa-external-link-alt"></i> 查看 Demo
-                                </span>
-                            </div>
-                        </a>
-                        <div class="sc-card__body">
-                            <span class="sc-card__label">TRAVEL</span>
-                            <h2 class="sc-card__title">旅遊網站</h2>
-                            <p class="sc-card__desc">探索每一個值得記憶的目的地。行程規劃、景點介紹與預訂功能完整呈現。</p>
-                            <a class="sc-card__link" href="demo/travel/" target="_blank" rel="noopener">
-                                查看展示
-                                <span class="sc-card__link-line" aria-hidden="true"></span>
-                            </a>
-                        </div>
-                    </article>
+<!-- Cookie 橫幅（GA4 只在「接受所有」後載入） -->
+<div class="cookie" role="dialog" aria-label="Cookie 同意">
+  <p>我們使用分析型與廣告型 Cookie 改善服務體驗。<a href="/privacy">隱私政策</a></p>
+  <div class="btns">
+    <button class="accept">接受所有</button>
+    <button class="decline">僅必要</button>
+  </div>
+</div>
 
-                </div>
-
-                <!-- CTA -->
-                <div class="sc-cta" data-reveal>
-                    <p class="sc-cta__text">想要一個屬於你的網站？</p>
-                    <div class="coming-soon__cta-group" data-reveal data-reveal-delay="0.4">
-                    <a href="/contact" class="btn btn--primary">
-                        與我們聯絡
-                        <span class="btn-arrow" aria-hidden="true">→</span>
-                    </a>
-                </div>
-                </div>
-
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Scripts（順序不得更改）-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="assets/js/core.js"></script>
-    <script src="assets/js/nav.js"></script>
+<script src="/assets/js/site.js"></script>
 </body>
 </html>
