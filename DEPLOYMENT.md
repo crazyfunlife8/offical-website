@@ -9,10 +9,10 @@
 - Cloudflare 帳戶已轉移到 Crazyfunlife8@gmail.com。Pages 專案在新帳戶以 **Git 整合**重建（Connect to a repository：repo `offical-website`、branch `main`、framework None、build 輸出目錄 `/`），子網域 `nestdigitalai-8me.pages.dev`。
 - **push `main` = 自動部署 production；push 其他分支 = 自動產生預覽**，網址是 `https://<分支名，/ 換成 ->.nestdigitalai-8me.pages.dev`（例：`feature-galaxy-site.nestdigitalai-8me.pages.dev`）。
 - GitHub Actions 的 `deploy.yml` **已於 2026-10-28 移除**：帳號轉移後它每次 push 都在 `Deploy to Cloudflare Pages` 那步失敗（推測是 repo secret 仍是舊帳戶的 `CLOUDFLARE_API_TOKEN`／`ACCOUNT_ID`；當時未取得失敗日誌確認），而且與 Git 整合重複部署。不要再加回來。
-- **Build command 要設成 `rm -f *.md`**（Pages 專案 Settings → Builds）。Git 整合不像舊 workflow 會先刪內部文件，沒設的話 `CLAUDE.md`、`DEPLOYMENT.md` 會被公開在正式網址上。
+- **Build command 已設為 `rm -f *.md`**（Pages 專案 Settings → Builds → Build configuration，output／root 目錄留空；2026-10-28 設定並驗證，`/CLAUDE.md`、`/DEPLOYMENT.md` 回 404）。Git 整合不像舊 workflow 會先刪內部文件，這條被改掉的話內部文件會再度公開。`package.json`、`wrangler.jsonc`、`.gitignore`、`.assetsignore` 仍可下載（無金鑰；`package.json` 刻意不刪，Functions 打包可能需要）。
 - 環境變數在 Settings → Variables and Secrets，**Production 與 Preview 是兩組、要各自設**（只設 Production 的話預覽站的 `/api/generate` 會 500）。目前用到：`ANTHROPIC_API_KEY`、`RESEND_API_KEY`、`NOTIFY_EMAIL`、`MAIL_FROM`、`CLOUDINARY_CLOUD_NAME`／`_API_KEY`／`_API_SECRET`、`RELAY_TOKEN`。**改完變數必須用新部署（推新 commit 或 Retry deployment 最新那筆）才會生效**。
 - Anthropic 會擋來自**香港機房（HKG）**的請求（403 Request not allowed），而 Pages Functions 在用戶進來的機房執行。`generate.js`／`enhance.js` 在設了 `RELAY_TOKEN` 時改走獨立的 `nest-claude-relay` Worker（placement 固定在東京，`https://nest-claude-relay.crazyfunlife8.workers.dev`）；沒設就直連。Worker 原始碼不在此 repo。
-- GitHub Pages 仍開著（見 §三）：它是靜態備援，**不含 Functions**，且內部文件也會在上面；不需要備援的話到 repo Settings → Pages → Source 設為 None。
+- GitHub Pages 已於 2026-10-28 關閉（見 §三），現在 push 只會有 Cloudflare 一筆部署。
 
 ---
 
@@ -50,10 +50,10 @@
 - 與其用 GitHub Pages 設 CNAME 再讓 Cloudflare 反代，不如直接由 Cloudflare 一條龍：原始檔案儲存、CDN 分發、SSL、DNS 全在同一平台
 - 部署速度、快取規則、未來擴充（如要加 Workers 動態邏輯）都更直接
 
-**GitHub Pages 現況：**
-- 仍可訪問 https://crazyfunlife8.github.io/offical-website/（作為備援）
-- 無自訂網域（CNAME 檔案已於 commit `006ec1c Delete CNAME` 刪除）
-- 如要關閉：repo Settings → Pages → Source 設為 None
+**GitHub Pages 現況：已於 2026-10-28 關閉（Unpublish site）**
+- 原本是靜態備援（`https://crazyfunlife8.github.io/offical-website/`），無自訂網域（CNAME 檔案已於 commit `006ec1c Delete CNAME` 刪除）。
+- 關閉原因：它只有靜態頁、**不含 Functions**（表單、預約登記、生成器在上面都不能用），當備援沒有實際作用；還會多發佈一份公開副本（含內部文件），並讓每次 push 多一筆部署紀錄。
+- 關閉方式：repo Settings → Pages → **Unpublish site**（新版介面 Source 下拉選單沒有 None 可選）。程式碼與分支不受影響；要恢復就在同一頁重新選 Source／Branch。
 
 ## 四、手動部署（fallback：GHA 失敗時 retry／本地測試用）
 
