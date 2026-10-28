@@ -297,7 +297,6 @@ couriers.forEach(newTrip);
 const labels = ALL.map((d, i) => {
   const el = document.createElement('button'); el.className = 'plabel' + (d.id === 'park' ? ' hot' : '');
   el.innerHTML = `<i>${String(i).padStart(2, '0')}</i>${d.name}`; el.addEventListener('click', () => focusPlanet(i));
-  el.addEventListener('mouseenter', () => setHover(i)); el.addEventListener('mouseleave', () => setHover(-1));
   $('labels').appendChild(el); return el;
 });
 
@@ -315,9 +314,16 @@ const labels = ALL.map((d, i) => {
 // ---------- 點星球：鏡頭飛過去＋面板 ----------
 let focus = -1, fly = null;
 const tmp = new THREE.Vector3();
-// hover 狀態屬於「星球」：滑到星球本體或它的名牌都算；名牌亮起、星球光暈變亮都看這個值
+// hover 狀態屬於「星球」（只看滑鼠指到的星球本體，名牌自己不是 hover 對象）：名牌亮起、星球光暈變亮都看這個值。
+// 滑進星球的那一刻，名牌播一次「衝向左上角再彈回」；dash[i] = 該名牌已播放秒數（-1 = 沒在播）。
+// 播放中不重播，避免滑鼠在星球邊緣來回時名牌跳位或卡在角落。
+const DASH_DUR = 0.6, dash = planets.map(() => -1);
 let hov = -1;
-function setHover(i) { if (i === hov) return; hov = i; labels.forEach((l, k) => l.classList.toggle('hov', k === i)); }
+function setHover(i) {
+  if (i === hov) return; hov = i;
+  labels.forEach((l, k) => l.classList.toggle('hov', k === i));
+  if (i >= 0 && dash[i] < 0) dash[i] = 0;
+}
 function focusPlanet(i) {
   focus = i; const p = planets[i], d = ALL[i];
   controls.autoRotate = false;
@@ -448,9 +454,15 @@ function loop() {
   planets.forEach((p, i) => {
     v3.copy(p.position); v3.y += ALL[i].r + 1.2; v3.project(camera);
     const el = labels[i], vis = v3.z < 1 && Math.abs(v3.x) < 1.1 && Math.abs(v3.y) < 1.1;
+    if (dash[i] >= 0 && (dash[i] += dt) >= DASH_DUR) dash[i] = -1;
     el.style.display = vis ? '' : 'none'; if (!vis) return;
+    let sx = (v3.x * 0.5 + 0.5) * W, sy = (-v3.y * 0.5 + 0.5) * H;
+    if (dash[i] >= 0) { // 衝向左上角（前 22% 時間快速到達）再緩緩彈回原位；目標點在 logo 下方、畫面內，不會飛出去
+      const u = dash[i] / DASH_DUR, r = u < 0.22 ? 1 - Math.pow(1 - u / 0.22, 3) : 1 - ease((u - 0.22) / 0.78);
+      sx += (Math.min(90, W * 0.25) - sx) * r; sy += (100 - sy) * r;
+    }
     // scale 放最後＝先以名牌自己為中心放大、再移到位置（位置不會被一起放大）；hk 是 hover 平滑值 0→1
-    el.style.transform = `translate(-50%,-100%) translate(${(v3.x * 0.5 + 0.5) * W}px,${(-v3.y * 0.5 + 0.5) * H}px) scale(${1 + 0.06 * (p.userData.hk || 0)})`;
+    el.style.transform = `translate(-50%,-100%) translate(${sx}px,${sy}px) scale(${1 + 0.06 * (p.userData.hk || 0)})`;
     el.style.opacity = focus >= 0 && focus !== i ? 0.35 : 1;
   });
   renderer.render(scene, camera);
