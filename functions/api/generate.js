@@ -138,6 +138,19 @@ async function fetchUnsplashPhotos(query, env, count = 3) {
     }
 }
 
+const MAX_PARSE_ATTEMPTS = 2;
+
+// 從模型回覆取出 {designs:[…]}；格式壞掉或不足 3 份就丟錯（由呼叫端決定要不要重試）
+function parseDesigns(text) {
+    // Extract JSON (handle potential markdown wrapping)
+    const jsonMatch = text.match(/\{[\s\S]*\}$/m) || text.match(/\{[\s\S]*\}/);
+    const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : text);
+    if (!Array.isArray(parsed.designs) || parsed.designs.length < 3) {
+        throw new Error('Invalid response: less than 3 designs returned');
+    }
+    return parsed;
+}
+
 export async function onRequestPost(context) {
     const { request, env } = context;
 
@@ -212,22 +225,27 @@ ${imageUrls.length >= 3
 生成序號 #${variationSeed}：請在各風格定義內選擇你認為最適合此商家的具體字體、配色與排版細節，確保三份設計彼此明顯不同，且不落入千篇一律的模板感。
 嚴格按照系統規範的 JSON 格式輸出，直接輸出 JSON，不加任何說明。`;
 
-        const response = await client.messages.create({
-            model: 'claude-haiku-4-5-20251001',
-            max_tokens: 12000,
-            system: systemPrompt,
-            messages: [{ role: 'user', content: userMessage }]
-        });
+        // 模型偶爾輸出壞掉的 JSON（正式站實測約 1／6）：解析或驗證失敗就整個重來一次。
+        // 只重試「內容壞掉」；API 本身的錯誤（403／401 等）不重試，SDK 對暫時性錯誤原本就會自己重試。
+        let parsed, lastErr;
+        for (let attempt = 1; attempt <= MAX_PARSE_ATTEMPTS; attempt++) {
+            const response = await client.messages.create({
+                model: 'claude-haiku-4-5-20251001',
+                max_tokens: 12000,
+                system: systemPrompt,
+                messages: [{ role: 'user', content: userMessage }]
+            });
 
-        const text = response.content[0].text.trim();
-
-        // Extract JSON (handle potential markdown wrapping)
-        const jsonMatch = text.match(/\{[\s\S]*\}$/m) || text.match(/\{[\s\S]*\}/);
-        const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : text);
-
-        if (!Array.isArray(parsed.designs) || parsed.designs.length < 3) {
-            throw new Error('Invalid response: less than 3 designs returned');
+            const text = (response.content[0]?.text || '').trim();
+            try {
+                parsed = parseDesigns(text);
+                break;
+            } catch (e) {
+                lastErr = e;
+                console.warn(`[/api/generate] 第 ${attempt}/${MAX_PARSE_ATTEMPTS} 次內容無法使用（stop_reason=${response.stop_reason}，${text.length} 字）：${e.message}`);
+            }
         }
+        if (!parsed) throw lastErr;
 
         return new Response(JSON.stringify({ designs: parsed.designs }), {
             headers: { 'Content-Type': 'application/json' }
