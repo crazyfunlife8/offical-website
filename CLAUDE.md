@@ -59,7 +59,7 @@
   - `--f-display-en`：**Italiana**（hairline serif，雜誌封面感）→ 英文 echo 副標
   - `--f-sans`：Noto Sans TC（Google Fonts，100–900）→ 內文/說明/次要中文
   - `--f-mono`：JetBrains Mono → 等寬資料讀出條、Nav 品牌名、按鈕箭頭
-- **部署**：Cloudflare Pages（`.github/workflows/deploy.yml` push main 自動部署、Pages 專案 `nestdigitalai`），對外網域 `nestdigitalai.com`（舊 `nestxmedia.com` 已退役）
+- **部署**：Cloudflare Pages（Git 整合：push main 自動部署、其他分支自動預覽，詳見 `DEPLOYMENT.md` §〇；GitHub Actions deploy.yml 已於 2026-10-28 移除；Pages 專案 `nestdigitalai`），對外網域 `nestdigitalai.com`（舊 `nestxmedia.com` 已退役）
 
 ### CSS 5 層架構（載入順序不得更改）
 ```
