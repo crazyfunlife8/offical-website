@@ -317,7 +317,7 @@ const tmp = new THREE.Vector3();
 // hover 狀態屬於「星球」（只看滑鼠指到的星球本體，名牌自己不是 hover 對象）：名牌亮起、星球光暈變亮都看這個值。
 // 滑進星球的那一刻，名牌播一次「衝向左上角再彈回」；dash[i] = 該名牌已播放秒數（-1 = 沒在播）。
 // 播放中不重播，避免滑鼠在星球邊緣來回時名牌跳位或卡在角落。
-const DASH_DUR = 0.6, dash = planets.map(() => -1);
+const DASH_DUR = 0.26, DASH_GO = 0.46, dash = planets.map(() => -1); // 去 0.12s＋回 0.14s，不停留（原版 transition 就是 .12s）
 let hov = -1;
 function setHover(i) {
   if (i === hov) return; hov = i;
@@ -457,8 +457,8 @@ function loop() {
     if (dash[i] >= 0 && (dash[i] += dt) >= DASH_DUR) dash[i] = -1;
     el.style.display = vis ? '' : 'none'; if (!vis) return;
     let sx = (v3.x * 0.5 + 0.5) * W, sy = (-v3.y * 0.5 + 0.5) * H;
-    if (dash[i] >= 0) { // 衝向左上角（前 22% 時間快速到達）再緩緩彈回原位；目標點在 logo 下方、畫面內，不會飛出去
-      const u = dash[i] / DASH_DUR, r = u < 0.22 ? 1 - Math.pow(1 - u / 0.22, 3) : 1 - ease((u - 0.22) / 0.78);
+    if (dash[i] >= 0) { // 快速衝向左上角、到了立刻彈回原位（回程一開始就是快的，不停留）；目標點在 logo 下方、畫面內，不會飛出去
+      const u = dash[i] / DASH_DUR, r = u < DASH_GO ? 1 - Math.pow(1 - u / DASH_GO, 3) : Math.pow(1 - (u - DASH_GO) / (1 - DASH_GO), 2);
       sx += (Math.min(90, W * 0.25) - sx) * r; sy += (100 - sy) * r;
     }
     // scale 放最後＝先以名牌自己為中心放大、再移到位置（位置不會被一起放大）；hk 是 hover 平滑值 0→1
