@@ -1,5 +1,16 @@
 import Anthropic from '@anthropic-ai/sdk';
 
+// Anthropic 不接受來自香港（HKG）機房的請求（403 Request not allowed），而 Pages Functions 在「用戶進來的機房」
+// 執行，走香港的用戶就會失敗。設了 RELAY_TOKEN 就改走 nest-claude-relay（固定在東京附近執行）；沒設就直連（原行為）。
+function anthropicOptions(env) {
+    const opts = { apiKey: env.ANTHROPIC_API_KEY };
+    if (env.RELAY_TOKEN) {
+        opts.baseURL = env.RELAY_URL || 'https://nest-claude-relay.crazyfunlife8.workers.dev';
+        opts.defaultHeaders = { 'x-relay-token': env.RELAY_TOKEN };
+    }
+    return opts;
+}
+
 // ── 風格池：每次呼叫從 8 種隨機抽 3，確保重新生成有真實差異 ──────────
 const STYLE_POOL = [
     {
@@ -166,7 +177,7 @@ export async function onRequestPost(context) {
             imageUrls.push(...stockPhotos);
         }
 
-        const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+        const client = new Anthropic(anthropicOptions(env));
 
         // 隨機抽 3 種風格（Fisher-Yates shuffle 前 3 個）
         const shuffled = [...STYLE_POOL].sort(() => Math.random() - 0.5);

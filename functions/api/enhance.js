@@ -1,6 +1,17 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { parse } from 'node-html-parser';
 
+// Anthropic 不接受來自香港（HKG）機房的請求（403 Request not allowed），而 Pages Functions 在「用戶進來的機房」
+// 執行，走香港的用戶就會失敗。設了 RELAY_TOKEN 就改走 nest-claude-relay（固定在東京附近執行）；沒設就直連（原行為）。
+function anthropicOptions(env) {
+    const opts = { apiKey: env.ANTHROPIC_API_KEY };
+    if (env.RELAY_TOKEN) {
+        opts.baseURL = env.RELAY_URL || 'https://nest-claude-relay.crazyfunlife8.workers.dev';
+        opts.defaultHeaders = { 'x-relay-token': env.RELAY_TOKEN };
+    }
+    return opts;
+}
+
 const STEP3_SYSTEM = `你是一位資深前端工程師。你會收到一份完整的網站 HTML 和用戶選配的功能資料。
 
 你的任務是：分析 HTML 結構，為每個選配功能決定最佳的插入位置，並生成對應的 HTML 片段。
@@ -66,7 +77,7 @@ const STEP3_SYSTEM = `你是一位資深前端工程師。你會收到一份完�
 - insertions 陣列可以是空陣列（表示沒有任何需要新增的內容）
 - JSON 必須完全合法，可直接被 JSON.parse() 解析`;
 
-async function step3(selectedHtml, form2Data, siteName, apiKey) {
+async function step3(selectedHtml, form2Data, siteName, env) {
     const {
         lineUrl, facebookUrl, instagramUrl, youtubeUrl,
         includeMap, businessHours, announcement, bookingUrl, orderUrl,
@@ -87,7 +98,7 @@ async function step3(selectedHtml, form2Data, siteName, apiKey) {
 
     if (features.length === 0) return selectedHtml;
 
-    const client = new Anthropic({ apiKey });
+    const client = new Anthropic(anthropicOptions(env));
 
     const userText = `以下是「${siteName || '商家'}」網站的完整 HTML。
 
@@ -168,7 +179,7 @@ export async function onRequestPost(context) {
             address,
         };
 
-        const html = await step3(selectedHtml, form2Data, siteName, env.ANTHROPIC_API_KEY);
+        const html = await step3(selectedHtml, form2Data, siteName, env);
 
         return new Response(JSON.stringify({ html }), {
             headers: { 'Content-Type': 'application/json' }
