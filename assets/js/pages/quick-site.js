@@ -151,9 +151,7 @@ function appendThumb(file) {
 
     thumb.innerHTML = `
         <img src="${url}" alt="${file.name}" loading="lazy">
-        <button type="button" class="qs-image-thumb__remove" aria-label="移除">
-            <i class="fas fa-times"></i>
-        </button>
+        <button type="button" class="qs-image-thumb__remove" aria-label="移除">×</button>
     `;
 
     thumb.querySelector('.qs-image-thumb__remove').addEventListener('click', () => {
@@ -297,7 +295,8 @@ function buildSubmitFormData() {
 document.getElementById('menuPdf').addEventListener('change', function () {
     const file   = this.files[0];
     const nameEl = document.getElementById('menuFileName');
-    const textEl = document.querySelector('.qs-file-label__text');
+    // 限定在 PDF 這個上傳區內找（頁面上另有圖片上傳區也有同 class，全域 querySelector 會抓到圖片那個）
+    const textEl = this.closest('.qs-file-area').querySelector('.qs-file-label__text');
 
     if (file) {
         if (file.size > 10 * 1024 * 1024) {
@@ -431,11 +430,9 @@ function createCard(design, index) {
         </div>
         <div class="qs-preview-palette">${swatches}</div>
         <div class="qs-preview-card__actions">
-            <button type="button" class="qs-btn-expand" data-index="${index}">
-                <i class="fas fa-expand-alt" aria-hidden="true"></i> 放大預覽
-            </button>
-            <button type="button" class="btn btn--yellow qs-btn-select" data-index="${index}">
-                選擇這個 <span class="btn-arrow" aria-hidden="true">→</span>
+            <button type="button" class="qs-btn-expand" data-index="${index}">放大預覽</button>
+            <button type="button" class="btn btn--gold qs-btn-select" data-index="${index}">
+                選擇這個 <span class="arw" aria-hidden="true">→</span>
             </button>
         </div>
     `;
@@ -580,14 +577,12 @@ function startStepAnimation() {
     stepTimers.forEach(clearTimeout);
     stepTimers = [];
 
-    // 重置步驟狀態
+    // 重置步驟狀態（圖示由 quick-site.css 依狀態 class 畫，這裡只換 class）
     const initialStates = ['qs-step--done', 'qs-step--active', 'qs-step--pending', 'qs-step--pending', 'qs-step--pending'];
-    const initialIcons  = ['fa-check', 'fa-spinner fa-spin', 'fa-circle', 'fa-circle', 'fa-circle'];
     ['step1','step2','step3','step4','step5'].forEach((id, i) => {
         const el = document.getElementById(id);
         if (!el) return;
         el.className = `qs-step ${initialStates[i]}`;
-        el.querySelector('.qs-step__icon').innerHTML = `<i class="fas ${initialIcons[i]}"></i>`;
     });
 
     const stepIds = ['step2', 'step3', 'step4', 'step5'];
@@ -601,12 +596,8 @@ function advanceStep(activeId) {
     const el = document.getElementById(activeId);
     if (!el) return;
     const prev = el.previousElementSibling;
-    if (prev) {
-        prev.className = 'qs-step qs-step--done';
-        prev.querySelector('.qs-step__icon').innerHTML = '<i class="fas fa-check"></i>';
-    }
+    if (prev) prev.className = 'qs-step qs-step--done';
     el.className = 'qs-step qs-step--active';
-    el.querySelector('.qs-step__icon').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 }
 
 function finishSteps(callback) {
@@ -616,7 +607,6 @@ function finishSteps(callback) {
         const el = document.getElementById(id);
         if (!el) return;
         el.className = 'qs-step qs-step--done';
-        el.querySelector('.qs-step__icon').innerHTML = '<i class="fas fa-check"></i>';
     });
     setTimeout(callback, 600);
 }
