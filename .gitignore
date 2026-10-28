@@ -43,3 +43,6 @@ _imgtest/
 
 # 影片素材（Cloudflare Pages 單檔上限 25MB，影片改用 Cloudinary 托管）
 assets/videos/
+
+# Claude Code 本機設定（含個人權限清單），不進 repo 也不上正式站
+.claude/settings.local.json
