@@ -71,13 +71,18 @@ body.list-open #btnList{border-color:var(--c-cyan);background:rgba(var(--c-cyan-
   padding:.38rem .8rem;border-radius:999px;border:1px solid var(--line);
   background:rgba(8,16,48,.6);backdrop-filter:blur(12px);color:var(--ink);
   font-family:var(--f-sans);font-size:13px;font-weight:700;
-  box-shadow:0 8px 24px rgba(0,0,0,.4);
-  transition:transform .12s,border-color .18s,background .18s,box-shadow .18s}
+  box-shadow:0 8px 24px rgba(0,0,0,.4);cursor:pointer;
+  /* 位置與 hover 放大都由 JS 每幀寫進 inline transform，所以 transition 不可含 transform（會拖尾）。
+     也不要改用 CSS scale 屬性：它套在 transform 外面，會連位置座標一起放大，名牌就滑離星球 */
+  transition:border-color .18s,background .18s,box-shadow .18s}
 .plabel i{font-style:normal;font-family:var(--f-mono);font-size:11px;color:rgba(var(--c-cyan-rgb),.85);font-weight:500}
-.plabel:hover{border-color:var(--line-cyan);transform:translate(-50%,-100%) scale(1.06)!important;
+/* hover 的對象是「星球」：JS 依滑鼠指到的星球（或它的名牌）加 .hov，名牌本身不再有 :hover 樣式 */
+.plabel.hov{border-color:var(--line-cyan);z-index:2;
   box-shadow:0 0 28px rgba(var(--c-cyan-rgb),.25)}
 .plabel.hot{border-color:rgba(var(--c-yellow-rgb),.6);
   box-shadow:0 0 0 1px rgba(var(--c-yellow-rgb),.3),0 8px 28px rgba(var(--c-yellow-rgb),.25)}
+.plabel.hot.hov{border-color:var(--c-yellow);
+  box-shadow:0 0 0 1px rgba(var(--c-yellow-rgb),.6),0 8px 36px rgba(var(--c-yellow-rgb),.5)}
 .plabel.hot i{color:var(--c-yellow)}
 .plabel.on{border-color:var(--c-cyan);background:rgba(var(--c-cyan-rgb),.16);box-shadow:0 0 28px rgba(var(--c-cyan-rgb),.3)}
 .plabel.on i{color:var(--c-cyan)}

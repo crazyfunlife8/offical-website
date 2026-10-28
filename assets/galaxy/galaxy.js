@@ -297,6 +297,7 @@ couriers.forEach(newTrip);
 const labels = ALL.map((d, i) => {
   const el = document.createElement('button'); el.className = 'plabel' + (d.id === 'park' ? ' hot' : '');
   el.innerHTML = `<i>${String(i).padStart(2, '0')}</i>${d.name}`; el.addEventListener('click', () => focusPlanet(i));
+  el.addEventListener('mouseenter', () => setHover(i)); el.addEventListener('mouseleave', () => setHover(-1));
   $('labels').appendChild(el); return el;
 });
 
@@ -314,6 +315,9 @@ const labels = ALL.map((d, i) => {
 // ---------- 點星球：鏡頭飛過去＋面板 ----------
 let focus = -1, fly = null;
 const tmp = new THREE.Vector3();
+// hover 狀態屬於「星球」：滑到星球本體或它的名牌都算；名牌亮起、星球光暈變亮都看這個值
+let hov = -1;
+function setHover(i) { if (i === hov) return; hov = i; labels.forEach((l, k) => l.classList.toggle('hov', k === i)); }
 function focusPlanet(i) {
   focus = i; const p = planets[i], d = ALL[i];
   controls.autoRotate = false;
@@ -370,8 +374,12 @@ renderer.domElement.addEventListener('pointerup', (e) => {
 });
 renderer.domElement.addEventListener('pointermove', (e) => {
   if (isTouch) return; mouse.set(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1); ray.setFromCamera(mouse, camera);
-  renderer.domElement.style.cursor = ray.intersectObjects(pickables, false).length ? 'pointer' : 'grab';
+  const hit = ray.intersectObjects(pickables, false)[0];
+  renderer.domElement.style.cursor = hit ? 'pointer' : 'grab';
+  const u = hit && hit.object.userData;
+  setHover(e.buttons || !u ? -1 : planets.indexOf(u.planet || (u.moon && u.moon.planet))); // 拖曳轉星系時不亮
 });
+renderer.domElement.addEventListener('pointerleave', () => setHover(-1));
 addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; if (document.body.classList.contains('list-open')) setList(false); else goHome(); });
 
 // ---------- 導覽卡（第一次來才出現） ----------
@@ -405,7 +413,10 @@ function loop() {
     p.userData.top.rotation.y += dt * (d.spin ?? 0.06); // 星球慢慢自轉（地表＋小場景一起轉）
     p.children[0].rotation.y = p.userData.top.rotation.y; if (p.children[1] && d.ground) p.children[1].rotation.y = p.userData.top.rotation.y;
     p.position.y = d.pos[1] + Math.sin(t * 0.5 + i) * 0.35; // 微微上下漂
-    p.userData.halo.material.opacity = (focus === i ? 0.6 : 0.3) + Math.sin(t * 1.5 + i) * 0.05;
+    const hl = p.userData.halo, hk = (p.userData.hk = (p.userData.hk || 0) + ((hov === i ? 1 : 0) - (p.userData.hk || 0)) * Math.min(1, dt * 10)); // hover 平滑 0→1
+    hl.userData.base = hl.userData.base || hl.scale.x;
+    hl.material.opacity = (focus === i ? 0.6 : 0.3) + hk * 0.25 + Math.sin(t * 1.5 + i) * 0.05;
+    hl.scale.setScalar(hl.userData.base * (1 + hk * 0.18));
     for (const m of p.userData.moons) { const u = m.userData; u.a += dt * u.sp; m.position.set(Math.cos(u.a) * u.d, Math.sin(u.a * 1.3) * u.tilt * u.d * 0.3, Math.sin(u.a) * u.d); u.body.rotation.y += dt * 0.8; }
     const U = p.userData;
     if (U.mascotAnim) U.mascotAnim.tick(dt);
@@ -438,7 +449,8 @@ function loop() {
     v3.copy(p.position); v3.y += ALL[i].r + 1.2; v3.project(camera);
     const el = labels[i], vis = v3.z < 1 && Math.abs(v3.x) < 1.1 && Math.abs(v3.y) < 1.1;
     el.style.display = vis ? '' : 'none'; if (!vis) return;
-    el.style.transform = `translate(-50%,-100%) translate(${(v3.x * 0.5 + 0.5) * W}px,${(-v3.y * 0.5 + 0.5) * H}px)`;
+    // scale 放最後＝先以名牌自己為中心放大、再移到位置（位置不會被一起放大）；hk 是 hover 平滑值 0→1
+    el.style.transform = `translate(-50%,-100%) translate(${(v3.x * 0.5 + 0.5) * W}px,${(-v3.y * 0.5 + 0.5) * H}px) scale(${1 + 0.06 * (p.userData.hk || 0)})`;
     el.style.opacity = focus >= 0 && focus !== i ? 0.35 : 1;
   });
   renderer.render(scene, camera);
